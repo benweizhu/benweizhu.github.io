@@ -1,0 +1,481 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>一起学学Spring Batch（一） - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="批处理应用（Batch Application）主要是在没有人工干预的情况下处理大量数据。比如，不同系统之间数据文件的导入和导出，数据的计算，定期生成财务报告等等。 Spring Batch是一个轻量级的，复杂的Batch框架，能够让你开发针对企业级系统日常操作的Batch应用。 Spring &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2014/03/08/spring-batch-job-by-example">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">一起学学Spring Batch（一）</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-08T17:52:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>5:52 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>批处理应用（Batch Application）主要是在没有人工干预的情况下处理大量数据。比如，不同系统之间数据文件的导入和导出，数据的计算，定期生成财务报告等等。</p>
+
+<p>Spring Batch是一个轻量级的，复杂的Batch框架，能够让你开发针对企业级系统日常操作的Batch应用。</p>
+
+<p><strong>Spring Batch提供的有用特性：</strong></p>
+
+<ol>
+<li>Spring框架中的基础，依赖注入，切面编程，企业级别的支持</li>
+<li>面向批处理的运行时，有效的驱动批处理应用的流程</li>
+<li>有效处理数据，以最佳策略读写数据</li>
+<li>可用的现成组件，提供能够定位到不同批处理场景的组件</li>
+</ol>
+
+
+<p>Spring框架以轻量级容器闻名，提供配置方式来完成应用程序组件的组装。</p>
+
+<p>Spring Batch对Spring框架进行了扩展，提供了专用的xml的命名空间来配置批处理的过程。</p>
+
+<p><strong>有效处理数据</strong></p>
+
+<p>以一种经典场景为例：从一个数据系统读取数据存储到另一个数据系统中。如果一次将整个数据系统中的数据读入到内存，JVM随时可能Out of Memory。当然将所有数据读入到内存肯定不是最好的办法。</p>
+
+<p>Spring Batch使用一种更加有效的办法，叫做Chunk Processing（块处理方式）：以数据流的方式读取输入的源数据，并处理一定数量（这一块）的记录，并写入到对应的组件。</p>
+
+<p>这个块的大小可以改变，所以仍然可以让批处理一条一条的处理数据。</p>
+
+<p><strong>Ready-to-use Component</strong></p>
+
+<p>Spring Batch提供了基础设施来执行块处理，并代理I/O到专用的组件，并命名为reader和writer。</p>
+
+<p>Spring为一些通用的批处理场景提供可用的组件，这些组件可以让你更加专注于业务逻辑。</p>
+
+<p>Spring Batch对reader和writer场景的支持技术。</p>
+
+<table>
+<thead>
+<tr>
+<th>数据类型     </th>
+<th> 技术格式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Database </td>
+<td> JDBC</td>
+</tr>
+<tr>
+<td>Database </td>
+<td> Hibernate</td>
+</tr>
+<tr>
+<td>Database </td>
+<td> JPA</td>
+</tr>
+<tr>
+<td>Database </td>
+<td> iBatis</td>
+</tr>
+<tr>
+<td>File </td>
+<td> Flatfile</td>
+</tr>
+<tr>
+<td>File </td>
+<td> XML</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>当然Spring Batch支持的不止这些技术。当然如果没有你需要的实现，你也可以自己是实现对应的组件。</p>
+
+<p><strong>Spring Batch不是Scheduler</strong></p>
+
+<p>Spring Batch可以驱动批处理流程但是不会提供启动它们的支持，特别是基于时间的启动。Spring Batch一般会讲这些工作代理给其他Scheduler工具，例如Quartz或者Cron。</p>
+
+<p><strong>下面是一个Spring Batch Job的Hello World Example</strong></p>
+
+<figure class='code'><figcaption><span>build.gradle </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'> <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'> <span class="n">compile</span> <span class="s1">&#39;org.springframework.batch:spring-batch-core:2.2.5.RELEASE&#39;</span>
+</span><span class='line'> <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-context:3.2.8.RELEASE&#39;</span>
+</span><span class='line'> <span class="n">testCompile</span> <span class="nl">group:</span> <span class="s1">&#39;junit&#39;</span><span class="o">,</span> <span class="nl">name:</span> <span class="s1">&#39;junit&#39;</span><span class="o">,</span> <span class="nl">version:</span> <span class="s1">&#39;4.+&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在这里定义一个具体的task。</p>
+
+<figure class='code'><figcaption><span>tasklet.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">tasklet</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.StepContribution</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.scope.context.ChunkContext</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.step.tasklet.Tasklet</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.repeat.RepeatStatus</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">repeat</span><span class="o">.</span><span class="na">RepeatStatus</span><span class="o">.</span><span class="na">FINISHED</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloTasklet</span> <span class="kd">implements</span> <span class="n">Tasklet</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">RepeatStatus</span> <span class="nf">execute</span><span class="o">(</span><span class="n">StepContribution</span> <span class="n">contribution</span><span class="o">,</span> <span class="n">ChunkContext</span> <span class="n">chunkContext</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hello Spring Batch!&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">FINISHED</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>beans.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:batch=</span><span class="s">&quot;http://www.springframework.org/schema/batch&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;transactionManager&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.support.transaction.ResourcelessTransactionManager&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jobRepository&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;transactionManager&quot;</span> <span class="na">ref=</span><span class="s">&quot;transactionManager&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>   <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jobLauncher&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.core.launch.support.SimpleJobLauncher&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;jobRepository&quot;</span> <span class="na">ref=</span><span class="s">&quot;jobRepository&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>   <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在xml中配置一个具体batch job，这里只有一步，那就是执行上面定义的task。</p>
+
+<figure class='code'><figcaption><span>batch-job.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:batch=</span><span class="s">&quot;http://www.springframework.org/schema/batch&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;import</span> <span class="na">resource=</span><span class="s">&quot;spring-batch-beans.xml&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;helloTasklet&quot;</span> <span class="na">class=</span><span class="s">&quot;me.zeph.spring.batch.tasklet.HelloTasklet&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;batch:job</span> <span class="na">id=</span><span class="s">&quot;helloJob&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;batch:step</span> <span class="na">id=</span><span class="s">&quot;helloStep&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;batch:tasklet</span> <span class="na">ref=</span><span class="s">&quot;helloTasklet&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/batch:step&gt;</span>
+</span><span class='line'>   <span class="nt">&lt;/batch:job&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在main函数中，通过JobLauncher来运行一个Job。</p>
+
+<figure class='code'><figcaption><span>main.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">tasklet</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.Job</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.JobExecution</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.JobParameters</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.launch.JobLauncher</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.ApplicationContext</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.support.ClassPathXmlApplicationContext</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">TaskletRunner</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">String</span><span class="o">[]</span> <span class="n">configLocations</span> <span class="o">=</span> <span class="o">{</span><span class="s">&quot;spring-batch-beans.xml&quot;</span><span class="o">,</span> <span class="s">&quot;spring-batch-jobs.xml&quot;</span><span class="o">};</span>
+</span><span class='line'>      <span class="n">ApplicationContext</span> <span class="n">applicationContext</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ClassPathXmlApplicationContext</span><span class="o">(</span><span class="n">configLocations</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">JobLauncher</span> <span class="n">jobLauncher</span> <span class="o">=</span> <span class="n">applicationContext</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">JobLauncher</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">Job</span> <span class="n">job</span> <span class="o">=</span> <span class="n">applicationContext</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">Job</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">JobExecution</span> <span class="n">jobExecution</span> <span class="o">=</span> <span class="n">jobLauncher</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">job</span><span class="o">,</span> <span class="k">new</span> <span class="nf">JobParameters</span><span class="o">());</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;JOB EXECUTION STATUS:&quot;</span> <span class="o">+</span> <span class="n">jobExecution</span><span class="o">.</span><span class="na">getExitStatus</span><span class="o">().</span><span class="na">getExitCode</span><span class="o">());</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2014-03-08T17:52:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>5:52 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2014/03/08/spring-batch-job-by-example/" data-via="" data-counturl="http://benweizhu.github.io/blog/2014/03/08/spring-batch-job-by-example/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/02/23/spring-aop-by-example/" title="Previous Post: Spring AOP by Example">&laquo; Spring AOP by Example</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/03/13/spring-batch-job-by-example-2/" title="Next Post: 一起学学Spring Batch（二）">一起学学Spring Batch（二） &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/12/19/yes-angularjs-1/">开始！AngularJS!（一）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">Gradle Jetty和Gradle Watch插件实现热部署</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/24/the-web-dot-xml-you-need-to-know/">Spring，Gradle，Web.xml和Intellij</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/19/spring-validation-by-example/">Spring Validation 深入浅出</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/13/learning-jdbc-transaction/">再次了解JDBC（下）- 事务</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>再次了解JDBC（下）- 事务 - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="事务就是将一条或者多条语句作为一个单元一起执行，要么全部执行，要么全都不执行。 如果你读过数据库的书，肯定知道数据库事务有四个基本特性：原子性，一致性，隔离性，持久性。 在JDBC中，事务的操作建立在Connection对象上，Connection对象提供了与事务相关的操作函数，例如： &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2014/07/13/learning-jdbc-transaction">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">再次了解JDBC（下）- 事务</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-07-13T13:37:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:37 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>事务就是将一条或者多条语句作为一个单元一起执行，要么全部执行，要么全都不执行。</p>
+
+<p>如果你读过数据库的书，肯定知道数据库事务有四个基本特性：原子性，一致性，隔离性，持久性。</p>
+
+<p>在JDBC中，事务的操作建立在Connection对象上，Connection对象提供了与事务相关的操作函数，例如：setAutoCommit()，commit()，rollback()等。</p>
+
+<h2><strong>autocommit</strong></h2>
+
+<p>JDBC Connection默认的情况是AutoCommit模式，即每一条SQL语句在执行完之后都会提交到数据库中。对于简单的应用是可以的，但是关闭自动提交模式，由自己管理实务是有必要的，提高执行效率，保证业务处理过程完整性，使用分布式事务。</p>
+
+<p>事务可以让你控制对数据库的改变，它将一条或多条SQL语句作为一个逻辑单元，如果任何一条语句失败，则整个事务失败。</p>
+
+<p>关闭自动提交模式的方法很简单，调用setAutoCommit()方法：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">setAutoCommit</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2><strong>commit &amp; rollback</strong></h2>
+
+<p>一旦你完成了对数据库的改变操作，你需要执行commit()方法来提交改变，当执行过程中出现异常，你需要执行rollback()方法来回滚该事物。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>调用rollback方法会终结一个事务，并返回到数据被修改之前的值。如果你尝试在一个事务中去执行一条或多条语句，结果得到一个SQLException，调用rollback去结束一个事务，然后重新开始事务。这是唯一知道什么被提交，什么没有被提交的办法。因为捕获到SQLException会告诉你什么样的错误发生了，但是不会告诉你什么已经提交，什么没有。回滚是唯一的可靠办法。</p>
+
+<h2><strong>完整性</strong></h2>
+
+<p>除了将语句分组以一个单元统一执行，事务还帮助保证一张表中数据的完整性。事务会提供某种程度的保护，以防止两个用户同时访问数据时，造成的冲突。</p>
+
+<p>DBMS会使用锁机制，来防止其他用户对已经被事务访问的数据进行访问。一旦加锁，它会强制保证不变直到事务被提交。锁机制的目的是防止用户读到脏数据，也就是读到一些还没有被永久保存的数据（访问一个被更新但是还没有被提交的值，被认为是访问到脏数据，因为这个值很有可能会被回滚到以前的结果，那么你读到的值就是无效的）。</p>
+
+<p>锁是如何被设置的是由一个叫做事务隔离级别决定的。举例来说，如果事务隔离级别被设置为TRANSACTION_READ_COMMITTED，那么它就不会允许数据被访问，直到事务提交。换句话说，DBMS不允许读取脏数据的事件发生。</p>
+
+<p>TRANSACTION_NONE JDBC 驱动不支持事务<br/>
+TRANSACTION_READ_UNCOMMITTED 允许脏读，不可重复读和幻读。<br/>
+TRANSACTION_READ_COMMITTED 禁止脏读，但允许不可重复读和幻读。<br/>
+TRANSACTION_REPEATABLE_READ 禁止脏读和不可重复读，单运行幻读。<br/>
+TRANSACTION_SERIALIZABLE 禁止脏读，不可重复读和幻读。</p>
+
+<p>不可重复读的场景发生在事务A读取一行数据，事务B后续的改变了这一行，当事务A再次去读时，两次读取的事务就不一致了。</p>
+
+<p>幻读的场景是事务A读取到满足一定条件的一部分数据，事务B后续插入或者更新了一行数据，但是同样满足该条件，此时A再去读取发现多了一行数据。</p>
+
+<p>通常，你不需要对事务隔离级别做任何操作，只要使用默认的即可，但默认值取决于DBMS。例如，对于Java数据库，默认值是TRANSACTION_READ_COMMITTED。JDBC允许你获取和改变该级别，方法是getTransactionIsolation()和setTransactionIsolation()。</p>
+
+<p>参考资料：</p>
+
+<p><a href="http://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html">http://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html</a></p>
+
+<p><a href="http://www.tutorialspoint.com/jdbc/jdbc-transactions.htm">http://www.tutorialspoint.com/jdbc/jdbc-transactions.htm</a></p>
+
+<p><a href="http://blog.csdn.net/chenyongsuda/article/details/5641412">http://blog.csdn.net/chenyongsuda/article/details/5641412</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2014-07-13T13:37:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:37 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2014/07/13/learning-jdbc-transaction/" data-via="" data-counturl="http://benweizhu.github.io/blog/2014/07/13/learning-jdbc-transaction/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/07/07/learning-jdbc-with-jndi/" title="Previous Post: 再次了解JDBC（中）- 引入JNDI">&laquo; 再次了解JDBC（中）- 引入JNDI</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/07/19/spring-validation-by-example/" title="Next Post: Spring Validation 深入浅出">Spring Validation 深入浅出 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/12/19/yes-angularjs-1/">开始！AngularJS!（一）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">Gradle Jetty和Gradle Watch插件实现热部署</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/24/the-web-dot-xml-you-need-to-know/">Spring，Gradle，Web.xml和Intellij</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/19/spring-validation-by-example/">Spring Validation 深入浅出</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/13/learning-jdbc-transaction/">再次了解JDBC（下）- 事务</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

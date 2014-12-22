@@ -1,0 +1,417 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>丢掉IDE，回到Java的第一堂课 - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="最近，《实现领域驱动设计》的译者，ThoughtWorks的“滕老板”（腾云）给我们上了一堂基础课，就是没有IDE的情况下，去编译和运行用文本编辑器编写的Java代码。 这本应该是基础中的基础，我记得应该是Java第一堂课就应该讲到的东西。但是我们这群用惯了IDE的程序员，在没有了IDE之后， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2014/04/07/write-java-code-without-ide">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">丢掉IDE，回到Java的第一堂课</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-04-07T13:56:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:56 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>最近，《实现领域驱动设计》的译者，ThoughtWorks的<a href="http://www.davenkin.me/">“滕老板”</a>（腾云）给我们上了一堂基础课，就是没有IDE的情况下，去编译和运行用文本编辑器编写的Java代码。</p>
+
+<p>这本应该是基础中的基础，我记得应该是Java第一堂课就应该讲到的东西。但是我们这群用惯了IDE的程序员，在没有了IDE之后，就开始不知所措了。虽然不知道这些知识，对于普通开发似乎是没有影响，但毕竟是Java的重要基础知识，了解这些知识可以帮助你理解IDE帮你做了什么，可以更快速的定位问题。</p>
+
+<p>还是举例子，滕老板的例子：</p>
+
+<p>目录结构</p>
+
+<p>src</p>
+
+<p>&ndash;client</p>
+
+<p>&mdash;-Client.java</p>
+
+<p>&ndash;service</p>
+
+<p>&mdash;-Service.java</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">service</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Service</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">run</span><span class="o">(){</span>
+</span><span class='line'>      <span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">String</span><span class="o">(</span><span class="s">&quot;as your service&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">str</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">client</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">service.*</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Client</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[]){</span>
+</span><span class='line'>      <span class="n">Service</span> <span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Service</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">service</span><span class="o">.</span><span class="na">run</span><span class="o">());</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ok，代码写完了，你知道该怎么运行吗？</p>
+
+<p>命令行：进入到src目录下</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='powershell'><span class='line'><span class="n">javac</span> <span class="n">client</span><span class="p">/</span><span class="n">Client</span><span class="p">.</span><span class="n">java</span>
+</span><span class='line'><span class="n">java</span> <span class="n">client</span><span class="p">.</span><span class="n">Client</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样就会输出正确结果：as your service。</p>
+
+<p>再来看一下目录结构</p>
+
+<p>src</p>
+
+<p>&ndash;client</p>
+
+<p>&mdash;-Client.java</p>
+
+<p>&mdash;-Client.class</p>
+
+<p>&ndash;service</p>
+
+<p>&mdash;-Service.java</p>
+
+<p>&mdash;-Service.class</p>
+
+<p>我们知道javac命令编译的是.java文件，而java命令运行是.class文件。</p>
+
+<p>但是这里还是有几个疑问：</p>
+
+<p>1.javac client/Client.java时，它怎么知道去哪里找Service类？</p>
+
+<p>2.对于上一个疑问，你的答案可能是import service.*;告诉它去service包下找，那么第二疑问，为什么是import service.*;而不是import src.service.*?</p>
+
+<p>3.第三个疑问和第一个疑问类似，答案也类似，java client.Client，怎么知道去哪里找service.class文件？</p>
+
+<p>面对这三个问题，答案是，要引入两个概念。</p>
+
+<p>sourcepath和classpath。</p>
+
+<p>classpath大家听得比较多，用来告诉JVM或者Java编译器到哪里去寻找用户定义的类和包。</p>
+
+<p>sourcepath和classpath一样，只不过它是用来告诉编译器到哪里去寻找源文件。</p>
+
+<p>在上面的javac和java命令中，既没有显示的指定sourcepath，也没有显示的指定classpath。但是它们都有默认值，就是将当前目录作为各自的路径。</p>
+
+<p>比如：我现在从当前路径src，进入到它的一个子目录中src/sub。</p>
+
+<p>然后我运行：javac ../client/Client.java命令</p>
+
+<p>它提示我找不到Service类。 那是因为当前的sourcepath是src/sub，在这个路径下没有Service.java。我们改一下，显示的设置它sourcepath。</p>
+
+<p>运行命令：javac -sourcepath ../ ../client/Client.java</p>
+
+<p>编译成功。</p>
+
+<p>那么运行呢？</p>
+
+<p>直接在src/sub路径下，运行：java client.Client。能行吗？肯定不行。</p>
+
+<p>Error: Could not find or load main class client.Client</p>
+
+<p>必须要显示的指定它的classpath为上一级目录：</p>
+
+<p>java -classpath ../ client.Client</p>
+
+<p>ok，成功。</p>
+
+<p>现在再来让我们回到刚才的第二个问题。为什么import的不是src.service.* ，因为我们设置它的sourcepath，它就成为一个相对路径。</p>
+
+<p>这不禁让我想到一个问题。package和import到底有什么用？为什么package名字和目录结构一致？</p>
+
+<p>这不是白痴问题吗？</p>
+
+<p>package是作为命名空间，因为不同开发商，开发出来的类库可能会有相同的类名。为了区分，防止冲突，用不同的包名区分。</p>
+
+<p>import是根据你要使用的类，从classpath下找到你要使用的类，并引入到你的类中。</p>
+
+<p>我做了一个实验：</p>
+
+<p>将Service类的package定义，改为service.something，这样包名和目录结构就不一致了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">service</span><span class="o">.</span><span class="na">something</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Service</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">run</span><span class="o">(){</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;as your service&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后还是照常编译。</p>
+
+<pre><code>client/Client.java:7: error: cannot access Service
+    Service service = new Service();
+    ^
+    bad source file: ./service/Service.java
+    file does not contain class service.Service
+Please remove or make sure it appears in the correct subdirectory of the sourcepath.
+1 error
+</code></pre>
+
+<p>第四行，bad source file: ./service/Service.java表明他在编译Client.java文件时，通过import找到了该文件，说明import是通过文件结构去找到的。</p>
+
+<p>但是他又说file does not contain class service.Service，说明在这个Service.java中找不到对应的Service类。</p>
+
+<p>为什么呢？因为我的包名是service.something，但是他要找的是service。</p>
+
+<p>所以包的作用是和类的名字组成完整的类名，这里的Service类的全名应该是service.something.Service。但是他去找到的是service.Service。所以它找不到。</p>
+
+<p>那是不是将import改为import service.something.*;就可以呢？</p>
+
+<p>不行，前面说了，import是根据目录结构去找到的，根本就没有service/something这个目录结构，所以不可能找到。</p>
+
+<pre><code>client/Client.java:3: error: package service.something does not exist
+import service.something.*;
+^
+client/Client.java:7: error: cannot find symbol
+    Service service = new Service();
+    ^
+    symbol:   class Service
+    location: class Client
+    client/Client.java:7: error: cannot find symbol
+    Service service = new Service();
+                          ^
+    symbol:   class Service
+    location: class Client
+</code></pre>
+
+<p>你看，第一行：client/Client.java:3: error: package service.something does not exist</p>
+
+<p>回过头来想，这也是为什么，有时候，当同时导入两个不同包中名字相同的类时，其中有一个要用完全限定名。因为类的名字本来就是由包的名字和类的自身名字组成。</p>
+
+<p>总而言之，这堂课的收获还是挺大的，重点要掌握上面提到的两个概念。</p>
+
+<p>课上本来还有一点关于，打jar包和如何引用jar包的内容，以及通过java -d命令，将class文件编译到指定的目录下。</p>
+
+<p>这里我就不多说了，万变不离其宗。</p>
+
+<p>javac -classpath &ldquo;.:service.jar&rdquo; client/Client.java //linux下面是冒号，windows下面是分号</p>
+
+<p>java -classpath &ldquo;.:service.jar&rdquo; client.Client</p>
+
+<p>只不过要注意一点的是，打jar包时，一定要按照package定义的目录结构去打。因为在将jar包加入到classpath时和将一个目录下的class文件加入是一样的，相对路径。</p>
+
+<p>java -d out client/Client.java，会将class文件编译到out目录下，且内部目录结构与包的结构一致。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2014-04-07T13:56:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:56 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2014/04/07/write-java-code-without-ide/" data-via="" data-counturl="http://benweizhu.github.io/blog/2014/04/07/write-java-code-without-ide/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/04/06/spring-restful-web-service-by-example/" title="Previous Post: Spring Restful Web Service By Example">&laquo; Spring Restful Web Service By Example</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/05/03/what-is-war-and-ear/" title="Next Post: 了解war包和ear包">了解war包和ear包 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/12/19/yes-angularjs-1/">开始！AngularJS!（一）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">Gradle Jetty和Gradle Watch插件实现热部署</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/24/the-web-dot-xml-you-need-to-know/">Spring，Gradle，Web.xml和Intellij</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/19/spring-validation-by-example/">Spring Validation 深入浅出</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/13/learning-jdbc-transaction/">再次了解JDBC（下）- 事务</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

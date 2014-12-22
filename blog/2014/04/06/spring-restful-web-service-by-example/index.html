@@ -1,0 +1,580 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Spring Restful Web Service by Example - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="REST是Roy Fielding在他的2000年博士论文《Architectural Styles and the Design of Network-based Software Architectures》中提出的概念，全称是Representational State Transfer。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2014/04/06/spring-restful-web-service-by-example">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Spring Restful Web Service by Example</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-04-06T12:06:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:06 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>REST是<a href="http://en.wikipedia.org/wiki/Roy_Fielding">Roy Fielding</a>在他的2000年博士论文《Architectural Styles and the Design of Network-based Software Architectures》中提出的概念，全称是Representational State Transfer。</p>
+
+<p>Roy Fielding是互联网一个极为重要的人物，他是HTTP协议（1.0版和1.1版）的主要设计者，Apache服务器软件的作者之一，Apache基金会的第一任主席。</p>
+
+<p>他在他的论文中提到一点：“网络研究主要关注系统之间通信行为的细节、如何改进特定通信机制的表现，常常忽视了一个事实，那就是<strong>改变应用程序的互动风格比改变互动协议，对整体表现有更大的影响</strong>。”。</p>
+
+<p>REST是个名字，加上ful之后，变成了形容词“具有REST风格的”。</p>
+
+<p>在看过一些资料之后，我觉的REST越来越火的主要原因之一，就是想在的互联网应用已经不仅仅是内容的资源，还包括计算资源。而资源的消费者也不仅仅是浏览器（人在消费），还有其他应用（应用程序在消费），所以资源的表现形式在变化。</p>
+
+<h2><strong>Web Service</strong></h2>
+
+<p>Web Service是一种服务导向架构的技术，通过标准的Web协议提供服务，目的是保证不同平台的应用服务可以互操作。而它的技术通常是根据SOAP协议进行传递XML格式消息。而基于Java的主流WEB服务开发框架往往需要通过WSDL生成客户端的源代码。</p>
+
+<p>PS：这里没有任何想要对比基于SOAP和基于REST的Web Service的区别或者优缺点的意思。</p>
+
+<h2><strong>Restful Web Service</strong></h2>
+
+<p>Restful Web Service又称为Restful Web API。Rest本身其实不是一种技术，而是一种风格，它基于HTTP协议，具有统一的URL资源，通过HTTP协议提供的方法来表示对数据的操作，资源的表现形式多样化，具体表现形式由资源的消费者决定等等。</p>
+
+<p>说了这么多，还是回到标题，如何实现？</p>
+
+<p>如果你的项目采用Spring开发，那么Spring提供了一套基于Spring MVC的Restful方案，可以非常方便的通过Controller提供想要的Web Service，又可以通过RestTemplate实现客户端对Web Service操作。</p>
+
+<p>PS：本例子是针对Spring 3.2以后，3.1版本有所不同。</p>
+
+<p>首先来实现一个基于Controller的Restful Web Service：</p>
+
+<p>首先是Domain，这个很简单一个Car类，包含名字和价格。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">restful</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">model</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Car</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">price</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPrice</span><span class="o">(</span><span class="kt">int</span> <span class="n">price</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">price</span> <span class="o">=</span> <span class="n">price</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getPrice</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">price</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后是Controller，按照普通写RequestMapping一样方式，但这里返回的是Domain对象。
+这里有两个位置不同，一个是注解@ResponseBody用来说明返回的结果是HttpResponse的body部分。
+另一个参数produces用来说明，这里只接受Http请求中head里说明了Accept类型是Application/Json。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">restful</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.restful.demo.model.Car</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.ResponseBody</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON_VALUE</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Controller</span>
+</span><span class='line'><span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;car&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CarController</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VIEW_NAME</span> <span class="o">=</span> <span class="s">&quot;car&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getCarByView</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">VIEW_NAME</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">produces</span> <span class="o">=</span> <span class="o">{</span><span class="n">APPLICATION_JSON_VALUE</span><span class="o">})</span>
+</span><span class='line'>  <span class="nd">@ResponseBody</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">Car</span> <span class="nf">getCarByJSON</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nf">getCar</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Car</span> <span class="nf">getCar</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Car</span> <span class="n">car</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Car</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">car</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="s">&quot;BenZ&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">car</span><span class="o">.</span><span class="na">setPrice</span><span class="o">(</span><span class="mi">300000</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">car</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样基本就算完成了，可能有人会问，为什么上面的getCarByView方法没有写produces。其实，我也看到许多网上例子，将返回HTML格式View的方法添加了produces。比如，添加Text/Http等。</p>
+
+<p>为什么这里不加，原因是，我们知道，该方法是提供给浏览器请求，用于返回基于HTML的页面。而对于不同的浏览器而言，发出的HTTP请求的head的是不一样，以Chrome和IE为例。</p>
+
+<p>Chrome发出的head是：“text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8”</p>
+
+<p>IE发出的head是：“*/*”</p>
+
+<p>所以如果添加了produces，那么有可能返回结果不是HTML。我就遇到过，添加了Text/Http之后，在IE中返回给我的是JSON数据，而不是HTML页面。</p>
+
+<p>如果不写，那么就是默认的选择，在不满足其他RequestMapping，会去走默认那条Mapping路线。你可以在RestClient中验证，URL是localhost:8080/spring-restful-demo/car，但是head不同，那么它返回给你的view格式就不同了。</p>
+
+<p>其实，走到这一步，已经就完成了。</p>
+
+<h2><strong>但是如果你在页面上和RestClient上做一个实验，就会发现它远远不止如此！！！</strong></h2>
+
+<p>在浏览器上输入localhost:8080/spring-restful-demo/car.html，会返回给你html页面。</p>
+
+<p>在浏览器上输入localhost:8080/spring-restful-demo/car.json，会返回给你给你json数据。</p>
+
+<p>明明通过浏览器发送请求的Head是Text/Html，为什么会返回给我Json数据。如果通过debug的方式，你会看到确实进入的是getCarByJSON方法。</p>
+
+<p>在<strong>RestClient</strong>去试一把，输入地址，localhost:8080/spring-restful-demo/car.html，设置head为accept=Application/Json，返回给我的是HTMl页面。</p>
+
+<h2><strong>默认规约</strong></h2>
+
+<p>原来Spring在选择映射的时候，有一定的规约，加入了检查条件，URL后缀，URL参数。并且其默认的检查顺序是后缀，参数，最后才是Accept。</p>
+
+<p>也就是，如果你的URL是以HTML结尾，那么无论你的head是什么，Spring都会认为是返回HTML页面，因为你显示的指明了。</p>
+
+<p>对于那些希望显示指明返回类型的应用，Spring的默认规约已经帮助它们实现。</p>
+
+<p>但是如果，我不希望呢？</p>
+
+<p>无论你的后缀还是参数是什么，我都希望Spring根据我head中的accept值来决定。</p>
+
+<h2><strong>Content Negotiation（内容协商）</strong></h2>
+
+<p>这里就要引入另外一个东西：Spring MVC Content Negotiation（内容协商）。</p>
+
+<p>它是用来帮助你定义在返回多种表现形式时，应该遵守的规约，默认我们是不需要定义的，那么它就会像上面所提到的去做。但如果你不想要默认的规则，那么你就需要在Spring的Context中定义这个Bean。</p>
+
+<p>这里用我的demo中的例子，简单说明一下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:mvc=</span><span class="s">&quot;http://www.springframework.org/schema/mvc&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/mvc</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/beans</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/context</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/context/spring-context-3.2.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;me.zeph.spring.restful.demo&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;mvc:annotation-driven</span> <span class="na">content-negotiation-manager=</span><span class="s">&quot;contentNegotiationManager&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;viewResolver&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;viewClass&quot;</span> <span class="na">value=</span><span class="s">&quot;org.springframework.web.servlet.view.JstlView&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;prefix&quot;</span> <span class="na">value=</span><span class="s">&quot;/WEB-INF/view/&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;suffix&quot;</span> <span class="na">value=</span><span class="s">&quot;.jsp&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;contentNegotiationManager&quot;</span>
+</span><span class='line'>          <span class="na">class=</span><span class="s">&quot;org.springframework.web.accept.ContentNegotiationManagerFactoryBean&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;favorPathExtension&quot;</span> <span class="na">value=</span><span class="s">&quot;false&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;favorParameter&quot;</span> <span class="na">value=</span><span class="s">&quot;false&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;defaultContentType&quot;</span> <span class="na">value=</span><span class="s">&quot;text/html&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;restfulTemplate&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.web.client.RestTemplate&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在Spring 3.2以后，实现内容协商的bean的名字叫做ContentNegotiationManager，需要通过他的工厂类ContentNegotiationManagerFactoryBean去定义规约。在这里，我修改了三个属性，favorPathExtension，favorParameter和defaultContentType，defaultContentType简单，就是默认的表现内容形式，favorPathExtension表示是否采用路径扩展作为最高优先级的判断，同理favorParameter表示是否采用参数作为第二优先级的判断。这里，我将它们两个都设置为false。即不采用它们作为判断条件。最后，在annotation-driven的标签里，添加属性contentNegotiationManager，说明使用@Controller注解的Controller都采用这种规约。</p>
+
+<p>然后，我们再来是测试，在RestClient上，设置请求Url为localhost:8080/spring-restful-demo/car.html，但是呢，将head设为Accept=Applicaiton/Json。你猜结果怎样？乖乖的返回Json数据。</p>
+
+<p>关于Content Negotiation就说到这里，关于它功能还有很多，以后有机会在补充，那么Web Service就差不多说完了。</p>
+
+<h2><strong>RestTemplate实现客户端</strong></h2>
+
+<p>在来看看怎么实现Client端的代码。如果不用Spring，可以通过Apache的HttpClient作为客户端，当然写的代码要多一点。</p>
+
+<p>如果使用Spring，可以通过Spring提供的RestTemplate，目的应该和Spring的JDBCTemplate类似，帮你封装了具体操作。</p>
+
+<p>用起来很简单，我写了另一个Controller来在页面显示调用该Web Service的结果。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">restful</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.restful.demo.common.URLs</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.restful.demo.model.Car</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ui.Model</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.client.RestTemplate</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Controller</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DisplayCarController</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VIEW_NAME</span> <span class="o">=</span> <span class="s">&quot;displayCarJson&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">RestTemplate</span> <span class="n">restTemplate</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Autowired</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">DisplayCarController</span><span class="o">(</span><span class="n">RestTemplate</span> <span class="n">restTemplate</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">restTemplate</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">VIEW_NAME</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getCar</span><span class="o">(</span><span class="n">Model</span> <span class="n">model</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">model</span><span class="o">.</span><span class="na">addAttribute</span><span class="o">(</span><span class="s">&quot;car&quot;</span><span class="o">,</span> <span class="n">getCarByJson</span><span class="o">());</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">VIEW_NAME</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Car</span> <span class="nf">getCarByJson</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">getForObject</span><span class="o">(</span><span class="n">URLs</span><span class="o">.</span><span class="na">REST_CAR_URL</span><span class="o">,</span> <span class="n">Car</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>如果你需要特定指定请求的Head。可以使用RestTemplate的exchange方法，不过使用起来要麻烦一些。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="n">Car</span> <span class="nf">getCarByJson</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">HttpHeaders</span> <span class="n">headers</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HttpHeaders</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">headers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;accept&quot;</span><span class="o">,</span> <span class="s">&quot;application/json&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">HttpEntity</span> <span class="n">httpEntity</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HttpEntity</span><span class="o">(</span><span class="s">&quot;&quot;</span><span class="o">,</span> <span class="n">headers</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">Car</span><span class="o">&gt;</span> <span class="n">exchange</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">exchange</span><span class="o">(</span><span class="n">URLs</span><span class="o">.</span><span class="na">REST_CAR_URL</span><span class="o">,</span> <span class="n">HttpMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">,</span> <span class="n">httpEntity</span><span class="o">,</span> <span class="n">Car</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">exchange</span><span class="o">.</span><span class="na">getBody</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>不过第二种方式更能说明是指定了具体head来请求哪种资源。</p>
+
+<p>这里使用Spring来发出请求，都是后端的，如果要用前端请求，固然是通过Ajax，不过那是另外一部分内容。</p>
+
+<p>总而言之，在使用Spring Web Service的这个过程当中还是遇到了不少的坑。</p>
+
+<p>首先，你需要知道有Content Negotiation这个东西，其次，不同的Spring版本，默认的规约不同。Spring 3.2和3.1就是一个分水岭，使用的时候要注意你使用的是哪个版本。</p>
+
+<p>参考资料：</p>
+
+<p><a href="https://spring.io/guides/gs/rest-service/">https://spring.io/guides/gs/rest-service/</a></p>
+
+<p><a href="https://spring.io/blog/2013/05/11/content-negotiation-using-spring-mvc">https://spring.io/blog/2013/05/11/content-negotiation-using-spring-mvc</a></p>
+
+<p><a href="http://spring.io/blog/2013/06/03/content-negotiation-using-views/">http://spring.io/blog/2013/06/03/content-negotiation-using-views/</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2014-04-06T12:06:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:06 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2014/04/06/spring-restful-web-service-by-example/" data-via="" data-counturl="http://benweizhu.github.io/blog/2014/04/06/spring-restful-web-service-by-example/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/03/29/something-you-n-need-to-know-about-javascript-2/" title="Previous Post: JavaScript中你需要了解的基本知识（二）">&laquo; JavaScript中你需要了解的基本知识（二）</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/04/07/write-java-code-without-ide/" title="Next Post: 丢掉IDE，回到Java的第一堂课">丢掉IDE，回到Java的第一堂课 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/12/19/yes-angularjs-1/">开始！AngularJS!（一）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">Gradle Jetty和Gradle Watch插件实现热部署</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/24/the-web-dot-xml-you-need-to-know/">Spring，Gradle，Web.xml和Intellij</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/19/spring-validation-by-example/">Spring Validation 深入浅出</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/13/learning-jdbc-transaction/">再次了解JDBC（下）- 事务</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

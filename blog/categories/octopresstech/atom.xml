@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Octopresstech | My Octopress Blog]]></title>
+  <link href="http://benweizhu.github.io/blog/categories/octopresstech/atom.xml" rel="self"/>
+  <link href="http://benweizhu.github.io/"/>
+  <updated>2014-12-22T18:23:03+08:00</updated>
+  <id>http://benweizhu.github.io/</id>
+  <author>
+    <name><![CDATA[Your Name]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[如何用Octopress在github上建立博客?]]></title>
+    <link href="http://benweizhu.github.io/blog/2013/09/21/how-to-use-octopress-to-set-up-blog-on-github/"/>
+    <updated>2013-09-21T15:46:00+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2013/09/21/how-to-use-octopress-to-set-up-blog-on-github</id>
+    <content type="html"><![CDATA[<p>这个问题，我也花了大概半天时间才解决。因为之前有用github做博客，所以算是已经有些经验。</p>
+
+<p>这里提供一些我查的比较有用的资料,方便需要的人查询。</p>
+
+<p><a href="http://octopress.org/docs/">octopress doc</a></p>
+
+<p>第一手资料当然是Octopress的官方网站，但是实际上不是太好用。</p>
+
+<p><a href="http://www.cnblogs.com/simonshi2012/archive/2012/03/30/2425141.html">update ruby for mac</a></p>
+
+<p>需要做一些前期准备，例如更新ruby1.9.3。这里更新ruby，由于repository在国外，所以我用了代理，据说可以改用taobao的，会方便点。</p>
+
+<p><a href="http://code.dblock.org/octopress-setting-up-a-blog-and-contributing-to-an-existing-one">Octopress: Setting up a Blog and Contributing to an Existing One</a></p>
+
+<p>由于官方资料我没有看明白。所以我参考的另外一篇文章成功将文章发布到github。</p>
+
+<p><a href="http://zerodie.github.io/blog/2012/01/19/octopress-github-pages/">Github Page + Octopress</a></p>
+
+<p>还有一篇中文文章可以结合英文的看，虽然看上面一篇英文的就可以了。</p>
+
+<p>这个博客建立好，还是花了很多时间，一个是ruby升级很花时间，二个是学习如何使用Octopress。</p>
+
+<p>今天就写这么多，Octopress还有很多好用的feature，可以在官方网站上找到。</p>
+]]></content>
+  </entry>
+  
+</feed>
