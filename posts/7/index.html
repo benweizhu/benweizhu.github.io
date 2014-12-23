@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>JavaScript中你需要了解的基本知识（一） - NO END FOR LEARNING</title>
+  <title>NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="对于初学JavaScript的人很容易去关注如何快速使用它，而忘记学好一门语言，应该首先掌握的基本知识，我就是这样。但是基础知识才是真正掌握一门语言最关键的部分，特别是JavaScript这个看上去好像和C++、Java相同，但实际上完全不是一回事的语言。 作用域 在编程语言中， &hellip;">
+  <meta name="description" content="表达式 表达式是一组可以计算出一个数值的有效的代码的集合，是一个单纯的运算过程。 函数立刻调用 当你声明类似function foo(){}或var foo = function(){}函数的时候，通过在后面加个括弧就可以实现函数的执行，例如foo()。 在一个表达式后面加上括号()， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io/blog/2014/03/22/something-you-need-to-know-about-javascript">
+  <link rel="canonical" href="http://benweizhu.github.io/posts/7">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -62,12 +62,293 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div>
-<article class="hentry" role="article">
+      <div class="blog-index">
   
+  
+  
+    <article>
+      
   <header>
     
-      <h1 class="entry-title">JavaScript中你需要了解的基本知识（一）</h1>
+      <h1 class="entry-title"><a href="/blog/2014/03/29/something-you-need-to-know-about-javascript-2/">JavaScript中你需要了解的基本知识（二）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-29T22:44:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>10:44 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2><strong>表达式</strong></h2>
+
+<p>表达式是一组可以计算出一个数值的有效的代码的集合，是一个单纯的运算过程。</p>
+
+<h2><strong>函数立刻调用</strong></h2>
+
+<p>当你声明类似function foo(){}或var foo = function(){}函数的时候，通过在后面加个括弧就可以实现函数的执行，例如foo()。</p>
+
+<p>在一个表达式后面加上括号()，该表达式会立即执行，但是在一个语句后面加上括号()，是完全不一样的意思，他的只是分组操作符。</p>
+
+<p>我们只需要用大括弧将代码的代码全部括住就行了，因为JavaScript里括弧()里面不能包含语句，所以在这一点上，解析器在解析function关键字的时候，会将相应的代码解析成function表达式，而不是function声明。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">runImmediately</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">getValue</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">}());</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">runImmediately</span><span class="p">.</span><span class="nx">getValue</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>关于函数立即执行有两种写法，(function f(){}())和(function f(){})()，我个人认为第二种更容易理解，加入括号()，语句变成表达式，然后再加一个括号()，表达式执行。但是我看到大部分例子中都倾向于前一种写法，可能更容易说明他是一个整体。</p>
+
+<h2><strong>闭包</strong></h2>
+
+<p>我在这里给出多个解释，因为有时候，我感觉从一种解释中不一定能够获得完全理解。</p>
+
+<p>在计算机科学中，闭包（Closure）是词法闭包（Lexical Closure）的简称，是引用了自由变量的<strong>函数</strong>。这个被引用的自由变量将和这个函数一同存在，<strong>即使已经离开了创造它的环境也不例外</strong>。所以，有另一种说法认为闭包是由函数和与其相关的引用环境组合而成的实体。闭包在运行时可以有多个实例，不同的引用环境和相同的函数组合可以产生不同的实例。&mdash;&mdash;-维基百科</p>
+
+<p>闭包可以用来在一个函数与一组“私有”变量之间建立关联关系。在给定函数被多次调用的过程中，这些私有变量能够保持其持久性。变量的作用域仅限于包含它们的函数，因此无法从其它程序代码部分进行访问。&mdash;&mdash;-维基百科</p>
+
+<p>闭包是能够指向独立自由变量的函数。换句话说，定义在闭包中的函数能够“记住”定义它的环境。&mdash;&mdash;-mozilla社区</p>
+
+<p>闭包是一种特殊的对象。它由两部分构成：函数，以及创建该函数的环境。环境由闭包创建时在作用域中的任何局部变量组成。&mdash;&mdash;-mozilla社区</p>
+
+<p><strong>JavaScript的作用域是让JavaScript拥有闭包特性的根本。</strong></p>
+
+<p>看下面这段代码：</p>
+
+<p>闭包是一个函数和该函数所引用的自由变量组成。在下面的代码中isBigEnough函数和它所引用的自由变量threshold组成了一个闭包。该闭包传递给了list对象的filter函数。filter函数会反复调用这个函数。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">130</span><span class="p">,</span> <span class="mi">44</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">getNumberBigThan</span><span class="p">(</span><span class="nx">list</span><span class="p">,</span><span class="nx">threshold</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">list</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span> <span class="nx">isBigEnough</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">element</span> <span class="o">&gt;=</span> <span class="nx">threshold</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">filteredList</span> <span class="o">=</span> <span class="nx">getNumberBigThan</span><span class="p">(</span><span class="nx">list</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">filteredList</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面那个例子还不够清楚，再看下面这个：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">f1</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span><span class="err">　　　　</span>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">f2</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">n</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">f2</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">f1</span><span class="p">(</span><span class="mi">999</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">());</span> <span class="c1">// 1000</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">result2</span> <span class="o">=</span> <span class="nx">f1</span><span class="p">(</span><span class="mi">499</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result2</span><span class="p">());</span> <span class="c1">// 500</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>闭包f2由f2函数和它引用的自由变量n组成。在f1运行之后，将f2返回给了result对象。此时运行result就是运行f2，得到结果是1000。说明，闭包f2保留了创建它的环境，变量n并没有在离开函数f1之后被销毁。而且根据创建的环境不同，闭包有不同的实例。
+最后看一个例子，来自：<a href="http://bonsaiden.github.io/JavaScript-Garden/zh/#function.closures">http://bonsaiden.github.io/JavaScript-Garden/zh/#function.closures</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Counter</span><span class="p">(</span><span class="nx">start</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">count</span> <span class="o">=</span> <span class="nx">start</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">increment</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">count</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">count</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="nx">Counter</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</span><span class='line'><span class="nx">foo</span><span class="p">.</span><span class="nx">increment</span><span class="p">();</span>
+</span><span class='line'><span class="nx">foo</span><span class="p">.</span><span class="nx">get</span><span class="p">();</span> <span class="c1">// 5</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里，Counter函数返回两个闭包，函数increment和函数get。这两个函数都维持着对外部作用域Counter的引用，因此总可以访问此作用域内定义的变量count。</p>
+
+<h2><strong>匿名函数立即执行</strong></h2>
+
+<p>我们知道定义函数有两种方式：直接定义和函数表达式（函数字面量）</p>
+
+<p>在定义函数字面量时，我们可以不写函数的名字，通过该在函数对象加上括号来执行该函数。</p>
+
+<p>我们可以在定义该函数字面量时，直接将函数表达式执行。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">funRun</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">c</span><span class="p">;</span>
+</span><span class='line'><span class="p">}());</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">funRun</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果不return任何东西，则funRun为undefined。</p>
+
+<p>通过匿名函数立即执行，可以实现匿名闭包。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">funRun</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'><span class="p">}());</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">funRun</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2><strong>模块化</strong></h2>
+
+<p>JavaScript最讨厌的特性就是它的全局性，随便创建一个方法或者变量，就是全局的，因为它没有像Java或者C++这种语言性上，类方式的模块划分，所以很容易冲突。</p>
+
+<p>那JavaScript为了实现模块化只有借助于实现模式：模块模式。</p>
+
+<p>利用JavaScript的作用域特性，以函数作为模块，利用闭包特性，定义不会污染全局的局部变量和方法（我这描述的有点抽象），直接看怎么写。</p>
+
+<p>通过匿名函数的立即执行返回两个闭包add和sub。这样定义出来的方法add和sub不会暴露到全局中，同时还可以访问在函数内部定义的“私有变量”。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">fact</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">(</span><span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">)</span> <span class="o">*</span> <span class="nx">fact</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">sub</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">(</span><span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">)</span> <span class="o">*</span> <span class="nx">fact</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">add</span><span class="o">:</span> <span class="nx">add</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">sub</span><span class="o">:</span> <span class="nx">sub</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">}());</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">module</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">module</span><span class="p">.</span><span class="nx">sub</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>关于模块化，还更多深入和高级的知识，例如导入全局变量（要用jQuery的时候）等。
+可以查看这边译文。<a href="http://www.oschina.net/translate/javascript-module-pattern-in-depth">http://www.oschina.net/translate/javascript-module-pattern-in-depth</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/22/something-you-need-to-know-about-javascript/">JavaScript中你需要了解的基本知识（一）</a></h1>
     
     
       <p class="meta">
@@ -83,7 +364,7 @@
   </header>
 
 
-<div class="entry-content"><p>对于初学JavaScript的人很容易去关注如何快速使用它，而忘记学好一门语言，应该首先掌握的基本知识，我就是这样。但是基础知识才是真正掌握一门语言最关键的部分，特别是JavaScript这个看上去好像和C++、Java相同，但实际上完全不是一回事的语言。</p>
+  <div class="entry-content"><p>对于初学JavaScript的人很容易去关注如何快速使用它，而忘记学好一门语言，应该首先掌握的基本知识，我就是这样。但是基础知识才是真正掌握一门语言最关键的部分，特别是JavaScript这个看上去好像和C++、Java相同，但实际上完全不是一回事的语言。</p>
 
 <h2><strong>作用域</strong></h2>
 
@@ -382,48 +663,22 @@
 </span></code></pre></td></tr></table></div></figure>
 
 </div>
-
-
-  <footer>
-    <p class="meta">
-      
+  
   
 
-<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
 
-      
-
-
-
-
-<time class='entry-date' datetime='2014-03-22T14:16:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2014</span></span> <span class='time'>2:16 pm</span></time>
-      
-
-
-    </p>
+    </article>
+  
+  <div class="pagination">
     
-      <div class="sharing">
-  
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2014/03/22/something-you-need-to-know-about-javascript/" data-via="" data-counturl="http://benweizhu.github.io/blog/2014/03/22/something-you-need-to-know-about-javascript/" >Tweet</a>
-  
-  
-  
-</div>
-
+      <a class="prev" href="/posts/8">&larr; Older</a>
     
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/blog/2014/03/13/spring-batch-job-by-example-2/" title="Previous Post: 一起学学Spring Batch（二）">&laquo; 一起学学Spring Batch（二）</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2014/03/29/something-you-need-to-know-about-javascript-2/" title="Next Post: JavaScript中你需要了解的基本知识（二）">JavaScript中你需要了解的基本知识（二） &raquo;</a>
-      
-    </p>
-  </footer>
-</article>
-
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/posts/6">Newer &rarr;</a>
+    
+  </div>
 </div>
-
 <aside class="sidebar">
   
     <section>
@@ -465,7 +720,6 @@
 
   
 </aside>
-
 
     </div>
   </div>
