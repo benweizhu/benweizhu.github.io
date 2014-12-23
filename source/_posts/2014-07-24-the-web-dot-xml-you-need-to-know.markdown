@@ -36,7 +36,12 @@ configuration目录中，配置有一些Spring的Bean，比如Service类，Dao�
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans.xsd 
+       http://www.springframework.org/schema/context 
+       http://www.springframework.org/schema/context/spring-context.xsd 
+       http://www.springframework.org/schema/mvc 
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <context:component-scan base-package="me.zeph.springmvc"/>
 
@@ -151,7 +156,7 @@ web.xml的配置中<context-param>配置作用：（为了不赘述，引用文�
 
 在这个例子里，configuration下所有的东西，我都希望打到war包的classpath下，于是你就需要自定义SourceSet，告诉Gradle，我的源文件在哪个位置。
 
-{% codeblock lang:xml %}
+{% codeblock lang:groovy %}
 apply plugin: 'jetty'
 apply plugin: 'idea'
 

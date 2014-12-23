@@ -16,7 +16,7 @@ categories:
 </body>
 {% endcodeblock %}
 
-{% codeblock lang:js %}
+{% codeblock lang:javascript %}
 var MAX_LENGTH = 10;
 
 function textLengthLimitController($scope) {

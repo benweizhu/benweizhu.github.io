@@ -133,7 +133,8 @@ public class HelloTasklet implements Tasklet {
         </batch:step>
    </batch:job>
 
-</beans>{% endcodeblock %}
+</beans>
+{% endcodeblock %}
 
 在main函数中，通过JobLauncher来运行一个Job。
 {% codeblock main.java lang:java %}

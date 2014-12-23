@@ -34,7 +34,7 @@ jettyRun的Gradle API文档中有这么一句话：Once started, the web contain
 
 试一把，把它改为支持：
 
-{% codeblock lang:xml %}
+{% codeblock lang:groovy %}
 apply plugin: 'jetty'
 apply plugin: 'idea'
 
@@ -66,7 +66,7 @@ gradle watch的作用是监听某种类型的文件的变化，包括添加，�
 
 使用起来很简单：
 
-{% codeblock lang:xml %}
+{% codeblock lang:groovy %}
 apply plugin: 'jetty'
 apply plugin: 'idea'
 
@@ -128,7 +128,7 @@ Building > :watch
 
 那么对于资源文件呢？比如，我使用了Spring，需要改变Spring的Bean配置文件，同样可以。
 
-{% codeblock lang:xml %}
+{% codeblock lang:groovy %}
 
 watch {
     java {
