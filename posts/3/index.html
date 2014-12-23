@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="事务就是将一条或者多条语句作为一个单元一起执行，要么全部执行，要么全都不执行。 如果你读过数据库的书，肯定知道数据库事务有四个基本特性：原子性，一致性，隔离性，持久性。 在JDBC中，事务的操作建立在Connection对象上，Connection对象提供了与事务相关的操作函数，例如： &hellip;">
+  <meta name="description" content="最早接触PhoneGap平台是在1年多之前，能够使用HTML、CSS和JavaScript跨平台来编写Android或者IOS设备程序，并且应用的核心代码不需要多少修改就可以移植，确实让我感觉的到它应该是未来移动设备开发的趋势。Web程序员，特别是前端程序员， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -38,7 +38,7 @@
   <header role="banner"><hgroup>
   <h1><a href="/">NO END FOR LEARNING</a></h1>
   
-    <h2>Writing blog if you feel tired</h2>
+    <h2>Walking In The Air</h2>
   
 </hgroup>
 </header>
@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/07/13/learning-jdbc-transaction/">再次了解JDBC（下）- 事务</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/01/11/cordova-set-up/">Cordova探索之旅系列（一）</a></h1>
     
     
       <p class="meta">
@@ -79,77 +79,165 @@
 
 
 
-<time class='entry-date' datetime='2014-07-13T13:37:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:37 pm</span></time>
+<time class='entry-date' datetime='2014-01-11T16:47:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>4:47 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>事务就是将一条或者多条语句作为一个单元一起执行，要么全部执行，要么全都不执行。</p>
+  <div class="entry-content"><p>最早接触PhoneGap平台是在1年多之前，能够使用HTML、CSS和JavaScript跨平台来编写Android或者IOS设备程序，并且应用的核心代码不需要多少修改就可以移植，确实让我感觉的到它应该是未来移动设备开发的趋势。Web程序员，特别是前端程序员，能够轻松的通过Web技术来编写移动设备软件。</p>
 
-<p>如果你读过数据库的书，肯定知道数据库事务有四个基本特性：原子性，一致性，隔离性，持久性。</p>
+<p><strong>但是当时给我带来的感觉是应用的响应速度太慢，提供的API不全，能够实现的功能不多。PhoneGap经过1年多的沉淀，如今过头再来看PhoneGap，它又是什么样的呢？有哪些进步呢？</strong></p>
 
-<p>在JDBC中，事务的操作建立在Connection对象上，Connection对象提供了与事务相关的操作函数，例如：setAutoCommit()，commit()，rollback()等。</p>
+<h2>Cordova是什么？</h2>
 
-<h2><strong>autocommit</strong></h2>
+<p>Apache Cordova是PhoneGap贡献给Apache后的开源项目，是从PhoneGap中抽出的核心代码，是驱动PhoneGap的核心引擎。</p>
 
-<p>JDBC Connection默认的情况是AutoCommit模式，即每一条SQL语句在执行完之后都会提交到数据库中。对于简单的应用是可以的，但是关闭自动提交模式，由自己管理实务是有必要的，提高执行效率，保证业务处理过程完整性，使用分布式事务。</p>
+<p>Cordova是一个设备API的集合，它允许手机开发者通过JavaScript去访问设备原生功能，例如相机，重力感应等。结合UI框架，例如jQuery Mobile，Dojo Mobile或者Sencha Touch，可以让开发者通过HTML，CSS和JavaScript开发手机应用。</p>
 
-<p>事务可以让你控制对数据库的改变，它将一条或多条SQL语句作为一个逻辑单元，如果任何一条语句失败，则整个事务失败。</p>
+<p>当使用Cordova的API时，应用可以在没有任何原生代码（Java，Object-C等）的情况下构建。并且，虽然使用着Web开发技术，但是该应用却是在本机运行，而不是远程的Web应用）。</p>
 
-<p>关闭自动提交模式的方法很简单，调用setAutoCommit()方法：</p>
+<p>并且因为提供的JavaScript的API在多个设备平台都保持一致性并且基于web标准，所以，应用可以在几乎没有任何修改的情况下应用到各个不同的设备平台。</p>
+
+<p>使用Cordova开发的应用仍然是使用平台的SDK打包，可以放置到每个设备平台的应用商店中。</p>
+
+<p>Cordova提供了一套统一的JavaScript库，其背后使用平台对应的代码来驱动设备。Cordova支持的平台有：IOS，Android，Blackberry，Windows Phone，Palm WebOS，Bada和Symbian。</p>
+
+<h2>如何开始Cordova编程?</h2>
+
+<p><strong>1.下载并安装node.js（如果你已经安装过，就不用了）</strong></p>
+
+<p><a href="http://nodejs.org/">http://nodejs.org/</a></p>
+
+<p><strong>2.安装Cordova</strong></p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">setAutoCommit</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo npm install -g cordova
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h2><strong>commit &amp; rollback</strong></h2>
-
-<p>一旦你完成了对数据库的改变操作，你需要执行commit()方法来提交改变，当执行过程中出现异常，你需要执行rollback()方法来回滚该事物。</p>
+<p><strong>3.创建应用程序</strong></p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova create hello com.example.hello HelloWorld
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p><strong>4.添加应用平台</strong></p>
 
+<p>这里添加的是Android应用程序</p>
+
+<p>你可能会得到如下信息：</p>
+
+<p>Error: ERROR : executing command ‘ant’, make sure you have ant installed and added to your path.</p>
+
+<p>说明你需要安装ant，方法如下：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>brew update
+</span><span class='line'>brew install ant
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>调用rollback方法会终结一个事务，并返回到数据被修改之前的值。如果你尝试在一个事务中去执行一条或多条语句，结果得到一个SQLException，调用rollback去结束一个事务，然后重新开始事务。这是唯一知道什么被提交，什么没有被提交的办法。因为捕获到SQLException会告诉你什么样的错误发生了，但是不会告诉你什么已经提交，什么没有。回滚是唯一的可靠办法。</p>
+<p>然后添加应用平台</p>
 
-<h2><strong>完整性</strong></h2>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd </span>hello
+</span></code></pre></td></tr></table></div></figure>
 
-<p>除了将语句分组以一个单元统一执行，事务还帮助保证一张表中数据的完整性。事务会提供某种程度的保护，以防止两个用户同时访问数据时，造成的冲突。</p>
 
-<p>DBMS会使用锁机制，来防止其他用户对已经被事务访问的数据进行访问。一旦加锁，它会强制保证不变直到事务被提交。锁机制的目的是防止用户读到脏数据，也就是读到一些还没有被永久保存的数据（访问一个被更新但是还没有被提交的值，被认为是访问到脏数据，因为这个值很有可能会被回滚到以前的结果，那么你读到的值就是无效的）。</p>
+<p>首先进入到hello目录下</p>
 
-<p>锁是如何被设置的是由一个叫做事务隔离级别决定的。举例来说，如果事务隔离级别被设置为TRANSACTION_READ_COMMITTED，那么它就不会允许数据被访问，直到事务提交。换句话说，DBMS不允许读取脏数据的事件发生。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova platform add android
+</span></code></pre></td></tr></table></div></figure>
 
-<p>TRANSACTION_NONE JDBC 驱动不支持事务<br/>
-TRANSACTION_READ_UNCOMMITTED 允许脏读，不可重复读和幻读。<br/>
-TRANSACTION_READ_COMMITTED 禁止脏读，但允许不可重复读和幻读。<br/>
-TRANSACTION_REPEATABLE_READ 禁止脏读和不可重复读，单运行幻读。<br/>
-TRANSACTION_SERIALIZABLE 禁止脏读，不可重复读和幻读。</p>
 
-<p>不可重复读的场景发生在事务A读取一行数据，事务B后续的改变了这一行，当事务A再次去读时，两次读取的事务就不一致了。</p>
+<p>这里也可以删除一个应用平台</p>
 
-<p>幻读的场景是事务A读取到满足一定条件的一部分数据，事务B后续插入或者更新了一行数据，但是同样满足该条件，此时A再去读取发现多了一行数据。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova platform rm android
+</span></code></pre></td></tr></table></div></figure>
 
-<p>通常，你不需要对事务隔离级别做任何操作，只要使用默认的即可，但默认值取决于DBMS。例如，对于Java数据库，默认值是TRANSACTION_READ_COMMITTED。JDBC允许你获取和改变该级别，方法是getTransactionIsolation()和setTransactionIsolation()。</p>
 
-<p>参考资料：</p>
+<p>通过ls命令</p>
 
-<p><a href="http://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html">http://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html</a></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova platforms ls
+</span></code></pre></td></tr></table></div></figure>
 
-<p><a href="http://www.tutorialspoint.com/jdbc/jdbc-transactions.htm">http://www.tutorialspoint.com/jdbc/jdbc-transactions.htm</a></p>
 
-<p><a href="http://blog.csdn.net/chenyongsuda/article/details/5641412">http://blog.csdn.net/chenyongsuda/article/details/5641412</a></p>
+<p>可以查看你安装关于平台的信息，例如，我的是:</p>
+
+<p>Installed platforms: android 3.3.0</p>
+
+<p>Available platforms: blackberry10, firefoxos, ios</p>
+
+<p><strong>5.构建应用程序</strong></p>
+
+<p>在进行构建之前，先确保你的Android SDK配置好了。</p>
+
+<p>需要下载Android的SDK，并设置Path到系统路径下。</p>
+
+<p>安装Android SDK（Mac平台，下载解压缩就行）</p>
+
+<p>配置SDK的Path到系统路径</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>touch ~/.bash_profile<span class="p">;</span> open ~/.bash_profile
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在profile文件中加一句话：</p>
+
+<p>export PATH=${PATH}:/Users/twer/Downloads/adt-bundle-mac-x86_64-20131030/sdk/platform-tools:/Users/twer/Downloads/adt-bundle-mac-x86_64-20131030/sdk/tools</p>
+
+<p>记得要指定你自己的路径。</p>
+
+<p>最后还要执行profile将它更新到你的系统path下。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">source</span> ~/.bash_profile
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后你就可以开始构建了:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova build
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然你也可以正对某一个平台构建：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova build android
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>6.在模拟器上运行</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova emulate android
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>此时，模拟器会启动，并自动安装应用，效果应该如下：</p>
+
+<p><img src="http://cordova.apache.org/docs/zh/3.1.0/img/guide/cli/android_emulate_install.png" alt="Jasmine" /></p>
+
+<p><strong>7.实体机上运行</strong></p>
+
+<p>将你的设备插到电脑上，然后运行命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova run android
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>会将应用安装到你的手机上。</p>
 </div>
   
   
@@ -162,7 +250,7 @@ TRANSACTION_SERIALIZABLE 禁止脏读，不可重复读和幻读。</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/07/07/learning-jdbc-with-jndi/">再次了解JDBC（中）- 引入JNDI</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/01/05/about-android-activity-lifecycle-translate/">About Android Activity LifeCycle(译)</a></h1>
     
     
       <p class="meta">
@@ -171,111 +259,188 @@ TRANSACTION_SERIALIZABLE 禁止脏读，不可重复读和幻读。</p>
 
 
 
-<time class='entry-date' datetime='2014-07-07T13:56:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:56 pm</span></time>
+<time class='entry-date' datetime='2014-01-05T23:22:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>11:22 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h2><strong>什么是命名服务？什么是目录服务？什么是命名服务的上下文？</strong></h2>
+  <div class="entry-content"><p><img src="http://developer.android.com/images/activity_lifecycle.png" alt="Jasmine" /></p>
 
-<p>命名服务NS（Naming Service）是命名系统提供的服务功能，通过名字访问命名系统中的对象。</p>
+<p>Activity是应用的一个组件，它提供用户可以交互的屏幕，例如拨打电话，照相，发邮件，看地图。每一个Activity都会被赋予一个窗户用来绘画用户界面。这个窗口通常会占据整个屏幕，但是也可以比屏幕小和悬浮在其他窗口之上。</p>
 
-<p>目录服务DS(Directory Service)是命名服务的扩展，它不仅把名字与对象对应在一起，并且把名字与对象属性(Attribute) 联系在一起，因此不仅可以通过名字还可以通过属性来搜索对象。</p>
+<p>一个应用程序通常由多个Activity组成，它们之间以一种较为松弛的关系联系在一起。例如，一个Activity作为主要的Activity，它会作为程序启动时第一个展现给用户的Activity。每一个Activity能够启动另外一个Activity，以便去执行其他的动作。每一次一个新的Activity启动，前一个Activity就会停止，但是系统会将它保存在一个栈中（“back stack”）。当一个新的Activity启动时，当前的Activity会被压入栈中，并拿走焦点。这个栈遵守“后进先出”原则，所以，当用户在当前Activity完成对应操作，按下返回按钮的时候，它会从栈顶弹出，并销毁，然后前一个Activity恢复。</p>
 
-<p>对象名与对应的对象构成的集合叫对象上下文（Context）。
-例如，在文件命名系统中，一个目录就是一个Context，其内容是文件名（名）和对应的文件的集合。</p>
+<p>当一个Activity因为另一个新的Activity启动而停止时，系统会通过Activity生命周期中的回调函数通知它这个状态的变化。由于状态的改变，Activity会接受到多个回调函数，无论系统是在create，stop，resume还是destroy，并且每一次回调都提供你一个机会去执行适合这个状态变化的操作。例如，当stop时，你的Activity应该释放任何比较大的对象，例如网络和数据库连接。当Activity恢复时，你应该从新获取必要的资源和恢复之前被打断的操作。状态的转换是Activity生命周期的一部分。</p>
 
-<h2><strong>那什么是JNDI？</strong></h2>
+<p>通过回调函数去管理Activity的生命周期是实现健壮和灵活应用的关键。Activity的生命周期直接受到其他Activity，Task以及back stack的影响。</p>
 
-<p>Java Naming and Dirctory Interface - Java命名和目录接口，它是sun公司提出的方便应用程序访问命名和目录服务的的API。</p>
+<p>一个Activity可以存在于三个状态中：</p>
 
-<p>和其他设计一样，JNDI是接口API，它独立于任何命名或者目录服务的具体实现。这样，你就可以用相同的API去访问多种不同类型的命名和目录服务。</p>
+<p><em>Resumed</em></p>
 
-<p>根据它们作用的不同，典型应用场景也就分为两个部分：</p>
+<p>该状态下，Activity置于屏幕前景，并拥有聚焦，可以把这个状态理解为正在运行。</p>
 
-<p>（1）将Java应用程序连接到外部的目录服务。</p>
+<p><em>Paused</em></p>
 
-<p>（2）允许Java的Servlet在web容器中寻找定义配置信息。</p>
+<p>该状态下，另一个Activity正置于屏幕前景并拥有聚焦，但是当前Activity仍然可见。一个暂停的Activity是处于完全存活状态的（Activity对象仍然保有内存，它维持状态和成员信息，并保持与Window Manger的关系），但是如果内存不足时，系统有权利关闭该Activity。</p>
 
-<p>JNDI的架构是有一套API和一套SPI（Service Provider Interface）接口组成。Java应用程序使用JNDI API来访问不同的命名和目录服务。SPI则让不同的命名和目录服务可以透明和无缝插入，这样Java应用程序才能使用JNDI API来访问它们的服务。</p>
+<p><em>Stopped</em></p>
 
-<p><img class="center" src="/../images/jndi/arch.png"></p>
+<p>该状态下，该Activity完全被另一个Activity遮挡（该Activity就会进入到背景状态）。进入stopped状态的Activity也是仍然处于存活状态。然而，它对用户是不可见的，同样在系统需要内存的时候，它会被关闭。</p>
 
-<p>JNDI是包含在Java SE平台中。要使用JNDI，你必须有JNDI的类库和一个到多个服务提供商。JDK本身包含一些服务提供商：</p>
+<p>如果一个Activity进入paused或者stopped状态，系统可以通过调用finish方法或者终止进程的方式，将Activity从内存中清除。当该Activity从新打开，他必须要重新创建一次。</p>
 
-<p>Lightweight Directory Access Protocol (LDAP)<br/>
-Common Object Request Broker Architecture (CORBA) Common Object Services (COS) name service<br/>
-Java Remote Method Invocation (RMI) Registry<br/>
-Domain Name Service (DNS)</p>
+<p>Activity<strong>完整的生命周期</strong>发生于onCreate()方法和onDestroy()方法之间。Activity应该在onCreate()方法时，设置一些全局状态，例如布局，并且在onDestroy()方法释放所有保持的资源。例如，如果Activity拥有一个线程在后台运行并正在从网络上下载数据，该线程可能是在onCreate()方法中创建的，那么就应该在onDestroy()方法中停止该线程。</p>
 
-<p>JNDI API是访问任何命名或者目录服务的通用API。实际访问一个命名或目录服务需要在JNDI下插入一个服务提供商。</p>
+<p>Activity的<strong>可见生命周期</strong>发生于onStart()方法和onStop()方法之间。在这段时间，用户可以在屏幕上看见它，并进行交互。例如，onStop()方法被调用发生在当一个新的Activity启动，而当前Activity不在可见时。在这两个方法之间，你可以保有Activity所需要的资源。例如，你可以在onStart()方法调用时，注册一个BroadCartReceiver，让他监控你对UI的操作，并在用户不在看到这个Activity时，在onStop()方法中注销这个BroadCartReceiver。</p>
 
-<p>服务提供商是一个映射到JNDI API能实际调用命名或目录服务器的软件。一般情况，服务提供商的角色和命名或目录服务器的角色是不一样的。从C/S软件角度说，JNDI和服务器提供商是JNDI的客户端，命名或者目录服务器是服务端。</p>
+<p>Activity<strong>前景生命周</strong>发生于onResume()方法和onPause()方法之间。在这段时间中，该Activity处于所有Activity的上方并且拥有用户输入焦点。Activity能够频繁的在前景中出镜和入镜。例如，当设备进入睡眠或者有一个对话框弹出时，在onPause()方法被调用时。因为，这个状态频繁的转变，在这两个方法中的代码要尽量的轻量级，以避免转换太慢，让用户等待。</p>
 
-<p>客户端和服务器端交互的方式有很多。一种比较常用的方式是，使用网络协议。而服务器通常支持不同的客户端，不仅仅是JNDI的客户端，只是它们要遵循不同协议。JNDI也不规定JNDI客户端和服务端交互的方式。</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+<th>Killable after?</th>
+<th>Next</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>onCreate()</td>
+<td>当Activity第一次被创建时调用。在这里，你应该做所有关于静态配置的事情-创建View，绑定数据到List等等。这个方法会传入一个Bundle对象，如果Activity中有捕获自身状态，那么它包含了Activity之前的状态。</td>
+<td>No</td>
+<td>onStart()</td>
+</tr>
+<tr>
+<td>onRestart()</td>
+<td> 在Activity停止之后被调用，指明Activity会被重新启动。</td>
+<td>No</td>
+<td>onStart()</td>
+</tr>
+<tr>
+<td>onStart()</td>
+<td>在Activity变成用户可见状态之前调用。如果Activity要变成前景状态，那么onResume()方法会被调用，如果Activity要被隐藏，则onStop()方法会被调用。</td>
+<td>No</td>
+<td>onResume() or onStop()</td>
+</tr>
+<tr>
+<td>onResume()</td>
+<td>在Activity开始与用户交互之前调用。这个时候，Activity会置于栈顶，并伴随着用户输入。</td>
+<td>No</td>
+<td>onPause()</td>
+</tr>
+<tr>
+<td>onPause()</td>
+<td>在系统开始要恢复另一个Activity时被调用。该方法通常被用于提交未保存数据到持久数据中，停止动画和其他会占用CPU资源的操作。并且应该非常迅速的做这些事情，因为下一个Activity只有在当前方法执行完成之后才会恢复。如果Activity回到前端，则onResume()方法跟在onPaused()方法后面，如果对用户不可见，则onStop()方法跟在后面。</td>
+<td>Yes</td>
+<td>onResume() or onStop()</td>
+</tr>
+<tr>
+<td>onStop()</td>
+<td>当Activity对用户不在可见时被调用。onStop()发生的原因是Activity被销毁，或者另一个Activity被恢复并正在覆盖当前Activity。如果紧跟随着的是onRestart()方法，则说明Activity正在恢复与用户的交互。如果跟着的是onDestory()方法，则说明这个Activity要被销毁了。</td>
+<td>Yes</td>
+<td>onRestart() or onDestroy()</td>
+</tr>
+<tr>
+<td>onDestroy()</td>
+<td>在Activity被销毁时调用。这是Activity最后一个会接收到的调用。被调用的原因要么是因为finish()方法在哪个位置调用，或者因为系统因为要保留资源而临时销毁它。可以通过isFinishing()方法来区分两种不同情况。</td>
+<td>Yes</td>
+<td>nothing</td>
+</tr>
+</tbody>
+</table>
 
-<h2><strong>JDNI的Context（上下文）</strong></h2>
 
-<p>上下文这个概念在Java的开发中经常出现，比如，ServletContext，Spring的Context，Android中也有Context，JNDI也不例外。</p>
+<p>文献参考自：<a href="http://developer.android.com/guide/components/activities.html">http://developer.android.com/guide/components/activities.html</a></p>
+</div>
+  
+  
 
-<p>JNDI的上下文，依赖于一个重要的接口Context和一个重要的类InitialContext</p>
 
-<p>Context接口 它表示一个命名上下文，由一组名称到对象的绑定组成。它提供了查找，绑定，重命名，创建和销毁子上下文的接口。</p>
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/12/21/web-mvc-by-example-with-spring-mvc/">Web MVC by Example</a></h1>
+    
+    
+      <p class="meta">
+        
 
-<p>InitialContext类 所有命名操作都相对于某一上下文，它是JNDI提供的，执行命名和目录操作的初始上下文，是根上下文，为命名和目录服务提供起点。一旦你有了初始化上下文，你就可以去查找其他的上下文和对象。</p>
 
-<h2><strong>JNDI的环境变量</strong></h2>
 
-<p>JNDI需要定义许多环境变量来说明访问什么样的命名和目录服务。</p>
 
-<p>而为了简化设置JNDI应用需要的环境变量，应用程序组件和服务提供商会和资源文件一起发布。JNDI的资源文件就是常用的properties文件格式，包含的是键值对。</p>
+<time class='entry-date' datetime='2013-12-21T17:03:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>5:03 pm</span></time>
+        
+      </p>
+    
+  </header>
 
-<p>JNDI的资源文件有两种类型：provider和application</p>
 
-<p>每个服务商都有一个可选的资源文件：[prefix/]jndiprovider.properties，这个prefix前缀是context实现类的包名。例如：</p>
+  <div class="entry-content"><p>早期的web应用主要是静态页面的浏览。静态页面使用HTML语言来编写，放在服务器上。用户使用浏览器通过HTTP协议请求服务器上的Web页面，服务器上的Web服务器软件接收到用户发送的请求后，读取请求URI所标识的资源，加上消息报头发送给客户端的浏览器；浏览器解析响应中的HTML数据，从而向用户呈现多姿多彩的HTML页面。</p>
 
-<p>com.sun.jndi.ldap.LdapCtx对应的资源文件是com/sun/jndi/ldap/jndiprovider.properties</p>
+<h3><strong>CGI-Servlet-JSP-Model1-Model2</strong></h3>
 
-<p>JNDI会使用ClassLoader.getResources()方法在应用程序的所有资源文件中查找一个叫jndi.properties的文件。该文件中定义的所有属性都会放到InitialContext里面，而其他的Context会继承自该InitialContext。</p>
+<p>早期使用的Web服务器扩展机制是CGI，它允许用户调用Web服务器上的CGI程序。CGI的全称是Common Gateway Interface，即公共网关接口。用户通过单击某个链接或者直接在浏览器的地址栏中输入URL来访问CGI程序，Web服务器接收到请求后，发现这个请求是给CGI程序的，于是就启动并运行这个CGI程序，对用户请求进行处理。CGI程序解析请求中的CGI数据，处理数据，并产生一个响应（通常是HTML页面）。这个响应被返回给Web服务器，Web服务器包装这个响应（例如添加消息报头），以HTTP响应的形式发送给Web浏览器。</p>
 
-<p>当InitialContext被构建时，它的环境会被初始化，要么通过传递进来的HashMap参数，要么通过定义的Java应用properties文件。而IntialContext的具体实现是在运行时决定的，默认的策略是使用环境变量“java.naming.factory.initial”定义的InitContextFactory（工厂类）。</p>
+<p>Java Servlet（<strong>Java服务器小程序Servlet=Server+Applet</strong>）是一个基于Java技术的Web组件，运行在服务器端，由Servlet容器所管理，用于生成动态的内容。Servlet是平台独立的Java类，编写一个Servlet，实际上就是按照Servlet规范编写一个Java类。</p>
 
-<p><strong>回到我们的例子当中：</strong></p>
+<p>Servlet不能独立运行，它必须被部署到Servlet容器（例如：Tomcat）中，由容器来实例化和调用Servlet的方法，Servlet容器在Servlet的生命周期内包容和管理Servlet。</p>
 
-<p>那么在<a href="http://benweizhu.github.io/blog/2014/07/06/learning-jdbc/" title="再次了解JDBC（上）">上一篇</a>中，DataSource API文档里提到的“实现DataSource接口的对象通常在基于JavaTM Naming and Directory Interface(JNDI) API的命名服务中注册。”就是JNDI的第二种应用方式。</p>
+<p>用户通过单击某个链接或者直接在浏览器的地址栏中输入URL来访问Servlet，Web服务器接收到该请求后，并不是将请求直接交给Servlet，而是交给Servlet容器。Servlet容器实例化Servlet，调用Servlet的一个特定方法对请求进行处理，并产生一个响应。这个响应由Servlet容器返回给Web服务器，Web服务器包装这个响应，以HTTP响应的形式发送给Web浏览器。</p>
 
-<p>我们使用的Apache Common的DBCP作为DataSource的实现，而DBCP也是Tomcat的数据库连接池组建，所以针对它，我么可以使用Tomcat实现的JNDI服务。</p>
+<p>下面是用servlet编写的get和post请求页面例子：</p>
 
-<p>首先需要把上一篇中的例子改为一个Java Web应用。</p>
-
-<p>定义Context.xml，位置在webapp/META-INF/context.xml</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>web.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&#39;1.0&#39; encoding=&#39;utf-8&#39;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;Context&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;Resource</span> <span class="na">name=</span><span class="s">&quot;jdbc/mysql/bookshelf&quot;</span> <span class="na">auth=</span><span class="s">&quot;Container&quot;</span> <span class="na">type=</span><span class="s">&quot;javax.sql.DataSource&quot;</span>
-</span><span class='line'>              <span class="na">maxActive=</span><span class="s">&quot;100&quot;</span> <span class="na">maxIdle=</span><span class="s">&quot;30&quot;</span> <span class="na">maxWait=</span><span class="s">&quot;10000&quot;</span>
-</span><span class='line'>              <span class="na">username=</span><span class="s">&quot;root&quot;</span> <span class="na">password=</span><span class="s">&quot;&quot;</span> <span class="na">driverClassName=</span><span class="s">&quot;com.mysql.jdbc.Driver&quot;</span>
-</span><span class='line'>              <span class="na">url=</span><span class="s">&quot;jdbc:mysql://localhost:3306/bookshelf&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/Context&gt;</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee&quot;</span>
+</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee</span>
+</span><span class='line'><span class="s">        http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot;</span>
+</span><span class='line'>         <span class="na">version=</span><span class="s">&quot;2.5&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;servlet&gt;</span>
+</span><span class='line'>       <span class="nt">&lt;servlet-name&gt;</span>hello<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>       <span class="nt">&lt;servlet-class&gt;</span>me.zeph.springview.demo.HelloWorldServlet<span class="nt">&lt;/servlet-class&gt;</span>
+</span><span class='line'>   <span class="nt">&lt;/servlet&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;servlet-mapping&gt;</span>
+</span><span class='line'>       <span class="nt">&lt;servlet-name&gt;</span>hello<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>       <span class="nt">&lt;url-pattern&gt;</span>/hello<span class="nt">&lt;/url-pattern&gt;</span>
+</span><span class='line'>   <span class="nt">&lt;/servlet-mapping&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>在JDNI中，对象是一种资源，Tomcat指定资源的入口出在<Context>元素中，有两个位置可以定义，一个是在$CATALINA_BASE/conf/server.xml，一个是在每个web应用需的META-INF/context.xml中。前一种方式，Tomcat容器中所有的Web应用都可以使用，算是一种全局的资源。不过一般第二种方式会更好。</p>
 
-<p>我在使用第一种方式的时候，遇到了MySQL的Driver文件找不到的问题，应该是需要将MySQL的驱动拷贝的Tomcat的lib下。</p>
 
-<p>定义web.xml文件，位置在webapp/WEB-INF/web.xml</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>servlet.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -300,39 +465,68 @@ Domain Name Service (DNS)</p>
 <span class='line-number'>23</span>
 <span class='line-number'>24</span>
 <span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">version=</span><span class="s">&quot;2.4&quot;</span>
-</span><span class='line'>         <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span>
-</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee</span>
-</span><span class='line'><span class="s">        http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd&quot;</span><span class="nt">&gt;</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;servlet&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>helloDataSource<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-class&gt;</span>me.zeph.jdbc.example.servlet.HelloDataSourceServlet<span class="nt">&lt;/servlet-class&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/servlet&gt;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.ServletException</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServlet</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletRequest</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletResponse</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.io.PrintWriter</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;servlet-mapping&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>helloDataSource<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;url-pattern&gt;</span>/helloDataSource<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/servlet-mapping&gt;</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldServlet</span> <span class="kd">extends</span> <span class="n">HttpServlet</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@Override</span>
+</span><span class='line'>  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">resp</span><span class="o">.</span><span class="na">setContentType</span><span class="o">(</span><span class="s">&quot;text/html&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">PrintWriter</span> <span class="n">writer</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="na">getWriter</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;h1&gt;HelloWorld&lt;/h1&gt;&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;form action=&#39;hello&#39; method=&#39;post&#39;&gt;&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;input type=&#39;text&#39; name=&#39;value&#39;&gt;&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;input type=&#39;submit&#39; value=&#39;submit&#39;&gt;&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;form/&gt;&quot;</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;resource-ref&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;description&gt;</span>DB Connection<span class="nt">&lt;/description&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;res-ref-name&gt;</span>jdbc/mysql/bookshelf<span class="nt">&lt;/res-ref-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;res-type&gt;</span>javax.sql.DataSource<span class="nt">&lt;/res-type&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;res-auth&gt;</span>Application<span class="nt">&lt;/res-auth&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/resource-ref&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doPost</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">resp</span><span class="o">.</span><span class="na">setContentType</span><span class="o">(</span><span class="s">&quot;text/html&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">String</span> <span class="n">value</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;value&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">PrintWriter</span> <span class="n">writer</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="na">getWriter</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;Hi, &quot;</span> <span class="o">+</span> <span class="n">value</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>光定义资源还不行，web应用必须要有个办法知道资源有哪些？所以需要在web.xml定义资源的引用。</p>
+<p>这样的web开发流程都在实现一个servlet类的实例。也就是无论是业务逻辑还是前端显示，都是放在Servlet类中来完成，通过实现doGet和doPost的方法，来完成前端参数的获取和视图的渲染。</p>
 
-<p>此时，获取Connection的方式就可以换成JNDI的方式了。</p>
+<p>但这样做的缺点是<strong>表现逻辑、控制逻辑和业务逻辑全部写在了Java类中，导致逻辑有些混乱</strong>。</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>之后，JSP技术出现，它由Sun和许多公司参与共同创建的一种使软件开发者可以响应客户端请求，而动态生成HTML、XML或其他格式文档的Web网页的技术标准。</p>
+
+<p>它以Java语言作为脚本语言的，使Java代码和特定的预定义动作可以嵌入到静态页面中。</p>
+
+<p>Sun这样做提供了非常好的前端显示，<strong>前端开发工程师也可以更好地改善页面体验</strong>，但实际上，它仍然没有解决前端显示和控制逻辑以及业务逻辑的混乱问题。</p>
+
+<p><strong>Servlet是将前端显示放在了Java类中，而JSP是将控制和业务逻辑放在了JSP中。</strong></p>
+
+<p>JSP+JavaBean是纯JSP的增强版被称为Model1。特点是使用&lt;jsp:useBean>标准动作，自动将请求参数封装为JavaBean组件。</p>
+
+<p>这样可以将部分业务逻辑封装到JavaBean中。</p>
+
+<p>Model1的架构中，JSP要负责控制逻辑、表现逻辑和业务对象（JavaBean）的调用，所以实际上仍然不理想。</p>
+
+<p><strong>Model2架构其实可以认为就是我们所说的Web MVC模型，只是控制器采用Servlet、模型采用JavaBean、视图采用JSP</strong>。</p>
+
+<p>下面是一个Model2的例子：</p>
+
+<p>web.xml配置和上面一样配置一个Servlet映射。但是Servlet只负责控制逻辑，不进行前端操作，而是直接将前端渲染分发给jsp页面进行。</p>
+
+<figure class='code'><figcaption><span>HelloWorldServlet.java</span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -373,125 +567,2110 @@ Domain Name Service (DNS)</p>
 <span class='line-number'>39</span>
 <span class='line-number'>40</span>
 <span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">dao</span><span class="o">;</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.jdbc.example.model.Book</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.User</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.naming.Context</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.naming.InitialContext</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.naming.NamingException</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.sql.DataSource</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.Connection</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.ResultSet</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.SQLException</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.Statement</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.ServletException</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServlet</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletRequest</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletResponse</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookDaoWithDS</span> <span class="o">{</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldServlet</span> <span class="kd">extends</span> <span class="n">HttpServlet</span> <span class="o">{</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">Book</span> <span class="nf">findBookByISBN</span><span class="o">(</span><span class="kt">int</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="n">Statement</span> <span class="n">statement</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">connection</span> <span class="o">=</span> <span class="n">getConnection</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">statement</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createStatement</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">book</span> <span class="o">=</span> <span class="n">getBook</span><span class="o">(</span><span class="n">statement</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">(</span><span class="n">getQuerySqlFor</span><span class="o">(</span><span class="n">isbn</span><span class="o">)));</span>
-</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
-</span><span class='line'>      <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-</span><span class='line'>          <span class="k">try</span> <span class="o">{</span>
-</span><span class='line'>              <span class="k">if</span> <span class="o">(</span><span class="n">statement</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                  <span class="n">statement</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
-</span><span class='line'>              <span class="o">}</span>
-</span><span class='line'>              <span class="k">if</span> <span class="o">(</span><span class="n">connection</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                  <span class="n">connection</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
-</span><span class='line'>              <span class="o">}</span>
-</span><span class='line'>          <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>              <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
-</span><span class='line'>          <span class="o">}</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">book</span><span class="o">;</span>
+</span><span class='line'>   <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">GET_PATH</span> <span class="o">=</span> <span class="s">&quot;WEB-INF/view/hello-world.jsp&quot;</span><span class="o">;</span>
+</span><span class='line'>   <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">POST_PATH</span> <span class="o">=</span> <span class="s">&quot;WEB-INF/view/hello-world-confirm.jsp&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>   <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+</span><span class='line'>     <span class="n">req</span><span class="o">.</span><span class="na">getRequestDispatcher</span><span class="o">(</span><span class="n">GET_PATH</span><span class="o">).</span><span class="na">forward</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="n">resp</span><span class="o">);</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>   <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doPost</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+</span><span class='line'>         <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">getUserFromRequest</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span><span class='line'>     <span class="n">String</span> <span class="n">path</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>     <span class="k">if</span> <span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">validate</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">req</span><span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">&quot;user&quot;</span><span class="o">,</span> <span class="n">user</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">path</span> <span class="o">=</span> <span class="n">POST_PATH</span><span class="o">;</span>
+</span><span class='line'>     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">req</span><span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">&quot;error&quot;</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">path</span> <span class="o">=</span> <span class="n">GET_PATH</span><span class="o">;</span>
+</span><span class='line'>     <span class="o">}</span>
+</span><span class='line'>     <span class="n">req</span><span class="o">.</span><span class="na">getRequestDispatcher</span><span class="o">(</span><span class="n">path</span><span class="o">).</span><span class="na">forward</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="n">resp</span><span class="o">);</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="kd">private</span> <span class="n">User</span> <span class="nf">getUserFromRequest</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>     <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">User</span><span class="o">();</span>
+</span><span class='line'>     <span class="n">user</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">req</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">));</span>
+</span><span class='line'>     <span class="n">user</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="n">req</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;password&quot;</span><span class="o">));</span>
+</span><span class='line'>     <span class="k">return</span> <span class="n">user</span><span class="o">;</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<figure class='code'><figcaption><span>hello-world.jsp</span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ taglib prefix=&quot;c&quot; uri=&quot;http://java.sun.com/jsp/jstl/core&quot; %&gt;
+</span><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
+</span><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'><span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>hello world<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'><span class="nt">&lt;/head&gt;</span>
+</span><span class='line'><span class="nt">&lt;body&gt;</span>
+</span><span class='line'><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;helloWorld&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;name&quot;</span><span class="nt">&gt;</span>name:<span class="nt">&lt;/label&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">id=</span><span class="s">&quot;name&quot;</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;password&quot;</span><span class="nt">&gt;</span>password:<span class="nt">&lt;/label&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="na">id=</span><span class="s">&quot;password&quot;</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;submit&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;c:if</span> <span class="na">test=</span><span class="s">&quot;${error}&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        login failed
+</span><span class='line'>    <span class="nt">&lt;/c:if&gt;</span>
+</span><span class='line'><span class="nt">&lt;/form&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<figure class='code'><figcaption><span>hello-world-confirm.jsp</span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
+</span><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'><span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>helloWorldConfirm<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'><span class="nt">&lt;/head&gt;</span>
+</span><span class='line'><span class="nt">&lt;body&gt;</span>
+</span><span class='line'>hi,${user.name}
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>User.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">domain</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">NAME</span> <span class="o">=</span> <span class="s">&quot;zeph&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">PASSWORD</span> <span class="o">=</span> <span class="s">&quot;123456&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">password</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">Connection</span> <span class="nf">getConnection</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">DataSource</span> <span class="n">dataSource</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">InitialContext</span> <span class="n">initialContext</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">InitialContext</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">Context</span> <span class="n">envContext</span> <span class="o">=</span> <span class="o">(</span><span class="n">Context</span><span class="o">)</span> <span class="n">initialContext</span><span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="s">&quot;java:/comp/env&quot;</span><span class="o">);</span>
-</span><span class='line'>          <span class="n">dataSource</span> <span class="o">=</span> <span class="o">(</span><span class="n">DataSource</span><span class="o">)</span> <span class="n">envContext</span><span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="s">&quot;jdbc/mysql/bookshelf&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">NamingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">dataSource</span><span class="o">.</span><span class="na">getConnection</span><span class="o">();</span>
+</span><span class='line'>   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="nf">getQuerySqlFor</span><span class="o">(</span><span class="kt">int</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;select * from book where isbn = &quot;</span> <span class="o">+</span> <span class="n">isbn</span> <span class="o">+</span> <span class="s">&quot;;&quot;</span><span class="o">;</span>
+</span><span class='line'>   <span class="kd">public</span> <span class="n">String</span> <span class="nf">getPassword</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">password</span><span class="o">;</span>
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">Book</span> <span class="nf">getBook</span><span class="o">(</span><span class="n">ResultSet</span> <span class="n">resultSet</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">while</span> <span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">next</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">book</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Book</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setIsbn</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getInt</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span>
-</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="mi">2</span><span class="o">));</span>
-</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setPrice</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getDouble</span><span class="o">(</span><span class="mi">3</span><span class="o">));</span>
-</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setAuthor</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="mi">4</span><span class="o">));</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">book</span><span class="o">;</span>
+</span><span class='line'>   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPassword</span><span class="o">(</span><span class="n">String</span> <span class="n">password</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">password</span> <span class="o">=</span> <span class="n">password</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">validate</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">NAME</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">name</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">PASSWORD</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">password</span><span class="o">);</span>
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这里你可以将java.naming.factory.initial和java.naming.factory.url.pkgs打印出来，结果是：org.apache.naming.java.javaURLContextFactory和org.apache.naming。</p>
+<p>总结，Model2模式已经很好的将控制逻辑，业务逻辑和显示逻辑分开，但其中也有些位置还可以进一步改进。</p>
 
-<p>java.naming.factory.url.pkgs的作用是告诉JNDI去哪个包下面，找满足java.javaURLContextFactory的类。</p>
+<p>例如：<strong>从参数到业务模型的转换（数据绑定），视图显示技术不容易更换（View解析）。</strong></p>
 
-<p>你应该还看到一点有点疑惑，我的资源名字命名就是：jdbc/mysql/bookshelf，为什么前面还有java:/comp/env。</p>
+<p>不过，Web MVC框架替我们解决的了这些问题（流行的Web MVC框架有：Spring MVC，Struts）。</p>
 
-<p>java:/comp/env是环境命名上下文，是针对Java EE组件中使用JNDI引入的，目的是为了防止冲突。Java EE环境下，被访问的系统或者用户定义的对象都是存储在java:comp/env的环境命名上下文中。</p>
+<p>关于Spring MVC框架的使用将留在下一篇介绍。</p>
+</div>
+  
+  
 
-<p>到此，我们实现了JNDI的引入，可以通过JNDI来配置DataSource，此时，如果我们希望从MySQL迁移到Oracle就不需要修改Java代码，只需要更改一下配置文件即可，这也就是JNDI的好处。</p>
 
-<p>再下一篇，我们继续讨论，JDBC的事务。</p>
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/12/07/why-gradle/">为何要用gradle?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-12-07T11:11:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>11:11 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>“Gradle能够取代Maven吗？”</p>
+
+<p>有很多人问这个问题，我没有答案。因为我也想问这个问题。</p>
+
+<p>如果Gradle能够取代Maven，那么“如何取代之？”</p>
+
+<p>取代之后，带来的“好处有哪些呢？”</p>
+
+<p>带着这个3个问题，我们一起好好研究一下这两个项目管理工具。</p>
+
+<p><strong>1.引言</strong></p>
+
+<p>Maven是目前最常用的Java项目管理及自动化构建工具。</p>
+
+<p>与Ant对比时的经典名言：约定由于配置</p>
+
+<p>它包含：</p>
+
+<p>1.一个项目对象模型（Project Object Model）</p>
+
+<p>2.一组标准集合</p>
+
+<p>3.一个项目生命周期（Project Lifecycle）</p>
+
+<p>4.一个依赖管理系统（Dependency Management System）</p>
+
+<p>5.用来运行定义在生命周期阶段（phase）中插件（plugin）目标（goal）的逻辑
+当你使用Maven的时候，你用一个明确定义的项目对象模型（POM）来描述你的项目。</p>
+
+<p>Gradle是一个基于Ant和Maven概念的项目自动化建构工具。</p>
+
+<p>它能提供的是：</p>
+
+<p>1.一个像ant一样，通用的灵活的构建工具。</p>
+
+<p>2.一种可切换的，像Maven一样的基于约定的构建框架，却又从不锁住你。</p>
+
+<p>3.对多项目构建的强大支持。</p>
+
+<p>4.强大的依赖管理（基于Apache Ivy）。</p>
+
+<p>5.全力支持已有的Maven或者Ivy仓库基础建设。</p>
+
+<p>6.在不需要远程仓库或者pom.xml或者ivy配置文件的前提下，支持传递性依赖管理。</p>
+
+<p>7.Ant的任务（Task）和构建是gradle的一等公民。</p>
+
+<p>8.基于Groovy脚本构建，其build脚本使用groovy语言编写。</p>
+
+<p>9.具有广泛的领域模型支持你的构建。</p>
+
+<p>Gradle使用一种基于Groovy的特定领域语言来声明项目的设置。</p>
+
+<p><strong>2.对比</strong></p>
+
+<p><strong>2.1 语言不同</strong></p>
+
+<p>Gradle和Maven最大的也是最明显的不同就是它们对待管理项目的描述方式不一样，这也是导致它们不同的最本质因素。</p>
+
+<p>Maven采用几乎所有程序员都理解项目描述方式：XML。</p>
+
+<p>Gradle则采用JVM的一个替代语言Groovy作为脚本语言，它的语法与Java的语法相似（这里是指你可以像Java那样去些Groovy程序，但Groovy的一些特性会让Gradle的脚本看的更加简洁，也就是说真正的Gradle脚本看着并不是很像Java）。</p>
+
+<p>Maven通过pom.xml描述一个项目。</p>
+
+<p>Gradle通过build.gradle描述一个项目。</p>
+
+<p><strong>2.2 Maven的核心概念1 - 生命周期</strong></p>
+
+<p>生命周期是Maven的一个核心概念，它是理解Maven工作的重点。</p>
+
+<p>生命周期是什么含义呢？它表示一个项目从构建到发布的所有步骤已经是明确预先定义好了。</p>
+
+<p>对于开发者而言，我们只需要输入几个简单的命令，POM就能确保Maven的执行能够得到我们想要的结果。</p>
+
+<p>Maven有三个内置的生命周期：default，clean，site。</p>
+
+<p>default负责项目部署，clean负责项目的清理，site负责站点和文档生成。</p>
+
+<p>每一个生命周期都是由各种不同的phase（阶段）构成。例如default生命周期就包含下面的这些phase：</p>
+
+<p><strong>validate</strong> - validate the project is correct and all necessary information is available</p>
+
+<p><strong>compile</strong> - compile the source code of the project</p>
+
+<p><strong>test</strong> - test the compiled source code using a suitable unit testing framework. These tests
+should not require the code be packaged or deployed</p>
+
+<p><strong>package</strong> - take the compiled code and package it in its distributable format, such as a JAR.</p>
+
+<p><strong>integration-test</strong> - process and deploy the package if necessary into an environment where integration tests can be run</p>
+
+<p><strong>verify</strong> - run any checks to verify the package is valid and meets quality criteria</p>
+
+<p><strong>install</strong> - install the package into the local repository, for use as a dependency in other projects locally</p>
+
+<p><strong>deploy</strong> - done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects.</p>
+
+<p>这些phase会在default生命周期中按照顺序依次执行。</p>
+
+<p>要执行整个default的生命周期。你只需要执行：mvn deploy命令。</p>
+
+<p>这是因为就算你仅仅只是让maven执行deploy这一个phase，它也会把在它之前的所有phase按照顺序全部执行一遍。</p>
+
+<p>例如：mvn integration-test。它会按照顺序从validate开始一直执行到integration-test。</p>
+
+<p>关于mvn clean install命令：它是先执行clean生命周期中的clean（包含pre-clean），然后在执行default生命周期中的install（当然包含install之前的所有phase）。</p>
+
+<p>下面是clean生命周期的所有phase：</p>
+
+<p>pre-clean - executes processes needed prior to the actual project cleaning</p>
+
+<p>clean - remove all files generated by the previous build</p>
+
+<p>post-clean - executes processes needed to finalize the project cleaning</p>
+
+<p><strong>2.3 Maven的核心概念2 - 插件（plugin）及目标（goal）</strong></p>
+
+<p>虽然一个phase代表着Maven生命周期中的一步（阶段），但生命周期（life cycle）和阶段（phase）只是抽象的概念，不涉及具体的功能。</p>
+
+<p>maven去管理和构建一个项目的具体的功能是全都是由goal提供的。</p>
+
+<p>而plugin是goal的容器，plugin和goal之间的关系是包含关系，一个plugin中包含多个goal。</p>
+
+<p>例如：Compiler插件有两个goal: compile和testCompile，分别完成对main和test中源代码的编译。</p>
+
+<p>执行Goal的方式有两种：</p>
+
+<p>绑定到一个或者多个phase上</p>
+
+<p>单独执行</p>
+
+<p>绑定在phase上是比较常做的办法。在Maven执行过程中，所有经历的执行阶段(phase)上绑定的goal都将得到执行。</p>
+
+<p>例如，对于一个jar包应用，当执行mvn package命令时，在执行到compile阶段时，compiler插件的compile goal会被执行，因为这个goal是绑定在compile阶段(phase)上的。</p>
+
+<p>一些插件的goal并不适合绑定到任何阶段(phase)上，或者是，这些goal往往是单独执行，不需要同某个阶段(phase)绑定在一起。</p>
+
+<p>例如jetty插件，它的goal都是将打包或未打包的工程部署到jetty里然后启动jetty容器的，多数情况下，都是独立运行这些goal的，比如：当键入mvn jetty:run后，工程就能完成编译后启动jetty。</p>
+
+<p>生命周期(lifecycle)由多个阶段(phase)组成,每个阶段(phase)会挂接零个到多个goal，如果一个phase没有goal挂载，那么它就不会被执行。</p>
+
+<p><strong>2.4 约定由于配置</strong></p>
+
+<p>这是一个简单的概念。</p>
+
+<p>系统，类库，框架应该假定合理的默认值，而非要求提供不必要的配置。</p>
+
+<p>Maven通过给项目提供明智的默认行为来融合这个概念。</p>
+
+<p>例如：</p>
+
+<p>在没有自定义的情况下,源代码假定是在 ${basedir}/src/main/java</p>
+
+<p>资源文件假定是在 ${basedir}/src/main/resources</p>
+
+<p>测试代码假定是在 ${basedir}/src/test</p>
+
+<p>项目假定会产生一个JAR文件，Maven 假定你想要把编译好的字节码放到 ${basedir}/target/classes，并且在${basedir}/target创建一个可分发的 JAR 文件。</p>
+
+<p>Maven的力量来自它的”武断&#8221;，它有一个定义好的生命周期和一组知道如何构建和装配软件的通用插件。如果你遵循这些约定，</p>
+
+<p>Maven只需要几乎为零的工作—仅仅是将你的源代码放到正确的目录，Maven将会帮你处理剩下的事情。</p>
+
+<p>Maven标准目录结构</p>
+
+<p>src/main/java</p>
+
+<p>src/main/resources</p>
+
+<p>src/main/filters</p>
+
+<p>src/main/assembly</p>
+
+<p>src/main/config</p>
+
+<p>src/main/scripts</p>
+
+<p>src/main/webapp</p>
+
+<p>src/test/java</p>
+
+<p>src/test/resources</p>
+
+<p>src/test/filters</p>
+
+<p>src/site</p>
+
+<p>LICENSE.txt</p>
+
+<p>NOTICE.txt</p>
+
+<p>README.txt</p>
+
+<p>关于更多关于Maven的目录结构请参考这里。</p>
+
+<p>POM是Maven工作的基础。它是一个XML文件，包含了关于项目的信息及提供Maven完成构建工作的配置细节。同时它还包含对于大多数项目都一致的默认值。例如：目录结构。</p>
+
+<p>那么问题来了，这些默认值是在哪里设置的呢？答案是Super POM。</p>
+
+<p>Super POM是Maven的默认POM。除非特别指定，所有的POM都继承自这个Super POM，这意味着所有在Super POM中的配置都会在你的工程中继承。</p>
+
+<p>下面摘抄一些Super POM配置。例如：仓库的配置：</p>
+
+<figure class='code'><figcaption><span>pom.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;repositories&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;repository&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;id&gt;</span>central<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;name&gt;</span>Maven Repository Switchboard<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;layout&gt;</span>default<span class="nt">&lt;/layout&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;url&gt;</span>http://repo1.maven.org/maven2<span class="nt">&lt;/url&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;snapshots&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;enabled&gt;</span>false<span class="nt">&lt;/enabled&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/snapshots&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/repository&gt;</span>
+</span><span class='line'><span class="nt">&lt;/repositories&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>例如，目录的配置：</p>
+
+<figure class='code'><figcaption><span>pom.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;build&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;directory&gt;</span>target<span class="nt">&lt;/directory&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;outputDirectory&gt;</span>target/classes<span class="nt">&lt;/outputDirectory&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;finalName&gt;</span>${artifactId}-${version}<span class="nt">&lt;/finalName&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;testOutputDirectory&gt;</span>target/test-classes<span class="nt">&lt;/testOutputDirectory&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;sourceDirectory&gt;</span>src/main/java<span class="nt">&lt;/sourceDirectory&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;scriptSourceDirectory&gt;</span>src/main/scripts<span class="nt">&lt;/scriptSourceDirectory&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;testSourceDirectory&gt;</span>src/test/java<span class="nt">&lt;/testSourceDirectory&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;resources&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;resource&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;directory&gt;</span>src/main/resources<span class="nt">&lt;/directory&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/resource&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/resources&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;testResources&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;testResource&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;directory&gt;</span>src/test/resources<span class="nt">&lt;/directory&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/testResource&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/testResources&gt;</span>
+</span><span class='line'><span class="nt">&lt;/build&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>关于Super POM的具体内容请参考这里。</p>
+
+<p><strong>2.5 对Gradle的基本理解</strong></p>
+
+<p>首先，我们不要深入太多细节，从宏观的角度去理解Gradle的工作原理。</p>
+
+<p>Gradle也提出类似于Maven的两个概念：插件（plugin）和任务（task）。</p>
+
+<p>插件与任务之间的关系也是：包含的关系，插件中包含多个任务。</p>
+
+<p>但是与Maven不同的地方是，Gradle没有像Maven那样的内建生命周期，所以并不是像Maven那样，将目标（goals）绑定到生命周期中对应的不同阶段（phase）上然后顺序执行。</p>
+
+<p>Gradle通过定义task和它们之间的依赖关系，并保证它们根据依赖关系依次执行（且每个task只执行一次），task之间形成一种有向无环图，从而产生类似Maven生命周期的行为。</p>
+
+<p><strong>2.6 Gradle的生命周期</strong></p>
+
+<p>Gradle有严格的三个阶段：</p>
+
+<p>初始化（Initialization）配置（Configuration）执行（Execution）</p>
+
+<p>因为Gradle支持单工程和多工程构建。在初始化阶段，Gradle决定哪些工程将参与构建，并为每一个工程创建一个Project的
+实例对象。</p>
+
+<p>配置阶段是用于配置在初始化阶段产生的Project的实例对象。工程的构建脚本会在这个阶段被执行。</p>
+
+<p>Gradle将执行在配置阶段被创建和配置的一个task的小集合。这个小集合是由task的名字（task的名字是通过gradle的命令传入）和当前的目录决定。</p>
+
+<p>这里可以看出Gradle的生命周期和Maven的生命周期是完全不同的概念。</p>
+
+<p><strong>2.5 Gradle的Project和Task概念</strong></p>
+
+<p>Project和Task，顾名思义，表示工程和任务。</p>
+
+<p>Project在Gradle中表示某一个待构建的组件，可以是Jar文件，或者web应用，Gradle的构建是有一个或者多个Project组成。</p>
+
+<p>Task在Gradle中表示在构建中的一件独立工作，每个Task都属于某一个Project。</p>
+
+<p>在使用Gradle时，创建Task最常见的方式是：</p>
+
+<figure class='code'><figcaption><span>task </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">hello</span> <span class="err">«</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">println</span> <span class="err">‘</span><span class="n">hello</span><span class="err">’</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里的“«”表示追加的意思，即向hello中加入执行过程。</p>
+
+<p><strong>2.6 进一步深入理解</strong></p>
+
+<p>Gradle提供一套DSL语言来描述构建脚本。这套DSL语言是Groovy的内部DSL语言再添加一些东西，所以是基于Groovy语法的。</p>
+
+<p>上面介绍了一个最常见的创建Task的方法，实际上它是在调用Gradle API提供的一个方法task，该方法属于Project类。方法签名如下：</p>
+
+<p>Task task(String name, Closure configClosure);</p>
+
+<p>创建一个Task对象，给它一个名字，并将它添加到Project对象中。</p>
+
+<p>一个构建脚本build.gradle代表着一个工程。</p>
+
+<p>对于构建中的每一个工程，Gradle都会创建一个Project的实例对象，并把它与构建脚本关联。当构建脚本在执行时，它会配置这个Project的实例对象。</p>
+
+<p>配置方式如下：</p>
+
+<p>任何在你脚本中调用的方法（例如：task方法），如果不是在脚本中定义的方法，就把它代理给Project对象（也就是说它认为是Project对象的一个方法）。</p>
+
+<p>任何你访问的属性（例如：name属性），如果不是在脚本中定义的属性，就把它代理给Project对象（也就是project.name属性了）。</p>
+
+<p>那么Project有哪些方法呢？</p>
+
+<p>task()是一个，你已经看到，用于定义一个任务。</p>
+
+<p>apply()是一个，用于向Project对象添加插件，关于插件的具体内容，后面会讲到。</p>
+
+<p>Project有哪些属性呢？</p>
+
+<p>有name属性，表示工程目录的名字</p>
+
+<p>有project属性，也就它自己，所以:</p>
+
+<p>println name和 println project.name是一样的。</p>
+
+<p><strong>2.7 Gradle的另一个重要概念：Plugin，插件</strong></p>
+
+<p>Gradle的插件的目的是包装起可重用的构建逻辑，这样可以重复使用在许多的工程和构建中。</p>
+
+<p>Gradle的插件可以用任何语言去实现，提供的实现最终都将编译为字节码。</p>
+
+<p>你可以把插件当做是对Gradle的扩展，它会以某种方式帮助你配置工程，典型的是添加一些预配置的task提供你使用。</p>
+
+<p>Gradle作为一种通用的构建工具。核心的功能都用插件来提供，以便构建的使用者可以重用一些模式和实践。</p>
+
+<p>Gradle自带了很多插件，已提供常用的功能。</p>
+
+<p>例如，Java插件，Jetty插件，Maven插件（可以使用Maven的仓库），WAR插件，CheckStyle插件，Jacoco插件（测试覆盖率）等等。</p>
+
+<p>Java插件：</p>
+
+<p>使用的方法是在build.gradle构建脚本中加入一段代码:</p>
+
+<figure class='code'><figcaption><span>task </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="err">‘</span><span class="n">java</span><span class="err">’</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在上一篇中已经介绍过，build.gradle的构建脚本在没有明确定义一个函数时，都是代理调用Project对象的方法。这里调用
+的是Project对象中的apply方法：</p>
+
+<p>apply(Map&lt;String, ?> option);</p>
+
+<p>java插件向Project中引入了多个Task和Property。java插件比较与众不同的地方，其中之一便是它在项目中引入了构建生命周期的概念，就像Maven一样。但是，和Maven不同的是，Gradle的项目构建生命周期并不是Gradle的内建机制，而是由Plugin自己引入的（这一点前面介绍过）。</p>
+
+<p>当你在命令行中执行“gradle build”命令，可以看到java插件所引入的主要Task：</p>
+
+<p>:compileJava</p>
+
+<p>:processResources</p>
+
+<p>:classes</p>
+
+<p>:jar</p>
+
+<p>:assemble</p>
+
+<p>:compileTestJava</p>
+
+<p>:processTestResources</p>
+
+<p>:testClasses</p>
+
+<p>:test</p>
+
+<p>:check</p>
+
+<p>:build</p>
+
+<p>当然还有一个有用的Task：</p>
+
+<p>clean：Deletes the build directory, removing all built files.</p>
+
+<p>具体的每一个task的含义，我就不一一解释了，在这里可以查得到。</p>
+
+<p>java插件中每个task之间的关系图，他们之间的依赖关系，构成了类似Maven完整的生命周期。</p>
+
+<p>Gradle是一个结合Ant和Maven的项目管理工具。Maven的约定优于配置的思想固然是要在这里体现的。</p>
+
+<p>java插件会假设你的项目结构如下：</p>
+
+<p>src/main/java Production Java source</p>
+
+<p>src/main/resources Production resources</p>
+
+<p>src/test/java Test Java source</p>
+
+<p>src/test/resources Test resources</p>
+
+<p>src/sourceSet/java Java source for the given source set</p>
+
+<p>src/sourceSet/resources Resources for the given source set</p>
+
+<p>Source Set概念（此处摘抄自腾云的博文，待修改）</p>
+
+<p>Gradle在采用了Maven目录结构的同时，还融入了自己的一些概念，即source set。对于上图中的目录结构，Gradle实际上为我们创建了2个source set，一个名为main，一个名为test。</p>
+
+<p>请注意，这里的source set的名字main与上图目录结构中的main文件夹并无必然的联系，只是在默认情况下，Gradle为了source set概念到文件系统目录结构的映射方便，才采用了相同的名字。对于test， 也是如此。我们完全可以在build.gradle文件中重新配置这些source set所对应的目录结构，同时，我们还可以创建新的source set。</p>
+
+<p>从本质上讲，Gradle的每个source set都包含有一个名字，并且包含有一个名为java的Property和一个名为resources的Property，他们分别用于表示该source set所包含的Java源文件集合和资源文件集合。在实际应用时，我们可以将他们设置成任何目录值。比如，我们可以重新设置main的目录结构：</p>
+
+<figure class='code'><figcaption><span>task </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">main</span> <span class="o">{</span>
+</span><span class='line'>     <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">srcDir</span> <span class="err">‘</span><span class="n">java</span><span class="o">-</span><span class="n">sources</span><span class="err">’</span>
+</span><span class='line'>     <span class="o">}</span>
+</span><span class='line'>     <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">srcDir</span> <span class="err">‘</span><span class="n">resources</span><span class="err">’</span>
+</span><span class='line'>     <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>2.8 另外一个重点：依赖管理</strong></p>
+
+<p>我们知道依赖管理是项目管理软件中的一个非常重要部分，在Maven的POM文件中，占据最多行配置代码的就是这个部分。</p>
+
+<p>现在我们来看看在Gradle中是如何配置依赖的？</p>
+
+<figure class='code'><figcaption><span>task </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="err">‘</span><span class="n">java</span><span class="err">’</span>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">testCompile</span> <span class="nl">group:</span> <span class="err">‘</span><span class="n">junit</span><span class="err">’</span><span class="o">,</span> <span class="nl">name:</span> <span class="err">‘</span><span class="n">junit</span><span class="err">’</span><span class="o">,</span> <span class="nl">version:</span> <span class="err">‘</span><span class="mi">4</span><span class="o">.+</span><span class="err">’</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的代码，定义了对junit的依赖，并告诉Gradle到maven的中心仓库去寻找依赖。</p>
+
+<p>在Gradle中，依赖会被分组到不同的configuration对象中。configuration有名字和一些属性，并且他们能够互相扩展。许多Gradle的插件就预定义了一些configuration到工程中。</p>
+
+<p>定义一个configuration的方式如下：</p>
+
+<figure class='code'><figcaption><span>task </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">configurations</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">compile</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的代码表示定义了一个名字是compile的configuration对象。</p>
+
+<p>实际上他调用的是Project对象的configurations方法：</p>
+
+<p>void configurations(Closure configureClosure)</p>
+
+<p>它是用于配置configuration对象的。</p>
+
+<p>在java插件中已经预先定义了一些configuration，例如：compile，runtime，testCompile，testRuntime。</p>
+
+<p>compile</p>
+
+<p>需要在编译产品代码时使用的依赖</p>
+
+<p>runtime</p>
+
+<p>需要在产品代码的运行时使用的依赖，默认也包含编译时使用的依赖。</p>
+
+<p>testCompile</p>
+
+<p>需要在编译测试代码时使用的依赖。默认也包含编译时和运行时产品代码的依赖。</p>
+
+<p>testRuntime</p>
+
+<p>需要在测试代码运行时的依赖。默认包含产品代码编译时和运行时依赖，以及测试代码编译时依赖。</p>
+
+<figure class='code'><figcaption><span>task </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="err">‘</span><span class="n">java</span><span class="err">’</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//so that we can use ‘compile’, ‘testCompile’ for dependencies</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">//for dependencies found in artifact repositories you can use</span>
+</span><span class='line'>         <span class="c1">//the group:name:version notation</span>
+</span><span class='line'>       <span class="n">compile</span> <span class="err">‘</span><span class="n">commons</span><span class="o">-</span><span class="nl">lang:</span><span class="n">commons</span><span class="o">-</span><span class="nl">lang:</span><span class="mf">2.6</span><span class="err">’</span>
+</span><span class='line'>       <span class="n">testCompile</span> <span class="err">‘</span><span class="n">org</span><span class="o">.</span><span class="na">mockito</span><span class="o">:</span><span class="nl">mockito:</span><span class="mf">1.9</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">rc1</span><span class="err">’</span>
+</span><span class='line'>        <span class="c1">//map-style notation:</span>
+</span><span class='line'>       <span class="n">compile</span> <span class="nl">group:</span> <span class="err">‘</span><span class="n">com</span><span class="o">.</span><span class="na">google</span><span class="o">.</span><span class="na">code</span><span class="o">.</span><span class="na">guice</span><span class="err">’</span><span class="o">,</span> <span class="nl">name:</span> <span class="err">‘</span><span class="n">guice</span><span class="err">’</span><span class="o">,</span> <span class="nl">version:</span> <span class="err">‘</span><span class="mf">1.0</span><span class="err">’</span>
+</span><span class='line'>        <span class="c1">//declaring arbitrary files as dependencies</span>
+</span><span class='line'>       <span class="n">compile</span> <span class="nf">files</span><span class="o">(</span><span class="err">‘</span><span class="n">hibernate</span><span class="o">.</span><span class="na">jar</span><span class="err">’</span><span class="o">,</span> <span class="err">‘</span><span class="n">libs</span><span class="s">/spring.jar’)</span>
+</span><span class='line'><span class="s">       /</span><span class="o">/</span><span class="n">putting</span> <span class="n">all</span> <span class="n">jars</span> <span class="n">from</span> <span class="err">‘</span><span class="n">libs</span><span class="err">’</span> <span class="n">onto</span> <span class="n">compile</span> <span class="n">classpath</span>
+</span><span class='line'>       <span class="n">compile</span> <span class="nf">fileTree</span><span class="o">(</span><span class="err">‘</span><span class="n">libs</span><span class="err">’</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然还有依赖配置的更高级的功能：</p>
+
+<ul>
+<li><p>强制某个依赖的版本号以防止冲突</p></li>
+<li><p>排除某个依赖</p></li>
+<li><p>避免某个依赖的传递依赖</p></li>
+</ul>
+
+
+<p>下面是一个使用了强制，排除和关闭依赖传递性的例子。</p>
+
+<figure class='code'><figcaption><span>task </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="err">‘</span><span class="n">java</span><span class="err">’</span> <span class="c1">//so that I can declare ‘compile’ dependencies</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="err">‘</span><span class="n">org</span><span class="o">.</span><span class="na">hibernate</span><span class="o">:</span><span class="nl">hibernate:</span><span class="mf">3.1</span><span class="err">’</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">//in case of versions conflict ‘3.1’ version of hibernate wins:</span>
+</span><span class='line'>        <span class="n">force</span> <span class="o">=</span> <span class="kc">true</span>
+</span><span class='line'>        <span class="c1">//excluding a particular transitive dependency:</span>
+</span><span class='line'>        <span class="n">exclude</span> <span class="nl">module:</span> <span class="err">‘</span><span class="n">cglib</span><span class="err">’</span> <span class="c1">//by artifact name</span>
+</span><span class='line'>        <span class="n">exclude</span> <span class="nl">group:</span> <span class="err">‘</span><span class="n">org</span><span class="o">.</span><span class="na">jmock</span><span class="err">’</span> <span class="c1">//by group</span>
+</span><span class='line'>        <span class="n">exclude</span> <span class="nl">group:</span> <span class="err">‘</span><span class="n">org</span><span class="o">.</span><span class="na">unwanted</span><span class="err">’</span><span class="o">,</span> <span class="nl">module:</span> <span class="err">‘</span><span class="n">iAmBuggy</span><span class="err">’</span> <span class="c1">//by both name and group</span>
+</span><span class='line'>        <span class="c1">//disabling all transitive dependencies of this dependency</span>
+</span><span class='line'>        <span class="n">transitive</span> <span class="o">=</span> <span class="kc">false</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>关于依赖，暂时先讲到这里，后面还有更详细的分析。</p>
+
+<p><strong>2.9 多个项目的构建</strong></p>
+
+<p>多项目，对于Maven而言，称为多模块（Multi-Module），对于Gradle而言，称为多个工程（Multi-Project）。</p>
+
+<p>多模块的好处是你只需在根模块中执行Maven命令，Maven会分别在各个子模块中执行该命令，执行顺序通过Maven的Reactor机制决定。</p>
+
+<p>收集起所有可构建的模块</p>
+
+<p>对模块的构建顺序进行排序</p>
+
+<p>按照正确的顺序进行构建</p>
+
+<p>排序的规则如下：</p>
+
+<ul>
+<li><p>一个模块的构建依赖于另一个构建中模块</p></li>
+<li><p>一个模块使用的插件来自于构建中的模块（构建的内容是一个插件）</p></li>
+<li><p>插件的依赖于另一个模块</p></li>
+<li><p>一个构建扩展声明来自于另一个构建中的模块</p></li>
+</ul>
+
+
+<p>在<modules>元素中声明的顺序（如果没有其他规则的情况下）</p>
+
+<p>强调一点，在Maven中，由多模块（由上到下）和继承（由下到上）关系并不必同时存在。</p>
+
+<p>在Maven中，定义多模块的方式是在父POM中定义</p>
+
+<figure class='code'><figcaption><span>pom.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;modules&gt;</span>…<span class="nt">&lt;modules&gt;</span>。
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>而实现继承的方式是在子POM中声明</p>
+
+<figure class='code'><figcaption><span>pom.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;parent&gt;</span>…<span class="nt">&lt;/parent&gt;</span>。
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>多模块的目的是让父模块知道子模块及它们之间的关系。</p>
+
+<p>继承是子模块希望从父模块那里继承属性，减少在子模块中对相同属性的重复定义。</p>
+
+<p>在Gradle中，定义project之间的父子关系，要比Maven更简单。</p>
+
+<p>首先在根project中加入名为settings.gradle的配置文件，然后我们在根project目录下创建两个文件夹来表示子project的目录，分别为sub-project1和sub-project2，</p>
+
+<p>根project在自己的目录下拥有build.gradle文件和settings.gradle文件。而两个子Project拥有他们自己的
+build.gradle文件。</p>
+
+<p>目录结构如下：</p>
+
+<p>root-project/</p>
+
+<p> sub-project1/</p>
+
+<p>   build.gradle</p>
+
+<p> sub-project2/</p>
+
+<p>   build.gradle</p>
+
+<p>build.gradle</p>
+
+<p>settings.gradle</p>
+
+<p>最后，需要在settings.gradle中加入一段脚本：</p>
+
+<figure class='code'><figcaption><span>task </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">include</span> <span class="err">‘</span><span class="n">sub</span><span class="o">-</span><span class="n">project1</span><span class="err">’</span><span class="o">,</span> <span class="err">‘</span><span class="n">sub</span><span class="o">-</span><span class="n">project2</span><span class="err">’</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在前面，我们讲过Gradle的声明周期，初始化，配置，执行。</p>
+
+<p>其中初始化的过程就是用来确定多个project的过程。</p>
+
+<p>而配置阶段就是根据构建脚本内容对project对象的配置过程。</p>
+
+<p>Gradle提出一种按需配置的模式。意思是说，根据需要，并不是所有的project都需要配置，根据task的需求而定。</p>
+
+<p>关于这一点的具体内容，后续在继续聊。</p>
+
+<p>定义所有project的共同内容</p>
+
+<p>在父project的build.gradle中定义：</p>
+
+<figure class='code'><figcaption><span>task </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">allprojects</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">task</span> <span class="n">hello</span> <span class="err">«</span> <span class="o">{</span> <span class="n">task</span> <span class="o">-&gt;</span> <span class="n">println</span> <span class="err">“</span><span class="n">I</span><span class="err">’</span><span class="n">m</span> <span class="n">$task</span><span class="o">.</span><span class="na">project</span><span class="o">.</span><span class="na">name</span><span class="err">”</span> <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>它会调用project对象的allprojects方法：</p>
+
+<p>void allprojects(Closure configureClosure)</p>
+
+<p>在这个里面的配置是提供给所有的project，这意味着父project和所有子project。</p>
+
+<p>定义给子project的共同内容</p>
+
+<figure class='code'><figcaption><span>task </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">subprojects</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">hello</span> <span class="err">«</span> <span class="o">{</span><span class="n">println</span> <span class="err">“</span><span class="o">-</span> <span class="n">I</span> <span class="n">depend</span> <span class="n">on</span> <span class="n">water</span><span class="err">”</span><span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>它会调用project对象的subprojects方法：</p>
+
+<p>void subprojects(Closure configureClosure)</p>
+
+<p>这里面的配置是提供给所有的子project使用。</p>
+
+<p>还可以在父project的build.gradle中写一句话来指定某一个子project做一件事情。</p>
+
+<figure class='code'><figcaption><span>task </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">project</span><span class="o">(</span><span class="err">‘</span><span class="o">:</span><span class="n">bluewhale</span><span class="err">’</span><span class="o">).</span><span class="na">hello</span> <span class="err">«</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">println</span> <span class="err">“</span><span class="o">-</span> <span class="n">I</span><span class="err">’</span><span class="n">m</span> <span class="n">the</span> <span class="n">largest</span> <span class="n">animal</span> <span class="n">that</span> <span class="n">has</span> <span class="n">ever</span> <span class="n">lived</span> <span class="n">on</span> <span class="k">this</span> <span class="n">planet</span><span class="o">.</span><span class="err">”</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>传入子project的名字（就是它的目录名），并定义一个task。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/10/14/using-jasmine-to-write-test-for-javascript/">使用jasmine为javascript写单元测试</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-10-14T14:38:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>2:38 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>写这一篇关于Jasmine文章，是因为在正式加入ThoughtWorks之前，做过的一个偏前端的web项目。</p>
+
+<p>项目的内容是对用户提供的数据进行计算，并得到一个报表，提供打印。</p>
+
+<p>当时希望能够用github page作为空间，但我们都知道，github page是只支持前端，即页面和javascript。</p>
+
+<p>所以在项目中，我使用js进行计算，使用xml作为数据库，使用cookie来确保用户意外退出浏览器时，不会丢失尚未完成计算的输入数据。</p>
+
+<p>项目中最难的部分是对计算公式的选择，需要根据计算参数的不同条件选择出不同的计算公式。这里我给出一部分较为简单的公式选择逻辑作为说明。C和AF是条件也就是参数，PI是对应的选择公式。</p>
+
+<pre><code>#   C       AF      PI
+1.  q       q       1/q
+2.  pq      q       1/2q
+3.  q       qr      1/2q
+4.  pq      pq      (p+q)/4pq
+5.  pq      qr      1/4q
+</code></pre>
+
+<p>如果这个是一个Java或者C的项目，Ok，即使没有测试，我们也可以非常方便的通过控制台查看计算结果（如果内容多了，还是要写测试，因为要重构）。</p>
+
+<p>但对于是js项目，如果没有测试帮助判断逻辑的正确性，将是非常痛苦的事情。</p>
+
+<p><img src="http://pivotal.github.io/jasmine/images/jasmine_logo.png" alt="Jasmine" /></p>
+
+<p>Jasmine是一种基于行为驱动的Javascript测试框架。它不依赖于其他的Javascript框架。</p>
+
+<p>下面是一个简单的且常用的单元测试模式。</p>
+
+<figure class='code'><figcaption><span>a junit test for js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s2">&quot;Test method&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">it</span><span class="p">(</span><span class="s2">&quot;should return true when condition is pp qq&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">expect</span><span class="p">(</span><span class="nx">someMethod</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;q&#39;</span><span class="p">,</span><span class="s1">&#39;q&#39;</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>describe是对一系列单元测试的大描述。</p>
+
+<p>it中的描述是这一个单元测试的描述。例如，我们可以在describe中写多个单元测试，例如：</p>
+
+<figure class='code'><figcaption><span>a junit test for js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s2">&quot;Test method&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">it</span><span class="p">(</span><span class="s2">&quot;should return true when condition is pp qq&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">expect</span><span class="p">(</span><span class="nx">someMethod</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;q&#39;</span><span class="p">,</span><span class="s1">&#39;q&#39;</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>  <span class="nx">it</span><span class="p">(</span><span class="s2">&quot;should return false when condition is pp pp&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">expect</span><span class="p">(</span><span class="nx">someMethod</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<blockquote><p>下面进入正题，如何在项目中引入Jasmine。
+jasmine库中一共包含4个重要文件。</p></blockquote>
+
+<p>jasmine.css   jasmine.js   jasmine-html.js   SpecRunner.html</p>
+
+<p>剩下的是你自己的Javascript文件和测试文件。例如，假设js文件是</p>
+
+<figure class='code'><figcaption><span>justdoit.js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么你对应的测试文件是</p>
+
+<figure class='code'><figcaption><span>justdoitSpec.js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s2">&quot;just do it&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s2">&quot;should return 10 when 5 plus 5&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">expect</span><span class="p">(</span><span class="nx">add</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在写完测试代码之后，需要将对应的js文件引入在SpecRunner.html文件中。</p>
+
+<figure class='code'><figcaption><span>justdoitSpec.js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c">&lt;!--</span> <span class="nx">include</span> <span class="nx">source</span> <span class="nx">files</span> <span class="nx">here</span><span class="p">...</span> <span class="o">--&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text/javascript&quot;</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;src/justdoit.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">&lt;!--</span> <span class="nx">include</span> <span class="nx">spec</span> <span class="nx">files</span> <span class="nx">here</span><span class="p">...</span> <span class="o">--&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text/javascript&quot;</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;spec/whatervername.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>运行测试的方式是在浏览器中打开这个SpecRunner.html页面。</p>
+
+<p>大致给出的内容就是：</p>
+
+<pre><code>Passing 1 spec
+
+just do it
+
+    should return 10 when 5 plus 5
+</code></pre>
+
+<p>在我的这个项目中，起初没有使用jasmine，由于逻辑复杂，手动在页面测试非常麻烦，且不易于代码重构。</p>
+
+<p>后期引入jasmine之后，覆盖了所有的测试情况，这样可以在重构代码时，能够非常迅速的知道重构代码是否正确。</p>
+
+<p>Jasmine还有很多更高级的用法，就目前项目中暂时还没有用到，如果用到，在以后的时间继续更新。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/09/22/inversion-of-control-containers-and-the-dependency-injection-pattern-translate/">留档记录：IoC容器和Dependency Injection模式</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-09-22T17:53:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2013</span></span> <span class='time'>5:53 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>IoC容器和Dependency Injection模式(作者：Martin Fowler)</p>
+
+<p>原文链接：<a href="http://martinfowler.com/articles/injection.html">http://martinfowler.com/articles/injection.html</a></p>
+
+<p>翻译：透明（<a href="http://gigix.thoughtworkers.org/">熊节</a>）</p>
+
+<p>摘要：Java社群近来掀起了一阵轻量级容器的热潮，这些容器能够帮助开发者将来自不同项目的组件组装成为一个内聚的应用程序。在它们的背后有着同一个模式，这个模式决定了这些容器进行组件装配的方式。人们用一个大而化之的名字来称呼这个模式：“控制反转”（ Inversion of Control，IoC）。在本文中，我将深入探索这个模式的工作原理，给它一个更能描述其特点的名字——“依赖注入”（Dependency Injection），并将其与“服务定位器”（Service Locator）模式作一个比较。不过，这两者之间的差异并不太重要，更重要的是：应该将组件的配置与使用分离开——两个模式的目标都是这个。</p>
+
+<h2>目录</h2>
+
+<p>组件和服务<br/>
+一个简单的例子<br/>
+控制反转<br/>
+依赖注入的几种形式<br/>
+使用PicoContainer 进行构造函数注入    <br/>
+使用Spring 进行设值方法注入<br/>
+接口注入<br/>
+使用Service Locator  <br/>
+为定位器提供分离的接口  <br/>
+动态服务定位器<br/>
+用Avalon 兼顾服务定位器和依赖注入<br/>
+作出一个选择 <br/>
+Service Locator vs. Dependency Injection   <br/>
+构造函数注入 vs. 设值方法注入 <br/>
+代码配置 vs. 配置文件 <br/>
+分离配置与使用<br/>
+更多的问题<br/>
+结论和思考<br/>
+致谢</p>
+
+<p>在企业级Java的世界里存在一个有趣的现象：有很多人投入很多精力来研究主流J2EE 技术的替代品——自然，这大多发生在open source社群。在很大程度上，这可以看作是开发者对主流J2EE技术的笨重和复杂作出的回应，但其中的确有很多极富创意的想法，的确提供了一些可供选择的方案。J2EE开发者常遇到的一个问题就是如何组装不同的程序元素：如果web控制器体系结构和数据库接口是由不同的团队所开发的，彼此几乎一无所知，你应该如何让它们配合工作？很多框架尝试过解决这个问题，有几个框架索性朝这个方向发展，提供了更通用的“组装各层组件”的方案。这样的框架通常被称为“轻量级容器”，PicoContainer和Spring都在此列中。</p>
+
+<p>在这些容器背后，一些有趣的设计原则发挥着作用。这些原则已经超越了特定容器的范畴，甚至已经超越了Java平台的范畴。在本文中，我就要初步揭示这些原则。我使用的范例是Java代码，但正如我的大多数文章一样，这些原则也同样适用于别的OO环境，特别是.NET。</p>
+
+<h2>组件和服务</h2>
+
+<p>装配程序元素，这样的话题立即将我拖进了一个棘手的术语问题：如何区分“服务”（service）和“组件”（component）？你可以毫不费力地找出关于这两个词定义的长篇大论，各种彼此矛盾的定义会让你感受到我所处的窘境。有鉴于此，对于这两个遭到了严重滥用的词汇，我将首先说明它们在本文中的用法。</p>
+
+<p>所谓“组件”是指这样一个软件单元：它将被作者无法控制的其他应用程序使用，但后者不能对组件进行修改。也就是说，使用一个组件的应用程序不能修改组件的源代码，但可以通过作者预留的某种途径对其进行扩展，以改变组件的行为。</p>
+
+<p>服务和组件有某种相似之处：它们都将被外部的应用程序使用。在我看来，两者之间最大的差异在于：组件是在本地使用的（例如JAR文件、程序集、DLL、或者源码导入）；而服务是要通过同步或异步的远程接口来远程使用的（例如web service、消息系统、RPC，或者socket）。</p>
+
+<p>在本文中，我将主要使用“服务”这个词，但文中的大多数逻辑也同样适用于本地组件。实际上，为了方便地访问远程服务，你往往需要某种本地组件框架。不过，“组件或者服务”这样一个词组实在太麻烦了，而且“服务”这个词当下也很流行，所以本文将用“服务”指代这两者。</p>
+
+<h2>一个简单的例子</h2>
+
+<p>为了更好地说明问题，我要引入一个例子。和我以前用的所有例子一样，这是一个超级简单的例子：它非常小，小得有点不够真实，但足以帮助你看清其中的道理，而不至于陷入真实例子的泥潭中无法自拔。</p>
+
+<p>在这个例子中，我编写了一个组件，用于提供一份电影清单，清单上列出的影片都是由一位特定的导演执导的。实现这个伟大的功能只需要一个方法：</p>
+
+<p>File /Users/twer/Documents/octopress/source/downloads/code/MovieListerOrigin.java could not be found</p>
+
+<p>你可以看到，这个功能的实现极其简单：moviesDirectedBy方法首先请求finder（影片搜寻者）对象（我们稍后会谈到这个对象）返回后者所知道的所有影片，然后遍历finder对象返回的清单，并返回其中由特定的某个导演执导的影片。非常简单，不过不必担心，这只是整个例子的脚手架罢了。我们真正想要考察的是finder对象，或者说，如何将MovieLister对象与特定的finder对象连接起来。为什么我们对这个问题特别感兴趣？因为我希望上面这个漂亮的moviesDirectedBy方法完全不依赖于影片的实际存储方式。所以，这个方法只能引用一个finder对象，而finder对象则必须知道如何对findAll 方法作出回应。为了帮助读者更清楚地理解，我给finder定义了一个接口：</p>
+
+<p>File /Users/twer/Documents/octopress/source/downloads/code/MovieFinder.java could not be found</p>
+
+<p>现在，两个对象之间没有什么耦合关系。但是，当我要实际寻找影片时，就必须涉及到MovieFinder的某个具体子类。在这里，我把涉及具体子类的代码放在MovieLister类的构造函数中。</p>
+
+<p>File /Users/twer/Documents/octopress/source/downloads/code/MovieListerNoInjection.java could not be found</p>
+
+<p>这个实现类的名字就说明：我将要从一个逗号分隔的文本文件中获得影片列表。你不必操心具体的实现细节，只要设想这样一个实现类就可以了。如果这个类只由我自己使用，一切都没问题。但是，如果我的朋友叹服于这个精彩的功能，也想使用我的程序，那又会怎么样呢？如果他们也把影片清单保存在一个逗号分隔的文本文件中，并且也把这个文件命名为“ movie1.txt ”，那么一切还是没问题。如果他们只是给这个文件改改名，我也可以从一个配置文件获得文件名，这也很容易。但是，如果他们用完全不同的方式——例如SQL 数据库、XML 文件、web service，或者另一种格式的文本文件——来存储影片清单呢？在这种情况下，我们需要用另一个类来获取数据。由于已经定义了MovieFinder接口，我可以不用修改moviesDirectedBy方法。但是，我仍然需要通过某种途径获得合适的MovieFinder实现类的实例。</p>
+
+<p><img class="center" src="/../images/martin-fowler-ioc-di/Graphics1.png"></p>
+
+<p>图1展现了这种情况下的依赖关系：MovieLister类既依赖于MovieFinder接口，也依赖于具体的实现类。我们当然希望MovieLister类只依赖于接口，但我们要如何获得一个MovieFinder子类的实例呢？</p>
+
+<p>在Patterns of Enterprise Application Architecture一书中，我们把这种情况称为插件（plugin）：MovieFinder的实现类不是在编译期连入程序之中的，因为我并不知道我的朋友会使用哪个实现类。我们希望MovieLister类能够与MovieFinder的任何实现类配合工作，并且允许在运行期插入具体的实现类，插入动作完全脱离我（原作者）的控制。这里的问题就是：如何设计这个连接过程，使MovieLister类在不知道实现类细节的前提下与其实例协同工作。</p>
+
+<p>将这个例子推而广之，在一个真实的系统中，我们可能有数十个服务和组件。在任何时候，我们总可以对使用组件的情形加以抽象，通过接口与具体的组件交流（如果组件并没有设计一个接口，也可以通过适配器与之交流）。但是，如果我们希望以不同的方式部署这个系统，就需要用插件机制来处理服务之间的交互过程，这样我们才可能在不同的部署方案中使用不同的实现。所以，现在的核心问题就是：如何将这些插件组合成一个应用程序？这正是新生的轻量级容器所面临的主要问题，而它们解决这个问题的手段无一例外地是控制反转（Inversion of Control）模式。</p>
+
+<h2>控制反转</h2>
+
+<p>几位轻量级容器的作者曾骄傲地对我说：这些容器非常有用，因为它们实现了控制反转。这样的说辞让我深感迷惑：控制反转是框架所共有的特征，如果仅仅因为使用了控制反转就认为这些轻量级容器与众不同，就好象在说我的轿车是与众不同的，因为它有四个轮子。</p>
+
+<p>问题的关键在于：它们反转了哪方面的控制？我第一次接触到的控制反转针对的是用户界面的主控权。早期的用户界面是完全由应用程序来控制的，你预先设计一系列命令，例如输入姓名、输入地址等，应用程序逐条输出提示信息，并取回用户的响应。而在图形用户界面环境下，UI框架将负责执行一个主循环，你的应用程序只需为屏幕的各个区域提供事件处理函数即可。在这里，程序的主控权发生了反转：从应用程序移到了框架。对于这些新生的容器，它们反转的是如何定位插件的具体实现。在前面那个简单的例子中，MovieLister类负责定位MovieFinder的具体实现——它直接实例化后者的一个子类。这样一来，MovieFinder也就不成其为一个插件了，因为它并不是在运行期插入应用程序中的。而这些轻量级容器则使用了更为灵活的办法，只要插件遵循一定的规则，一个独立的组装模块就能够将插件的具体实现注射到应用程序中。因此，我想我们需要给这个模式起一个更能说明其特点的名字——“控制反转”这个名字太泛了，常常让人有些迷惑。与多位IoC 爱好者讨论之后，我们决定将这个模式叫做“依赖注入”（Dependency Injection）。</p>
+
+<p>下面，我将开始介绍Dependency Injection模式的几种不同形式。不过，在此之前，我要首先指出：要消除应用程序对插件实现的依赖，依赖注入并不是唯一的选择，你也可以用Service Locator模式获得同样的效果。介绍完Dependency Injection模式之后，我也会谈到Service Locator 模式。</p>
+
+<h2>依赖注入的几种形式</h2>
+
+<p>Dependency Injection 模式的基本思想是：用一个单独的对象（装配器）来获得MovieFinder的一个合适的实现，并将其实例赋给MovieLister类的一个字段。这样一来，我们就得到了图2所示的依赖图：</p>
+
+<p><img class="center" src="/../images/martin-fowler-ioc-di/Graphics2.png"></p>
+
+<p>依赖注入的形式主要有三种，我分别将它们叫做构造函数注入（Constructor Injection）、设值方法注入（Setter Injection）和接口注入（Interface Injection）。如果读过最近关于IoC的一些讨论材料，你不难看出：这三种注入形式分别就是type 1 IoC（接口注入）、type 2 IoC（设值方法注入）和type 3 IoC（构造函数注入）。我发现数字编号往往比较难记，所以我使用了这里的命名方式。</p>
+
+<h2>使用PicoContainer 进行构造函数注入</h2>
+
+<p>首先，我要向读者展示如何用一个名为PicoContainer的轻量级容器完成依赖注入。之所以从这里开始，主要是因为我在ThoughtWorks公司的几个同事在PicoContainer的开发社群中非常活跃——没错，也可以说是某种偏袒吧。</p>
+
+<p>PicoContainer通过构造函数来判断如何将MovieFinder实例注入MovieLister 类。因此，MovieLister类必须声明一个构造函数，并在其中包含所有需要注入的元素：</p>
+
+<p>File /Users/twer/Documents/octopress/source/downloads/code/MovieListerWithConstructor.java could not be found</p>
+
+<p>MovieFinder实例本身也将由PicoContainer来管理，因此文本文件的名字也可以由容器注入：</p>
+
+<p>File /Users/twer/Documents/octopress/source/downloads/code/ColonMovieFinder.java could not be found</p>
+
+<p>随后，需要告诉PicoContainer：各个接口分别与哪个实现类关联、将哪个字符串注入MovieFinder组件。</p>
+
+<p>File /Users/twer/Documents/octopress/source/downloads/code/configureContainer.java could not be found</p>
+
+<p>这段配置代码通常位于另一个类。对于我们这个例子，使用我的MovieLister 类的朋友需要在自己的设置类中编写合适的配置代码。当然，还可以将这些配置信息放在一个单独的配置文件中，这也是一种常见的做法。你可以编写一个类来读取配置文件，然后对容器进行合适的设置。尽管PicoContainer本身并不包含这项功能，但另一个与它关系紧密的项目NanoContainer提供了一些包装，允许开发者使用XML配置文件保存配置信息。NanoContainer能够解析XML文件，并对底下的PicoContainer进行配置。这个项目的哲学观念就是：将配置文件的格式与底下的配置机制分离开。</p>
+
+<p>使用这个容器，你写出的代码大概会是这样：
+File /Users/twer/Documents/octopress/source/downloads/code/testWithPico.java could not be found
+尽管在这里我使用了构造函数注入，实际上PicoContainer也支持设值方法注入，不过该项目的开发者更推荐使用构造函数注入。</p>
+
+<p>使用Spring 进行设值方法注入</p>
+
+<p>Spring 框架是一个用途广泛的企业级Java 开发框架，其中包括了针对事务、持久化框架、web应用开发和JDBC等常用功能的抽象。和PicoContainer一样，它也同时支持构造函数注入和设值方法注入，但该项目的开发者更推荐使用设值方法注入——恰好适合这个例子。为了让MovieLister类接受注入， 我需要为它定义一个设值方法，该方法接受类型为MovieFinder的参数：
+File /Users/twer/Documents/octopress/source/downloads/code/MovieListerWithSetter.java could not be found</p>
+
+<p>类似地，在MovieFinder的实现类中，我也定义了一个设值方法，接受类型为String 的参数：</p>
+
+<p>File /Users/twer/Documents/octopress/source/downloads/code/ColonMovieFinderWithSetter.java could not be found</p>
+
+<p>第三步是设定配置文件。Spring 支持多种配置方式，你可以通过XML 文件进行配置，也可以直接在代码中配置。不过，XML 文件是比较理想的配置方式。</p>
+
+<p>File /Users/twer/Documents/octopress/source/downloads/code/Spring.xml could not be found</p>
+
+<p>于是，测试代码大概就像下面这样：</p>
+
+<p>File /Users/twer/Documents/octopress/source/downloads/code/testWithString.java could not be found</p>
+
+<h2>接口注入</h2>
+
+<p>除了前面两种注入技术，还可以在接口中定义需要注入的信息，并通过接口完成注入。Avalon框架就使用了类似的技术。在这里，我首先用简单的范例代码说明它的用法，后面还会有更深入的讨论。首先，我需要定义一个接口，组件的注入将通过这个接口进行。在本例中，这个接口的用途是将一个MovieFinder实例注入继承了该接口的对象。</p>
+
+<p>File /Users/twer/Documents/octopress/source/downloads/code/InjectFinder.java could not be found</p>
+
+<p>这个接口应该由提供MovieFinder接口的人一并提供。任何想要使用MovieFinder实例的类（例如MovieLister类）都必须实现这个接口。</p>
+
+<p>File /Users/twer/Documents/octopress/source/downloads/code/MovieListerImplementInjectFinder.java could not be found</p>
+
+<p>然后，我使用类似的方法将文件名注入MovieFinder的实现类：</p>
+
+<p>File /Users/twer/Documents/octopress/source/downloads/code/InjectFilename.java could not be found</p>
+
+<p>现在，还需要用一些配置代码将所有的组件实现装配起来。简单起见，我直接在代码中完成配置，并将配置好的MovieLister 对象保存在名为lister的字段中：
+File /Users/twer/Documents/octopress/source/downloads/code/IfaceTester.java could not be found</p>
+
+<p>测试代码则可以直接使用这个字段：
+File /Users/twer/Documents/octopress/source/downloads/code/IfaceTestertestIface.java could not be found</p>
+
+<h2>使用Service Locator</h2>
+
+<p>依赖注入的最大好处在于：它消除了MovieLister类对具体MovieFinder实现类的依赖。这样一来，我就可以把MovieLister类交给朋友，让他们根据自己的环境插入一个合适的MovieFinder实现即可。不过，Dependency Injection模式并不是打破这层依赖关系的唯一手段，另一种方法是使用Service Locator模式。</p>
+
+<p>Service Locator模式背后的基本思想是：有一个对象（即服务定位器）知道如何获得一个应用程序所需的所有服务。也就是说，在我们的例子中，服务定位器应该有一个方法，用于获得一个MovieFinder实例。当然，这不过是把麻烦换了一个样子，我们仍然必须在MovieLister中获得服务定位器，最终得到的依赖关系如图3 所示：</p>
+
+<p><img class="center" src="/../images/martin-fowler-ioc-di/Graphics3.png"></p>
+
+<p>在这里，我把ServiceLocator类实现为一个Singleton的注册表，于是MovieLister就可以在实例化时通过ServiceLocator获得一个MovieFinder实例。</p>
+
+<figure class='code'><figcaption><span>通过ServiceLocator获得一个MovieFinder实例 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">class</span> <span class="nc">MovieLister</span><span class="o">...</span>
+</span><span class='line'><span class="n">MovieFinder</span> <span class="n">finder</span> <span class="o">=</span> <span class="n">ServiceLocator</span><span class="o">.</span><span class="na">movieFinder</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">class</span> <span class="nc">ServiceLocator</span><span class="o">...</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">MovieFinder</span> <span class="nf">movieFinder</span><span class="o">(){</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">soleInstance</span><span class="o">.</span><span class="na">movieFinder</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="n">ServiceLocator</span> <span class="n">soleInstance</span><span class="o">;</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">MovieFinder</span> <span class="n">movieFinder</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>和注入的方式一样，我们也必须对服务定位器加以配置。在这里，我直接在代码中进行配置，但设计一种通过配置文件获得数据的机制也并非难事。</p>
+
+<figure class='code'><figcaption><span>通过配置文件获得数据 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">class</span> <span class="nc">Tester</span><span class="o">...</span>
+</span><span class='line'><span class="kd">private</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(){</span>
+</span><span class='line'>  <span class="n">ServiceLocator</span><span class="o">.</span><span class="na">load</span><span class="o">(</span><span class="k">new</span> <span class="nf">ServiceLocator</span><span class="o">(</span>
+</span><span class='line'>      <span class="k">new</span> <span class="nf">ColonMovieFinder</span><span class="o">(</span><span class="s">&quot;movies1.txt&quot;</span><span class="o">)));</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">class</span> <span class="nc">ServiceLocator</span><span class="o">...</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">load</span><span class="o">(</span><span class="n">ServiceLocator</span> <span class="n">arg</span><span class="o">){</span>
+</span><span class='line'>  <span class="n">soleInstance</span> <span class="o">=</span> <span class="n">arg</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="kd">public</span> <span class="nf">ServiceLocator</span><span class="o">(</span><span class="n">MovieFinder</span> <span class="n">movieFinder</span><span class="o">){</span>
+</span><span class='line'>  <span class="k">this</span><span class="o">.</span><span class="na">movieFinder</span> <span class="o">=</span> <span class="n">movieFinder</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>下面是测试代码：</p>
+
+<figure class='code'><figcaption><span>测试代码 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">class</span> <span class="nc">Tester</span><span class="o">...</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">testSimple</span><span class="o">(){</span>
+</span><span class='line'>  <span class="n">configure</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">MovieLister</span> <span class="n">lister</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">MovieLister</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">Movie</span><span class="o">[]</span> <span class="n">movies</span> <span class="o">=</span> <span class="n">lister</span><span class="o">.</span><span class="na">moviesDirectedBy</span><span class="o">(</span><span class="s">&quot;Sergio Leone&quot;</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">assertEquals</span><span class="o">(</span><span class="s">&quot;Once Upon a Time in the West&quot;</span><span class="o">,</span>  <span class="n">movies</span><span class="o">[</span><span class="mi">0</span><span class="o">].</span><span class="na">getTitle</span><span class="o">());</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我时常听到这样的论调：这样的服务定位器不是什么好东西，因为你无法替换它返回的服务实现，从而导致无法对它们进行测试。当然，如果你的设计很糟糕，你的确会遇到这样的麻烦；但你也可以选择良好的设计。在这个例子中，ServiceLocator实例仅仅是一个简单的数据容器，只需要对它做一些简单的修改，就可以让它返回用于测试的服务实现。</p>
+
+<p>对于更复杂的情况，我可以从ServiceLocator派生出多个子类，并将子类型的实例传递给注册表的类变量。另外，我可以修改ServiceLocator的静态方法，使其调用ServiceLocator实例的方法，而不是直接访问实例变量。我还可以使用特定于线程的存储机制，从而提供特定于线程的服务定位器。所有这一切改进都无须修改ServiceLocator的使用者。</p>
+
+<p>一种改进的思路是：服务定位器仍然是一个注册表，但不是Singleton。Singleton的确是实现注册表的一种简单途径，但这只是一个实现时的决定，可以很轻松地改变它。</p>
+
+<h2>为定位器提供分离的接口</h2>
+
+<p>上面这种简单的实现方式有一个问题：MovieLister类将依赖于整个ServiceLocator类，但它需要使用的却只是后者所提供的一项服务。我们可以针对这项服务提供一个单独的接口，减少MovieLister对ServiceLocator的依赖程度。这样一来，MovieLister就不必使用整个的ServiceLocator 接口，只需声明它想要使用的那部分接口。</p>
+
+<p>此时，MovieLister 类的提供者也应该一并提供一个定位器接口，使用者可以通过这个接口获得MovieFinder实例。</p>
+
+<figure class='code'><figcaption><span>接口 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">MovieFinderLocator</span><span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">MovieFinder</span> <span class="nf">movieFinder</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>真实的服务定位器需要实现上述接口，提供访问MovieFinder实例的能力：</p>
+
+<figure class='code'><figcaption><span>接口 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">MovieFinderLocator</span> <span class="n">locator</span> <span class="o">=</span> <span class="n">ServiceLocator</span><span class="o">.</span><span class="na">locator</span><span class="o">();</span>
+</span><span class='line'><span class="n">MovieFinder</span> <span class="n">finder</span> <span class="o">=</span> <span class="n">locator</span><span class="o">.</span><span class="na">movieFinder</span><span class="o">();</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">ServiceLocator</span> <span class="nf">locator</span><span class="o">(){</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">soleInstance</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">MovieFinder</span> <span class="nf">movieFinder</span><span class="o">(){</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">movieFinder</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="n">ServiceLocator</span> <span class="n">soleInstance</span><span class="o">;</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">MovieFinder</span> <span class="n">movieFinder</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>你应该已经注意到了：由于想要使用接口，我们不能再通过静态方法直接访问服务——我们必须首先通过ServiceLocator类获得定位器实例，然后使用定位器实例得到我们想要的服务。</p>
+
+<h2>动态服务定位器</h2>
+
+<p>上面是一个静态定位器的例子——对于你所需要的每项服务，ServiceLocator类都有对应的方法。这并不是实现服务定位器的唯一方式，你也可以创建一个动态服务定位器，你可以在其中注册需要的任何服务，并在运行期决定获得哪一项服务。</p>
+
+<p>在本例中，ServiceLocator使用一个map来保存服务信息，而不再是将这些信息保存在字段中。此外，ServiceLocator还提供了一个通用的方法，用于获取和加载服务对象。</p>
+
+<figure class='code'><figcaption><span>获取和加载服务对象 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">class</span> <span class="nc">ServiceLocator</span><span class="o">...</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="n">ServiceLocator</span> <span class="n">soleInstance</span><span class="o">;</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">load</span><span class="o">(</span><span class="n">ServiceLocator</span> <span class="n">arg</span><span class="o">){</span>
+</span><span class='line'>  <span class="n">soleInstance</span> <span class="o">=</span> <span class="n">arg</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">Map</span> <span class="n">services</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HashMap</span><span class="o">();</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">Object</span> <span class="nf">getService</span><span class="o">(</span><span class="n">String</span> <span class="n">key</span><span class="o">){</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">soleInstance</span><span class="o">.</span><span class="na">services</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">loadService</span> <span class="o">(</span><span class="n">String</span> <span class="n">key</span><span class="o">,</span> <span class="n">Object</span> <span class="n">service</span><span class="o">){</span>
+</span><span class='line'>  <span class="n">services</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">service</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>同样需要对服务定位器进行配置，将服务对象与适当的关键字加载到定位器中：</p>
+
+<figure class='code'><figcaption><span>服务对象与适当的关键字加载到定位器 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">class</span> <span class="nc">Tester</span><span class="o">...</span>
+</span><span class='line'><span class="kd">private</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(){</span>
+</span><span class='line'>  <span class="n">ServiceLocator</span> <span class="n">locator</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ServiceLocator</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">locator</span><span class="o">.</span><span class="na">loadService</span><span class="o">(</span><span class="s">&quot;MovieFinder&quot;</span><span class="o">,</span> <span class="k">new</span>  <span class="nf">ColonMovieFinder</span><span class="o">(</span><span class="s">&quot;movies1.txt&quot;</span><span class="o">));</span>
+</span><span class='line'>  <span class="n">ServiceLocator</span><span class="o">.</span><span class="na">load</span><span class="o">(</span><span class="n">locator</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我使用与服务对象类名称相同的字符串作为服务对象的关键字：</p>
+
+<figure class='code'><figcaption><span>使用与服务对象类名称相同的字符串作为服务对象的关键字 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">class</span> <span class="nc">MovieLister</span><span class="o">...</span>
+</span><span class='line'><span class="n">MovieFinder</span> <span class="n">finder</span> <span class="o">=</span> <span class="o">(</span><span class="n">MovieFinder</span><span class="o">)</span>
+</span><span class='line'><span class="n">ServiceLocator</span><span class="o">.</span><span class="na">getService</span><span class="o">(</span><span class="s">&quot;MovieFinder&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>总体而言，我不喜欢这种方式。无疑，这样实现的服务定位器具有更强的灵活性，但它的使用方式不够直观明朗。我只有通过文本形式的关键字才能找到一个服务对象。相比之下，我更欣赏通过一个方法明确获得服务对象的方式，因为这让使用者能够从接口定义中清楚地知道如何获得某项服务。</p>
+
+<h2>用Avalon 兼顾服务定位器和依赖注入</h2>
+
+<p>Dependency Injection和Service Locator两个模式并不是互斥的，你可以同时使用它们，Avalon框架就是这样的一个例子。Avalon使用了服务定位器，但如何获得定位器的信息则是通过注入的方式告知组件的。
+对于前面一直使用的例子，Berin Loritsch发送给了我一个简单的Avalon实现版本：</p>
+
+<figure class='code'><figcaption><span>一个简单的Avalon实现版本 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyMovieLister</span> <span class="kd">implements</span> <span class="n">MovieLister</span><span class="o">,</span> <span class="n">Serviceable</span><span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">MovieFinder</span> <span class="n">finder</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">service</span><span class="o">(</span> <span class="n">ServiceManager</span> <span class="n">manager</span> <span class="o">)</span> <span class="kd">throws</span>    <span class="n">ServiceException</span><span class="o">{</span>
+</span><span class='line'>  <span class="n">finder</span> <span class="o">=</span> <span class="o">(</span><span class="n">MovieFinder</span><span class="o">)</span><span class="n">manager</span><span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="s">&quot;finder&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>service方法就是接口注入的例子，它使容器可以将一个ServiceManager对象注入MyMovieLister对象。ServiceManager则是一个服务定位器。在这个例子中，MyMovieLister并不把ServiceManager对象保存在字段中，而是马上借助它找到MovieFinder 实例，并将后者保存起来。</p>
+
+<h2>作出一个选择</h2>
+
+<p>到现在为止，我一直在阐述自己对这两个模式（ Dependency Injection模式和Service Locator模式）以及它们的变化形式的看法。现在，我要开始讨论他们的优点和缺点，以便指出它们各自适用的场景。</p>
+
+<p>Service Locator vs. Dependency Injection</p>
+
+<p>首先，我们面临Service Locator和Dependency Injection之间的选择。应该注意，尽管我们前面那个简单的例子不足以表现出来，实际上这两个模式都提供了基本的解耦合能力。无论使用哪个模式，应用程序代码都不依赖于服务接口的具体实现。两者之间最重要的区别在于：具体实现以什么方式提供给应用程序代码。使用Service Locator模式时，应用程序代码直接向服务定位器发送一个消息，明确要求服务的实现；使用Dependency Injection模式时，应用程序代码不发出显式的请求，服务的实现自然会出现在应用程序代码中，这也就是所谓控制反转。</p>
+
+<p>控制反转是框架的共同特征，但它也要求你付出一定的代价：它会增加理解的难度，并且给调试带来一定的困难。所以，整体来说，除非必要，否则我会尽量避免使用它。这并不意味着控制反转不好，只是我认为在很多时候使用一个更为直观的方案（例如Service Locator模式）会比较合适。</p>
+
+<p>一个关键的区别在于：使用Service Locator模式时，服务的使用者必须依赖于服务定位器。定位器可以隐藏使用者对服务具体实现的依赖，但你必须首先看到定位器本身。所以，问题的答案就很明朗了：选择Service Locator还是Dependency Injection，取决于对定位器的依赖是否会给你带来麻烦。</p>
+
+<p>Dependency Injection模式可以帮助你看清组件之间的依赖关系：你只需观察依赖注入的机制（例如构造函数），就可以掌握整个依赖关系。而使用Service Locator模式时，你就必须在源代码中到处搜索对服务定位器的调用。具备全文检索能力的IDE可以略微简化这一工作，但还是不如直接观察构造函数或者设值方法来得轻松。</p>
+
+<p>这个选择主要取决于服务使用者的性质。如果你的应用程序中有很多不同的类要使用一个服务，那么应用程序代码对服务定位器的依赖就不是什么大问题。在前面的例子中，我要把MovieLister类交给朋友去用，这种情况下使用服务定位器就很好：我的朋友们只需要对定位器做一点配置（通过配置文件或者某些配置性的代码），使其提供合适的服务实现就可以了。在这种情况下，我看不出Dependency Injection模式提供的控制反转有什么吸引人的地方。但是，如果把MovieLister 看作一个组件，要将它提供给别人写的应用程序去使用，情况就不同了。在这种时候，我无法预测使用者会使用什么样的服务定位器API，每个使用者都可能有自己的服务定位器，而且彼此之间无法兼容。一种解决办法是为每项服务提供单独的接口，使用者可以编写一个适配器，让我的接口与他们的服务定位器相配合。但即便如此，我仍然需要到第一个服务定位器中寻找我规定的接口。而且一旦用上了适配器，服务定位器所提供的简单性就被大大削弱了。</p>
+
+<p>另一方面，如果使用Dependency Injection模式，组件与注入器之间不会有依赖关系，因此组件无法从注入器那里获得更多的服务， 只能获得配置信息中所提供的那些。这也是Dependency Injection 模式的局限性之一。</p>
+
+<p>人们倾向于使用Dependency Injection模式的一个常见理由是：它简化了测试工作。这里的关键是：出于测试的需要，你必须能够轻松地在真实的服务实现与供测试用的伪组件之间切换。但是，如果单从这个角度来考虑，Dependency Injection模式和Service Locator模式其实并没有太大区别：两者都能够很好地支持伪组件的插入。之所以很多人有 Dependency Injection模式更利于测试的印象，我猜是因为他们并没有努力保证服务定位器的可替换性。这正是持续测试起作用的地方：如果你不能轻松地用一些伪组件将一个服务架起来以便测试，这就意味着你的设计出现了严重的问题。</p>
+
+<p>当然，如果组件环境具有非常强的侵略性（就像EJB框架那样），测试的问题会更加严重。我的观点是：应该尽量减少这类框架对应用程序代码的影响，特别是不要做任何可能使编辑-执行的循环变慢的事情。用插件（plugin）机制取代重量级组件会对测试过程有很大帮助，这正是测试驱动开发（Test Driven Development，TDD）之类实践的关键所在。</p>
+
+<p>所以，主要的问题在于：代码的作者是否希望自己编写的组件能够脱离自己的控制、被使用在另一个应用程序中。如果答案是肯定的，那么他就不能对服务定位器做任何假设——哪怕最小的假设也会给使用者带来麻烦。</p>
+
+<h2>构造函数注入 vs. 设值方法注入</h2>
+
+<p>在组合服务时，你总得遵循一定的约定，才可能将所有东西拼装起来。依赖注入的优点主要在于：它只需要非常简单的约定——至少对于构造函数注入和设值方法注入来说是这样。相比于这两者，接口注入的侵略性要强得多，比起Service Locator模式的优势也不那么明显。所以，如果你想要提供一个组件给多个使用者，构造函数注入和设值方法注入看起来很有吸引力。你不必在组件中加入什么希奇古怪的东西，注入器可以相当轻松地把所有东西配置起来。</p>
+
+<p>设值函数注入和构造函数注入之间的选择相当有趣，因为它折射出面向对象编程的一些更普遍的问题：应该在哪里填充对象的字段，构造函数还是设值方法？</p>
+
+<p>一直以来，我首选的做法是尽量在构造阶段就创建完整、合法的对象——也就是说，在构造函数中填充对象字段。这样做的好处可以追溯到Kent Beck在Smalltalk Best Practice Patterns一书中介绍的两个模式：Constructor Method和Constructor Parameter Method。带有参数的构造函数可以明确地告诉你如何创建一个合法的对象。如果创建合法对象的方式不止一种，你还可以提供多个构造函数，以说明不同的组合方式。</p>
+
+<p>构造函数初始化的另一个好处是：你可以隐藏任何不可变的字段——只要不为它提供设值方法就行了。我认为这很重要：如果某个字段是不应该被改变的，没有针对该字段的设值方法就很清楚地说明了这一点。如果你通过设值方法完成初始化，暴露出来的设值方法很可能成为你心头永远的痛。（实际上，在这种时候我更愿意回避通常的设值方法约定，而是使用诸如initFoo之类的方法名，以表明该方法只应该在对象创建之初调用。）</p>
+
+<p>不过，世事总有例外。如果参数太多，构造函数会显得凌乱不堪，特别是对于不支持关键字参数的语言更是如此。的确，如果构造函数参数列表太长，通常标志着对象太过繁忙，理应将其拆分成几个对象，但有些时候也确实需要那么多的参数。如果有不止一种的方式可以构造一个合法的对象，也很难通过构造函数描述这一信息，因为构造函数之间只能通过参数的个数和类型加以区分。这就是Factory Method模式适用的场合了，工厂方法可以借助多个私有构造函数和设值方法的组合来完成自己的任务。经典Factory Method模式的问题在于：它们往往以静态方法的形式出现，你无法在接口中声明它们。你可以创建一个工厂类，但那又变成另一个服务实体了。工厂服务是一种不错的技巧，但你仍然需要以某种方式实例化这个工厂对象，问题仍然没有解决。
+如果要传入的参数是像字符串这样的简单类型，构造函数注入也会带来一些麻烦。使用设值方法注入时，你可以在每个设值方法的名字中说明参数的用途；而使用构造函数注入时，你只能靠参数的位置来决定每个参数的作用，而记住参数的正确位置显然要困难得多。</p>
+
+<p>如果对象有多个构造函数，对象之间又存在继承关系，事情就会变得特别讨厌。为了让所有东西都正确地初始化，你必须将对子类构造函数的调用转发给超类的构造函数，然后处理自己的参数。这可能造成构造函数规模的进一步膨胀。</p>
+
+<p>尽管有这些缺陷，但我仍然建议你首先考虑构造函数注入。不过，一旦前面提到的问题真的成了问题，你就应该准备转为使用设值方法注入。</p>
+
+<p>在将Dependecy Injection 模式作为框架的核心部分的几支团队之间，构造函数注入还是设值方法注入引发了很多的争论。不过，现在看来，开发这些框架的大多数人都已经意识到：不管更喜欢哪种注入机制，同时为两者提供支持都是有必要的。</p>
+
+<h2>代码配置 vs. 配置文件</h2>
+
+<p>另一个问题相对独立，但也经常与其他问题牵涉在一起：如何配置服务的组装，通过配置文件还是直接编码组装？对于大多数需要在多处部署的应用程序来说，一个单独的配置文件会更合适。配置文件几乎都是XML 文件，XML 也的确很适合这一用途。不过，有些时候直接在程序代码中实现装配会更简单。譬如一个简单的应用程序，也没有很多部署上的变化，这时用几句代码来配置就比XML 文件要清晰得多。</p>
+
+<p>与之相对的，有时应用程序的组装非常复杂，涉及大量的条件步骤。一旦编程语言中的配置逻辑开始变得复杂，你就应该用一种合适的语言来描述配置信息，使程序逻辑变得更清晰。然后，你可以编写一个构造器（builder）类来完成装配工作。如果使用构造器的情景不止一种，你可以提供多个构造器类，然后通过一个简单的配置文件在它们之间选择。</p>
+
+<p>我常常发现，人们太急于定义配置文件。编程语言通常会提供简捷而强大的配置管理机制，现代编程语言也可以将程序编译成小的模块，并将其插入大型系统中。如果编译过程会很费力，脚本语言也可以在这方面提供帮助。通常认为，配置文件不应该用编程语言来编写，因为它们需要能够被不懂编程的系统管理人员编辑。但是，这种情况出现的几率有多大呢？我们真的希望不懂编程的系统管理人员来改变一个复杂的服务器端应用程序的事务隔离等级吗？只有在非常简单的时候，非编程语言的配置文件才有最好的效果。如果配置信息开始变得复杂，就应该考虑选择一种合适的编程语言来编写配置文件。</p>
+
+<p>在Java 世界里，我们听到了来自配置文件的不和谐音——每个组件都有它自己的配置文件，而且格式还各不相同。如果你要使用一打这样的组件，你就得维护一打的配置文件，那会很快让你烦死。</p>
+
+<p>在这里，我的建议是：始终提供一种标准的配置方式，使程序员能够通过同一个编程接口轻松地完成配置工作。至于其他的配置文件，仅仅把它们当作一种可选的功能。借助这个编程接口，开发者可以轻松地管理配置文件。如果你编写了一个组件，则可以由组件的使用者来选择如何管理配置信息：使用你的编程接口、直接操作配置文件格式，或者定义他们自己的配置文件格式，并将其与你的编程接口相结合。</p>
+
+<h2>分离配置与使用</h2>
+
+<p>所有这一切的关键在于：服务的配置应该与使用分开。实际上，这是一个基本的设计原则——分离接口与实现。在面向对象程序里，我们在一个地方用条件逻辑来决定具体实例化哪一个类，以后的条件分支都由多态来实现，而不是继续重复前面的条件逻辑，这就是分离接口与实现的原则。</p>
+
+<p>如果对于一段代码而言，接口与实现的分离还只是有用的话，那么当你需要使用外部元素（例如组件和服务）时，它就是生死攸关的大事。这里的第一个问题是：你是否希望将选择具体实现类的决策推迟到部署阶段。如果是，那么你需要使用插入技术。使用了插入技术之后，插件的装配原则上是与应用程序的其余部分分开的，这样你就可以轻松地针对不同的部署替换不同的配置。这种配置机制可以通过服务定位器来实现（Service Locator模式），也可以借助依赖注入直接完成（Dependency Injection 模式）。</p>
+
+<h2>更多的问题</h2>
+
+<p>在本文中，我关注的焦点是使用Dependency Injection模式和Service Locator模式进行服务配置的基本问题。还有一些与之相关的话题值得关注，但我已经没有时间继续深入下去了。特别值得注意的是生命周期行为的问题：某些组件具有特定的生命周期事件，例如停止、开始等等。另一个值得注意的问题是：越来越多的人对如何在这些容器中运用面向方面（aspectoriented）的思想产生了兴趣。尽管目前还没有认真准备过这方面的材料，但我也很希望以后能在这个话题上写一些东西。</p>
+
+<p>关于这些问题，你在专注于轻量级容器的网站上可以找到很多资料。浏览<a href="http://www.picocontainer.org">PicoContainer</a> 或者<a href="http://www.springframework.org">Spring</a>的网站，你可以找到大量相关的讨论，并由此引申出更多的话题。</p>
+
+<h2>结论和思考</h2>
+
+<p>在时下流行的轻量级容器都使用了一个共同的模式来组装应用程序所需的服务，我把这个模式称为Dependency Injection，它可以有效地替代Service Locator模式。在开发应用程序时，两者不相上下，但我认为Service Locator模式略有优势，因为它的行为方式更为直观。但是，如果你开发的组件要交给多个应用程序去使用，那么Dependency Injection模式会是更好的选择。</p>
+
+<p>如果你决定使用Dependency Injection模式，这里还有几种不同的风格可供选择。我建议你首先考虑构造函数注入；如果遇到了某些特定的问题，再改用设值方法注入。如果你要选择一个容器，在其之上进行开发，我建议你选择同时支持这两种注入方式的容器。</p>
+
+<p>Service Locator 模式和Dependency Injection 模式之间的选择并是最重要的，更重要的是：应该将服务的配置和应用程序内部对服务的使用分离开。</p>
+
+<h2>致谢</h2>
+
+<p>在此，我要向帮助我理解本文中所提到的问题、并对本文提出宝贵意见的几个人表示感谢，他们是Rod Johnson、Paul Hammant、Joe Walnes、Aslak Hellesoy、Jon Tirsen和Bill Caputo。另外，Berin Loritsch和Hamilton Verissimo de Oliveira在Avalon方面给了我非常有用的建议，一并向他们表示感谢。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/09/22/what-is-spring-ioc/">什么是Spring IoC？</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-09-22T15:33:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2013</span></span> <span class='time'>3:33 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在直接进入主题之前，先引入一些基本概念。</p>
+
+<blockquote><p>概念1：什么是容器？</p></blockquote>
+
+<p>日常生活领域内的容器，用来包装或装载物品的贮存器(如箱、罐、罈)或者成形或柔软不成形的包覆材料。&ndash;维基百科。<br/>
+简而言之，容器是存放东西的东西。</p>
+
+<p>Java中，Java的类库有一系列的基本类来保存对象（正确的说是保存对象的引用），包括List，Set，Queue和Map，它们被称作集合类。<br/>
+Bruce Eckel（《Thinking in Java》的作者）使用了一个范围更广的术语来称呼它们：“容器”，容器提供了完善的方法来保存和管理对象。</p>
+
+<p>当然，这里只是为了简单介绍“容器”这个宽泛术语本身的含义。我们常说的容器并不是指Java的内部容器类。</p>
+
+<p>那么我们常说的容器是指的什么呢？举个例子，<em>Servlet容器</em>。<br/>
+什么是Servlet？这里又扯远了，引用孙鑫老师的说法（《Servlet/JSP深入详解：基于Tomcat的Web开发》的作者），Java Servlet（Java服务器小程序）是一个基于Java技术的Web组件，运行在服务器端。Servlet是平台独立的Java类，编写一个Servlet，实际上就是按照Servlet规范编写一个Java类。</p>
+
+<p>Servlet容器又称为Servlet引擎，它是Java Web服务器（例如：Apache Tomcat）的一部分，用来提供动态网页的服务。<br/>
+我们知道，Servlet没有main方法，它是不能独立运行的。它必须被部署到Servlet容器中，由容器来实例化和调用Servlet中的方法。因此，Servlet容器的作用是在Servlet的生命周期内包容和管理Servlet。</p>
+
+<p>用户通过单击某个链接或者直接在浏览器的地址栏中输入URL来访问Servlet，Java Web服务器接收到该请求后，并不是将请求直接交给Servlet，而是交给Servlet容器。Servlet容器实例化Servlet，调用Servlet的一个特定方法对请求进行处理，并产生一个响应。这个响应由Servlet容器返回给Web服务器，Web服务器包装这个响应，以HTTP响应的形式发送给Web浏览器。</p>
+
+<p>Ok，容器的概念就讲到这里，下一个依赖注入。</p>
+
+<blockquote><p>概念2：依赖注入</p></blockquote>
+
+<p>谈到依赖注入，必须提Martin Fowler的经典文章<a href="http://martinfowler.com/articles/injection.html">IoC容器和Dependency Injection模式</a>。这篇文章有对应的中文版翻译（<a href="http://gigix.thoughtworkers.org/">熊节</a>译），原文上有链接，但是由于时间太久了，链接已经不可用了。我把它转载到我的博客上做了记录，可以在这里访问。我相信如果有看完这篇文章的，应该不用听我在这里啰嗦了。
+依赖注入的直接好处就是解耦，消除组件之间的直接依赖。这种优势能够非常好的体现在对组件的测试。</p>
+
+<blockquote><p>进入正题</p></blockquote>
+
+<p>在Martin的那篇文章中已经提到，依赖注入有三种方式，分别是接口注入，构造器注入和设值注入。其中比较常用的是构造器注入和设值方法注入。在Spring中，配置依赖的方式有两种，一种是比较常用的xml方式配置，另一种是通过注解的方式配置（Spring2.5之后）。</p>
+
+<blockquote><p>首先介绍基于xml的配置方式：</p></blockquote>
+
+<p>现在来看一下，如何通过xml来配置一个bean</p>
+
+<figure class='code'><figcaption><span>bean-config.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;context:annotation-config/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;foo.bar&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;beans&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;dataBaseService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.DatabaseService&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;0&quot;</span> <span class="na">value=</span><span class="s">&quot;username&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;1&quot;</span> <span class="na">value=</span><span class="s">&quot;password&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;2&quot;</span> <span class="na">value=</span><span class="s">&quot;database_url&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;justService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.JustService&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;constructor-arg</span> <span class="na">value=</span><span class="s">&quot;word&quot;</span> <span class="na">type=</span><span class="s">&quot;java.lang.String&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;constructor-arg</span> <span class="na">value=</span><span class="s">&quot;10&quot;</span> <span class="na">type=</span><span class="s">&quot;int&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;justReferenceService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.JustReferenceService&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;justService&quot;</span> <span class="na">ref=</span><span class="s">&quot;justService&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;calculatorService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.CalculatorService&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;a&quot;</span> <span class="na">value=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;b&quot;</span> <span class="na">value=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;useCalculatorService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.UseCalculatorService&quot;</span> <span class="na">autowire=</span><span class="s">&quot;byName&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/beans&gt;</span>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>每一个Bean都有对应的id用来唯一表示它，可以理解为Spring容器中，该Bean的名字。</p>
+
+<p>在这个Bean的配置文件中，介绍了几种配置Bean的方法。</p>
+
+<p>dataBaseService采用构造器方式注入，由于构造器参数都是String类型，所以这里采用index来指定对应的参数。<br/>
+justService同样采用构造器方式注入，但构造器参数类型不同，所以这里可以根据类型指定参数。<br/>
+justReferenceService采用的是设值方式注入，并且注入的参数为一个引用类型，name为类中对应的变量名，ref是xml中的某一个Bean。<br/>
+calculatorService同样采用设值方式注入。<br/>
+useCalculatorService同样采用设值方法注入，并声明autowire自动装配是byName，它会根据类中成员变量的名字，在这些Bean中找到对应id等于成员变量名字的Bean。</p>
+
+<p>在xml中配置好这些Bean之后，就可以通过ApplicationContext去得到这些Bean。</p>
+
+<figure class='code'><figcaption><span>helloworld.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">foo</span><span class="o">.</span><span class="na">bar</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.ApplicationContext</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.support.ClassPathXmlApplicationContext</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">ApplicationContext</span> <span class="n">context</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ClassPathXmlApplicationContext</span><span class="o">(</span><span class="s">&quot;spring-config.xml&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">DatabaseService</span> <span class="n">databaseService</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">DatabaseService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">databaseService</span><span class="o">.</span><span class="na">connect</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">JustService</span> <span class="n">justService</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">JustService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">justService</span><span class="o">.</span><span class="na">justPrint</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">JustReferenceService</span> <span class="n">justReferenceService</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">JustReferenceService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">justReferenceService</span><span class="o">.</span><span class="na">justPrint</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">UseCalculatorService</span> <span class="n">useCalculatorService</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">UseCalculatorService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">useCalculatorService</span><span class="o">.</span><span class="na">calculate</span><span class="o">());</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<blockquote><p>另一种配置Bean的方式是直接在类文件中加入注解</p></blockquote>
+
+<figure class='code'><figcaption><span>bean-config.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;context:annotation-config</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;foo.bar&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面是一个没有任何Bean的xml配置文件，里面有两个标签，分别是&lt;context:annotation-config />和&lt;context:component-scan />。现在来解释一下这两个标签的作用：</p>
+
+<p>&lt;context:annotation-config />:隐式地向Spring容器注册
+AutowiredAnnotationBeanPostProcessor、CommonAnnotationBeanPostProcessor、
+PersistenceAnnotationBeanPostProcessor 以及 RequiredAnnotationBeanPostProcessor 这 4 个BeanPostProcessor。这样我们就可以使用@Required、@Autowired以及JSR 250的@PostConstruct、@PreDestroy和@Resource (if available）等等这些注解。如果不使用这个标签，那么如果要使用这些注解，就必须在xml文件中配置这些processor的Bean。</p>
+
+<p>&lt;context:component-scan base-package=&ldquo;foo.bar&rdquo;/>:它会扫描classpath下被注解过的类，并注册为Spring容器中的bean。Spring默认提供的注解有@Component、@Repository、@Service和@Controller。</p>
+
+<p>有了这两个标签，我们就可以简单的在类中添加注解实现Bean向Spring容器的注册，如下，是对JustReferenceService的配置：</p>
+
+<figure class='code'><figcaption><span>JustReferenceService.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">foo</span><span class="o">.</span><span class="na">bar</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Component</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">JustReferenceService</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Autowired</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">JustService</span> <span class="n">justService</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">JustService</span> <span class="nf">getJustService</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">justService</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setJustService</span><span class="o">(</span><span class="n">JustService</span> <span class="n">justService</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">justService</span> <span class="o">=</span> <span class="n">justService</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">justPrint</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">justService</span><span class="o">.</span><span class="na">justPrint</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>使用@Autowired注解进行装配，只能是根据类型进行匹配。@Autowired注解可以用于Setter方法、构造函数、字段，甚至普通方法，前提是方法必须有至少一个参数。</p>
+
+<p>当容器中存在多个Bean的类型与需要注入的相同时，注入将不能执行，我们可以给@Autowired增加一个候选值，做法是在@Autowired后面增加一个@Qualifier标注，提供一个String类型的值作为候选的Bean的名字，见下例。</p>
+
+<p>在xml配置中，有两个同类型的Bean，它们拥有不同的id，因此，需要在类中添加注解告诉它需要装配哪一个。</p>
+
+<figure class='code'><figcaption><span>UseCalculatorService.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">foo</span><span class="o">.</span><span class="na">bar</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Qualifier</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Component</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UseCalculatorService</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Autowired</span>
+</span><span class='line'>  <span class="nd">@Qualifier</span><span class="o">(</span><span class="s">&quot;anotherCalculatorService&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">CalculatorService</span> <span class="n">calculatorService</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">CalculatorService</span> <span class="nf">getCalculatorService</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">calculatorService</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setCalculatorService</span><span class="o">(</span><span class="n">CalculatorService</span> <span class="n">calculatorService</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">calculatorService</span> <span class="o">=</span> <span class="n">calculatorService</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">calculate</span><span class="o">(){</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">calculatorService</span><span class="o">.</span><span class="na">calculate</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>如果希望根据name执行自动装配</em></p>
+
+<p>那么应该使用JSR-250提供的@Resource注解，而不应该使用@Autowired与@Qualifier 的组合。@Resource使用byName的方式执行自动封装。@Resource标注可以作用于带一个参数的Setter方法、字段，以及带一个参数的普通方法上。@Resource注解有一个name属性，用于指定Bean在配置文件中对应的名字。如果没有指定name属性，那么默认值就是字段或者属性的名字。@Resource和@Qualifier的配合虽然仍然成立，但是@Qualifier对于@Resource而言，几乎与name属性等效。如果@Resource没有指定name属性，那么使用byName匹配失败后，会退而使用byType继续匹配，如果再失败，则抛出异常。</p>
+
+<figure class='code'><figcaption><span>UseCalculatorService.java 使用@Resource </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">foo</span><span class="o">.</span><span class="na">bar</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.annotation.Resource</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Component</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UseCalculatorService</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Resource</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;anotherCalculatorService&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">CalculatorService</span> <span class="n">calculatorService</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">CalculatorService</span> <span class="nf">getCalculatorService</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">calculatorService</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setCalculatorService</span><span class="o">(</span><span class="n">CalculatorService</span> <span class="n">calculatorService</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">calculatorService</span> <span class="o">=</span> <span class="n">calculatorService</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">calculate</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">calculatorService</span><span class="o">.</span><span class="na">calculate</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>使用 @Required 进行 Bean 的依赖检查</em></p>
+
+<p>依赖检查的作用是，判断给定Bean的相应Setter方法是否都在Bean被实例化的时候被调用了，而不是判断字段是否已经存在值了。Spring进行依赖检查时，只会判断属性是否使用了Setter注入。如果某个属性没有使用Setter注入，即使是通过构造函数已经为该属性注入了值，Spring仍然认为它没有执行注入，从而抛出异常。另外，Spring只管是否通过Setter执行了注入，而对注入的值却没有任何要求，即使注入的null，Spring也认为是执行了依赖注入。</p>
+
+<p>@Required 注解只能标注在Setter方法之上。因为依赖注入的本质是检查Setter方法是否被调用了，而不是真的去检查属性是否赋值了以及赋了什么样的值。如果将该注解标注在非setXxxx()类型的方法则被忽略。</p>
+
+<p><em>使用 @Configuration 和 @Bean 进行 Bean 的声明</em></p>
+
+<p>Spring3.0新增了另外两个实现类：AnnotationConfigApplicationContext和AnnotationConfigWebApplicationContext，它们是为注解而生，直接依赖于注解，作为容器配置信息来源的IoC容器初始化类。AnnotationConfigApplicationContext搭配上@Configuration和@Bean注解，自此，XML配置方式不再是 Spring IoC容器的唯一配置方式。Spring对标注Configuration的类有如下要求：</p>
+
+<p>(1)配置类不能是 final 的；(2)配置类不能是本地化的，亦即不能将配置类定义在其他类的方法内部；(3)配置类必须有一个无参构造函数。</p>
+
+<figure class='code'><figcaption><span>BeanConfiguration.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">foo</span><span class="o">.</span><span class="na">bar</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Bean</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Configuration</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Configuration</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BeanConfiguration</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Bean</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">DatabaseService</span> <span class="nf">dataBaseService</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="k">new</span> <span class="nf">DatabaseService</span><span class="o">(</span><span class="s">&quot;username&quot;</span><span class="o">,</span> <span class="s">&quot;password&quot;</span><span class="o">,</span> <span class="s">&quot;database_url&quot;</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Bean</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">JustService</span> <span class="nf">justService</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="k">new</span> <span class="nf">JustService</span><span class="o">(</span><span class="s">&quot;justService&quot;</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面这种配置bean的方式与下面的xml配置方式一样。</p>
+
+<figure class='code'><figcaption><span>spring-config.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;dataBaseService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.DatabaseService&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>       <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;0&quot;</span> <span class="na">value=</span><span class="s">&quot;username&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>       <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;1&quot;</span> <span class="na">value=</span><span class="s">&quot;password&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>       <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;2&quot;</span> <span class="na">value=</span><span class="s">&quot;database_url&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'><span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;justService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.JustService&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>       <span class="nt">&lt;constructor-arg</span> <span class="na">value=</span><span class="s">&quot;word&quot;</span> <span class="na">type=</span><span class="s">&quot;java.lang.String&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>       <span class="nt">&lt;constructor-arg</span> <span class="na">value=</span><span class="s">&quot;10&quot;</span> <span class="na">type=</span><span class="s">&quot;int&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/bean&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Spring IoC是将Bean的管理交给Spring容器，开发人员只需要配置，当要使用时，告诉Spring，让它注入给你。这样，在写程序时，可以大大降低耦合。</p>
 
 <p>参考资料：</p>
 
-<p><a href="http://docs.oracle.com/javase/tutorial/jndi/overview/index.html">http://docs.oracle.com/javase/tutorial/jndi/overview/index.html</a></p>
+<p><a href="http://www.ibm.com/developerworks/cn/opensource/os-cn-spring-iocannt/">http://www.ibm.com/developerworks/cn/opensource/os-cn-spring-iocannt/</a></p>
 
-<p><a href="http://tomcat.apache.org/tomcat-7.0-doc/jndi-resources-howto.html">http://tomcat.apache.org/tomcat-7.0-doc/jndi-resources-howto.html</a></p>
+<p><a href="http://www.springbyexample.org">http://www.springbyexample.org</a></p>
 
-<p><a href="http://docs.oracle.com/javase/jndi/tutorial/">http://docs.oracle.com/javase/jndi/tutorial/</a></p>
+<p>孙鑫《Servlet/JSP深入详解：基于Tomcat的Web开发》</p>
+</div>
+  
+  
 
-<p><a href="http://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html">http://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html</a></p>
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/09/21/how-to-use-octopress-to-set-up-blog-on-github/">如何用Octopress在github上建立博客?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-09-21T15:46:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>3:46 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>这个问题，我也花了大概半天时间才解决。因为之前有用github做博客，所以算是已经有些经验。</p>
+
+<p>这里提供一些我查的比较有用的资料,方便需要的人查询。</p>
+
+<p><a href="http://octopress.org/docs/">octopress doc</a></p>
+
+<p>第一手资料当然是Octopress的官方网站，但是实际上不是太好用。</p>
+
+<p><a href="http://www.cnblogs.com/simonshi2012/archive/2012/03/30/2425141.html">update ruby for mac</a></p>
+
+<p>需要做一些前期准备，例如更新ruby1.9.3。这里更新ruby，由于repository在国外，所以我用了代理，据说可以改用taobao的，会方便点。</p>
+
+<p><a href="http://code.dblock.org/octopress-setting-up-a-blog-and-contributing-to-an-existing-one">Octopress: Setting up a Blog and Contributing to an Existing One</a></p>
+
+<p>由于官方资料我没有看明白。所以我参考的另外一篇文章成功将文章发布到github。</p>
+
+<p><a href="http://zerodie.github.io/blog/2012/01/19/octopress-github-pages/">Github Page + Octopress</a></p>
+
+<p>还有一篇中文文章可以结合英文的看，虽然看上面一篇英文的就可以了。</p>
+
+<p>这个博客建立好，还是花了很多时间，一个是ruby升级很花时间，二个是学习如何使用Octopress。</p>
+
+<p>今天就写这么多，Octopress还有很多好用的feature，可以在官方网站上找到。</p>
 </div>
   
   
@@ -500,8 +2679,6 @@ Domain Name Service (DNS)</p>
     </article>
   
   <div class="pagination">
-    
-      <a class="prev" href="/posts/4">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
