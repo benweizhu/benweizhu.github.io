@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2014-12-23T23:43:54+08:00</updated>
+  <updated>2014-12-23T23:48:39+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -3990,9 +3990,9 @@ client/Client.java:7: error: cannot find symbol
   
   <entry>
     <title type="html"><![CDATA[JavaScript中你需要了解的基本知识（二）]]></title>
-    <link href="http://benweizhu.github.io/blog/2014/03/29/something-you-n-need-to-know-about-javascript-2/"/>
+    <link href="http://benweizhu.github.io/blog/2014/03/29/something-you-need-to-know-about-javascript-2/"/>
     <updated>2014-03-29T22:44:00+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2014/03/29/something-you-n-need-to-know-about-javascript-2</id>
+    <id>http://benweizhu.github.io/blog/2014/03/29/something-you-need-to-know-about-javascript-2</id>
     <content type="html"><![CDATA[<h2><strong>表达式</strong></h2>
 
 <p>表达式是一组可以计算出一个数值的有效的代码的集合，是一个单纯的运算过程。</p>
