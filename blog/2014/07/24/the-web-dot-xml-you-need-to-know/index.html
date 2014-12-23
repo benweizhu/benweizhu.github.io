@@ -5,8 +5,8 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Spring，Gradle，Web.xml和Intellij - My Octopress Blog</title>
-  <meta name="author" content="Your Name">
+  <title>Spring，Gradle，Web.xml和Intellij - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
 
   
   <meta name="description" content="标题取得不是太好哈，但是看这标题，就知道，这篇文章不是什么高大上的内容。四个看似完全搭不上边的东西，把它们结合在一起使用的时候，对于大部分Java新人来说，却绝对是个头疼的问题。 好，先把问题摆出来，看例子： 我有一个Spring Web MVC的小例子，项目结构是这样的： &hellip;">
@@ -21,7 +21,7 @@
   <link rel="canonical" href="http://benweizhu.github.io/blog/2014/07/24/the-web-dot-xml-you-need-to-know">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
@@ -36,12 +36,11 @@
 
 <body   >
   <header role="banner"><hgroup>
-  <h1><a href="/">My Octopress Blog</a></h1>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
   
-    <h2>A blogging framework for hackers.</h2>
+    <h2>Walking In The Air</h2>
   
 </hgroup>
-
 </header>
   <nav role="navigation"><ul class="subscription" data-subscription="rss">
   <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
@@ -133,12 +132,22 @@
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
 <span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
 </pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
 </span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
 </span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
 </span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
 </span><span class='line'>       <span class="na">xmlns:mvc=</span><span class="s">&quot;http://www.springframework.org/schema/mvc&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans </span>
+</span><span class='line'><span class="s">       http://www.springframework.org/schema/beans/spring-beans.xsd </span>
+</span><span class='line'><span class="s">       http://www.springframework.org/schema/context </span>
+</span><span class='line'><span class="s">       http://www.springframework.org/schema/context/spring-context.xsd </span>
+</span><span class='line'><span class="s">       http://www.springframework.org/schema/mvc </span>
+</span><span class='line'><span class="s">       http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;</span><span class="nt">&gt;</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;me.zeph.springmvc&quot;</span><span class="nt">/&gt;</span>
 </span><span class='line'>
@@ -304,24 +313,24 @@
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
 <span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>apply plugin: &#39;jetty&#39;
-</span><span class='line'>apply plugin: &#39;idea&#39;
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
 </span><span class='line'>
-</span><span class='line'>repositories {
-</span><span class='line'>    mavenCentral()
-</span><span class='line'>}
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>sourceSets {
-</span><span class='line'>    main {
-</span><span class='line'>        resources {
-</span><span class='line'>            srcDir &#39;configuration&#39;
-</span><span class='line'>        }
-</span><span class='line'>    }
-</span><span class='line'>}
+</span><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">main</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="s1">&#39;configuration&#39;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>dependencies {
-</span><span class='line'>    compile &#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;
-</span><span class='line'>}
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -364,7 +373,7 @@
       
   
 
-<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
 
       
 
@@ -439,7 +448,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Your Name -
+  Copyright &copy; 2014 - ZHU Benwei -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

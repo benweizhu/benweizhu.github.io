@@ -5,8 +5,8 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Gradle Jetty和Gradle Watch插件实现热部署 - My Octopress Blog</title>
-  <meta name="author" content="Your Name">
+  <title>Gradle Jetty和Gradle Watch插件实现热部署 - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
 
   
   <meta name="description" content="Jetty插件 Jetty插件提供两个重要方法：jettyRun和jettyRunWar。 jettyRun会将一个已暴露（解包的）的web应用部署到嵌入式Jetty Web容器中。它不需要将web应用打包成一个war文件，目的是为了节省部署时间。 jettyRunWar正好相反， &hellip;">
@@ -21,7 +21,7 @@
   <link rel="canonical" href="http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
@@ -36,12 +36,11 @@
 
 <body   >
   <header role="banner"><hgroup>
-  <h1><a href="/">My Octopress Blog</a></h1>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
   
-    <h2>A blogging framework for hackers.</h2>
+    <h2>Walking In The Air</h2>
   
 </hgroup>
-
 </header>
   <nav role="navigation"><ul class="subscription" data-subscription="rss">
   <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
@@ -127,21 +126,21 @@
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>apply plugin: &#39;jetty&#39;
-</span><span class='line'>apply plugin: &#39;idea&#39;
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
 </span><span class='line'>
-</span><span class='line'>repositories {
-</span><span class='line'>    mavenCentral()
-</span><span class='line'>}
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>dependencies {
-</span><span class='line'>    compile &#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;
-</span><span class='line'>}
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
+</span><span class='line'><span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>jettyRun {
-</span><span class='line'>    reload = &quot;automatic&quot;
-</span><span class='line'>    scanIntervalSeconds = 1
-</span><span class='line'>}
+</span><span class='line'><span class="n">jettyRun</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">reload</span> <span class="o">=</span> <span class="s2">&quot;automatic&quot;</span>
+</span><span class='line'>    <span class="n">scanIntervalSeconds</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -192,39 +191,39 @@
 <span class='line-number'>31</span>
 <span class='line-number'>32</span>
 <span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>apply plugin: &#39;jetty&#39;
-</span><span class='line'>apply plugin: &#39;idea&#39;
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
 </span><span class='line'>
-</span><span class='line'>repositories {
-</span><span class='line'>    mavenCentral()
-</span><span class='line'>}
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>dependencies {
-</span><span class='line'>    compile &#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;
-</span><span class='line'>}
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
+</span><span class='line'><span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>jettyRun {
-</span><span class='line'>    reload = &quot;automatic&quot;
-</span><span class='line'>    scanIntervalSeconds = 1
-</span><span class='line'>}
+</span><span class='line'><span class="n">jettyRun</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">reload</span> <span class="o">=</span> <span class="s2">&quot;automatic&quot;</span>
+</span><span class='line'>    <span class="n">scanIntervalSeconds</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>buildscript {
-</span><span class='line'>    repositories {
-</span><span class='line'>        jcenter()
-</span><span class='line'>    }
-</span><span class='line'>    dependencies {
-</span><span class='line'>        classpath &#39;com.bluepapa32:gradle-watch-plugin:0.1.3&#39;
-</span><span class='line'>    }
-</span><span class='line'>}
+</span><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">jcenter</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">classpath</span> <span class="s1">&#39;com.bluepapa32:gradle-watch-plugin:0.1.3&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>apply plugin: &#39;watch&#39;
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;watch&#39;</span>
 </span><span class='line'>
-</span><span class='line'>watch {
-</span><span class='line'>    java {
-</span><span class='line'>        files files(&#39;src/main/java&#39;)
-</span><span class='line'>        tasks &#39;compileJava&#39;
-</span><span class='line'>    }
-</span><span class='line'>}
+</span><span class='line'><span class="n">watch</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">files</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;src/main/java&#39;</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;compileJava&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -279,16 +278,16 @@
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>watch {
-</span><span class='line'>    java {
-</span><span class='line'>        files files(&#39;src/main/java&#39;)
-</span><span class='line'>        tasks &#39;compileJava&#39;
-</span><span class='line'>    }
-</span><span class='line'>    resources {
-</span><span class='line'>        files fileTree(dir: &#39;src/main/resources&#39;, include: &#39;**/*.xml&#39;)
-</span><span class='line'>        tasks &#39;processResources&#39;
-</span><span class='line'>    }
-</span><span class='line'>}
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">watch</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">files</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;src/main/java&#39;</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;compileJava&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">files</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="s1">&#39;src/main/resources&#39;</span><span class="o">,</span> <span class="nl">include:</span> <span class="s1">&#39;**/*.xml&#39;</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;processResources&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -340,7 +339,7 @@
       
   
 
-<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
 
       
 
@@ -415,7 +414,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Your Name -
+  Copyright &copy; 2014 - ZHU Benwei -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
