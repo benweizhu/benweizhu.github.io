@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2014-12-24T00:40:24+08:00</updated>
+  <updated>2014-12-25T22:10:53+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -18,7 +18,7 @@
     <link href="http://benweizhu.github.io/blog/2014/12/19/yes-angularjs-1/"/>
     <updated>2014-12-19T21:54:00+08:00</updated>
     <id>http://benweizhu.github.io/blog/2014/12/19/yes-angularjs-1</id>
-    <content type="html"><![CDATA[<p>首先，看这样一个例子：</p>
+    <content type="html"><![CDATA[<p>看这样一个例子：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -74,6 +74,39 @@
 3.定义行为发生的逻辑（MAX_LENGTH - $scope.text.length和$scope.remaining() >= 0）</p>
 
 <p>剩下最复杂的事情：对DOM元素的操作，交给了AngularJS来做。</p>
+
+<p><strong>引用AngularJS官方文档对AngularJS的介绍：</strong></p>
+
+<p>“AngularJS是一个开发动态Web应用的框架。它让你可以使用HTML作为模板语言并且可以通过扩展的HTML语法来使应用组件更加清晰和简洁。它的创新之处在于，通过数据绑定和依赖注入减少了大量代码，而这些都在浏览器端通过JavaScript实现，能够和任何服务器端技术完美结合。”</p>
+
+<p>就像文档介绍的那样，HTML本身是静态文档，是很好的声明式语言，但对于构建动态的web应用，却无能为力。</p>
+
+<p>针对这类问题，通常的解决办法是：通过JavaScript对HTML的DOM结构进行修改。比如，jQuery。</p>
+
+<p>而AngularJS另辟蹊径，通过扩展HTML的语法来拉近静态Web和动态Web之间的距离。</p>
+
+<p><strong>&ldquo;Angular是建立在这样的信念之上的：即声明式的代码用在构建用户界面和组装软件组件时更好，而命令式的代码更擅长展现业务逻辑。&rdquo;</strong></p>
+
+<p>AngularJS将应用逻辑与DOM操作解耦，让开发人员不用去担心去前端视图模型（View Model）改变，从而大大提高代码的可测试性。</p>
+
+<p>AngularJS试图去实现一个完整的前端解决方案：</p>
+
+<p>1.构建一个CRUD应用时可能用到的所有技术：数据绑定、基本模板指令、表单验证、路由、深度链接、组件重用、依赖注入<br/>
+2.可测试性：单元测试、端到端测试、模拟对象（mocks）、测试工具</p>
+
+<p>在一个以用户体验，多平台（Web和移动）为核心的现代应用时代，单页应用以前端+API成为了Web应用的开发的趋势：</p>
+
+<p>1.对于内容的改动不需要加载整个页面 <br/>
+2.对服务器压力很小，消耗更少的带宽，与面向服务的架构更好地结合<br/>
+3.多平台使用相同的API，减少后台逻辑的重复开发</p>
+
+<p>AngularJS给现代Web应用开发带来曙光，让我们一起认认真真学习AngularJS。</p>
+
+<p>参考资料：</p>
+
+<p>1.《精通AngularJS》<br/>
+2.<a href="http://www.ngnice.com/docs/guide/introduction">http://www.ngnice.com/docs/guide/introduction</a> <br/>
+3.<a href="http://www.csdn.net/article/2012-12-10/2812658-Single-Page-Applications">http://www.csdn.net/article/2012-12-10/2812658-Single-Page-Applications</a></p>
 ]]></content>
   </entry>
   
