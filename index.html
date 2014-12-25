@@ -9,11 +9,11 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在AngularJS中，视图是模型在模板中的映射的结果（模型（Model）和视图模型的绑定（View Model））。这意味当模型发生变化时，视图上的绑定内容会对应更新。 看第一个的例子，模型与模板： 1
+  <meta name="description" content="在AngularJS中，视图是模型在模板中的映射的结果（模型（Model）和视图模型的绑定（View Model））。这意味当模型发生变化时，视图上的绑定内容会对应更新。 模型 看第一个的例子，模型与模板： 1
 2
 3
 4
-&lt;body ng-app&gt; &lt;input type=&quot &hellip;">
+&lt;body ng-app&gt; &lt;input type=& &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -92,6 +92,8 @@
 
   <div class="entry-content"><p>在AngularJS中，视图是模型在模板中的映射的结果（模型（Model）和视图模型的绑定（View Model））。这意味当模型发生变化时，视图上的绑定内容会对应更新。</p>
 
+<p><strong>模型</strong></p>
+
 <p>看第一个的例子，模型与模板：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -114,6 +116,8 @@
 <p>在AngularJS中，当输入框中的内容改变时，对应的模型name会发生改变，AngularJS会<strong>检测到模型发生改变</strong>，重新渲染模板中与该模型绑定的视图部分。</p>
 
 <p>这是AngularJS提供的最基本也是最重要的功能之一，<strong>数据的双向绑定</strong>。</p>
+
+<p><strong>控制器</strong></p>
 
 <p>再来第二个例子，模型和控制器：</p>
 
@@ -149,11 +153,17 @@
 
 <p>虽然，一般情况下，我们不会用这样的方式去建立controller，但是我们可以清晰的看到，在AngularJS中，一个Controller其实就是JavaScript中的一个函数。所以，Controller可以做事情是很多，它并通过$scope对象与模型关联，从而可以实现对模型的赋值以及其他相关逻辑行为的定义。</p>
 
-<p>这里你看到了另一个重要对象$scope，作用域（Scope）是AngularJS的重要概念，它可以看做一种粘合剂，让模板，模型和控制器工作在一起。AngularJS通过作用域，以及模板中包含的信息，数据模型，控制器，让模型和视图保持位置的分离，内容的同步。任何对模型的改变都会反映到视图，任何视图的改变也会映射到模型中。</p>
+<p><strong>作用域</strong></p>
+
+<p>这里你看到了另一个重要对象$scope，<strong>作用域（Scope）是AngularJS的重要概念，它可以看做一种粘合剂，让模板，模型和控制器工作在一起。AngularJS通过作用域，以及模板中包含的信息，数据模型，控制器，让模型和视图保持位置的分离，内容的同步。任何对模型的改变都会反映到视图，任何视图的改变也会映射到模型中。</strong></p>
 
 <p>大部分Web应用都是基于MVC的模式，也衍生出许多中MVC的变种（如MVVM（Model View ViewModel）），但AngularJS宣称自己是MVW（Model View Whatever）。</p>
 
 <p>在本节，最重要的是了解视图，模板，模型，控制器之间的关系，以及对作用域对象$scope有一个基本的了解。我们可以在之后一起去了解一下这个Whatever到底是什么含义。</p>
+
+<p>参考资料：</p>
+
+<p>1.《精通AngularJS》</p>
 </div>
   
   
