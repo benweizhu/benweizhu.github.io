@@ -60,6 +60,19 @@ var textController = function($scope){
 
 在本节，最重要的是了解视图，模板，模型，控制器之间的关系，以及对作用域对象$scope有一个基本的了解。我们可以在之后一起去了解一下这个Whatever到底是什么含义。
 
+
+本节中遇到的概念：
+
+模板(Template) | 带有Angular扩展标记的HTML   
+指令(Directive) | 用于通过自定义属性和元素扩展HTML的行为    
+模型(Model) | 用于显示给用户并且与用户互动的数据    
+作用域(Scope) | 用来存储模型(Model)的语境(context)。模型放在这个语境中才能被控制器、指令和表达式等访问到    
+表达式(Expression) | 模板中可以通过它来访问作用域（Scope）中的变量和函数    
+视图(View) | 用户看到的内容（即DOM）    
+数据绑定(Data Binding) | 自动同步模型(Model)中的数据和视图(View)表现   
+控制器(Controller) | 视图(View)背后的业务逻辑
+
 参考资料：
 
-1.《精通AngularJS》 
+1.《精通AngularJS》   
+2.http://www.ngnice.com/docs/guide/concepts
