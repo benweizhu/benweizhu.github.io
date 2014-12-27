@@ -88,7 +88,7 @@ angular.module("listApp", [])
 
 
 1.《精通AngularJS》  
-2.http://www.ngnice.com/docs/guide/scope  
+2.http://www.ngnice.com/docs/guide/scope   
 3.http://www.angularjs.cn/A00y
 
 
