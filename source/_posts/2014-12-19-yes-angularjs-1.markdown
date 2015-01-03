@@ -3,7 +3,7 @@ layout: post
 title: "开始！AngularJS!（一）- 刚刚开始"
 date: 2014-12-19 21:54
 comments: true
-categories: 
+categories: AngularJS
 ---
 看这样一个例子：
 

@@ -3,7 +3,7 @@ layout: post
 title: "开始！AngularJS!（三）- 深入作用域"
 date: 2014-12-26 22:58:34 +0800
 comments: true
-categories: 
+categories: AngularJS
 ---
 ###什么是作用域？它做了些什么事情？
 

@@ -3,7 +3,7 @@ layout: post
 title: "开始！AngularJS!（四）- 了解控制器"
 date: 2014-12-27 19:14:15 +0800
 comments: true
-categories: 
+categories: AngularJS
 ---
 
 只要你做过Web开发的，控制器的概念对你来说，实在是太熟悉了。在Spring MVC中，我认为控制器的职责应该只是告诉我，请求从哪里来，带来什么，要到哪里去，带走了什么。

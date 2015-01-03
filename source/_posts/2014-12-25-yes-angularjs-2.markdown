@@ -3,7 +3,7 @@ layout: post
 title: "开始！AngularJS!（二）- 入门：视图，模板，模型，控制器和作用域"
 date: 2014-12-25 22:40:58 +0800
 comments: true
-categories: 
+categories: AngularJS
 ---
 
 在AngularJS中，视图是模型在模板中的映射的结果（模型（Model）和视图模型的绑定（View Model））。这意味当模型发生变化时，视图上的绑定内容会对应更新。

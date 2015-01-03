@@ -3,7 +3,7 @@ layout: post
 title: "开始！AngularJS!（五）- 模块化"
 date: 2015-01-03 10:47:01 +0800
 comments: true
-categories: 
+categories: AngularJS
 ---
 我们都知道JavaScript很容易就写出全局函数，所以无论是用jQuery还是纯JavaScript，我们都会使用模块化的策略避免写出来的函数污染全局。
 
