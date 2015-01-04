@@ -35,6 +35,8 @@ angular.module('diApp', [])
 
 在定义控制器diController时，在构造函数中传入一个对象$scope和一个服务$window。$scope将控制器作用域中的模型alertValue传递进来，而$window则提供alert()方法。
 
+###$inject
+
 用起来看着确实很简单，那么AngularJS是怎么做到的呢？看下面一个例子。
 
 {% codeblock lang:html %}
@@ -85,7 +87,7 @@ console.log(diService.getValue());
 
 而当你在声明说需要的依赖时，AngularJS帮你做了上面这件事情。
 
-依赖注解(Annotation)的方式
+###依赖注解(Annotation)的方式
 
 那么$inject服务，怎么知道应该将什么依赖注入给你呢？
 
@@ -127,7 +129,7 @@ myController['$inject'] = ['$scope', 'myService'];
 
 但是，这种方式是不是看的很累赘。
 
-还有最后一种方法，内联（inline）
+还有最后一种方法，**内联（inline）**
 
 {% codeblock lang:js %}
 angular.module('myApp',[]).controller('myController',['$scope','myService',function($scope, myService) {
