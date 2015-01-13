@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-01-09T17:41:58+08:00</updated>
+  <updated>2015-01-13T16:40:59+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,396 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[用Grunt做JavaScript的构建]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/01/09/use-grunt-to-build-javascript/"/>
+    <updated>2015-01-09T21:22:27+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/01/09/use-grunt-to-build-javascript</id>
+    <content type="html"><![CDATA[<p>就像Grunt官方网站上说的“为何要用构建工具？”</p>
+
+<p>”一句话：自动化。对于需要反复重复的任务，例如压缩（minification）、编译、单元测试、linting等，自动化工具可以减轻你的劳动，简化你的工作。当你正确配置好了任务，任务运行器就会自动帮你或你的小组完成大部分无聊的工作。”</p>
+
+<p>在Java世界里面，自动化工具或者说构建工具，我们见得的不少，并且已经很成熟，比如，Ant，Maven，Gradle。而在JavaScript的世界，我们同样需要一个工具，来帮助我们做一些重复并且需要频繁做的事情，比如，压缩（minification）、编译、单元测试、linting。</p>
+
+<p>对于Web开发来说，在Single Page的Web应用开始流行之前，我们使用Ant，Maven，Gradle，同样也可以做压缩（minification）、编译、单元测试、linting，因为官方和社区提供了各种各样的插件。</p>
+
+<p>但如果你只是在开发JavaScript的类库，或者静态站点，又或者现在流行的Single Page的Web应用，那么一个纯粹的针对JavaScript而开发的构建工具就拥有了它的存在价值。</p>
+
+<p>所以，才有了Grunt作为JavaScript世界的构建工具出现在我们的视野中。</p>
+
+<h2>Node</h2>
+
+<p>Grunt的第一版发布在2012年的3月，作者将它形容为“针对JavaScript项目的基于任务的命令行构建工具”</p>
+
+<p>Grunt和Grunt插件是通过npm安装和管理的。那npm是什么？node的包管理器（a package manager for node）。那Node又是什么？</p>
+
+<p>引入node.js官方的介绍：</p>
+
+<p>&ldquo;Node.js is a platform built on Chrome&rsquo;s JavaScript runtime for easily building fast, scalable network applications. Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient, perfect for data-intensive real-time applications that run across distributed devices.&rdquo;</p>
+
+<p>没错，它不是一个JavaScript的类库或者应用，node.js是一个基于Google Chrome V8 JavaScript引擎的JavaScript运行平台（环境）。</p>
+
+<p>看到这里，我们大概可以明白，要开始使用Grunt，首先要安装node.js，然后明白如何使用npm，但是要学会使用Grunt，你并不需要了解node.js的全部知识。</p>
+
+<p>所以，首先要来安装node.js，移步到官方网站 <a href="http://nodejs.org/">http://nodejs.org/</a> ，下载node.js，当前官网的最新版本是v0.10.35。安装完成之后，可以用node -v命令验证你是否安装成功。</p>
+
+<p>node.js本身就自带npm，所以你不需要单独安装npm，运行命令npm -v就可以查看npm的版本。</p>
+
+<h3>Node的模块系统</h3>
+
+<p>在正式开始了解npm之前，我们需要了解一个关于node.js的技术知识：模块系统</p>
+
+<p>node.js的模块系统是CommonJS标准的实现，它描述了一种简单的语法让JavaScript请求（导入）其他JavaScript程序进入到当前请求模块的上下文中。</p>
+
+<p>而在node.js中，<strong>每一个JavaScript文件都可以被看做是独立的模块</strong>。</p>
+
+<p>理解几个关键概念（对象或者函数），就可以很快理解CommonJS如何被使用。</p>
+
+<p><strong>module</strong> – 一个代表模块自身的对象。该模块对象包含一个关键的exports对象。就node.js，它还包括一些元信息，比如id，parent，children。</p>
+
+<p><strong>exports</strong> – 一个纯粹的JavaScript对象，它可以被扩展来向其他模块暴露方法。该exports对象，将会作为require函数被调用后的返回结果。</p>
+
+<p><strong>require</strong> ­– 用来引入模块的函数，返回相关的exports对象。</p>
+
+<p>math.js</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">exports</span><span class="p">.</span><span class="nx">add</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">args</span> <span class="o">=</span> <span class="nx">arguments</span><span class="p">,</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">l</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">sum</span> <span class="o">+=</span> <span class="nx">args</span><span class="p">[</span><span class="nx">i</span><span class="o">++</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">sum</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>increment.js</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">add</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;math&#39;</span><span class="p">).</span><span class="nx">add</span><span class="p">;</span>
+</span><span class='line'><span class="nx">exports</span><span class="p">.</span><span class="nx">increment</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">add</span><span class="p">(</span><span class="nx">val</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当require(&lsquo;math&rsquo;)执行，它会返回math.js模块对应的exports对象，于是就可以调用add方法。</p>
+
+<p>program.js</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">inc</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;increment&#39;</span><span class="p">).</span><span class="nx">increment</span><span class="p">;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="nx">inc</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span> <span class="c1">// 2</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">id</span> <span class="o">==</span> <span class="s2">&quot;program&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面同理</p>
+
+<p>更多关于CommonJS的内容，请移步 <a href="http://javascript.ruanyifeng.com/nodejs/commonjs.html">http://javascript.ruanyifeng.com/nodejs/commonjs.html</a></p>
+
+<h2>NPM</h2>
+
+<p>基本了解过Module系统的概念之后，我们再回过头来看npm。</p>
+
+<p>对于npm而言，它并不是为构建而存在，它是node的包管理工具，只是它的存在恰恰是一个成功构建工具必须要解决的一个问题, 提供真正价值的插件。npm可以将node.js的包发布到npm的仓库里，同样的，仓库里的一个包，也可以被任何知道它名字的应用安装和使用。</p>
+
+<h3>NPM中包和模块的关系</h3>
+
+<p>接下来的问题是，怎么样才算是一个包呢，它可以被上传和下载？</p>
+
+<p>“What is a package?</p>
+
+<p>A package is:</p>
+
+<p>a) a folder containing a program described by a package.json file</p>
+
+<p>b) a gzipped tarball containing (a)</p>
+
+<p>c) a url that resolves to (b)”</p>
+
+<p>根据上面的解释，一个包存在三种表现形式。</p>
+
+<p>我们再来看一下，node.js中一个模块是怎么定义的？怎么样它就是一个模块？</p>
+
+<p>“What is a module?</p>
+
+<p>A module is anything that can be loaded with require() in a Node.js program. The following things are all examples of things that can be loaded as modules:</p>
+
+<p>a) A folder with a package.json file containing a main field.</p>
+
+<p>b) A folder with an index.js file in it.</p>
+
+<p>c) A JavaScript file.&#8221;</p>
+
+<p>如果你仔细观察，两个解释中的定义a是非常相似的。一个包可以是一个含有package.json文件的文件夹，一个模块可以是一个含有package.json文件或者index.js文件的文件夹。所以，为了让别人在它的程序中使用你的包，它必须使用require函数来导入，顾名思义，你的包也必须是一个模块。</p>
+
+<h3>npm install</h3>
+
+<p>那么如何用npm来下载一个模块或者包呢？</p>
+
+<p>npm intall命令，它的目的只有一个就是从npm仓库下载模块。</p>
+
+<p>安装一个node模块时，有两种安装方式，一种是全局方式（global），一种是本地方式（local）。如果被下载模块是在另一个模块或者应用中使用，就应该下载到本地，如果这个模块是命令行工具（例如，grunt cli，这个之后会介绍），那么就可以放在全局。</p>
+
+<p>全局方式，就跟全局函数一样，意味着这个模块在安装之后，在任何位置都可以使用它。</p>
+
+<p>比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">npm</span> <span class="n">install</span> <span class="o">-</span><span class="n">g</span> <span class="n">grunt</span><span class="o">-</span><span class="n">cli</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果是mac系统，被下载的模块会放在usr/local/lib/node_modules 如果是Windows系统，则在C:\Users\AppData\Roaming\npm</p>
+
+<p>你可以通过命令，修改存储的位置，毕竟你不会太希望缓存库放在用户文件夹下:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">npm</span> <span class="n">config</span> <span class="nb">set</span> <span class="n">prefix</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Dev</span>\<span class="n">Software</span>\<span class="n">npm</span><span class="o">-</span><span class="n">repository</span>\<span class="n">npm</span> <span class="o">--</span><span class="k">global</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">npm</span> <span class="n">config</span> <span class="nb">set</span> <span class="n">cache</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Dev</span>\<span class="n">Software</span>\<span class="n">npm</span><span class="o">-</span><span class="n">repository</span>\<span class="n">npm</span><span class="o">-</span><span class="n">cache</span> <span class="o">--</span><span class="k">global</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>本地方式，顾名思义，是给指定模块或者应用使用，比如npm install grunt-contrib-uglify，那么uglify的存放路径到底在哪？它会存放在命令执行的工作路径上吗？不一定，它是有些规则的：</p>
+
+<p>这个新下载的模块会被放置在它认为的当前node包的node_modules文件中，那它怎么决定哪个是当前的node包呢？</p>
+
+<p>npm会从当前工作路径开始向上遍历，寻找模块描述文件package.json。如果找到了，则包含该描述文件的文件夹就会被当做包的根目录。如果向上遍历没有找到，它就会认为还没有package.json文件被创建，那么当前文件夹就会被当做包的根目录，并将模块下载到node_modules文件夹中。</p>
+
+<p>这种判断在什么位置存放node_modules文件夹的模式是和node中模块系统的require函数寻找导入模块的策略是相匹配的。</p>
+
+<p>当我们想要使用一个新安装的node模块时，我们通过require函数导入，传入的参数是模块的名字，而不是文件的名字。require函数会在当前路径寻找node_modules目录，如果没有找到，则会去它的父目录寻找。它会一直搜索，知道到达文件系统根目录。</p>
+
+<h2>Grunt</h2>
+
+<p>谈了这么多，还没有到今天的主题Grunt，那么Grunt和Node，npm是什么关系呢？答案是：Grunt是Node.js中的一个模块，可以通过npm下载并安装。</p>
+
+<p>所以，如果你要安装Grunt，就和安装其他node模块一样，npm install grunt。</p>
+
+<h3>Grunt的插件与Node模块</h3>
+
+<p>在前面提到，npm为Grunt成为一个成功的构建系统做了很大的贡献，它是一个构建系统的插件仓库。</p>
+
+<p>比如说，你希望构建的过程中，做JavaScript的CheckStyle。你需要安装：grunt-contrib-jshint插件（时刻记住，它就是node模块）</p>
+
+<p>比如说，你希望构建的过程中，做JavaScript的文件压缩。你需要安装：grunt-contrib-uglify插件(node模块)</p>
+
+<p>等等</p>
+
+<p>难道手动的去一个个install吗？当然不是。</p>
+
+<p>我们的项目，既是一个Grunt的工程，也是一个node模块，所以其中的package.json是有用的。</p>
+
+<p>模块中所有的依赖模块（在grunt中，就是需要的插件），都可以在package.json中声明，而你只需要一个命令npm install，就可以全部下载并安装。</p>
+
+<p>比如，在package.json中这么写：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;my-project-name&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;version&quot;</span><span class="o">:</span> <span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;devDependencies&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;grunt&quot;</span><span class="o">:</span> <span class="s2">&quot;~0.4.1&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;grunt-contrib-jshint&quot;</span><span class="o">:</span> <span class="s2">&quot;~0.6.0&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;grunt-contrib-nodeunit&quot;</span><span class="o">:</span> <span class="s2">&quot;~0.2.0&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;grunt-contrib-uglify&quot;</span><span class="o">:</span> <span class="s2">&quot;~0.2.2&quot;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后，你运行npm install即可。</p>
+
+<h3>Grunt CLI</h3>
+
+<p>那么，为了看到Grunt跑起来，看到最后的build success字样，还差什么呢？构建脚本，Gruntfile.js，这个是当然。但，即便我不知道怎么写，我可以拷贝一个过来。可是，好像还是差点什么东西，Ant，Maven，Gradle都分别有对应运行脚本的命令ant，mvn和gradle（或者gradlew）。那么Grunt的是什么？</p>
+
+<p>你可以打开当前工程的node_modules目录，看看里面grunt的文件夹，里面除了js文件就是json等描述性文件。好像这些都不是可以运行的命令文件。</p>
+
+<p>还差点什么？</p>
+
+<p>在前面，我们有引入一个命令npm install -g grunt-cli来安装grunt的命令行工具，你可以发现它是在全局范围内装了一个名字叫grunt-cli的模块。</p>
+
+<p>没错，就是它了。Grunt在0.4版本以后，被分割为三部分：grunt、grunt-cli和grunt-init。</p>
+
+<p>grunt-cli就是为了可以让你可以使用grunt命令，因此，当你在下载grunt-cli模块时，除了在全局的node_modules里面有grunt-cli模块，在npm文件夹下还有一个新下载的命令文件（例如，Windows是grunt.cmd），而且全局的node目录是放在系统path下的，因此你可以在任何位置使用这个命令。</p>
+
+<p>那么，除了是为了提供grunt命令给你使用，它还有一个特别的意义。</p>
+
+<p>Grunt CLI另一个很简单目的：运行离某个Gruntfile.js文件（Grunt里的build脚本）最近的某个版本的Grunt。换句话说，Grunt CLI就是类似Gradle中的Wrapper，是一个包装器。允许你在一台机器上给不同的应用使用不同的Grunt版本。</p>
+
+<p>而Grunt CLI又是安装在全局下的，所以你在任何一个位置都可以运行grunt命令，它会去找里当前构建文件Gruntfile.js最近的Grunt。</p>
+
+<p>我甚至怀疑它是不是就是借鉴的Gradle的包装器，只不过，Gradle的包装器在创建之前，需要创建的人先装一个支持包装器的Gradle版本，然后生成Gradlew，提交代码及对应的Gradlew命令，那么后面的人，就可以直接check out并运行，而不需要先安装Gradle，而这里，需要大家都安装Grunt CLI，它就是包装器，不需要某个人先创建。</p>
+
+<h3>最后一百米，如何完整的跑一次Grunt构建</h3>
+
+<p>有了它，剩下来的就是编写脚本文件Gruntfile.js，我个人觉得，它是整个Grunt生态系统中最容易理解的，因为它是配置。</p>
+
+<p>看一个最简单的完整例子：</p>
+
+<p>package.json</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;hello-grunt&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;version&quot;</span><span class="o">:</span> <span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;devDependencies&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;grunt&quot;</span><span class="o">:</span> <span class="s2">&quot;~0.4.1&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;grunt-contrib-jshint&quot;</span><span class="o">:</span> <span class="s2">&quot;~0.6.0&quot;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Gruntfile.js</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">grunt</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Project configuration.</span>
+</span><span class='line'>  <span class="nx">grunt</span><span class="p">.</span><span class="nx">initConfig</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">jshint</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">files</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;gruntfile.js&#39;</span><span class="p">,</span> <span class="s1">&#39;src/**/*.js&#39;</span><span class="p">,</span> <span class="s1">&#39;test/**/*.js&#39;</span><span class="p">],</span>
+</span><span class='line'>      <span class="nx">options</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">globals</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">jQuery</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>          <span class="nx">console</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>          <span class="nx">module</span><span class="o">:</span> <span class="kc">true</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">&#39;grunt-contrib-jshint&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;jshint&#39;</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>files: [&lsquo;gruntfile.js&rsquo;, &lsquo;src/<strong>/*.js&rsquo;, &lsquo;test/</strong>/*.js&rsquo;] 定义了所有需要做lint的的文件</p>
+
+<p>options 用来配置JSHint(文档在这里<a href="http://www.jshint.com/docs/">http://www.jshint.com/docs/</a>)</p>
+
+<p>grunt.loadNpmTasks(&lsquo;grunt-contrib-jshint&rsquo;) 用来加载包含 &ldquo;jshint&rdquo; 任务的插件。</p>
+
+<p>grunt.registerTask(&lsquo;default&rsquo;, [&lsquo;jshint&rsquo;]) 定义默认被执行的任务列表，即直接运行grunt命令，默认的任务是什么。</p>
+
+<p>现在你可以运行一下。</p>
+
+<p>首先运行npm install，安装在package.json中的模块。</p>
+
+<p>然后运行grunt命令，你也可以显示的指定运行某个任务 grunt jshint</p>
+
+<p>运行结果：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">Running</span> <span class="s">&quot;jshint:files&quot;</span> <span class="p">(</span><span class="n">jshint</span><span class="p">)</span> <span class="n">task</span>
+</span><span class='line'><span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="nb">file</span> <span class="n">lint</span> <span class="n">free</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Done</span><span class="p">,</span> <span class="n">without</span> <span class="n">errors</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Grunt官方提供了许多插件来满足一般JavaScript项目或者Web项目前端部分需要的任务，比如jshint，less，sass等。</p>
+
+<p>当你在grunt.initConfig中配置完对应的task之后，你就可以load和register对应的task到grunt中。</p>
+
+<p>当然，你也可以写自己的task。下面摘自官方的首页例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">grunt</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// A very basic default task.</span>
+</span><span class='line'>  <span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;Log some stuff.&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;Logging some stuff...&#39;</span><span class="p">).</span><span class="nx">ok</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>本篇关于Grunt的文章到这里就结束了，目的已经达到，如果你对更多关于如何写package.json和Gruntfile.js。可以去nodejs和grunt官方网站查看更多文档。</p>
+
+<p>总结，学习Grunt，本身不难，因为它是Cofiguation Over Code，这个的原则类似Maven。但是需要首先理解它的生态系统node.js。</p>
+
+<p>PS：我知道，现在，越来越多的人也在讨论到底Gulp（一个新的JavaScript构建工具，同样基于Node.js，提倡Code Over Configuration）该不该替代Grunt，或者它们的优缺点。但这对于你去了解一个构建工具并不影响。</p>
+
+<p>参考资料：</p>
+
+<p>1.<a href="http://www.gruntjs.net/docs/getting-started/">http://www.gruntjs.net/docs/getting-started/</a>   <br/>
+2.Book: Getting started with Grunt: The JavaScript Task Runner</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[开始！AngularJS!（六）- 依赖注入]]></title>
@@ -5268,414 +5658,6 @@ client/Client.java:7: error: cannot find symbol
 </span><span class='line'><span class="p">};</span>
 </span></code></pre></td></tr></table></div></figure>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[一起学学Spring Batch（二）]]></title>
-    <link href="http://benweizhu.github.io/blog/2014/03/13/spring-batch-job-by-example-2/"/>
-    <updated>2014-03-13T14:31:00+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2014/03/13/spring-batch-job-by-example-2</id>
-    <content type="html"><![CDATA[<p>所有的Batch处理都可以以一种最简单的方式描述，那就是<strong>读取大量的数据，然后进行某种方式的计算或者变形，最后输出写入到某个存储系统中</strong>。Spring Batch提供了三个简单的接口来帮助执行大量数据的读写，分别是<strong>ItemReader、ItmeWriter和ItermProcessor</strong>，你可以说它们是抽象出来的一种简单概念，它们同样也是针对不同类型数据的输入、输出和处理的方法。</p>
-
-<p>我们最常用到的数据类型有三种：<strong>数据库、XML和Flat文件</strong>。为了能够清晰的描述Batch处理的流程，我们采用Flat这种文件作为输入和输出数据源，排除数据库操作和XML文件解析的带来的理解上的复杂度。</p>
-
-<p>“Flat文件是一种包含没有相对关系结构的记录的文件。这个类型通常用来描述文字处理、其他结构字符或标记被移除了的文本。在任何事件中，许多用户把保存成“纯文本(text only)”类型的Microsoft Word文档叫做“Flat File(flat file)”。Flat File的另一种形式是包含了用ASCII码记录的，每个表单元由逗号分隔，用行表示记录组的文件。这种文件页叫做用逗号分隔数值(CSV)的文件.”</p>
-
-<p><strong>这里给出一个例子</strong>，从一个csv格式的flat文件中读取英语、数学、文学的分数，然后计算平均分，将结果写入另一个csv格式文件。</p>
-
-<p>首先是两个Model，分别是输入的数据模型ExamScore和输出的数据模型AverageScore。</p>
-
-<figure class='code'><figcaption><span>ExamScore.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">model</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ExamScore</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">id</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">english</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">math</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">literature</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setId</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getEnglish</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">english</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setEnglish</span><span class="o">(</span><span class="kt">int</span> <span class="n">english</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">english</span> <span class="o">=</span> <span class="n">english</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getMath</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">math</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setMath</span><span class="o">(</span><span class="kt">int</span> <span class="n">math</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">math</span> <span class="o">=</span> <span class="n">math</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getLiterature</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">literature</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setLiterature</span><span class="o">(</span><span class="kt">int</span> <span class="n">literature</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">literature</span> <span class="o">=</span> <span class="n">literature</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>  
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>AverageScore.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">model</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AverageScore</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">id</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">double</span> <span class="n">score</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setId</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">double</span> <span class="nf">getScore</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">score</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setScore</span><span class="o">(</span><span class="kt">double</span> <span class="n">score</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">score</span> <span class="o">=</span> <span class="n">score</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后是Processor，这里实现ItemProcessor接口。在process方法中传入输入数据模型，返回输出数据模型。</p>
-
-<figure class='code'><figcaption><span>ScoreProcessor.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">processor</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.batch.model.AverageScore</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.batch.model.ExamScore</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.item.ItemProcessor</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ScoreProcessor</span> <span class="kd">implements</span> <span class="n">ItemProcessor</span><span class="o">&lt;</span><span class="n">ExamScore</span><span class="o">,</span> <span class="n">AverageScore</span><span class="o">&gt;</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">double</span> <span class="n">COUNT</span> <span class="o">=</span> <span class="mf">3.0</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">AverageScore</span> <span class="nf">process</span><span class="o">(</span><span class="n">ExamScore</span> <span class="n">examScore</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">AverageScore</span> <span class="n">averageScore</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">AverageScore</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">averageScore</span><span class="o">.</span><span class="na">setId</span><span class="o">(</span><span class="n">examScore</span><span class="o">.</span><span class="na">getId</span><span class="o">());</span>
-</span><span class='line'>      <span class="n">averageScore</span><span class="o">.</span><span class="na">setScore</span><span class="o">(</span><span class="n">calculateAverageScore</span><span class="o">(</span><span class="n">examScore</span><span class="o">));</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">averageScore</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">double</span> <span class="nf">calculateAverageScore</span><span class="o">(</span><span class="n">ExamScore</span> <span class="n">examScore</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="o">(</span><span class="n">examScore</span><span class="o">.</span><span class="na">getEnglish</span><span class="o">()</span> <span class="o">+</span> <span class="n">examScore</span><span class="o">.</span><span class="na">getLiterature</span><span class="o">()</span> <span class="o">+</span> <span class="n">examScore</span><span class="o">.</span><span class="na">getMath</span><span class="o">())</span> <span class="o">/</span> <span class="n">COUNT</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>和上篇文章的一样，在spring-batch-beans.xml中定义了关于Sping Batch的一些基础Bean。</p>
-
-<figure class='code'><figcaption><span>spring-batch-beans.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;transactionManager&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.support.transaction.ResourcelessTransactionManager&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jobRepository&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;transactionManager&quot;</span> <span class="na">ref=</span><span class="s">&quot;transactionManager&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jobLauncher&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.core.launch.support.SimpleJobLauncher&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;jobRepository&quot;</span> <span class="na">ref=</span><span class="s">&quot;jobRepository&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>重点是下面一个xml文件spring-batch-jobs.xml，在这个里面定义所有关于Batch Job的具体内容。</p>
-
-<figure class='code'><figcaption><span>spring-batch-jobs.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:batch=</span><span class="s">&quot;http://www.springframework.org/schema/batch&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;import</span> <span class="na">resource=</span><span class="s">&quot;spring-batch-beans.xml&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;csvFileReader&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.FlatFileItemReader&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;resource&quot;</span> <span class="na">value=</span><span class="s">&quot;file:/Users/twer/Documents/gradle-project/spring-batch-example/src/main/resources/reader_file.csv&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;lineMapper&quot;</span> <span class="na">ref=</span><span class="s">&quot;lineMapper&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;lineMapper&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.mapping.DefaultLineMapper&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;lineTokenizer&quot;</span> <span class="na">ref=</span><span class="s">&quot;lineTokenizer&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;fieldSetMapper&quot;</span> <span class="na">ref=</span><span class="s">&quot;fieldSetMapper&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;lineTokenizer&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.transform.DelimitedLineTokenizer&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;delimiter&quot;</span> <span class="na">value=</span><span class="s">&quot;,&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;names&quot;</span> <span class="na">value=</span><span class="s">&quot;id,english,math,literature&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;fieldSetMapper&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;targetType&quot;</span> <span class="na">value=</span><span class="s">&quot;me.zeph.spring.batch.model.ExamScore&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;csvFileProcessor&quot;</span> <span class="na">class=</span><span class="s">&quot;me.zeph.spring.batch.processor.ScoreProcessor&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;csvFileWriter&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.FlatFileItemWriter&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;resource&quot;</span> <span class="na">value=</span><span class="s">&quot;file:/Users/twer/Documents/gradle-project/spring-batch-example/src/main/resources/writer_file.csv&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;lineAggregator&quot;</span> <span class="na">ref=</span><span class="s">&quot;lineAggregator&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;lineAggregator&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.transform.DelimitedLineAggregator&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;delimiter&quot;</span> <span class="na">value=</span><span class="s">&quot;,&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;fieldExtractor&quot;</span> <span class="na">ref=</span><span class="s">&quot;fieldExtractor&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;fieldExtractor&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;names&quot;</span> <span class="na">value=</span><span class="s">&quot;id,score&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;batch:job</span> <span class="na">id=</span><span class="s">&quot;fileTransfer&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;batch:step</span> <span class="na">id=</span><span class="s">&quot;step&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;batch:tasklet&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;batch:chunk</span> <span class="na">reader=</span><span class="s">&quot;csvFileReader&quot;</span> <span class="na">processor=</span><span class="s">&quot;csvFileProcessor&quot;</span> <span class="na">writer=</span><span class="s">&quot;csvFileWriter&quot;</span> <span class="na">commit-interval=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;/batch:tasklet&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/batch:step&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/batch:job&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>让我们来一起分析一下上面这个xml配置。</p>
-
-<p><strong>FlatFileItemReader</strong>是Flat文件的读取类，可以按行读取输入文件。这里传入两个参数，LineMapper和Resource。</p>
-
-<p>Resource顾名思义，用来指定数据源。</p>
-
-<p>LineMapper用于将文件中的每行数据映射到对应的数据模型，这里使用DefaultLineMapper。LineMapper中传入两个参数，分别是行分词器LineTokenizer和域映射器FieldSetMapper。</p>
-
-<p>对应的LineTokenizer采用基于分隔符的分词器，而对应的FieldSetMapper需要传入待映射的数据模型类型。</p>
-
-<p>对于<strong>FlatFileItemWriter</strong>，同样要配置对应的输出源Resource和行聚合器lineAggregator。</p>
-
-<p>对于lineAggregator这里同样采用基于分隔符的聚合器DelimitedLineAggregator，需要给聚合器配置对应的分隔符（比如“,”）和域提取器BeanWrapperFieldExtractor。</p>
-
-<p>在域提取器BeanWrapperFieldExtractor中配置要被提取的值。</p>
-
-<p>最后就是定义具体的Batch Job。</p>
-
-<figure class='code'><figcaption><span>spring-batch-jobs.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;batch:job</span> <span class="na">id=</span><span class="s">&quot;fileTransfer&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;batch:step</span> <span class="na">id=</span><span class="s">&quot;step&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;batch:tasklet&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;batch:chunk</span> <span class="na">reader=</span><span class="s">&quot;csvFileReader&quot;</span> <span class="na">processor=</span><span class="s">&quot;csvFileProcessor&quot;</span> <span class="na">writer=</span><span class="s">&quot;csvFileWriter&quot;</span> <span class="na">commit-interval=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;/batch:tasklet&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/batch:step&gt;</span>
-</span><span class='line'><span class="nt">&lt;/batch:job&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>运行结果：上面是输入，下面是输出</p>
-
-<pre><code>1,100,80,80
-2,100,70,80
-3,100,80,70
-
-1,86.66666666666667
-2,83.33333333333333
-3,83.33333333333333
-</code></pre>
 ]]></content>
   </entry>
   
