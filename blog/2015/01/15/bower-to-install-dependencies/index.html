@@ -279,6 +279,88 @@
 
 <h3>将bower和grunt集成</h3>
 
+<p>目前，github上面有很多grunt的插件可以将bower集成到grunt中。你可以去 <a href="https://www.npmjs.com/">https://www.npmjs.com/</a> 上搜索bower和grunt的关键字。</p>
+
+<p>我这里使用的是：grunt-bower-task</p>
+
+<p>安装很简单：npm install grunt-bower-task &ndash;save-dev</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;relations-front-end&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;devDependencies&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;grunt&quot;</span><span class="p">:</span> <span class="s2">&quot;~0.4.5&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;grunt-bower-task&quot;</span><span class="p">:</span> <span class="s2">&quot;^0.4.0&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;grunt-contrib-jshint&quot;</span><span class="p">:</span> <span class="s2">&quot;~0.4.0&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nt">&quot;scripts&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;test&quot;</span><span class="p">:</span> <span class="s2">&quot;grunt&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">grunt</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">initConfig</span><span class="p">({</span>
+</span><span class='line'>        <span class="nx">jshint</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">files</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;Gruntfile.js&#39;</span><span class="p">,</span> <span class="s1">&#39;src/**/*.js&#39;</span><span class="p">,</span> <span class="s1">&#39;test/**/*.js&#39;</span><span class="p">,</span> <span class="s1">&#39;!src/js/libs/**/*.js&#39;</span><span class="p">]</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="nx">bower</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">install</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">options</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="nx">targetDir</span><span class="o">:</span> <span class="s1">&#39;./src/js/libs&#39;</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">&#39;grunt-bower-task&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">&#39;grunt-contrib-jshint&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;bower:install&#39;</span><span class="p">,</span> <span class="s1">&#39;jshint&#39;</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>targetDir: &lsquo;./src/js/libs&#8217;的作用是告诉task将bower下载的目标文件拷贝一份到哪个路径下</p>
+
 <p>请参考：<a href="http://bower.io/docs/tools/">http://bower.io/docs/tools/</a></p>
 </div>
 
