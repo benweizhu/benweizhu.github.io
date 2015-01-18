@@ -134,6 +134,53 @@ bower uninstall   --卸载已安装的依赖包
 
 ###将bower和grunt集成
 
+目前，github上面有很多grunt的插件可以将bower集成到grunt中。你可以去 https://www.npmjs.com/ 上搜索bower和grunt的关键字。
+
+我这里使用的是：grunt-bower-task
+
+安装很简单：npm install grunt-bower-task --save-dev
+
+{% codeblock lang:json %}
+{
+    "name": "relations-front-end",
+    "version": "0.0.1",
+    "devDependencies": {
+        "grunt": "~0.4.5",
+        "grunt-bower-task": "^0.4.0",
+        "grunt-contrib-jshint": "~0.4.0"
+    },
+    "scripts": {
+        "test": "grunt"
+    }
+}
+{% endcodeblock %}
+
+{% codeblock lang:javascript %}
+module.exports = function (grunt) {
+
+    grunt.initConfig({
+        jshint: {
+            files: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js', '!src/js/libs/**/*.js']
+        },
+        bower: {
+            install: {
+                options: {
+                    targetDir: './src/js/libs'
+                }
+            }
+        }
+    });
+
+    grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
+
+    grunt.registerTask('default', ['bower:install', 'jshint']);
+
+};
+{% endcodeblock %}
+
+targetDir: './src/js/libs'的作用是告诉task将bower下载的目标文件拷贝一份到哪个路径下
+
 请参考：http://bower.io/docs/tools/
 
 
