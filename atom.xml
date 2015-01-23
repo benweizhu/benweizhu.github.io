@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-01-18T19:37:55+08:00</updated>
+  <updated>2015-01-24T00:47:56+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,212 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[开始！AngularJS!（八）- 路由]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/01/23/yes-angularjs-8/"/>
+    <updated>2015-01-23T22:18:10+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/01/23/yes-angularjs-8</id>
+    <content type="html"><![CDATA[<p>传统的Web应用，以Java栈为例，无论是纯Servlet还是MVC框架，比如，SpringMVC，Struts。在页面上的导航都比较简单，只需要在浏览器地址栏输入URL，一个URL用来指向服务器上一个单一的物理资源（页面文件）。当页面加载后，就可以点击链接跳转到其他资源，或者使用前进后退按钮跳转到已访问的页面。</p>
+
+<p>通过修改DOM，动态生成页面的Web应用改变了这一现状，因为对页面内容的改变是直接对页面DOM元素的修改，而不是向服务器发出请求。于是，前进后退按钮在这种情况受到了影响。</p>
+
+<h2>URL</h2>
+
+<p>那么，对于单页应用，如何能够修改浏览器的URL，让浏览器可以前进后退，但是又不会向服务器发出请求？</p>
+
+<h3>HashBang URL</h3>
+
+<p>通过修改URL定制中#符号后面的部分，而不会触发当前页面重新加载。比如， <a href="http://localhost:3000/#/user/123">http://localhost:3000/#/user/123</a> ，浏览器会选取URL中#号后面的差异部分来提供前进后退。</p>
+
+<h3>另一种方式，HTML5的historyAPI</h3>
+
+<p>这里首先要说明浏览器的前进和后退都依赖于浏览器的history堆栈（window.history对象），保证浏览器history堆栈的记录正确，前进后退的按钮就可以正常工作。HTML5中的history正好提供了方法来将URL推送到浏览器的history堆栈。然后只要监听window.onpopstate事件就可以修改应用的状态。</p>
+
+<p>但是当直接在服务器上输入URL时，还是会向服务器发送请求，这个时候还需要在服务器端做些事情，让服务器始终返回应用首页。所以这种方式会相对麻烦一些。</p>
+
+<p>当看到#号，你可能会想到另一个东西，HTML中的锚点，定位页面的位置。在HashBang方式下，需要借助AngularJS的一个服务$anchorScroll以及两个#来实现锚点。比如 <a href="http://localhost:3000/#/user/123#name">http://localhost:3000/#/user/123#name</a></p>
+
+<h2>使用AngularJS的路由服务</h2>
+
+<p>AngularJS内置了$route服务来处理Web应用的路由，并通过ng-view指令来显示匹配路由的内容，看下面的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;routeApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;#/admin&quot;</span><span class="nt">&gt;</span>admin<span class="nt">&lt;/a&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-view</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>被插入的模板，动态渲染部分</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;adminController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>   I am admin.
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;routeApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngRoute&#39;</span><span class="p">])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$routeProvider</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/admin&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/admin/admin.html&#39;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;adminController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里引入了.config方法，需要穿插介绍一点知识：模块的生命周期。AngularJS将模块的生命周期分为两个阶段，配置阶段和运行阶段。其中模块的.config方法可以用来注册一些需要在模块加载时候执行的动作或者进行的配置，比如这里的路由配置。</p>
+
+<p>AngularJS的路由服务在angular-route.js中，所以首先需要引入它，然后引入子模块ngRoute，在config方法中注入$routeProvider服务，然后剩下的就很清楚了，和Java技术栈中道理一样，URL和资源文件的Mapping。</p>
+
+<p>ng-view指令可以通过当前匹配的路由找到要显示的内容。</p>
+
+<h3>URL查询参数</h3>
+
+<p><a href="http://localhost:3000/#/user?id=123">http://localhost:3000/#/user?id=123</a> 或者 <a href="http://localhost:3000/#/user/123">http://localhost:3000/#/user/123</a></p>
+
+<p>几乎所有Web应用，遇到这样的URL是太平常的事情了，那么这种动态的URL应该怎么匹配呢？在AngularJS中，URL中任何以冒号（:）开头的字符串都会作为通配符。无论是这里的$routeProvider.when(/user/id=:userid)还是之后会介绍的与后端restful api通信的$resource服务在定义URL的时候。</p>
+
+<p>那么如何在controller中获取该参数呢？$routeParams服务。我们可以在controller中注入该服务，看下面的例子。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;routeApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngRoute&#39;</span><span class="p">])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$routeProvider</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/user/:userid&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/user/user.html&#39;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;userController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope, &#39;</span><span class="nx">$routeParams</span><span class="err">&#39;</span><span class="p">,</span>
+</span><span class='line'>       <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$routeParams</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">$scope</span><span class="p">.</span><span class="nx">userid</span> <span class="o">=</span> <span class="nx">$routeParams</span><span class="p">.</span><span class="nx">userid</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>多个控制器重用模块</h3>
+
+<p>在上面的例子中，url对应的页面文件是这样的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;adminController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>   I am admin.
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>模板的作用域固定为adminController的，如果不同路由下的其他controller也想用该模块，那么就得重新建一个新的html文件。</p>
+
+<p>还有一种办法，就是将controller的声明放在路由的定义中。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div&gt;</span>
+</span><span class='line'>   I am admin.
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;routeApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngRoute&#39;</span><span class="p">])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$routeProvider</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/admin&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/admin/adminOrSuperUser.html&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;adminController&#39;</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/superUser&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/admin/adminOrSuperUser.html&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;superUserController&#39;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;adminController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;superUserController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样多个控制器就可以使用相同的模板。</p>
+
+<h3>指定默认路由</h3>
+
+<p>就和编程语言中的switch一样，在$routeProvider还提供了otherwise方法来设置默认路由，很明显它只能是一个，一般的做法是通过redirectTo属性，跳转到一个已有的路由上。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">$routeProvider</span><span class="p">.</span><span class="nx">otherwise</span><span class="p">({</span><span class="nx">redirectTo</span><span class="o">:</span> <span class="s1">&#39;/home&#39;</span><span class="p">});</span>
+</span><span class='line'><span class="p">}]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>下一节，学习通过$Resource与后端restful的API通信。</p>
+
+<p>参考资料：</p>
+
+<ol>
+<li>精通AngularJS</li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[开始！AngularJS!（七）- 过滤器]]></title>
@@ -5157,396 +5363,6 @@ client/Client.java:7: error: cannot find symbol
 <p>只不过要注意一点的是，打jar包时，一定要按照package定义的目录结构去打。因为在将jar包加入到classpath时和将一个目录下的class文件加入是一样的，相对路径。</p>
 
 <p>java -d out client/Client.java，会将class文件编译到out目录下，且内部目录结构与包的结构一致。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Spring Restful Web Service by Example]]></title>
-    <link href="http://benweizhu.github.io/blog/2014/04/06/spring-restful-web-service-by-example/"/>
-    <updated>2014-04-06T12:06:00+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2014/04/06/spring-restful-web-service-by-example</id>
-    <content type="html"><![CDATA[<p>REST是<a href="http://en.wikipedia.org/wiki/Roy_Fielding">Roy Fielding</a>在他的2000年博士论文《Architectural Styles and the Design of Network-based Software Architectures》中提出的概念，全称是Representational State Transfer。</p>
-
-<p>Roy Fielding是互联网一个极为重要的人物，他是HTTP协议（1.0版和1.1版）的主要设计者，Apache服务器软件的作者之一，Apache基金会的第一任主席。</p>
-
-<p>他在他的论文中提到一点：“网络研究主要关注系统之间通信行为的细节、如何改进特定通信机制的表现，常常忽视了一个事实，那就是<strong>改变应用程序的互动风格比改变互动协议，对整体表现有更大的影响</strong>。”。</p>
-
-<p>REST是个名字，加上ful之后，变成了形容词“具有REST风格的”。</p>
-
-<p>在看过一些资料之后，我觉的REST越来越火的主要原因之一，就是想在的互联网应用已经不仅仅是内容的资源，还包括计算资源。而资源的消费者也不仅仅是浏览器（人在消费），还有其他应用（应用程序在消费），所以资源的表现形式在变化。</p>
-
-<h2><strong>Web Service</strong></h2>
-
-<p>Web Service是一种服务导向架构的技术，通过标准的Web协议提供服务，目的是保证不同平台的应用服务可以互操作。而它的技术通常是根据SOAP协议进行传递XML格式消息。而基于Java的主流WEB服务开发框架往往需要通过WSDL生成客户端的源代码。</p>
-
-<p>PS：这里没有任何想要对比基于SOAP和基于REST的Web Service的区别或者优缺点的意思。</p>
-
-<h2><strong>Restful Web Service</strong></h2>
-
-<p>Restful Web Service又称为Restful Web API。Rest本身其实不是一种技术，而是一种风格，它基于HTTP协议，具有统一的URL资源，通过HTTP协议提供的方法来表示对数据的操作，资源的表现形式多样化，具体表现形式由资源的消费者决定等等。</p>
-
-<p>说了这么多，还是回到标题，如何实现？</p>
-
-<p>如果你的项目采用Spring开发，那么Spring提供了一套基于Spring MVC的Restful方案，可以非常方便的通过Controller提供想要的Web Service，又可以通过RestTemplate实现客户端对Web Service操作。</p>
-
-<p>PS：本例子是针对Spring 3.2以后，3.1版本有所不同。</p>
-
-<p>首先来实现一个基于Controller的Restful Web Service：</p>
-
-<p>首先是Domain，这个很简单一个Car类，包含名字和价格。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">restful</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">model</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Car</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">price</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPrice</span><span class="o">(</span><span class="kt">int</span> <span class="n">price</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">price</span> <span class="o">=</span> <span class="n">price</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getPrice</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">price</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后是Controller，按照普通写RequestMapping一样方式，但这里返回的是Domain对象。
-这里有两个位置不同，一个是注解@ResponseBody用来说明返回的结果是HttpResponse的body部分。
-另一个参数produces用来说明，这里只接受Http请求中head里说明了Accept类型是Application/Json。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">restful</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.restful.demo.model.Car</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.ResponseBody</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON_VALUE</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Controller</span>
-</span><span class='line'><span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;car&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CarController</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VIEW_NAME</span> <span class="o">=</span> <span class="s">&quot;car&quot;</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@RequestMapping</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getCarByView</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">VIEW_NAME</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">produces</span> <span class="o">=</span> <span class="o">{</span><span class="n">APPLICATION_JSON_VALUE</span><span class="o">})</span>
-</span><span class='line'>  <span class="nd">@ResponseBody</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">Car</span> <span class="nf">getCarByJSON</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="nf">getCar</span><span class="o">();</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">Car</span> <span class="nf">getCar</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">Car</span> <span class="n">car</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Car</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">car</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="s">&quot;BenZ&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">car</span><span class="o">.</span><span class="na">setPrice</span><span class="o">(</span><span class="mi">300000</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">car</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这样基本就算完成了，可能有人会问，为什么上面的getCarByView方法没有写produces。其实，我也看到许多网上例子，将返回HTML格式View的方法添加了produces。比如，添加Text/Http等。</p>
-
-<p>为什么这里不加，原因是，我们知道，该方法是提供给浏览器请求，用于返回基于HTML的页面。而对于不同的浏览器而言，发出的HTTP请求的head的是不一样，以Chrome和IE为例。</p>
-
-<p>Chrome发出的head是：“text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8”</p>
-
-<p>IE发出的head是：“*/*”</p>
-
-<p>所以如果添加了produces，那么有可能返回结果不是HTML。我就遇到过，添加了Text/Http之后，在IE中返回给我的是JSON数据，而不是HTML页面。</p>
-
-<p>如果不写，那么就是默认的选择，在不满足其他RequestMapping，会去走默认那条Mapping路线。你可以在RestClient中验证，URL是localhost:8080/spring-restful-demo/car，但是head不同，那么它返回给你的view格式就不同了。</p>
-
-<p>其实，走到这一步，已经就完成了。</p>
-
-<h2><strong>但是如果你在页面上和RestClient上做一个实验，就会发现它远远不止如此！！！</strong></h2>
-
-<p>在浏览器上输入localhost:8080/spring-restful-demo/car.html，会返回给你html页面。</p>
-
-<p>在浏览器上输入localhost:8080/spring-restful-demo/car.json，会返回给你给你json数据。</p>
-
-<p>明明通过浏览器发送请求的Head是Text/Html，为什么会返回给我Json数据。如果通过debug的方式，你会看到确实进入的是getCarByJSON方法。</p>
-
-<p>在<strong>RestClient</strong>去试一把，输入地址，localhost:8080/spring-restful-demo/car.html，设置head为accept=Application/Json，返回给我的是HTMl页面。</p>
-
-<h2><strong>默认规约</strong></h2>
-
-<p>原来Spring在选择映射的时候，有一定的规约，加入了检查条件，URL后缀，URL参数。并且其默认的检查顺序是后缀，参数，最后才是Accept。</p>
-
-<p>也就是，如果你的URL是以HTML结尾，那么无论你的head是什么，Spring都会认为是返回HTML页面，因为你显示的指明了。</p>
-
-<p>对于那些希望显示指明返回类型的应用，Spring的默认规约已经帮助它们实现。</p>
-
-<p>但是如果，我不希望呢？</p>
-
-<p>无论你的后缀还是参数是什么，我都希望Spring根据我head中的accept值来决定。</p>
-
-<h2><strong>Content Negotiation（内容协商）</strong></h2>
-
-<p>这里就要引入另外一个东西：Spring MVC Content Negotiation（内容协商）。</p>
-
-<p>它是用来帮助你定义在返回多种表现形式时，应该遵守的规约，默认我们是不需要定义的，那么它就会像上面所提到的去做。但如果你不想要默认的规则，那么你就需要在Spring的Context中定义这个Bean。</p>
-
-<p>这里用我的demo中的例子，简单说明一下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:mvc=</span><span class="s">&quot;http://www.springframework.org/schema/mvc&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/mvc</span>
-</span><span class='line'><span class="s">                    http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd</span>
-</span><span class='line'><span class="s">                    http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">                    http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
-</span><span class='line'><span class="s">                    http://www.springframework.org/schema/context</span>
-</span><span class='line'><span class="s">                    http://www.springframework.org/schema/context/spring-context-3.2.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;me.zeph.spring.restful.demo&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;mvc:annotation-driven</span> <span class="na">content-negotiation-manager=</span><span class="s">&quot;contentNegotiationManager&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;viewResolver&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;viewClass&quot;</span> <span class="na">value=</span><span class="s">&quot;org.springframework.web.servlet.view.JstlView&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;prefix&quot;</span> <span class="na">value=</span><span class="s">&quot;/WEB-INF/view/&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;suffix&quot;</span> <span class="na">value=</span><span class="s">&quot;.jsp&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;contentNegotiationManager&quot;</span>
-</span><span class='line'>          <span class="na">class=</span><span class="s">&quot;org.springframework.web.accept.ContentNegotiationManagerFactoryBean&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;favorPathExtension&quot;</span> <span class="na">value=</span><span class="s">&quot;false&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;favorParameter&quot;</span> <span class="na">value=</span><span class="s">&quot;false&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;defaultContentType&quot;</span> <span class="na">value=</span><span class="s">&quot;text/html&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;restfulTemplate&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.web.client.RestTemplate&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在Spring 3.2以后，实现内容协商的bean的名字叫做ContentNegotiationManager，需要通过他的工厂类ContentNegotiationManagerFactoryBean去定义规约。在这里，我修改了三个属性，favorPathExtension，favorParameter和defaultContentType，defaultContentType简单，就是默认的表现内容形式，favorPathExtension表示是否采用路径扩展作为最高优先级的判断，同理favorParameter表示是否采用参数作为第二优先级的判断。这里，我将它们两个都设置为false。即不采用它们作为判断条件。最后，在annotation-driven的标签里，添加属性contentNegotiationManager，说明使用@Controller注解的Controller都采用这种规约。</p>
-
-<p>然后，我们再来是测试，在RestClient上，设置请求Url为localhost:8080/spring-restful-demo/car.html，但是呢，将head设为Accept=Applicaiton/Json。你猜结果怎样？乖乖的返回Json数据。</p>
-
-<p>关于Content Negotiation就说到这里，关于它功能还有很多，以后有机会在补充，那么Web Service就差不多说完了。</p>
-
-<h2><strong>RestTemplate实现客户端</strong></h2>
-
-<p>在来看看怎么实现Client端的代码。如果不用Spring，可以通过Apache的HttpClient作为客户端，当然写的代码要多一点。</p>
-
-<p>如果使用Spring，可以通过Spring提供的RestTemplate，目的应该和Spring的JDBCTemplate类似，帮你封装了具体操作。</p>
-
-<p>用起来很简单，我写了另一个Controller来在页面显示调用该Web Service的结果。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">restful</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.restful.demo.common.URLs</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.restful.demo.model.Car</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ui.Model</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.client.RestTemplate</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Controller</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DisplayCarController</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VIEW_NAME</span> <span class="o">=</span> <span class="s">&quot;displayCarJson&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">RestTemplate</span> <span class="n">restTemplate</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Autowired</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="nf">DisplayCarController</span><span class="o">(</span><span class="n">RestTemplate</span> <span class="n">restTemplate</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">restTemplate</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">VIEW_NAME</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getCar</span><span class="o">(</span><span class="n">Model</span> <span class="n">model</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">model</span><span class="o">.</span><span class="na">addAttribute</span><span class="o">(</span><span class="s">&quot;car&quot;</span><span class="o">,</span> <span class="n">getCarByJson</span><span class="o">());</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">VIEW_NAME</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">Car</span> <span class="nf">getCarByJson</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">getForObject</span><span class="o">(</span><span class="n">URLs</span><span class="o">.</span><span class="na">REST_CAR_URL</span><span class="o">,</span> <span class="n">Car</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<p>如果你需要特定指定请求的Head。可以使用RestTemplate的exchange方法，不过使用起来要麻烦一些。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="n">Car</span> <span class="nf">getCarByJson</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">HttpHeaders</span> <span class="n">headers</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HttpHeaders</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">headers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;accept&quot;</span><span class="o">,</span> <span class="s">&quot;application/json&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">HttpEntity</span> <span class="n">httpEntity</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HttpEntity</span><span class="o">(</span><span class="s">&quot;&quot;</span><span class="o">,</span> <span class="n">headers</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">Car</span><span class="o">&gt;</span> <span class="n">exchange</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">exchange</span><span class="o">(</span><span class="n">URLs</span><span class="o">.</span><span class="na">REST_CAR_URL</span><span class="o">,</span> <span class="n">HttpMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">,</span> <span class="n">httpEntity</span><span class="o">,</span> <span class="n">Car</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">exchange</span><span class="o">.</span><span class="na">getBody</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<p>不过第二种方式更能说明是指定了具体head来请求哪种资源。</p>
-
-<p>这里使用Spring来发出请求，都是后端的，如果要用前端请求，固然是通过Ajax，不过那是另外一部分内容。</p>
-
-<p>总而言之，在使用Spring Web Service的这个过程当中还是遇到了不少的坑。</p>
-
-<p>首先，你需要知道有Content Negotiation这个东西，其次，不同的Spring版本，默认的规约不同。Spring 3.2和3.1就是一个分水岭，使用的时候要注意你使用的是哪个版本。</p>
-
-<p>参考资料：</p>
-
-<p><a href="https://spring.io/guides/gs/rest-service/">https://spring.io/guides/gs/rest-service/</a></p>
-
-<p><a href="https://spring.io/blog/2013/05/11/content-negotiation-using-spring-mvc">https://spring.io/blog/2013/05/11/content-negotiation-using-spring-mvc</a></p>
-
-<p><a href="http://spring.io/blog/2013/06/03/content-negotiation-using-views/">http://spring.io/blog/2013/06/03/content-negotiation-using-views/</a></p>
 ]]></content>
   </entry>
   
