@@ -50,6 +50,14 @@ Java插件已经预定义了一些configuration，比如，compile，runtime，t
 
 一个更常见的例子，做web开发时需要servlet的依赖，但是只是编译阶段，运行时servlet依赖由servlet容器来提供。所以Gradle的War插件也提供了两个configuration，分别是providedCompile和providedRuntime，它们对依赖的使用范围定义和compile以及runtime一致，只不过依赖的Jar包不会被加到War包里面。
 
+###定义SourceSet时，添加的Configuration
+
+上一节，在介绍Java插件的时候，提到了SourceSet概念。针对每一个新添加的SourceSet，Java插件都会动态的给它添加两个Configuration，分别是sourceSetCompile和sourceSetRuntime。
+
+比如：新添加一个SourceSet，叫做int，那么对应的Configuration是intCompile和intRuntime。
+
+这一特性也正好印证，Java插件是如何识别自定义SourceSet来进行编译和运行。
+
 ###依赖的多种定义方式
 
 除了通过远程仓库和依赖坐标来定义依赖，Gradle还提供了另外两种常用的依赖定义方式，对本地文件的依赖，对某个项目的依赖。
