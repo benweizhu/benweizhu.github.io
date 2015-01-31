@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-01-31T21:42:10+08:00</updated>
+  <updated>2015-01-31T23:49:10+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,295 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Gradle深入与实战（四）自定义集成测试任务]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-4/"/>
+    <updated>2015-01-31T21:47:45+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-4</id>
+    <content type="html"><![CDATA[<p>由于本小节，涉及到自定义任务，所以穿插一点自定义任务的知识。</p>
+
+<h2>Gradle Task</h2>
+
+<p>在前面已经介绍过Gradle和Ant相似，由任务驱动，以任务依赖的方式形成任务链，从而实现构建生命周期。所以，任务是Gradle中一个完整的可执行单元。</p>
+
+<p>如何定义任务：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">hello</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">println</span> <span class="s1">&#39;hello Gradle&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>执行该任务，只需要输入命令gradle hello。定义task的方式有很多种：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">myTask</span>
+</span><span class='line'><span class="n">task</span> <span class="n">myTask</span> <span class="o">{</span> <span class="n">configure</span> <span class="n">closure</span> <span class="o">}</span>
+</span><span class='line'><span class="n">task</span> <span class="n">myType</span> <span class="o">&lt;&lt;</span> <span class="o">{</span> <span class="n">task</span> <span class="n">action</span> <span class="o">}</span>
+</span><span class='line'><span class="n">task</span> <span class="nf">myTask</span><span class="o">(</span><span class="nl">type:</span> <span class="n">SomeType</span><span class="o">)</span>
+</span><span class='line'><span class="n">task</span> <span class="nf">myTask</span><span class="o">(</span><span class="nl">type:</span> <span class="n">SomeType</span><span class="o">)</span> <span class="o">{</span> <span class="n">configure</span> <span class="n">closure</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其中有一种定义方式，传入了一个参数type，作用是预定义该task的类型，指定类型之后，在传入的闭包中就可以使用该类型task提供的特殊变量或函数。</p>
+
+<p>比如一个拷贝类型的task</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="nf">copyDocs</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Copy</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">from</span> <span class="s1">&#39;src/main/doc&#39;</span>
+</span><span class='line'>    <span class="n">into</span> <span class="s1">&#39;build/target/doc&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>更过关于Task的内容，在以后的章节中再介绍。</p>
+
+<h2>自定义集成测试任务</h2>
+
+<p><strong>现在我们开始写一个集成测试的task，需求是这样的：</strong></p>
+
+<p>作为一个Java的程序员，我想要将单元测试和集成测试分离</p>
+
+<p>1.我想要 将单元测试全部放在src/test/unit目录中，将集成测试全部放在src/test/intgetaion中   <br/>
+2.我想要 能够单独运行我的集成测试  <br/>
+3.我想要 在运行build命令时，同时跑单元测试和集成测试</p>
+
+<p><strong>根据这样的一个需求，划分几步来做：</strong> <br/>
+1.建立目录  <br/>
+2.目录结构已经和原来的默认规约不同，所以要更改Java插件提供的SourceSet test，来映射单元测试目录结构  <br/>
+3.需要新建一个SourceSet intTest，来映射集成测试目录结构  <br/>
+4.Java插件会给新建的SourceSet intTest定义两个Configuration，分别是intTestCompile和intTestRuntime，那么就需要给这两个分组指定构件内容和依赖  <br/>
+5.定义一个名字叫做integrationTest的测试的task</p>
+
+<p><strong>那么我们从第二步和第三步开始，修改Java插件提供的SourceSet test和新建SourceSet intTest：</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="c1">// 定义一些常量，在其他位置使用</span>
+</span><span class='line'><span class="n">ext</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">unitJavaSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/unit/java&#39;</span>
+</span><span class='line'>    <span class="n">unitResourcesSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/unit/resources&#39;</span>
+</span><span class='line'>    <span class="n">intJavaSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/integration/java&#39;</span>
+</span><span class='line'>    <span class="n">intResourcesSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/integration/resources&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitJavaSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitResourcesSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">intTest</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intJavaSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intResourcesSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>第三步，给intTestCompile和intTestRuntime指定指定构件内容（产品代码）和依赖</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;junit:junit:4.11&#39;</span>
+</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;org.mockito:mockito-core:1.9.5&#39;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">intTestCompile</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">main</span><span class="o">.</span><span class="na">output</span> <span class="c1">// 将sourceSets.main中的输出class指定到intTestCompile中</span>
+</span><span class='line'>    <span class="n">intTestCompile</span> <span class="n">configurations</span><span class="o">.</span><span class="na">testCompile</span> <span class="c1">// 将configurations.testCompile的依赖拿过来</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>最后一步，定义一个test类型的task，并让check任务依赖于它</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="nf">integrationTest</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Test</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">testClassesDir</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">output</span><span class="o">.</span><span class="na">classesDir</span>
+</span><span class='line'>    <span class="n">classpath</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">runtimeClasspath</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">check</span><span class="o">.</span><span class="na">dependsOn</span> <span class="n">integrationTest</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后，你就可以在命令行中运行gradle integrationTest。</p>
+
+<p>完整版本如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">ext</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">unitJavaSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/unit/java&#39;</span>
+</span><span class='line'>    <span class="n">unitResourcesSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/unit/resources&#39;</span>
+</span><span class='line'>    <span class="n">intJavaSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/integration/java&#39;</span>
+</span><span class='line'>    <span class="n">intResourcesSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/integration/resources&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitJavaSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitResourcesSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">intTest</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intJavaSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intResourcesSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;junit:junit:4.11&#39;</span>
+</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;org.mockito:mockito-core:1.9.5&#39;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">intTestCompile</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">main</span><span class="o">.</span><span class="na">output</span>
+</span><span class='line'>    <span class="n">intTestCompile</span> <span class="n">configurations</span><span class="o">.</span><span class="na">testCompile</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">task</span> <span class="nf">integrationTest</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Test</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">testClassesDir</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">output</span><span class="o">.</span><span class="na">classesDir</span>
+</span><span class='line'>    <span class="n">classpath</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">runtimeClasspath</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">check</span><span class="o">.</span><span class="na">dependsOn</span> <span class="n">integrationTest</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">idea</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">module</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">unitJavaSrcDir</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">unitResourcesSrcDir</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">intJavaSrcDir</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">intResourcesSrcDir</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料： <br/>
+1.Gradle官方文档 <br/>
+2.<a href="http://selimober.com/blog/2014/01/24/separate-unit-and-integration-tests-using-gradle/">http://selimober.com/blog/2014/01/24/separate-unit-and-integration-tests-using-gradle/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Gradle深入与实战（三）依赖管理工具]]></title>
@@ -71,6 +360,14 @@
 <p>那么，为什么产品代码的编译阶段和运行阶段也分组，一般编译阶段需要的依赖，在运行阶段也需要，但是反过来就不一定了。比如，你通过反射去load一个class，这时该class就不一定需要在编译阶段存在。</p>
 
 <p>一个更常见的例子，做web开发时需要servlet的依赖，但是只是编译阶段，运行时servlet依赖由servlet容器来提供。所以Gradle的War插件也提供了两个configuration，分别是providedCompile和providedRuntime，它们对依赖的使用范围定义和compile以及runtime一致，只不过依赖的Jar包不会被加到War包里面。</p>
+
+<h3>定义SourceSet时，添加的Configuration</h3>
+
+<p>上一节，在介绍Java插件的时候，提到了SourceSet概念。针对每一个新添加的SourceSet，Java插件都会动态的给它添加两个Configuration，分别是sourceSetCompile和sourceSetRuntime。</p>
+
+<p>比如：新添加一个SourceSet，叫做int，那么对应的Configuration是intCompile和intRuntime。</p>
+
+<p>这一特性也正好印证，Java插件是如何识别自定义SourceSet来进行编译和运行。</p>
 
 <h3>依赖的多种定义方式</h3>
 
@@ -4372,407 +4669,6 @@ Domain Name Service (DNS)</p>
 <p>从这段代码可以看出，映射了上面我说的的第二点，不需要向DriverManager注册，所以这里没有传入MySQL的ClassName。</p>
 
 <p>OK，到此，我们回顾了JDBC最基础的几个接口：DriverManager，Driver，Connection，Statement，ResultSet，以及JDBC推荐的数据库连接方式DataSource。在下一章，我们会继续了解与JDBC相关的核心技术和概念，包括事务，JNDI等。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[logger（SLF4j和log4j）]]></title>
-    <link href="http://benweizhu.github.io/blog/2014/06/01/slf4j-and-log4j/"/>
-    <updated>2014-06-01T12:33:00+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2014/06/01/slf4j-and-log4j</id>
-    <content type="html"><![CDATA[<h2><strong>SLF4j</strong></h2>
-
-<p>Simple Logging Facade for Java (SLF4J)</p>
-
-<p>SLF4J，简单日志门面（Facade），是各个不同日志框架的抽象，它不是具体的日志解决方案，只服务于各种各样的日志系统，例如java.util.logging, log4j等，它允许最终用户在部署其应用时使用其所希望的日志系统。</p>
-
-<p><strong>什么意思？</strong>SLF4J就像一个接口，是一个门面，在写代码时，我们只需要根据这个接口提供的方法去记录日志。这个接口可以和不同的日志框架绑定，比如Java自带的java.util.logging，或者大家常听到的log4j。这样，你可以在不修改代码的情况下，去替换不同的日志框架。</p>
-
-<p>基本概念明白之后，看下面这个例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.logger</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.loggerFactory</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">loggerFactory</span><span class="o">.</span><span class="na">getlogger</span><span class="o">(</span><span class="n">HelloWorld</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>    <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;Hello World&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>输出的结果是：</p>
-
-<p>SLF4J: Failed to load class &ldquo;org.slf4j.impl.StaticloggerBinder&rdquo;.<br/>
-SLF4J: Defaulting to no-operation (NOP) logger implementation<br/>
-SLF4J: See <a href="http://www.slf4j.org/codes.html#StaticloggerBinder">http://www.slf4j.org/codes.html#StaticloggerBinder</a> for further details.</p>
-
-<p>原因是你没有将SLF4j和某一个具体的日志框架绑定。怎么绑定呢？不需要你做任何事情，简单的加一个依赖就可以了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-simple:1.7.7&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>输出是：[main] INFO log.HelloWorld - Hello World</p>
-
-<p><strong>SLF4J支持对很多不同框架的绑定：</strong></p>
-
-<p>slf4j-log4j12-1.7.7.jar<br/>
-slf4j-jdk14-1.7.7.jar<br/>
-slf4j-nop-1.7.7.jar<br/>
-slf4j-simple-1.7.7.jar<br/>
-slf4j-jcl-1.7.7.jar</p>
-
-<p><strong>那么有个问题，SLF4J支不支持对多个日志框架的绑定呢？答案是不支持，也感觉一般这是不必要需求。</strong></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-simple:1.7.7&#39;</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-log4j12:1.7.7&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>输出：</p>
-
-<p>SLF4J: Class path contains multiple SLF4J bindings.<br/>
-&hellip;</p>
-
-<p><strong>在SLF4J的官方文档上也说明了这点：</strong></p>
-
-<p>“SLF4J does not rely on any special class loader machinery. In fact, each SLF4J binding is hardwired at compile time to use one and only one specific logging framework. For example, the slf4j-log4j12-1.7.7.jar binding is bound at compile time to use log4j. In your code, in addition to slf4j-api-1.7.7.jar, you simply drop one and only one binding of your choice onto the appropriate class path location. Do not place more than one binding on your class path.”</p>
-
-<p>OK，关于SLF4J的内容就到这里，该进入重头戏&ndash;log4J。</p>
-
-<h2><strong>log4j</strong></h2>
-
-<p>log4j相对于SLF4j就复杂许多了，毕竟SLF4j只是接口，log4j则是具体的实现了。</p>
-
-<p>log4j由三个重要的组件组成：</p>
-
-<ol>
-<li>类型和级别(logger)</li>
-<li>输出目的地(Appender)</li>
-<li>输出格式(Layout)</li>
-</ol>
-
-
-<h3><strong>logger</strong></h3>
-
-<p><strong>logger hierarchy（logger的层次级别）</strong></p>
-
-<p><strong>Named Hierarchy（以名字分层）</strong></p>
-
-<p>logger的名字是大小写敏感的，并且根据名字的不同，logger之间存在父子层次关系。举例来说，com.foo是com.foo.bar的父logger，com是com.foo.bar的祖先logger。</p>
-
-<p>在这些logger之间，存在一个root logger，位于这个层次的顶层，它是永久存在，并且不能够通过名字获取，要获取它，只能通过logger.getRootlogger()方法获取。而这样一个层次关系，也决定了logger和logger之间存在着一些继承关系。</p>
-
-<p><strong>Level Inheritance（级别继承）</strong></p>
-
-<p>子类继承父类的级别：如果子类级别没有显示的指定，子类的级别等于第一个级别非空的父类logger的级别，直到追溯到根logger。</p>
-
-<p>前面提到logger的级别，它们分别是TRACE, DEBUG, INFO, WARN, ERROR和FATAL。</p>
-
-<p>这些级别存在高低关系：DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL。</p>
-
-<p>如果你以前有用过一点点log4j，这些级别映射到你的记忆中，一定是反映成logger的各个方法。没错，在logger这个对象中，你会看到很多的打印方法，debug, info, warn, error, fatal和log。</p>
-
-<p><strong>回过头来想想，如果你给一个logger指定了级别，但是你打印日志时，又不是调用对应级别的方法，会发生什么事情呢？</strong></p>
-
-<p>答案是：对这些方法的调用，不光是打印日志信息，也是对logger对象级别改变的请求。</p>
-
-<p>但是，并不是你调用它，级别就一定会改变，对级别改变的请求还是取决于logger对象本身的级别（无论是被显示的指定，还是继承）。如果请求的级别低于该logger当前的级别，那么改变就不会成功。</p>
-
-<h3><strong>Appender</strong></h3>
-
-<p>Appender的作用是指出日志信息的输出位置，比如控制台，文件。而且好处是，你可以给一个logger指定多个appender，比如同时在控制台和文件中输出日志。</p>
-
-<h4><strong>Appender Additivity(附加性)</strong></h4>
-
-<p>每一个Appender都有一个属性，叫做additivity flag，默认是true。什么意思呢？</p>
-
-<p>子类会继承它直接父类的appender（包括该父类自己继承的appender），如果设置为false，则不继承其父类的appender。</p>
-
-<p><strong>这句话应该好理解，那下面这种情况呢？</strong></p>
-
-<table>
-<thead>
-<tr>
-<th style="text-align:left;">Logger </th>
-<th style="text-align:center;"> Appender </th>
-<th style="text-align:center;"> Additivity</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">root         </td>
-<td style="text-align:center;"> A1        </td>
-<td style="text-align:center;"> null</td>
-</tr>
-<tr>
-<td style="text-align:left;">appenderFather</td>
-<td style="text-align:center;"> A2        </td>
-<td style="text-align:center;"> false</td>
-</tr>
-<tr>
-<td style="text-align:left;">appenderFather.appenderChild</td>
-<td style="text-align:center;"> A3</td>
-<td style="text-align:center;">true</td>
-</tr>
-</tbody>
-</table>
-
-
-<p>appenderFather的flag设置为了false，所以他拥有的appender的结果应该比较明显，就是A2。</p>
-
-<p>appenderFather.appenderChild的结果应该是什么？答案是A2和A3。因为它只是继承它直接父类的appender。</p>
-
-<p><strong>log4j提供的Appender有哪些呢？</strong></p>
-
-<p>org.apache.log4j.ConsoleAppender（控制台）</p>
-
-<p>org.apache.log4j.FileAppender（文件）</p>
-
-<p>org.apache.log4j.DailyRollingFileAppender（每天产生一个日志文件）</p>
-
-<p>org.apache.log4j.RollingFileAppender（文件大小到达指定尺寸的时候产生新文件，用的较多，限制文件大小）</p>
-
-<p>org.apache.log4j.WriterAppender（将日志信息以流格式发送到任意指定的地方）</p>
-
-<h3><strong>Layout</strong></h3>
-
-<p>日志信息布局（格式）是log4j提供的另外一个非常有用的特性。</p>
-
-<p><strong>log4j提供四种Layout方式：</strong></p>
-
-<p>org.apache.log4j.HTMLLayout（以HTML表格形式布局），</p>
-
-<p>org.apache.log4j.PatternLayout（可以灵活地指定布局模式，比较常用），</p>
-
-<p>org.apache.log4j.SimpleLayout（包含日志信息的级别和信息字符串），</p>
-
-<p>org.apache.log4j.TTCCLayout（包含日志产生的时间、线程、类别等等信息）</p>
-
-<p><strong>log4j采用类似C语言中的printf函数的打印格式格式化日志信息，打印参数如下：</strong></p>
-
-<p>%m 输出代码中指定的消息 　</p>
-
-<p>%p 输出优先级，即DEBUG，INFO，WARN，ERROR，FATAL 　　</p>
-
-<p>%r 输出自应用启动到输出该log信息耗费的毫秒数 　　</p>
-
-<p>%c 输出所属的类目，通常就是所在类的全名 　　</p>
-
-<p>%t 输出产生该日志事件的线程名 　　</p>
-
-<p>%n 输出一个回车换行符，Windows平台为“rn”，Unix平台为“n” 　　</p>
-
-<p>%d 输出日志时间点的日期或时间，默认格式为ISO8601，也可以在其后指定格式，比如：%d{yyy MMM dd HH:mm:ss,SSS}，输出类似：2002年10月18日 22：10：28，921 　　</p>
-
-<p>%l 输出日志事件的发生位置，包括类目名、发生的线程，以及在代码中的行数。举例：Testlog4.main(TestLog4.java:10)</p>
-
-<p>%x: 输出和当前线程相关联的NDC(嵌套诊断环境),尤其用到像java servlets这样的多客户多线程的应用中。</p>
-
-<p>%%: 输出一个”%”字符 %F: 输出日志消息产生时所在的文件名称</p>
-
-<p>%L: 输出代码中的行号</p>
-
-<p>%m: 输出代码中指定的消息,产生的日志具体信息</p>
-
-<p>%n: 输出一个回车换行符，Windows平台为”\r\n”，Unix平台为”\n”输出日志信息换行 可以在%与模式字符之间加上修饰符来控制其最小宽度、最大宽度、和文本的对齐方式。</p>
-
-<p>Ok，基本知识就到这里，看一个例子。</p>
-
-<h2><strong>Example</strong></h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-log4j12:1.7.7&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在配置依赖时，将SLF4J和log4j绑定</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">log</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.Logger</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.LoggerFactory</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">HelloWorld</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">say</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;start time&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hello, world!!!&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">logger</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
-</span><span class='line'>      <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;end time&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">HelloWorld</span> <span class="n">helloWorld</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HelloWorld</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">helloWorld</span><span class="o">.</span><span class="na">say</span><span class="o">();</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>通过SLF4J的LoggerFactory.getLogger()方法得到一个logger的实力。logger的名字就是类名（全限定的类名）。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="na">log4j.rootLogger</span><span class="o">=</span><span class="s">info, console, file</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">log4j.appender.console</span><span class="o">=</span><span class="s">org.apache.log4j.ConsoleAppender</span>
-</span><span class='line'><span class="na">log4j.appender.console.layout</span><span class="o">=</span><span class="s">org.apache.log4j.PatternLayout</span>
-</span><span class='line'><span class="na">log4j.appender.console.layout.ConversionPattern</span><span class="o">=</span><span class="s">%p %l %d{yyy MMM dd HH:mm:ss,SSS} %m %n</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">log4j.appender.file</span><span class="o">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
-</span><span class='line'><span class="na">log4j.appender.file.File</span><span class="o">=</span><span class="s">logger.log</span>
-</span><span class='line'><span class="na">log4j.appender.file.layout</span><span class="o">=</span><span class="s">org.apache.log4j.PatternLayout</span>
-</span><span class='line'><span class="na">log4j.appender.file.layout.ConversionPattern</span><span class="o">=</span><span class="s">%p %l %d{yyy MMM dd HH:mm:ss,SSS} %m %n</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在log4j的properties文件中，指定了根logger的级别，以及它的两个appender，分别是console和file。然后定义这两个appender，并指定它们的layout使用PatternLayout，让它们输出：级别，日志输出的位置，时间，指定的信息和换行。</p>
-
-<p>输出结果如下：</p>
-
-<p>INFO log.HelloWorld.say(HelloWorld.java:11) 2014 Jun 01 16:57:54,807 start time <br/>
-Hello, world!!!<br/>
-INFO log.HelloWorld.say(HelloWorld.java:13) 2014 Jun 01 16:57:54,809 end time<br/>
-log.HelloWorld</p>
-
-<p>总结，log不算是功能代码，但是他对于开发人员和维护人员，非常有用了，往往是解决问题的唯一线索，特别是对于后台系统，往往只能通过log来分析问题。</p>
-
-<p>参考资料：</p>
-
-<p>1.<a href="http://logging.apache.org/log4j/1.2/manual.html  ">http://logging.apache.org/log4j/1.2/manual.html  </a>
-2.<a href="http://www.slf4j.org/manual.html  ">http://www.slf4j.org/manual.html  </a>
-3.<a href="http://www.cnblogs.com/dennisit/archive/2013/01/01/2841603.html">http://www.cnblogs.com/dennisit/archive/2013/01/01/2841603.html</a></p>
 ]]></content>
   </entry>
   

@@ -137,6 +137,14 @@
 
 <p>一个更常见的例子，做web开发时需要servlet的依赖，但是只是编译阶段，运行时servlet依赖由servlet容器来提供。所以Gradle的War插件也提供了两个configuration，分别是providedCompile和providedRuntime，它们对依赖的使用范围定义和compile以及runtime一致，只不过依赖的Jar包不会被加到War包里面。</p>
 
+<h3>定义SourceSet时，添加的Configuration</h3>
+
+<p>上一节，在介绍Java插件的时候，提到了SourceSet概念。针对每一个新添加的SourceSet，Java插件都会动态的给它添加两个Configuration，分别是sourceSetCompile和sourceSetRuntime。</p>
+
+<p>比如：新添加一个SourceSet，叫做int，那么对应的Configuration是intCompile和intRuntime。</p>
+
+<p>这一特性也正好印证，Java插件是如何识别自定义SourceSet来进行编译和运行。</p>
+
 <h3>依赖的多种定义方式</h3>
 
 <p>除了通过远程仓库和依赖坐标来定义依赖，Gradle还提供了另外两种常用的依赖定义方式，对本地文件的依赖，对某个项目的依赖。</p>
@@ -259,6 +267,8 @@ dependencyInsight - Displays the insight into a specific dependency in root proj
         <a class="basic-alignment left" href="/blog/2015/01/31/deep-into-gradle-in-action-2/" title="Previous Post: Gradle深入与实战（二）Java插件">&laquo; Gradle深入与实战（二）Java插件</a>
       
       
+        <a class="basic-alignment right" href="/blog/2015/01/31/deep-into-gradle-in-action-4/" title="Next Post: Gradle深入与实战（四）自定义集成测试任务">Gradle深入与实战（四）自定义集成测试任务 &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -297,6 +307,10 @@ dependencyInsight - Displays the insight into a specific dependency in root proj
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/01/31/deep-into-gradle-in-action-4/">Gradle深入与实战（四）自定义集成测试任务</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/01/31/deep-into-gradle-in-action-3/">Gradle深入与实战（三）依赖管理工具</a>
       </li>
     
@@ -310,10 +324,6 @@ dependencyInsight - Displays the insight into a specific dependency in root proj
     
       <li class="post">
         <a href="/blog/2015/01/23/yes-angularjs-8/">开始！AngularJS!（八）- 路由</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/01/17/yes-angularjs-7/">开始！AngularJS!（七）- 过滤器</a>
       </li>
     
   </ul>
