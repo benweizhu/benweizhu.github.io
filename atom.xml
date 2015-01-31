@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-01-24T00:47:56+08:00</updated>
+  <updated>2015-01-31T17:51:35+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,302 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Gradle深入与实战（二）]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-2/"/>
+    <updated>2015-01-31T13:57:55+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-2</id>
+    <content type="html"><![CDATA[<p>没有介绍Gradle的基础知识，直接开始实战，目的是为了更快的让大家开始使用Gradle做构建，快速上手，当需要实现的自动化需求更复杂时，在深入学习基础知识。</p>
+
+<p>这一篇，我们直接开始Java插件的使用。</p>
+
+<h3>应用Java插件</h3>
+
+<p>Gradle是一个通用构建工具，也就是说，它不单是为Java而生。比如，还可以做Groovy，Scala的构建。这取决于你使用什么样的插件。</p>
+
+<p>大部分Java项目的基本步骤都非常类似，编译Java源代码，运行单元测试，拷贝生成的class文件到目标目录，打包Jar文件（或者War包，Ear包），而这些重复且约定俗成的任务，如果可以不用写一行构建代码就实现，是多么的棒！Maven就做到这一点，采用约定由于配置的思想，预先定义常用的任务，并定义它们的执行顺序。</p>
+
+<p>Gradle吸收了Maven的这个优点，通过插件，实现预定义任务和任务之间依赖关系的导入，这样就可以在一行代码都不写的情况下（如果应用插件，你觉得也算一行的话，那就写一行吧），直接使用已经定义的任务。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>SourceSet和项目布局</h3>
+
+<p>就和Maven一样，在默认的情况下，项目的目录结构是固定的Java世界的标准项目目录布局，只不过Maven的不可以改，但是Gradle可以改。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">src</span> <span class="o">{</span><span class="c1">//目录结构而已，不是代码</span>
+</span><span class='line'>   <span class="n">main</span> <span class="o">{</span>
+</span><span class='line'>       <span class="n">java</span>
+</span><span class='line'>       <span class="n">resources</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>   <span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>       <span class="n">java</span>
+</span><span class='line'>       <span class="n">resources</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Java插件引入了一个概念叫做SourceSets，它代表了一组源文件，通过修改SourceSets中的属性，可以指定哪些源文件（或文件夹下的源文件）要被编译，哪些源文件要被排除。Gradle就是通过它实现Java项目的布局定义。</p>
+
+<p>Java插件默认实现了两个SourceSet，main和test。每个SourceSet都提供了一系列的属性，通过这些属性，可以定义该SourceSet所包含的源文件。比如，java.srcDirs，resources.srcDirs。Java插件中定义的其他任务，就根据main和test的这两个SourceSet的定义来寻找产品代码和测试代码等。</p>
+
+<p>在构建脚本中，怎么样定义或者修改SourceSet呢？Gradle提供了一系列的DSL，可以让你方便的定义或者修改配置。比如，sourceSets的DSL。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">main</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="s1">&#39;src/java&#39;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="s1">&#39;src/resources&#39;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的这个例子，在sourceSets中，修改了Java插件中已经定义的SourceSet main，修改了它的java.srcDir和resources.srcDir。于是，项目的目录结构就改变了。</p>
+
+<p>改变Java插件中预定义的项目目录结构，不是我们最终的目的，因为它是目前Java世界，标准的项目布局，或者说大家都遵守的项目布局。</p>
+
+<p>sourceSets最主要的作用是增加新的目录约定，比如，你想要定义一个新的SourceSet来管理集成测试的源文件，这样可以将单元测试和集成测试分开管理。</p>
+
+<p>至于，关于具体如何为集成测试写一个新的SourceSet会在后面介绍依赖管理时举例说明。</p>
+
+<h3>Java插件提供的任务</h3>
+
+<p>Java插件提供了一系列的任务给你使用，包括编译，运行测试，打包等等。当你在项目中应用Java插件时，就已经将这些任务集成到你的项目中了。</p>
+
+<p>在命令行中，运行gradle tasks命令，可以查看当前项目下主要的task。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">Build</span> <span class="n">tasks</span>
+</span><span class='line'><span class="n">assemble</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="n">the</span> <span class="n">outputs</span> <span class="n">of</span> <span class="n">this</span> <span class="n">project</span><span class="o">.</span>
+</span><span class='line'><span class="n">build</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="ow">and</span> <span class="n">tests</span> <span class="n">this</span> <span class="n">project</span><span class="o">.</span>
+</span><span class='line'><span class="n">buildDependents</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="ow">and</span> <span class="n">tests</span> <span class="n">this</span> <span class="n">project</span> <span class="ow">and</span> <span class="nb">all</span> <span class="n">projects</span> <span class="n">that</span> <span class="n">depend</span> <span class="n">on</span> <span class="n">it</span><span class="o">.</span>
+</span><span class='line'><span class="n">buildNeeded</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="ow">and</span> <span class="n">tests</span> <span class="n">this</span> <span class="n">project</span> <span class="ow">and</span> <span class="nb">all</span> <span class="n">projects</span> <span class="n">it</span> <span class="n">depends</span> <span class="n">on</span><span class="o">.</span>
+</span><span class='line'><span class="n">clean</span> <span class="o">-</span> <span class="n">Deletes</span> <span class="n">the</span> <span class="n">build</span> <span class="n">directory</span><span class="o">.</span>
+</span><span class='line'><span class="n">jar</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="n">a</span> <span class="n">jar</span> <span class="n">archive</span> <span class="n">containing</span> <span class="n">the</span> <span class="n">main</span> <span class="n">classes</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Documentation</span> <span class="n">tasks</span>
+</span><span class='line'><span class="n">javadoc</span> <span class="o">-</span> <span class="n">Generates</span> <span class="n">Javadoc</span> <span class="n">API</span> <span class="n">documentation</span> <span class="k">for</span> <span class="n">the</span> <span class="n">main</span> <span class="n">source</span> <span class="n">code</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Verification</span> <span class="n">tasks</span>
+</span><span class='line'><span class="n">check</span> <span class="o">-</span> <span class="n">Runs</span> <span class="nb">all</span> <span class="n">checks</span><span class="o">.</span>
+</span><span class='line'><span class="n">test</span> <span class="o">-</span> <span class="n">Runs</span> <span class="n">the</span> <span class="n">unit</span> <span class="n">tests</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>你可以对比Java插件应用前和应用后该命令的输出，Java插件提供的任务有很多，至于每个任务是做什么，这里就不赘述了。</p>
+
+<p>Java插件除了为你预定义这些任务，该预定义了这些任务之间的依赖关系。如下图：</p>
+
+<p><img src="http://gradle.org/docs/current/userguide/img/javaPluginTasks.png"></p>
+
+<p>你也可以通过命令gradle tasks &ndash;all来查看每个task各自有什么依赖。</p>
+
+<p>当然，这里还是重点提下，Java插件中四个重要和常用的任务，assemble，check，build，clean。</p>
+
+<p><strong>assemble</strong> <br/>
+All archive tasks in the project, including jar. Some plugins add additional archive tasks to the project. <br/>
+<strong>check</strong> <br/>
+All verification tasks in the project, including test. Some plugins add additional verification tasks to the project. <br/>
+<strong>build</strong> <br/>
+check and assemble   <br/>
+<strong>clean</strong>  <br/>
+Deletes the project build directory.</p>
+
+<p>assemble被用来产生Jar文件，输出目录在build/libs下。</p>
+
+<p>check用来运行所有的验收任务，包括test任务，以及其他验收任务，比如checkstyle。</p>
+
+<h3>Tips：在命令行中运行单个测试</h3>
+
+<p>JAVA插件中的test任务提供了一个filter属性，可以帮助指定运行test任务时，什么测试源文件要包含，什么要排除。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">filter</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">//include specific method in any of the tests</span>
+</span><span class='line'>        <span class="n">includeTestsMatching</span> <span class="s2">&quot;*UiCheck&quot;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">//include all tests from package</span>
+</span><span class='line'>        <span class="n">includeTestsMatching</span> <span class="s2">&quot;org.gradle.internal.*&quot;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">//include all integration tests</span>
+</span><span class='line'>        <span class="n">includeTestsMatching</span> <span class="s2">&quot;*IntegTest&quot;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然一般情况下，你不会这么去做。</p>
+
+<p>但重点是，你可以通过<strong>命令行传递的参数</strong>来指定这个matching规则，这样你就可以通过命令行来指定跑某一类测试，或者单个测试。你一定遇到过，某个测试在命令行中可以运行，在IDE中不能运行，或者反过来。这时，你可以不会想要跑全部的测试来验证某一个测试。于是，你就可以通过命令行来运行某一个测试：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">gradle</span> <span class="n">test</span> <span class="o">--</span><span class="n">tests</span> <span class="n">org</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">SomeTest</span><span class="o">.</span><span class="na">someSpecificFeature</span>
+</span><span class='line'><span class="n">gradle</span> <span class="n">test</span> <span class="o">--</span><span class="n">tests</span> <span class="o">*</span><span class="n">IntegTest</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>到目前为止，你已经了解了Java插件提供的一些核心功能和有用小技巧。虽然还未涉及到Jar任务和uploadfile任务（这些任务当需要时，再去看就行了），但是就启动项目而言，对Java插件的使用所需要了解的知识已经足够了。</p>
+
+<p>下一节，讲解依赖管理和为集成测试添加新的SourceSet</p>
+
+<p>参考资料： <br/>
+1.Gradle官方文档</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Gradle深入与实战（一）]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-1/"/>
+    <updated>2015-01-31T11:31:34+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-1</id>
+    <content type="html"><![CDATA[<h3>什么是构建工具?</h3>
+
+<p>一个可编程的工具，能够以可执行和有序的任务来表达满足需要的自动化过程。</p>
+
+<p>以Java为例，要得到一个简单可运行的Jar文件，需要下面几步：</p>
+
+<p>1.编译源代码<br/>
+2.运行测试（前提是你有测试）
+3.拷贝Class文件到目标目录<br/>
+4.打包Class文件为Jar文件</p>
+
+<p>这是一个完整的可自动化的过程，在没有构建工具之前，是由谁来做？IDE。一个强大的IDE，以上的步骤都只需要按几个按钮，这让开发人员的生活变得很美好，完全集中在写出优秀的代码。</p>
+
+<p>现在，本来整个开发过程只需要你一个人，随着任务的难度和复杂度的加剧，你的团队从一个人变成了3个人或者更多。这时，你肯定会需要代码集成，这个问题好解决，使用版本控制，无论是中心式的SVN还是分布式的Git，总之可以既可以解决版本问题，也解决代码集成的问题。</p>
+
+<p>这种情况下，在没有自动化构建时，你肯定会遇到下面几个问题： <br/>
+1.在我的机器上可以跑 <br/>
+2.从版本控制check out代码，发现编译不过，有人少提交了代码文件<br/>
+3.有个人提交代码时没跑测试，导致其他人check out代码后，测试跑不过<br/>
+4.版本发布时，由一个人来check out所有代码，在他自己的机器上编译打包，结果部署到服务器上运行不了<br/>
+&hellip;</p>
+
+<p>导致上面这些问题出现的原因都有两个特点： <br/>
+1.手动介入<br/>
+2.重复任务</p>
+
+<p>开发人员要关注的应该是编写实现功能的代码，至于编译编译代码，拷贝文件，运行测试等一切重复和可自动化的事情都应该交给机器去做，因为人是容易犯错的。</p>
+
+<h3>Java世界的构建工具</h3>
+
+<p>在Java的世界里，目前在被使用的常用构建工具有三个：Ant，Maven，Gradle。</p>
+
+<p>Ant的核心是由Java编写，采用XML作为构建脚本，这样就允许你在任何环境下，运行构建。Ant基于任务链思想，任务之间定义依赖，形成先后顺序。缺点是使用XML定义构建脚本，导致脚本臃肿，Ant自身没有为项目构建提供指导，导致每个build脚本都不一样，开发人员对于每个项目都需要去熟悉脚本内容，没有提供在Ant生态环境内的依赖管理工具。</p>
+
+<p>Maven团队意识到Ant的缺陷，采用标准的项目布局，和统一的生命周期，采用约定由于配置的思想，减少构建脚本需要的编写内容，活跃的社区，可以方便找到合适的插件，强大的依赖管理工具。缺点是采用默认的结构和生命周期，太过限制，编写插件扩展麻烦，XML作为构建脚本。</p>
+
+<p>如果有一个构建工具可以折中，同时拥有Ant和Maven的优点，是不是很爽？告诉你有，那就是Gradle。</p>
+
+<h2>Gradle</h2>
+
+<p>基于Groovy的DSL，提供声明式的构建语言 <br/>
+采用标准的项目布局，但拥有完全的可配置性，就是可以改 <br/>
+通过插件，提供默认的构建生命周期，也可以自己定义任务，单独运行任务，定义任务间的依赖 <br/>
+强大的依赖管理工具，与Maven和Ivy仓库结合<br/>
+与Ant天生兼容，有效的重用Ant的任务<br/>
+多种实现插件的方式，强大的官方插件库<br/>
+从构建级别，支持从Ant或者Maven的逐步迁移<br/>
+通过包装器，无缝的在各个平台运行</p>
+
+<p>看一个超级简单的例子：</p>
+
+<p>如果你的项目采用标准的Maven布局（Java世界的标准布局）</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">src</span> <span class="o">{</span><span class="c1">//目录结构而已，不是代码</span>
+</span><span class='line'>   <span class="n">main</span> <span class="o">{</span>
+</span><span class='line'>       <span class="n">java</span>
+</span><span class='line'>       <span class="n">resources</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>   <span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>       <span class="n">java</span>
+</span><span class='line'>       <span class="n">resources</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在项目根目录下，创建一个build.gradle，这个是Gradle的构建脚本文件，就和build.xml，POM.xml道理一样。</p>
+
+<p>那么你要实现Java的编译，测试，拷贝class到目标目录，打包Jar文件等，只需要在构建脚本中，使用下面一句话，使用Java插件。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后运行gradle build。</p>
+
+<p>下一篇，我们深入到实战学习Java插件的使用和依赖管理，让你快速开始Java应用开发。</p>
+
+<p>参考资料：<br/>
+1. 《Gradle in Action》Gradle实战</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[开始！AngularJS!（八）- 路由]]></title>
@@ -5013,356 +5309,6 @@ log.HelloWorld</p>
 <p>(1) spring webservice reference</p>
 
 <p>(2) <a href="http://www.w3school.com.cn/ws.asp">http://www.w3school.com.cn/ws.asp</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[了解war包和ear包]]></title>
-    <link href="http://benweizhu.github.io/blog/2014/05/03/what-is-war-and-ear/"/>
-    <updated>2014-05-03T17:06:00+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2014/05/03/what-is-war-and-ear</id>
-    <content type="html"><![CDATA[<p>上一次，讲到了如何如何手动编译Java，简单的介绍打Jar包（提示：在classpath的基础上，一定将包的目录结构打进去）。Jar包的目的，将编译过的class文件有效合理的组装起来，方便管理和使用。这一次，滕老板继续跟我们讲解了如何打War包。</p>
-
-<p>在本篇文章中，将分别介绍War包和Ear包（在项目中遇到的Ear包的模块，不清楚是什么，所以随便一起弄清楚）。</p>
-
-<h2><strong>War包</strong></h2>
-
-<p>只要做过Java开发的同志，肯定知道War包，至少听说过。</p>
-
-<p>War包（Web application ARchieve）也是一种Jar包文件，它被用来描述由JSP，Servlet，Java类，XML文件，tag库，静态web页面等资源组成的集合，它们组合在一起成文一个web应用。</p>
-
-<p>从命令上说，打War包的命令和打Jar包的命令一样，比较简单，主要是要了解一个War包的目录结构：</p>
-
-<p><image src="http://benweizhu.github.io/../images/ear/war.png" height="50%" width=50%" style="text-align: center"/></p>
-
-<p>MANIFEST.MF是一个可选文件，用来描述额外的元数据信息。</p>
-
-<p>WEB-INF目录包含了War中的私有文件，也就是说，当web应用被部署之后，该目录下的文件不能够由Web客户端（浏览器）直接访问的。</p>
-
-<p>WEB-INF/lib/用来放置你代码中需要使用的第三方的jar文件。</p>
-
-<p>WEB-INF/classes/用来放置你自己编译的class文件。</p>
-
-<p>WEB-INF/web.xml是web部署描述器，JavaEE配置web模块的标准描述器，这里不详细解释。</p>
-
-<p>最后是公共的静态文件。</p>
-
-<p>那么在打包的时候，按照这个目录结构打包，然后将War包放置到tomcat的webapp目录下，tomcat在运行时就会自动帮你解包并运行，或者你也可以直接将包含该目录结构的目录直接拷贝到tomcat的webapp下，一样可以运行，打包只不过是一个封装和压缩过程。</p>
-
-<h2><strong>那什么是Ear包呢？</strong></h2>
-
-<p>Ear(Enterprise ARchieve)用于在Java EE中将一个或者多个模块封装到一个文件中，这样，多个不同模块在应用服务器上的部署就可以同时并持续的进行。</p>
-
-<p>Java EE应用以Jar文件，War文件和Ear文件形式呈现。War或者Ear文件都是标准的Jar文件，只不过扩展名是.war和.ear。通过Jar，War和Ear等文件或模块的方式，使得用一些相同组件，来构建不同的JavaEE应用成为可能。不需要额外的编码，只需要将不同的JavaEE模块打包到不同的Java EE的Jar包，War包或Ear包的文件中。</p>
-
-<p>一个Ear文件是由Java EE模块和可选的部署描述器组成。部署描述器是一个带有.xml扩展名的XML文档，描述了一个应用，模块或者组件的部署设置。因为部署描述其的信息是声明式的，所以可以直接修改它，与我们的源代码没有关系。在运行时中，Java EE的服务器会读取部署描述器的内容，并根据描述对应用，模块或者组件做相对应的操作。</p>
-
-<p><image src="http://benweizhu.github.io/../images/ear/ear.png" height="50%" width=50%" style="text-align: center"/>
-<image src="http://docs.oracle.com/javaee/6/tutorial/doc/figures/overview-applicationModule.gif" style="text-align: center"/>
-上面两个图，分别摘自Jboss at Work(A practice guide)和JavaEE6 Tutorial。</p>
-
-<p>一个Java EE模块是由一个或者多个为同一个容器类型准备的Java EE组件组成，当然还包含一个可选的部署描述器文件。</p>
-
-<p>Java EE模块有以下几种类型：</p>
-
-<p>EJB模块，它包含企业级别的bean类文件，一个EJB的部署描述器（可选），EJB模块会以Jar包形式组装。</p>
-
-<p>Web模块，它包含了servlet类文件，web文件，其他相关class文件，图片，html静态文件，和一个web.xml部署文件（可选），并最终以war包形式组装。</p>
-
-<p>应用客户端模块，包含了class文件，应用客户端部署描述器文件（可选）并以Jar包形式组装。</p>
-
-<p>资源适配模块，包含所有的Java接口，类，原生库，部署描述器（可选）。组合在一起，实现JavaEE的Connector架构。同样是以Jar包方式组装，但是文件以.rar扩展名结尾。</p>
-
-<p>就和War包包含一个web.xml的部署描述器，一个Ear包文件包含一个名字为application.xml的文件。它是一个必要的打包列表，告诉Java EE服务器Ear包种包含什么东西，以及去哪里找。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;application</span> <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>             <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee             http://java.sun.com/xml/ns/j2ee/application_1_4.xsd&quot;</span>
-</span><span class='line'>             <span class="na">version=</span><span class="s">&quot;1.4&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;display-name&gt;</span>JBossAtWorkEAR<span class="nt">&lt;/display-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;module&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;web&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;web-uri&gt;</span>webapp.war<span class="nt">&lt;/web-uri&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;context-root&gt;</span>jaw<span class="nt">&lt;/context-root&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/web&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/module&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;module&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;java&gt;</span>common.jar<span class="nt">&lt;/java&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/module&gt;</span>
-</span><span class='line'><span class="nt">&lt;/application&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>application.xml中的元素都应该是自解释的。在告诉应用程序服务器每一个Jar包的名字，以及它的作用（功能）。</p>
-
-<p>例如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;module&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;web&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;web-uri&gt;</span>webapp.war<span class="nt">&lt;/web-uri&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;context-root&gt;</span>jaw<span class="nt">&lt;/context-root&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/web&gt;</span>
-</span><span class='line'><span class="nt">&lt;/module&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><context-root>用来告诉你web应用站点名字，如果你是直接打成War包，那么War包的名字就是这个站点名。</p>
-
-<p>总而言之，Ear包是由Java EE多个模块组成，相互配合，完成各自职责，形成完整的Java EE应用。</p>
-
-<p>参考资料：</p>
-
-<p><a href="http://docs.oracle.com/javaee/6/tutorial/doc/bnaby.html">http://docs.oracle.com/javaee/6/tutorial/doc/bnaby.html</a></p>
-
-<p>Jboss at work A practice guide(Chapter 3)(<a href="http://oreilly.com/catalog/jboss/chapter/ch03.pdf">http://oreilly.com/catalog/jboss/chapter/ch03.pdf</a>)</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[丢掉IDE，回到Java的第一堂课]]></title>
-    <link href="http://benweizhu.github.io/blog/2014/04/07/write-java-code-without-ide/"/>
-    <updated>2014-04-07T13:56:00+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2014/04/07/write-java-code-without-ide</id>
-    <content type="html"><![CDATA[<p>最近，《实现领域驱动设计》的译者，ThoughtWorks的<a href="http://www.davenkin.me/">“滕老板”</a>（腾云）给我们上了一堂基础课，就是没有IDE的情况下，去编译和运行用文本编辑器编写的Java代码。</p>
-
-<p>这本应该是基础中的基础，我记得应该是Java第一堂课就应该讲到的东西。但是我们这群用惯了IDE的程序员，在没有了IDE之后，就开始不知所措了。虽然不知道这些知识，对于普通开发似乎是没有影响，但毕竟是Java的重要基础知识，了解这些知识可以帮助你理解IDE帮你做了什么，可以更快速的定位问题。</p>
-
-<p>还是举例子，滕老板的例子：</p>
-
-<p>目录结构</p>
-
-<p>src</p>
-
-<p>&ndash;client</p>
-
-<p>&mdash;-Client.java</p>
-
-<p>&ndash;service</p>
-
-<p>&mdash;-Service.java</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Service</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">run</span><span class="o">(){</span>
-</span><span class='line'>      <span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">String</span><span class="o">(</span><span class="s">&quot;as your service&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">str</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">client</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">service.*</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Client</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[]){</span>
-</span><span class='line'>      <span class="n">Service</span> <span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Service</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">service</span><span class="o">.</span><span class="na">run</span><span class="o">());</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>ok，代码写完了，你知道该怎么运行吗？</p>
-
-<p>命令行：进入到src目录下</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='powershell'><span class='line'><span class="n">javac</span> <span class="n">client</span><span class="p">/</span><span class="n">Client</span><span class="p">.</span><span class="n">java</span>
-</span><span class='line'><span class="n">java</span> <span class="n">client</span><span class="p">.</span><span class="n">Client</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这样就会输出正确结果：as your service。</p>
-
-<p>再来看一下目录结构</p>
-
-<p>src</p>
-
-<p>&ndash;client</p>
-
-<p>&mdash;-Client.java</p>
-
-<p>&mdash;-Client.class</p>
-
-<p>&ndash;service</p>
-
-<p>&mdash;-Service.java</p>
-
-<p>&mdash;-Service.class</p>
-
-<p>我们知道javac命令编译的是.java文件，而java命令运行是.class文件。</p>
-
-<p>但是这里还是有几个疑问：</p>
-
-<p>1.javac client/Client.java时，它怎么知道去哪里找Service类？</p>
-
-<p>2.对于上一个疑问，你的答案可能是import service.*;告诉它去service包下找，那么第二疑问，为什么是import service.*;而不是import src.service.*?</p>
-
-<p>3.第三个疑问和第一个疑问类似，答案也类似，java client.Client，怎么知道去哪里找service.class文件？</p>
-
-<p>面对这三个问题，答案是，要引入两个概念。</p>
-
-<p>sourcepath和classpath。</p>
-
-<p>classpath大家听得比较多，用来告诉JVM或者Java编译器到哪里去寻找用户定义的类和包。</p>
-
-<p>sourcepath和classpath一样，只不过它是用来告诉编译器到哪里去寻找源文件。</p>
-
-<p>在上面的javac和java命令中，既没有显示的指定sourcepath，也没有显示的指定classpath。但是它们都有默认值，就是将当前目录作为各自的路径。</p>
-
-<p>比如：我现在从当前路径src，进入到它的一个子目录中src/sub。</p>
-
-<p>然后我运行：javac ../client/Client.java命令</p>
-
-<p>它提示我找不到Service类。 那是因为当前的sourcepath是src/sub，在这个路径下没有Service.java。我们改一下，显示的设置它sourcepath。</p>
-
-<p>运行命令：javac -sourcepath ../ ../client/Client.java</p>
-
-<p>编译成功。</p>
-
-<p>那么运行呢？</p>
-
-<p>直接在src/sub路径下，运行：java client.Client。能行吗？肯定不行。</p>
-
-<p>Error: Could not find or load main class client.Client</p>
-
-<p>必须要显示的指定它的classpath为上一级目录：</p>
-
-<p>java -classpath ../ client.Client</p>
-
-<p>ok，成功。</p>
-
-<p>现在再来让我们回到刚才的第二个问题。为什么import的不是src.service.* ，因为我们设置它的sourcepath，它就成为一个相对路径。</p>
-
-<p>这不禁让我想到一个问题。package和import到底有什么用？为什么package名字和目录结构一致？</p>
-
-<p>这不是白痴问题吗？</p>
-
-<p>package是作为命名空间，因为不同开发商，开发出来的类库可能会有相同的类名。为了区分，防止冲突，用不同的包名区分。</p>
-
-<p>import是根据你要使用的类，从classpath下找到你要使用的类，并引入到你的类中。</p>
-
-<p>我做了一个实验：</p>
-
-<p>将Service类的package定义，改为service.something，这样包名和目录结构就不一致了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">service</span><span class="o">.</span><span class="na">something</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Service</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">run</span><span class="o">(){</span>
-</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;as your service&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后还是照常编译。</p>
-
-<pre><code>client/Client.java:7: error: cannot access Service
-    Service service = new Service();
-    ^
-    bad source file: ./service/Service.java
-    file does not contain class service.Service
-Please remove or make sure it appears in the correct subdirectory of the sourcepath.
-1 error
-</code></pre>
-
-<p>第四行，bad source file: ./service/Service.java表明他在编译Client.java文件时，通过import找到了该文件，说明import是通过文件结构去找到的。</p>
-
-<p>但是他又说file does not contain class service.Service，说明在这个Service.java中找不到对应的Service类。</p>
-
-<p>为什么呢？因为我的包名是service.something，但是他要找的是service。</p>
-
-<p>所以包的作用是和类的名字组成完整的类名，这里的Service类的全名应该是service.something.Service。但是他去找到的是service.Service。所以它找不到。</p>
-
-<p>那是不是将import改为import service.something.*;就可以呢？</p>
-
-<p>不行，前面说了，import是根据目录结构去找到的，根本就没有service/something这个目录结构，所以不可能找到。</p>
-
-<pre><code>client/Client.java:3: error: package service.something does not exist
-import service.something.*;
-^
-client/Client.java:7: error: cannot find symbol
-    Service service = new Service();
-    ^
-    symbol:   class Service
-    location: class Client
-    client/Client.java:7: error: cannot find symbol
-    Service service = new Service();
-                          ^
-    symbol:   class Service
-    location: class Client
-</code></pre>
-
-<p>你看，第一行：client/Client.java:3: error: package service.something does not exist</p>
-
-<p>回过头来想，这也是为什么，有时候，当同时导入两个不同包中名字相同的类时，其中有一个要用完全限定名。因为类的名字本来就是由包的名字和类的自身名字组成。</p>
-
-<p>总而言之，这堂课的收获还是挺大的，重点要掌握上面提到的两个概念。</p>
-
-<p>课上本来还有一点关于，打jar包和如何引用jar包的内容，以及通过java -d命令，将class文件编译到指定的目录下。</p>
-
-<p>这里我就不多说了，万变不离其宗。</p>
-
-<p>javac -classpath &ldquo;.:service.jar&rdquo; client/Client.java //linux下面是冒号，windows下面是分号</p>
-
-<p>java -classpath &ldquo;.:service.jar&rdquo; client.Client</p>
-
-<p>只不过要注意一点的是，打jar包时，一定要按照package定义的目录结构去打。因为在将jar包加入到classpath时和将一个目录下的class文件加入是一样的，相对路径。</p>
-
-<p>java -d out client/Client.java，会将class文件编译到out目录下，且内部目录结构与包的结构一致。</p>
 ]]></content>
   </entry>
   
