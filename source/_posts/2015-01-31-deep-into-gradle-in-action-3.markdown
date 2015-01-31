@@ -33,16 +33,16 @@ dependencies {
 
 整个看起来是那么的表意，使用过Maven更会觉得是无缝转换，甚至更简洁。
 
-###Dependency configurations
+###Dependency configurations 依赖分组
 
 在Gradle中，依赖都被会分配到某一个具体的configuration中（这里我不倾向于翻译成配置，我觉得布局，或者分组更适合）。Configuration代表着一个或多个构件及构件所需依赖的一个分组。
 
 Java插件已经预定义了一些configuration，比如，compile，runtime，testCompile，testRuntime等。
 
-compile 放在这个configuration下的依赖是在编译产品代码时所使用的，但它作为一个分组，包含产品代码和编译所需的依赖。    
-runtime 产品代码在运行时需要的依赖，默认，也会包含compile中的依赖。    
-testCompile 编译测试代码时所需要的依赖，默认，被编译的产品代码和产品代码需要的编译依赖也属于该分组。    
-testRuntime 运行测试时需要的依赖。默认，包含compile，runtime和testCompile的分组的构建和依赖。
+**compile** 放在这个configuration下的依赖是在编译产品代码时所使用的，但它作为一个分组，包含产品代码和编译所需的依赖。    
+**runtime** 产品代码在运行时需要的依赖，默认，也会包含compile中的依赖。    
+**testCompile** 编译测试代码时所需要的依赖，默认，被编译的产品代码和产品代码需要的编译依赖也属于该分组。    
+**testRuntime** 运行测试时需要的依赖。默认，包含compile，runtime和testCompile的分组的构建和依赖。
 
 使用过Maven的都应该知道分组的含义，这里讲解给不明白的同学，依赖之所以要分组，是因为，每个阶段对依赖的需要不一样，最明显的是产品代码和测试代码，比如junit在产品代码中就不需要。
 
