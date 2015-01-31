@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Gradle深入与实战（二）"
+title: "Gradle深入与实战（二）Java插件"
 date: 2015-01-31 13:57:55 +0800
 comments: true
 categories: 
@@ -140,7 +140,7 @@ gradle test --tests *IntegTest
 
 到目前为止，你已经了解了Java插件提供的一些核心功能和有用小技巧。虽然还未涉及到Jar任务和uploadfile任务（这些任务当需要时，再去看就行了），但是就启动项目而言，对Java插件的使用所需要了解的知识已经足够了。
 
-下一节，讲解依赖管理和为集成测试添加新的SourceSet
+下一节，讲解依赖管理
 
 参考资料：   
 1.Gradle官方文档
