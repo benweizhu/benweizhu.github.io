@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "了解Spring Transaction"
+title: "了解Spring Transaction事务管理"
 date: 2015-02-07 17:33:36 +0800
 comments: true
 categories: 
