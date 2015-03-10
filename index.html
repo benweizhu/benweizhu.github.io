@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在敏捷开发和测试驱动开发中，自动化测试一直被认为是让软件开发人员能够有信心的进行软件开发的力量源泉。 所以，软件开发人员不仅要关注写出高质量的产品代码，同时也要关注写出高质量的测试代码。 有些人说，对于开发人员，自动化测试不过是利用Junit，Mockito， &hellip;">
+  <meta name="description" content="Spring Boot是Spring团队提供的全新框架，其设计目的是用来简化新的Spring应用的初始搭建以及开发过程。 Spring Boot的主要目的是：（参考：https://github.com/spring-projects/spring-boot%EF%BC%89 1.Provide &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,186 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/03/10/get-started-with-spring-boot-1-quick-start/">用Spring Boot开发Spring项目（一） - 快速上手</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-03-10T16:44:18+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>4:44 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Spring Boot是Spring团队提供的全新框架，其设计目的是用来简化新的Spring应用的初始搭建以及开发过程。</p>
+
+<p>Spring Boot的主要目的是：（参考：<a href="https://github.com/spring-projects/spring-boot%EF%BC%89">https://github.com/spring-projects/spring-boot%EF%BC%89</a></p>
+
+<p>1.Provide a radically faster and widely accessible getting started experience for all Spring development  <br/>
+2.Be opinionated out of the box, but get out of the way quickly as requirements start to diverge from the defaults  <br/>
+3.Provide a range of non-functional features that are common to large classes of projects (e.g. embedded servers, security, metrics, health checks, externalized configuration)  <br/>
+4.Absolutely no code generation and no requirement for XML configuration</p>
+
+<p>快速启动Spring的开发，快速响应变化，提供非功能的特性，无需XML配置，这是Spring Boot所带来的优势。</p>
+
+<p>下面通过一个例子，来快速的开发一个基于Spring Boot的Rest应用</p>
+
+<figure class='code'><figcaption><span>build.gradle </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">classpath</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-gradle-plugin:1.2.2.RELEASE&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;spring-boot&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">jar</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">baseName</span> <span class="o">=</span> <span class="s1">&#39;gs-spring-boot&#39;</span>
+</span><span class='line'>    <span class="n">version</span> <span class="o">=</span>  <span class="s1">&#39;0.1.0&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-web&quot;</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">exclude</span> <span class="nl">module:</span> <span class="s2">&quot;spring-boot-starter-tomcat&quot;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-jetty&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">testCompile</span><span class="o">(</span><span class="s2">&quot;junit:junit&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">task</span> <span class="nf">wrapper</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Wrapper</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">gradleVersion</span> <span class="o">=</span> <span class="s1">&#39;1.11&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在Gradle中，应用了Spring Boot Gradle插件，你可以看到dependencies中并没有指定Spring Boot依赖的版本，这是因为已经在插件的定义中已经指定了版本：1.2.2.RELEASE，所以这里就可以省略。（关于省略版本这一点，在之后的文章中会解释）。</p>
+
+<p>而且，依赖spring-boot-starter-web会一站式的帮你将与web开发相关的所有相关依赖下载，而不需要你一个个复制粘贴。这也是所有其他Spring Boot Starter的主要目的。</p>
+
+<figure class='code'><figcaption><span>HelloController.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RestController</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@RestController</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloController</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">hello</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;hello spring boot&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里定义了一个HelloController使用RestController注解，@RestController代表着@Controller和@ResponseBody，可以简化写Restful类型Controller的流程。</p>
+
+<figure class='code'><figcaption><span>Application.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.boot.SpringApplication</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.SpringBootApplication</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@SpringBootApplication</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Application</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">Application</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>最后一步，定义Spring boot应用的main方法，@SpringBootApplication等价于另外三个注解@Configuration，@EnableAutoConfiguration，@ComponentScan。</p>
+
+<p>运行Gradle的命令: gradlew bootRun就可以启动应用程序。</p>
+
+<p>通过Spring Boot创建的Java应用可以直接通过java -jar启动（即便它是Web应用）。也就是说，在这里，首先运行gradle assemble，得到jar文件，然后运行java -jar gs-spring-boot-0.1.0.jar。</p>
+
+<p>参考资料： <br/>
+1.<a href="https://github.com/spring-projects/spring-boot">https://github.com/spring-projects/spring-boot</a> <br/>
+2.<a href="http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#getting-started-first-application">http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#getting-started-first-application</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -306,316 +486,6 @@ MockMvc：是Spring在服务器端对Spring MVC测试的支持，可以在对Con
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/02/07/spring-transacation/">了解Spring Transaction事务管理</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-02-07T17:33:36+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>5:33 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>提供一种统一、抽象的编程模型来管理不同的事务API，如，JavaTransactionAPI(JTA)，JDBC，Hibernate，Java Persistence API (JPA)以及Java Data Objects (JDO)，是选择Spring Transaction做事务管理最直接的理由。</p>
-
-<h3>本地事务和全局事务</h3>
-
-<p>全局事务让你可以和多个事务资源工作在一起，比如，关系型数据库，消息队列。</p>
-
-<p>而本地事务则是与某个指定的事务资源联系在一起，比如，与JDBC连接相关的事务。本地事务相对于全局事务更容易使用，但不能跨多个事务资源。管理JDBC连接所写的事务代码不能够在全局事务中使用。</p>
-
-<h3>Spring Transaction</h3>
-
-<p>Spring Transaction使得开发人员在任何一个环境中都可以使用相同的编程模型。只要写一次代码，就可以在不同环境下的不同的事务策略中使用。最重要的是Spring提供了声明式的事务管理方式，可以通过配置的方式实现事务管理。</p>
-
-<p>Spring事务抽象中一种关键的概念是：事务策略。</p>
-
-<p>一个事务策略，由PlatformTransactionManager接口所定义：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">PlatformTransactionManager</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">TransactionStatus</span> <span class="nf">getTransaction</span><span class="o">(</span><span class="n">TransactionDefinition</span> <span class="n">definition</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">TransactionException</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kt">void</span> <span class="nf">commit</span><span class="o">(</span><span class="n">TransactionStatus</span> <span class="n">status</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">TransactionException</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kt">void</span> <span class="nf">rollback</span><span class="o">(</span><span class="n">TransactionStatus</span> <span class="n">status</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">TransactionException</span><span class="o">;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>PlatformTransactionManager是事务管理的抽象层，Spring根据这个抽象层提供许多不同的具体实现。无论是声明式还是编程式的进行事务管理，你都必须正确的定义PlatformTransactionManager的实现。</p>
-
-<p>在使用PlatformTransactionManager的具体实现时，通常都需要一些与对应工作环境的相关知识，比如：JDBC，JTA，Hibernate。</p>
-
-<p>下面是一个JDBC的例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">class=</span><span class="s">&quot;org.apache.commons.dbcp.BasicDataSource&quot;</span> <span class="na">destroy-method=</span><span class="s">&quot;close&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;driverClassName&quot;</span> <span class="na">value=</span><span class="s">&quot;${jdbc.driverClassName}&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;url&quot;</span> <span class="na">value=</span><span class="s">&quot;${jdbc.url}&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;username&quot;</span> <span class="na">value=</span><span class="s">&quot;${jdbc.username}&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span> <span class="na">value=</span><span class="s">&quot;${jdbc.password}&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;txManager&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">ref=</span><span class="s">&quot;dataSource&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/bean&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>下面是一个Hibernate的例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;sessionFactory&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.orm.hibernate3.LocalSessionFactoryBean&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">ref=</span><span class="s">&quot;dataSource&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;mappingResources&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;list&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;value&gt;</span>org/springframework/samples/petclinic/hibernate/petclinic.hbm.xml<span class="nt">&lt;/value&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;/list&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;hibernateProperties&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;value&gt;</span>
-</span><span class='line'>                hibernate.dialect=${hibernate.dialect}
-</span><span class='line'>            <span class="nt">&lt;/value&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/property&gt;</span>
-</span><span class='line'><span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;txManager&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.orm.hibernate3.HibernateTransactionManager&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;sessionFactory&quot;</span> <span class="na">ref=</span><span class="s">&quot;sessionFactory&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/bean&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>声明式的事务管理</h3>
-
-<p>大部分Spring框架的使用者都会采用声明式的事务管理，因为这样做对产品代码的侵入性是最低的。这种声明式的事务管理，使得它可以和Spring的切面编程（AOP）结合在一起，不过即便你不了解AOP，仍然可以使用，因为它几乎是模板式的配置。</p>
-
-<p>这种声明式的事务管理可以允许你在方法级别上指定事务行为。</p>
-
-<h4>理解Spring声明式事务的实现</h4>
-
-<p>要理解Spring声明式事务的实现，你需要知道的最重要的概念就是，Spring声明式事务的实现是通过Spring的AOP代理。</p>
-
-<p>下面是一个通过XML方式配置事务的例子，方便你理解事务的实现方式。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span> <span class="na">xmlns:aop=</span><span class="s">&quot;http://www.springframework.org/schema/aop&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:tx=</span><span class="s">&quot;http://www.springframework.org/schema/tx&quot;</span> <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
-</span><span class='line'><span class="s">        http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">        http://www.springframework.org/schema/beans/spring-beans.xsd</span>
-</span><span class='line'><span class="s">        http://www.springframework.org/schema/tx</span>
-</span><span class='line'><span class="s">        http://www.springframework.org/schema/tx/spring-tx.xsd</span>
-</span><span class='line'><span class="s">        http://www.springframework.org/schema/aop</span>
-</span><span class='line'><span class="s">        http://www.springframework.org/schema/aop/spring-aop.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!-- this is the service object that we want to make transactional --&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;fooService&quot;</span> <span class="na">class=</span><span class="s">&quot;x.y.service.DefaultFooService&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!-- the transactional advice (what &#39;happens&#39;; see the &lt;aop:advisor/&gt; bean below) --&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;tx:advice</span> <span class="na">id=</span><span class="s">&quot;txAdvice&quot;</span> <span class="na">transaction-manager=</span><span class="s">&quot;txManager&quot;</span><span class="nt">&gt;</span> <span class="c">&lt;!-- the transactional semantics... --&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;tx:attributes&gt;</span>
-</span><span class='line'>            <span class="c">&lt;!-- all methods starting with &#39;get&#39; are read-only --&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;tx:method</span> <span class="na">name=</span><span class="s">&quot;get*&quot;</span> <span class="na">read-only=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="c">&lt;!-- other methods use the default transaction settings (see below) --&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;tx:method</span> <span class="na">name=</span><span class="s">&quot;*&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/tx:attributes&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/tx:advice&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!-- ensure that the above transactional advice runs for any execution</span>
-</span><span class='line'><span class="c">        of an operation defined by the FooService interface --&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;aop:config&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;aop:pointcut</span> <span class="na">id=</span><span class="s">&quot;fooServiceOperation&quot;</span> <span class="na">expression=</span><span class="s">&quot;execution(* x.y.service.FooService.*(..))&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;aop:advisor</span> <span class="na">advice-ref=</span><span class="s">&quot;txAdvice&quot;</span> <span class="na">pointcut-ref=</span><span class="s">&quot;fooServiceOperation&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/aop:config&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!-- don&#39;t forget the DataSource --&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">class=</span><span class="s">&quot;org.apache.commons.dbcp.BasicDataSource&quot;</span> <span class="na">destroy-method=</span><span class="s">&quot;close&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;driverClassName&quot;</span> <span class="na">value=</span><span class="s">&quot;oracle.jdbc.driver.OracleDriver&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;url&quot;</span> <span class="na">value=</span><span class="s">&quot;jdbc:oracle:thin:@rj-t42:1521:elvis&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;username&quot;</span> <span class="na">value=</span><span class="s">&quot;scott&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span> <span class="na">value=</span><span class="s">&quot;tiger&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!-- similarly, don&#39;t forget the PlatformTransactionManager --&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;txManager&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">ref=</span><span class="s">&quot;dataSource&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!-- other &lt;bean/&gt; definitions here --&gt;</span>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>对于x.y.service.FooService包中的任何一个服务类的任何一个方法，我都需要它被txManager所管理，任何以get开头的方法都让它在只读事务的上下文中执行，其他的则在默认事务的上下文中执行。</p>
-
-<p>Note：如果DataSourceTransactionManager的bean name，定义为transactionManager，则&lt;tx:advice>中的transaction-manager不用指定。</p>
-
-<h4>注解的方式</h4>
-
-<p>在真正的开发当中，除了这种xml的方式来指定事务的配置，通过注解的方式来配置事务相对更简单一些。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Transactional</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DefaultFooService</span> <span class="kd">implements</span> <span class="n">FooService</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">Foo</span> <span class="nf">getFoo</span><span class="o">(</span><span class="n">String</span> <span class="n">fooName</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">Foo</span> <span class="nf">getFoo</span><span class="o">(</span><span class="n">String</span> <span class="n">fooName</span><span class="o">,</span> <span class="n">String</span> <span class="n">barName</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kt">void</span> <span class="nf">insertFoo</span><span class="o">(</span><span class="n">Foo</span> <span class="n">foo</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kt">void</span> <span class="nf">updateFoo</span><span class="o">(</span><span class="n">Foo</span> <span class="n">foo</span><span class="o">);</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:tx=</span><span class="s">&quot;http://www.springframework.org/schema/tx&quot;</span> <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">        http://www.springframework.org/schema/beans/spring-beans.xsd</span>
-</span><span class='line'><span class="s">        http://www.springframework.org/schema/tx</span>
-</span><span class='line'><span class="s">        http://www.springframework.org/schema/tx/spring-tx.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!-- this is the service object that we want to make transactional --&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;fooService&quot;</span> <span class="na">class=</span><span class="s">&quot;x.y.service.DefaultFooService&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!-- enable the configuration of transactional behavior based on annotations --&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;tx:annotation-driven</span> <span class="na">transaction-manager=</span><span class="s">&quot;txManager&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!-- a PlatformTransactionManager is still</span>
-</span><span class='line'><span class="c">     required --&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;txManager&quot;</span>
-</span><span class='line'>          <span class="na">class=</span><span class="s">&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;</span><span class="nt">&gt;</span> <span class="c">&lt;!-- (this dependency is defined somewhere else) --&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">ref=</span><span class="s">&quot;dataSource&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!-- other &lt;bean/&gt; definitions here --&gt;</span>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Note：同样的道理，如果DataSourceTransactionManager的bean name，定义为transactionManager，则&lt;tx:annotation-driven>中的transaction-manager不用指定。</p>
-
-<p>要真正启动事务管理，仅仅配置@Transactional是不够的，一定要配置&lt;tx:annotation-driven>来启动事务管理行为。</p>
-
-<p>Note：如果你使用Java的配置方式，只需要在@Configuration的类上添加@EnableTransactionManagement来启动事务管理。</p>
-
-<p>Note：@EnableTransactionManagement和&lt;tx:annotation-driven/>在查找@Transactional时，只会在它们定义位置的上下文中查找。意味着，如果你把它们放在了WebApplicationContext中，那么它们只会在Controller中，而不是Service中查找@Transactional。</p>
-
-<p>参考资料：   <br/>
-1.Spring Framework Reference Document, Transaction Management</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -637,6 +507,10 @@ MockMvc：是Spring在服务器端对Spring MVC测试的支持，可以在对Con
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/03/10/get-started-with-spring-boot-1-quick-start/">用Spring Boot开发Spring项目（一） - 快速上手</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/02/07/spring-test-and-integration-test/">了解Spring Test对单元测试和集成测试的支持</a>
       </li>
     
@@ -650,10 +524,6 @@ MockMvc：是Spring在服务器端对Spring MVC测试的支持，可以在对Con
     
       <li class="post">
         <a href="/blog/2015/01/31/deep-into-gradle-in-action-4/">Gradle深入与实战（四）自定义集成测试任务</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/01/31/deep-into-gradle-in-action-3/">Gradle深入与实战（三）依赖管理工具</a>
       </li>
     
   </ul>
