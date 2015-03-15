@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-03-10T18:34:11+08:00</updated>
+  <updated>2015-03-15T15:02:28+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,230 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Gradle深入与实战（五）自定义插件]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/03/15/deep-into-gradle-in-action-5/"/>
+    <updated>2015-03-15T14:18:10+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/03/15/deep-into-gradle-in-action-5</id>
+    <content type="html"><![CDATA[<p>利用Gradle做构建，必然逃不掉Gradle的插件的使用，即便是最简单的Java或Groovy的应用都需要使用Java插件或者Groovy插件。</p>
+
+<p>Gradle插件的作用就是将会被重复利用的逻辑打包，这样就可以在不同的项目中重复的使用。比如在上一节中实现的集成测试任务，就可以打包到插件中，然后在其他的工程中使用，而不需要重复的写相同的任务。</p>
+
+<p><strong>Gradle提供了三种写插件的方式：</strong></p>
+
+<p>1.直接在build.gradle文件中写插件，然后直接使用，不好的地方很明显，不能在该build.gradle脚本之外的位置（其他脚本或者工程）中使用。</p>
+
+<p>2.将插件写在项目的rootProjectDir/buildSrc/src/main/groovy包下，Gradle会负责编译和放置到classpath，虽然可以多个gradle脚本中使用，但是不能在其他工程中使用。</p>
+
+<p>3.一个独立的插件工程，很明显，这是最常见的实现方式，因为可以被任何脚本或者工程使用。</p>
+
+<p>为了节省时间，我们直接进入到最常见的实现方式：<strong>实现一个独立的插件工程</strong>。</p>
+
+<h2>这是一个Groovy工程</h2>
+
+<p>我们知道，Gradle项目是基于Groovy语言开发的，所以插件功能必然是一个Groovy工程，构建创建一个build.gradle文件。</p>
+
+<figure class='code'><figcaption><span>build.gradle </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;groovy&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="nf">gradleApi</span><span class="o">()</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="nf">localGroovy</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">task</span> <span class="nf">wrapper</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Wrapper</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">gradleVersion</span> <span class="o">=</span> <span class="s1">&#39;1.11&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>按照Groovy插件推荐的目录结构建立好下面结构的目录，你可以忽略java那一级</p>
+
+<p>src/main/java     <br/>
+src/main/resources   <br/>
+src/main/groovy  <br/>
+src/test/java   <br/>
+src/test/resources        <br/>
+src/test/groovy</p>
+
+<h2>利用Plugin接口实现插件</h2>
+
+<p>然后，我们写一个Groovy类，让它实现Plugin接口，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugin</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.gradle.extension.HelloExtension</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.gradle.api.Plugin</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.gradle.api.Project</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">class</span> <span class="nc">HelloPlugin</span> <span class="kd">implements</span> <span class="n">Plugin</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">apply</span><span class="o">(</span><span class="n">Project</span> <span class="n">project</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">project</span><span class="o">.</span><span class="na">task</span><span class="o">(</span><span class="s1">&#39;hello&#39;</span><span class="o">)</span> <span class="o">&lt;&lt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">println</span> <span class="s1">&#39;hello plugin&#39;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里，我们通过project的task方法实现了一个名字是hello的task，里面打印了一句话。这个任务很简单，现在我们来增加一点点复杂度。记不记得大部分插件在使用之后，除了提供一些列的task，还提供了许多的closure（闭包），可以通过这些闭包传递一些参数进去。那么，这是怎么是实现的呢？很简单，利用project提供的扩展。</p>
+
+<h2>扩展的使用</h2>
+
+<p>定义一个名字是HelloExtension的Groovy类（名字其实无所谓叫什么，而且居然不需要实现任何的接口）：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">extension</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">class</span> <span class="nc">HelloExtension</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">String</span> <span class="n">message</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>改变一些插件的实现：</p>
+
+<figure class='code'><figcaption><span>build.gradle </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugin</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.gradle.extension.HelloExtension</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.gradle.api.Plugin</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.gradle.api.Project</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">class</span> <span class="nc">HelloPlugin</span> <span class="kd">implements</span> <span class="n">Plugin</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="nf">apply</span><span class="o">(</span><span class="n">Project</span> <span class="n">project</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">project</span><span class="o">.</span><span class="na">extensions</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s1">&#39;hello&#39;</span><span class="o">,</span> <span class="n">HelloExtension</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">project</span><span class="o">.</span><span class="na">task</span><span class="o">(</span><span class="s1">&#39;hello&#39;</span><span class="o">)</span> <span class="o">&lt;&lt;</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">println</span> <span class="n">project</span><span class="o">.</span><span class="na">hello</span><span class="o">.</span><span class="na">message</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>project.extensions.add(&lsquo;hello&rsquo;, HelloExtension)，这段代码将HelloExtension添加到project的extensions中，于是task就可以通过project.hello.message来获取。是不是很简单？</p>
+
+<h2>告诉别人这是个插件：插件id</h2>
+
+<p>那么，功能部分都写完了，怎么样让其他构件脚本知道这是一个插件能？配置META-INF。</p>
+
+<p>在resources目录下建立这样一个目录结构：/resources/META-INF/gradle-plugins</p>
+
+<p>然后在这里建立一个名字是me.zeph.hello.properties的Property文件，文件里的内容是：</p>
+
+<figure class='code'><figcaption><span>me.zeph.hello.properties </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="na">implementation-class</span><span class="o">=</span><span class="s">me.zeph.gradle.plugin.HelloPlugin</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个Property文件的命名并不是随意定义的，名字的作用是定义该插件的id，什么意思？说白了就是apply时使用的名字。如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;me.zeph.hello&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>至于里面的内容，我就不解释了，一眼就看明白了。</p>
+
+<h2>使用生成的插件</h2>
+
+<p>到这里，一个独立的插件工程就完成了，实验一把！！</p>
+
+<p>运行gredlew clean assemble，将生成的jar文件，拷贝到其他的项目目录中（这里没有upload到仓库，所以直接文件形式引入依赖）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">classpath</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="s1">&#39;libs&#39;</span><span class="o">,</span> <span class="nl">include:</span> <span class="s1">&#39;*.jar&#39;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;me.zeph.hello&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">hello</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;hello gradle plugin&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后运行gradlew hello，就可以看到hello任务的执行。</p>
+
+<p>总结，其实实现一个Gradle的独立插件工程，从建立工程的角度还是比较简单的，关键在如何通过Groovy实现插件，已经理解插件的api。</p>
+
+<p>参考资料：</p>
+
+<p>1.<a href="https://gradle.org/docs/current/userguide/custom_plugins.html">https://gradle.org/docs/current/userguide/custom_plugins.html</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[用Spring Boot开发Spring项目（一） - 快速上手]]></title>
@@ -3744,296 +3968,6 @@ DOM操作则属于应用程序的表现层逻辑操作，向来以测试难度�
 <p>2.<a href="http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.jetty.JettyRun.html">http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.jetty.JettyRun.html</a></p>
 
 <p>3.<a href="https://github.com/bluepapa32/gradle-watch-plugin">https://github.com/bluepapa32/gradle-watch-plugin</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Spring，Gradle，Web.xml和Intellij]]></title>
-    <link href="http://benweizhu.github.io/blog/2014/07/24/the-web-dot-xml-you-need-to-know/"/>
-    <updated>2014-07-24T21:38:00+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2014/07/24/the-web-dot-xml-you-need-to-know</id>
-    <content type="html"><![CDATA[<p>标题取得不是太好哈，但是看这标题，就知道，这篇文章不是什么高大上的内容。四个看似完全搭不上边的东西，把它们结合在一起使用的时候，对于大部分Java新人来说，却绝对是个头疼的问题。</p>
-
-<p>好，先把问题摆出来，看例子：</p>
-
-<p>我有一个Spring Web MVC的小例子，项目结构是这样的：</p>
-
-<p><img class="center" src="http://benweizhu.github.io/../images/springgradlewebintellij/project-structure.png"></p>
-
-<p>configuration目录中，配置有一些Spring的Bean，比如Service类，Dao类等等。比如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/beans/spring-beans.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;helloService&quot;</span> <span class="na">class=</span><span class="s">&quot;me.zeph.springmvc.service.HelloService&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>项目中的xx-servlet.xml很简单，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:mvc=</span><span class="s">&quot;http://www.springframework.org/schema/mvc&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans </span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/beans/spring-beans.xsd </span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/context </span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/context/spring-context.xsd </span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/mvc </span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;me.zeph.springmvc&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;viewResolver&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.web.servlet.view.UrlBasedViewResolver&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;prefix&quot;</span> <span class="na">value=</span><span class="s">&quot;/WEB-INF/view/&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;suffix&quot;</span> <span class="na">value=</span><span class="s">&quot;.jsp&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;viewClass&quot;</span> <span class="na">value=</span><span class="s">&quot;org.springframework.web.servlet.view.JstlView&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;mvc:annotation-driven/&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>问题是，我应该在怎么写web.xml和build.xml？才能够让它跑起来。</p>
-
-<p>大部分进入项目的人，包括我在内，都很少有机会能够在项目开始时就加入，那么你就没有机会参与到项目结构的配置过程中，这样对于大部分人都很难有这方面的经验，除非你去做项目的迁移工作。</p>
-
-<p>最常见的问题就是，跑一个gradle jettyRun，报了一个异常，XXXBean Not Define，然后就不知所措了。</p>
-
-<p>今天，我们就通过这个很小的例子来了解一下，如何通过Gradle来合理配置Spring的Bean定义文件？</p>
-
-<p>要弄清楚这个内容，你需要有几项基本知识：</p>
-
-<p>1.ClassPath<br/>
-2.Gradle的SourceSet<br/>
-3.web.xml中<context-param>的含义<br/>
-4.contextConfigLocation<br/>
-5.ContextLoaderListener<br/>
-6.web.xml中classpath: 符号</p>
-
-<p>关于前两项：</p>
-
-<p>关于ClassPath的基本知识，可以自学，或者看我的这篇文章：<a href="http://benweizhu.github.io/blog/2014/04/07/write-java-code-without-ide/">http://benweizhu.github.io/blog/2014/04/07/write-java-code-without-ide/</a>     （丢掉IDE，回到Java的第一堂课）</p>
-
-<p>SourceSet，请阅读<a href="http://www.gradle.org/docs/current/userguide/java_plugin.html">http://www.gradle.org/docs/current/userguide/java_plugin.html</a>  ，基本概念就是，它是Gradle的Java插件引入的一个概念，用于告诉Gradle，项目哪些目录是源文件，需要Gradle在打包的时候将这些文件加入。</p>
-
-<p>后面的，我们一边看答案，一边了解。</p>
-
-<p>先来看web.xml该怎么写？</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">version=</span><span class="s">&quot;2.4&quot;</span>
-</span><span class='line'>         <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span>
-</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee</span>
-</span><span class='line'><span class="s">        http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;servlet&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>webapp<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-class&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="nt">&lt;/servlet-class&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;load-on-startup&gt;</span>1<span class="nt">&lt;/load-on-startup&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/servlet&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;servlet-mapping&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>webapp<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;url-pattern&gt;</span>/<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/servlet-mapping&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;context-param&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;param-name&gt;</span>contextConfigLocation<span class="nt">&lt;/param-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;param-value&gt;</span>
-</span><span class='line'>            classpath:spring/applicationContextService.xml,
-</span><span class='line'>            classpath:spring/applicationContextDao.xml,
-</span><span class='line'>            classpath:spring/applicationContextJMS.xml
-</span><span class='line'>        <span class="nt">&lt;/param-value&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/context-param&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;listener&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;listener-class&gt;</span>org.springframework.web.context.ContextLoaderListener<span class="nt">&lt;/listener-class&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/listener&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>除了配置servlet，这里还有两项配置，分别是context-param和listener。</p>
-
-<p><strong>context-param</strong></p>
-
-<p>web.xml的配置中<context-param>配置作用：（为了不赘述，引用文章，<a href="http://www.cnblogs.com/hzj-/articles/1689836.html">http://www.cnblogs.com/hzj-/articles/1689836.html</a> ）</p>
-
-<p>1.启动一个WEB项目的时候,容器(如:Tomcat)会去读它的配置文件web.xml.读两个节点: <listener></listener> 和 <context-param></context-param></p>
-
-<p>2.紧接着,容器创建一个ServletContext(上下文),这个WEB项目所有部分都将共享这个上下文.</p>
-
-<p>3.容器将<context-param></context-param>转化为键值对,并交给ServletContext.</p>
-
-<p>4.容器创建<listener></listener>中的类实例,即创建监听.</p>
-
-<p>5.在监听中会有contextInitialized(ServletContextEvent args)初始化方法,在这个方法中获得ServletContext = ServletContextEvent.getServletContext();context-param的值 = ServletContext.getInitParameter(&ldquo;context-param的键&rdquo;);</p>
-
-<p>6.得到这个context-param的值之后,你就可以做一些操作了.注意,这个时候你的WEB项目还没有完全启动完成.这个动作会比所有的Servlet都要早.换句话说,这个时候,你对<context-param>中的键值做的操作,将在你的WEB项目完全启动之前被执行.</p>
-
-<p><strong>listener</strong></p>
-
-<p>在这里，ContextLoaderListener的作用是为Servlet初始化Spring的Web应用上下文，而上下文的内容就是上面<context-param>中配置的contextConfigLocation的内容。</p>
-
-<p>你只需要知道他们的作用是什么，如何配置的，不用太深入的知道，Spring到底是怎么使用它们的。</p>
-
-<p>于是，有了这些基本了解之后，再来看怎么写contextConfigLocation的内容，以及为什么这么写？</p>
-
-<p>首先，classpath:spring/applicationContextService.xml是什么意思？它是说在当前应用的classpath下去寻找spring目录下的applicationContextService.xml文件。</p>
-
-<p>就以Web开发为例，web应用程序是以War包的形式存在，它的classpath，就是War中的WEB-INF/class目录。只要你的applicationContextService.xml在war包的class目录下，它就在classpath路径下的。那么针对上例，你需要在打包的时候将applicationContextService.xml放在War包中的WEB-INF/class/spring目录下。</p>
-
-<p>道理很简单吧，那么问题来了，怎么样让Gradle帮我把它打到War包中呢？</p>
-
-<p>答案是自定义SourceSet，告诉Gradle applicationContextService.xml是我的源文件，我希望你帮我打到War包中。</p>
-
-<p>如果你有去了解SourceSet，你应该知道，它有默认的规约，就是遵循Maven的项目布局模式。main/java，main/sources等。</p>
-
-<p>在这个例子里，configuration下所有的东西，我都希望打到war包的classpath下，于是你就需要自定义SourceSet，告诉Gradle，我的源文件在哪个位置。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">main</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="s1">&#39;configuration&#39;</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当以上这些你都配置好之后，你可以运行 gradle war命令，打一个war包，然后将它解压缩，看看里面class目录的内容，应该是包含spring/applicationContext**等相关文件。</p>
-
-<p>现在你应该清楚Gradle，Web.xml和Spring是怎么相亲相爱的在一起了吧。</p>
-
-<p><strong>我们再来看一个更有趣的内容，Intellij和它们有什么关系呢？</strong></p>
-
-<p>这是很多初学Java和使用Intellij的人容易犯的错误。</p>
-
-<p>你肯定遇到过这个问题，为什么我的Intellij的xml配置文件中一些路径的配置老是红的，比如classpath:applicationXX.xml，而一些又是好的。</p>
-
-<p>为什么我的配置没有红，而且它可以通过Ctrl + B可以跳转到源文件，但是启动jettyRun的时候还是提示我找不到Bean呢?</p>
-
-<p>那是因为Intellij和你启动Gradle打包和部署一点关系都没有。所以答案就是：没有关系。</p>
-
-<p>之所以会红，是因为，xml文件所在目录，你并没有在Intellij中Mark为SourceRoot（会变成绿色文件夹那个）。所以Intellij不认为那是你的源代码，所以你在classpath：时，它就认为你指定的不对，如果你将该目录mark为SourceRoot，Intellij不仅不红，还是很智能的提示你，帮你补全。</p>
-
-<p>相反，那为什么他都帮我补全，而且可以Ctrl + B 跳过去了，但是Gradle jettyRun却提示找不到Bean呢？那是因为，你在Intellij中设置了Source目录，但是Gradle并不知道啊！！！你是否还会天真的以为，明明找得到啊，都Ctrl + B跳过去了，为什么还是不对呢？</p>
-
-<p>好吧，这是很多新人，包括以前的我在内，都不太了解的基本知识。</p>
-
-<p>希望今天这篇文章对大家有帮助，帮助大家解答所有的疑惑。不早了，晚安。</p>
-
-<p>参考资料：</p>
-
-<p>1.<a href="http://www.cnblogs.com/hellojava/archive/2012/12/28/2835730.html">http://www.cnblogs.com/hellojava/archive/2012/12/28/2835730.html</a></p>
-
-<p>2.<a href="http://www.gradle.org/docs/current/userguide/java_plugin.html">http://www.gradle.org/docs/current/userguide/java_plugin.html</a></p>
-
-<p>3.<a href="http://lyfei022.blog.163.com/blog/static/82558312009112943635741/">http://lyfei022.blog.163.com/blog/static/82558312009112943635741/</a></p>
-
-<p>4.<a href="http://www.cnblogs.com/hzj-/articles/1689836.html">http://www.cnblogs.com/hzj-/articles/1689836.html</a></p>
 ]]></content>
   </entry>
   

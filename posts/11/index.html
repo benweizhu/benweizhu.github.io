@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在Web开发中，一个重要的特性，那就是对表单提交的内容进行合法性校验。 校验的方式根据方式的不同，分为两类：前端校验和后端校验。 前端校验的优点是，不用与服务器交互，由JavaScript直接对页面元素中的内容进行校验，速度更快。但这种方式的安全性不高， &hellip;">
+  <meta name="description" content="标题取得不是太好哈，但是看这标题，就知道，这篇文章不是什么高大上的内容。四个看似完全搭不上边的东西，把它们结合在一起使用的时候，对于大部分Java新人来说，却绝对是个头疼的问题。 好，先把问题摆出来，看例子： 我有一个Spring Web MVC的小例子，项目结构是这样的： &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,316 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/07/24/the-web-dot-xml-you-need-to-know/">Spring，Gradle，Web.xml和Intellij</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-07-24T21:38:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:38 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>标题取得不是太好哈，但是看这标题，就知道，这篇文章不是什么高大上的内容。四个看似完全搭不上边的东西，把它们结合在一起使用的时候，对于大部分Java新人来说，却绝对是个头疼的问题。</p>
+
+<p>好，先把问题摆出来，看例子：</p>
+
+<p>我有一个Spring Web MVC的小例子，项目结构是这样的：</p>
+
+<p><img class="center" src="/../images/springgradlewebintellij/project-structure.png"></p>
+
+<p>configuration目录中，配置有一些Spring的Bean，比如Service类，Dao类等等。比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
+</span><span class='line'><span class="s">       http://www.springframework.org/schema/beans/spring-beans.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;helloService&quot;</span> <span class="na">class=</span><span class="s">&quot;me.zeph.springmvc.service.HelloService&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>项目中的xx-servlet.xml很简单，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:mvc=</span><span class="s">&quot;http://www.springframework.org/schema/mvc&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans </span>
+</span><span class='line'><span class="s">       http://www.springframework.org/schema/beans/spring-beans.xsd </span>
+</span><span class='line'><span class="s">       http://www.springframework.org/schema/context </span>
+</span><span class='line'><span class="s">       http://www.springframework.org/schema/context/spring-context.xsd </span>
+</span><span class='line'><span class="s">       http://www.springframework.org/schema/mvc </span>
+</span><span class='line'><span class="s">       http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;me.zeph.springmvc&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;viewResolver&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.web.servlet.view.UrlBasedViewResolver&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;prefix&quot;</span> <span class="na">value=</span><span class="s">&quot;/WEB-INF/view/&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;suffix&quot;</span> <span class="na">value=</span><span class="s">&quot;.jsp&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;viewClass&quot;</span> <span class="na">value=</span><span class="s">&quot;org.springframework.web.servlet.view.JstlView&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;mvc:annotation-driven/&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>问题是，我应该在怎么写web.xml和build.xml？才能够让它跑起来。</p>
+
+<p>大部分进入项目的人，包括我在内，都很少有机会能够在项目开始时就加入，那么你就没有机会参与到项目结构的配置过程中，这样对于大部分人都很难有这方面的经验，除非你去做项目的迁移工作。</p>
+
+<p>最常见的问题就是，跑一个gradle jettyRun，报了一个异常，XXXBean Not Define，然后就不知所措了。</p>
+
+<p>今天，我们就通过这个很小的例子来了解一下，如何通过Gradle来合理配置Spring的Bean定义文件？</p>
+
+<p>要弄清楚这个内容，你需要有几项基本知识：</p>
+
+<p>1.ClassPath<br/>
+2.Gradle的SourceSet<br/>
+3.web.xml中<context-param>的含义<br/>
+4.contextConfigLocation<br/>
+5.ContextLoaderListener<br/>
+6.web.xml中classpath: 符号</p>
+
+<p>关于前两项：</p>
+
+<p>关于ClassPath的基本知识，可以自学，或者看我的这篇文章：<a href="http://benweizhu.github.io/blog/2014/04/07/write-java-code-without-ide/">http://benweizhu.github.io/blog/2014/04/07/write-java-code-without-ide/</a>     （丢掉IDE，回到Java的第一堂课）</p>
+
+<p>SourceSet，请阅读<a href="http://www.gradle.org/docs/current/userguide/java_plugin.html">http://www.gradle.org/docs/current/userguide/java_plugin.html</a>  ，基本概念就是，它是Gradle的Java插件引入的一个概念，用于告诉Gradle，项目哪些目录是源文件，需要Gradle在打包的时候将这些文件加入。</p>
+
+<p>后面的，我们一边看答案，一边了解。</p>
+
+<p>先来看web.xml该怎么写？</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">version=</span><span class="s">&quot;2.4&quot;</span>
+</span><span class='line'>         <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span>
+</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee</span>
+</span><span class='line'><span class="s">        http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;servlet&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>webapp<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;servlet-class&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="nt">&lt;/servlet-class&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;load-on-startup&gt;</span>1<span class="nt">&lt;/load-on-startup&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/servlet&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;servlet-mapping&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>webapp<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;url-pattern&gt;</span>/<span class="nt">&lt;/url-pattern&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/servlet-mapping&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;context-param&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;param-name&gt;</span>contextConfigLocation<span class="nt">&lt;/param-name&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;param-value&gt;</span>
+</span><span class='line'>            classpath:spring/applicationContextService.xml,
+</span><span class='line'>            classpath:spring/applicationContextDao.xml,
+</span><span class='line'>            classpath:spring/applicationContextJMS.xml
+</span><span class='line'>        <span class="nt">&lt;/param-value&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/context-param&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;listener&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;listener-class&gt;</span>org.springframework.web.context.ContextLoaderListener<span class="nt">&lt;/listener-class&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/listener&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>除了配置servlet，这里还有两项配置，分别是context-param和listener。</p>
+
+<p><strong>context-param</strong></p>
+
+<p>web.xml的配置中<context-param>配置作用：（为了不赘述，引用文章，<a href="http://www.cnblogs.com/hzj-/articles/1689836.html">http://www.cnblogs.com/hzj-/articles/1689836.html</a> ）</p>
+
+<p>1.启动一个WEB项目的时候,容器(如:Tomcat)会去读它的配置文件web.xml.读两个节点: <listener></listener> 和 <context-param></context-param></p>
+
+<p>2.紧接着,容器创建一个ServletContext(上下文),这个WEB项目所有部分都将共享这个上下文.</p>
+
+<p>3.容器将<context-param></context-param>转化为键值对,并交给ServletContext.</p>
+
+<p>4.容器创建<listener></listener>中的类实例,即创建监听.</p>
+
+<p>5.在监听中会有contextInitialized(ServletContextEvent args)初始化方法,在这个方法中获得ServletContext = ServletContextEvent.getServletContext();context-param的值 = ServletContext.getInitParameter(&ldquo;context-param的键&rdquo;);</p>
+
+<p>6.得到这个context-param的值之后,你就可以做一些操作了.注意,这个时候你的WEB项目还没有完全启动完成.这个动作会比所有的Servlet都要早.换句话说,这个时候,你对<context-param>中的键值做的操作,将在你的WEB项目完全启动之前被执行.</p>
+
+<p><strong>listener</strong></p>
+
+<p>在这里，ContextLoaderListener的作用是为Servlet初始化Spring的Web应用上下文，而上下文的内容就是上面<context-param>中配置的contextConfigLocation的内容。</p>
+
+<p>你只需要知道他们的作用是什么，如何配置的，不用太深入的知道，Spring到底是怎么使用它们的。</p>
+
+<p>于是，有了这些基本了解之后，再来看怎么写contextConfigLocation的内容，以及为什么这么写？</p>
+
+<p>首先，classpath:spring/applicationContextService.xml是什么意思？它是说在当前应用的classpath下去寻找spring目录下的applicationContextService.xml文件。</p>
+
+<p>就以Web开发为例，web应用程序是以War包的形式存在，它的classpath，就是War中的WEB-INF/class目录。只要你的applicationContextService.xml在war包的class目录下，它就在classpath路径下的。那么针对上例，你需要在打包的时候将applicationContextService.xml放在War包中的WEB-INF/class/spring目录下。</p>
+
+<p>道理很简单吧，那么问题来了，怎么样让Gradle帮我把它打到War包中呢？</p>
+
+<p>答案是自定义SourceSet，告诉Gradle applicationContextService.xml是我的源文件，我希望你帮我打到War包中。</p>
+
+<p>如果你有去了解SourceSet，你应该知道，它有默认的规约，就是遵循Maven的项目布局模式。main/java，main/sources等。</p>
+
+<p>在这个例子里，configuration下所有的东西，我都希望打到war包的classpath下，于是你就需要自定义SourceSet，告诉Gradle，我的源文件在哪个位置。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">main</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="s1">&#39;configuration&#39;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当以上这些你都配置好之后，你可以运行 gradle war命令，打一个war包，然后将它解压缩，看看里面class目录的内容，应该是包含spring/applicationContext**等相关文件。</p>
+
+<p>现在你应该清楚Gradle，Web.xml和Spring是怎么相亲相爱的在一起了吧。</p>
+
+<p><strong>我们再来看一个更有趣的内容，Intellij和它们有什么关系呢？</strong></p>
+
+<p>这是很多初学Java和使用Intellij的人容易犯的错误。</p>
+
+<p>你肯定遇到过这个问题，为什么我的Intellij的xml配置文件中一些路径的配置老是红的，比如classpath:applicationXX.xml，而一些又是好的。</p>
+
+<p>为什么我的配置没有红，而且它可以通过Ctrl + B可以跳转到源文件，但是启动jettyRun的时候还是提示我找不到Bean呢?</p>
+
+<p>那是因为Intellij和你启动Gradle打包和部署一点关系都没有。所以答案就是：没有关系。</p>
+
+<p>之所以会红，是因为，xml文件所在目录，你并没有在Intellij中Mark为SourceRoot（会变成绿色文件夹那个）。所以Intellij不认为那是你的源代码，所以你在classpath：时，它就认为你指定的不对，如果你将该目录mark为SourceRoot，Intellij不仅不红，还是很智能的提示你，帮你补全。</p>
+
+<p>相反，那为什么他都帮我补全，而且可以Ctrl + B 跳过去了，但是Gradle jettyRun却提示找不到Bean呢？那是因为，你在Intellij中设置了Source目录，但是Gradle并不知道啊！！！你是否还会天真的以为，明明找得到啊，都Ctrl + B跳过去了，为什么还是不对呢？</p>
+
+<p>好吧，这是很多新人，包括以前的我在内，都不太了解的基本知识。</p>
+
+<p>希望今天这篇文章对大家有帮助，帮助大家解答所有的疑惑。不早了，晚安。</p>
+
+<p>参考资料：</p>
+
+<p>1.<a href="http://www.cnblogs.com/hellojava/archive/2012/12/28/2835730.html">http://www.cnblogs.com/hellojava/archive/2012/12/28/2835730.html</a></p>
+
+<p>2.<a href="http://www.gradle.org/docs/current/userguide/java_plugin.html">http://www.gradle.org/docs/current/userguide/java_plugin.html</a></p>
+
+<p>3.<a href="http://lyfei022.blog.163.com/blog/static/82558312009112943635741/">http://lyfei022.blog.163.com/blog/static/82558312009112943635741/</a></p>
+
+<p>4.<a href="http://www.cnblogs.com/hzj-/articles/1689836.html">http://www.cnblogs.com/hzj-/articles/1689836.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -795,98 +1105,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/13/learning-jdbc-transaction/">再次了解JDBC（下）- 事务</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-07-13T13:37:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:37 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>事务就是将一条或者多条语句作为一个单元一起执行，要么全部执行，要么全都不执行。</p>
-
-<p>如果你读过数据库的书，肯定知道数据库事务有四个基本特性：原子性，一致性，隔离性，持久性。</p>
-
-<p>在JDBC中，事务的操作建立在Connection对象上，Connection对象提供了与事务相关的操作函数，例如：setAutoCommit()，commit()，rollback()等。</p>
-
-<h2><strong>autocommit</strong></h2>
-
-<p>JDBC Connection默认的情况是AutoCommit模式，即每一条SQL语句在执行完之后都会提交到数据库中。对于简单的应用是可以的，但是关闭自动提交模式，由自己管理实务是有必要的，提高执行效率，保证业务处理过程完整性，使用分布式事务。</p>
-
-<p>事务可以让你控制对数据库的改变，它将一条或多条SQL语句作为一个逻辑单元，如果任何一条语句失败，则整个事务失败。</p>
-
-<p>关闭自动提交模式的方法很简单，调用setAutoCommit()方法：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">setAutoCommit</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2><strong>commit &amp; rollback</strong></h2>
-
-<p>一旦你完成了对数据库的改变操作，你需要执行commit()方法来提交改变，当执行过程中出现异常，你需要执行rollback()方法来回滚该事物。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>调用rollback方法会终结一个事务，并返回到数据被修改之前的值。如果你尝试在一个事务中去执行一条或多条语句，结果得到一个SQLException，调用rollback去结束一个事务，然后重新开始事务。这是唯一知道什么被提交，什么没有被提交的办法。因为捕获到SQLException会告诉你什么样的错误发生了，但是不会告诉你什么已经提交，什么没有。回滚是唯一的可靠办法。</p>
-
-<h2><strong>完整性</strong></h2>
-
-<p>除了将语句分组以一个单元统一执行，事务还帮助保证一张表中数据的完整性。事务会提供某种程度的保护，以防止两个用户同时访问数据时，造成的冲突。</p>
-
-<p>DBMS会使用锁机制，来防止其他用户对已经被事务访问的数据进行访问。一旦加锁，它会强制保证不变直到事务被提交。锁机制的目的是防止用户读到脏数据，也就是读到一些还没有被永久保存的数据（访问一个被更新但是还没有被提交的值，被认为是访问到脏数据，因为这个值很有可能会被回滚到以前的结果，那么你读到的值就是无效的）。</p>
-
-<p>锁是如何被设置的是由一个叫做事务隔离级别决定的。举例来说，如果事务隔离级别被设置为TRANSACTION_READ_COMMITTED，那么它就不会允许数据被访问，直到事务提交。换句话说，DBMS不允许读取脏数据的事件发生。</p>
-
-<p>TRANSACTION_NONE JDBC 驱动不支持事务<br/>
-TRANSACTION_READ_UNCOMMITTED 允许脏读，不可重复读和幻读。<br/>
-TRANSACTION_READ_COMMITTED 禁止脏读，但允许不可重复读和幻读。<br/>
-TRANSACTION_REPEATABLE_READ 禁止脏读和不可重复读，单运行幻读。<br/>
-TRANSACTION_SERIALIZABLE 禁止脏读，不可重复读和幻读。</p>
-
-<p>不可重复读的场景发生在事务A读取一行数据，事务B后续的改变了这一行，当事务A再次去读时，两次读取的事务就不一致了。</p>
-
-<p>幻读的场景是事务A读取到满足一定条件的一部分数据，事务B后续插入或者更新了一行数据，但是同样满足该条件，此时A再去读取发现多了一行数据。</p>
-
-<p>通常，你不需要对事务隔离级别做任何操作，只要使用默认的即可，但默认值取决于DBMS。例如，对于Java数据库，默认值是TRANSACTION_READ_COMMITTED。JDBC允许你获取和改变该级别，方法是getTransactionIsolation()和setTransactionIsolation()。</p>
-
-<p>参考资料：</p>
-
-<p><a href="http://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html">http://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html</a></p>
-
-<p><a href="http://www.tutorialspoint.com/jdbc/jdbc-transactions.htm">http://www.tutorialspoint.com/jdbc/jdbc-transactions.htm</a></p>
-
-<p><a href="http://blog.csdn.net/chenyongsuda/article/details/5641412">http://blog.csdn.net/chenyongsuda/article/details/5641412</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/12">&larr; Older</a>
@@ -910,6 +1128,10 @@ TRANSACTION_SERIALIZABLE 禁止脏读，不可重复读和幻读。</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/03/15/deep-into-gradle-in-action-5/">Gradle深入与实战（五）自定义插件</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/03/10/get-started-with-spring-boot-1-quick-start/">用Spring Boot开发Spring项目（一） - 快速上手</a>
       </li>
     
@@ -923,10 +1145,6 @@ TRANSACTION_SERIALIZABLE 禁止脏读，不可重复读和幻读。</p>
     
       <li class="post">
         <a href="/blog/2015/02/03/servlet-multiple-thread-and-threadlocal/">Servlet多线程安全问题和LocalThread</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/01/31/deep-into-gradle-in-action-4/">Gradle深入与实战（四）自定义集成测试任务</a>
       </li>
     
   </ul>
