@@ -84,6 +84,45 @@ public class Phone {
 
 多对多关系的管理方的定义取决于JoinTable的定义方，至于由哪一边作为管理方，取决于业务的关系，所以并不固定。但是必须要理解的时，它们之间建立关系的方式（即谁管理谁）。举个例子，User和Group，这是一个常见的多对多关系，当你将管理方定义在Group这边时，你要做的是将User添加到Group，然后保存Group。而不能将Group添加给User，然后保存User。
 
+应用级联
+
+由某一方来管理对象的操作，需要应用级联属性，来说明是否将级联操作传递到对应的实体类上。如果你在存储一个对象时，该对象关联到另一个对象，而它们之间的关系没有使用级联，则会抛出异常，告诉你，需要先存储关联对象。
+
+级联操作的类型有6种，分别是ALL，PERSIST，MERGE，REMOVE，REFRESH，DETACH。
+
+{% codeblock lang:java %}
+public enum CascadeType {
+
+    /** Cascade all operations */
+    ALL,
+
+    /** Cascade persist operation */
+    PERSIST,
+
+    /** Cascade merge operation */
+    MERGE,
+
+    /** Cascade remove operation */
+    REMOVE,
+
+    /** Cascade refresh operation */
+    REFRESH,
+
+    /**
+     * Cascade detach operation
+     *
+     * @since Java Persistence 2.0
+     *
+     */
+    DETACH
+}
+{% endcodeblock %}
+
+{% codeblock lang:java %}
+@ManyToMany(cascade = CascadeType.ALL)
+{% endcodeblock %}
+
+
 
 参考资料：    
 1.http://en.wikibooks.org/wiki/Java_Persistence/ManyToMany     
