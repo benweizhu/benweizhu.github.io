@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/03/21/java-persistence-and-relationships/">JPA中的多对多关系</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/03/21/jpa-many-to-many-relationship/">JPA中的多对多关系</a></h1>
     
     
       <p class="meta">
@@ -210,6 +210,72 @@
 <p>多对多关系的管理方的选择</p>
 
 <p>多对多关系的管理方的定义取决于JoinTable的定义方，至于由哪一边作为管理方，取决于业务的关系，所以并不固定。但是必须要理解的时，它们之间建立关系的方式（即谁管理谁）。举个例子，User和Group，这是一个常见的多对多关系，当你将管理方定义在Group这边时，你要做的是将User添加到Group，然后保存Group。而不能将Group添加给User，然后保存User。</p>
+
+<p>应用级联</p>
+
+<p>由某一方来管理对象的操作，需要应用级联属性，来说明是否将级联操作传递到对应的实体类上。如果你在存储一个对象时，该对象关联到另一个对象，而它们之间的关系没有使用级联，则会抛出异常，告诉你，需要先存储关联对象。</p>
+
+<p>级联操作的类型有6种，分别是ALL，PERSIST，MERGE，REMOVE，REFRESH，DETACH。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">enum</span> <span class="n">CascadeType</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade all operations */</span>
+</span><span class='line'>    <span class="n">ALL</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade persist operation */</span>
+</span><span class='line'>    <span class="n">PERSIST</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade merge operation */</span>
+</span><span class='line'>    <span class="n">MERGE</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade remove operation */</span>
+</span><span class='line'>    <span class="n">REMOVE</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade refresh operation */</span>
+</span><span class='line'>    <span class="n">REFRESH</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Cascade detach operation</span>
+</span><span class='line'><span class="cm">     *</span>
+</span><span class='line'><span class="cm">     * @since Java Persistence 2.0</span>
+</span><span class='line'><span class="cm">     *</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="n">DETACH</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@ManyToMany</span><span class="o">(</span><span class="n">cascade</span> <span class="o">=</span> <span class="n">CascadeType</span><span class="o">.</span><span class="na">ALL</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>参考资料：  <br/>
 1.<a href="http://en.wikibooks.org/wiki/Java_Persistence/ManyToMany">http://en.wikibooks.org/wiki/Java_Persistence/ManyToMany</a>   <br/>
@@ -486,7 +552,7 @@ src/test/groovy</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2015/03/21/java-persistence-and-relationships/">JPA中的多对多关系</a>
+        <a href="/blog/2015/03/21/jpa-many-to-many-relationship/">JPA中的多对多关系</a>
       </li>
     
       <li class="post">
