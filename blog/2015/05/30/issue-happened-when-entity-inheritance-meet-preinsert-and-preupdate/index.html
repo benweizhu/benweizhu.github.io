@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>当Entity继承遇到@PreCreate - NO END FOR LEARNING</title>
+  <title>当Entity继承遇到Hibernate的insert@PrePersist和@PreUpdate - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="假设你的数据库是这样设计的： 1
+  <meta name="description" content="上周做项目的时候遇到的关于实现审计日志方式的问题，这里记录一下。 假设你的数据库是这样设计的： 1
 2
 3
 4
@@ -19,8 +19,7 @@
 8
 9
 10
-11
-{ &quot;Customer&quot;: { &quot;id&quot;: 1, &quot;name&quot;: &quot;benwei&quot; }, &quot;AdvancedCustomer& &hellip;">
+{ &quot;Customer&quot;: { &quot;id&quot;: 1, &quot;name&quot;: &quot;benwei&quot &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -29,7 +28,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-precreate">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-preinsert-and-preupdate">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -78,7 +77,7 @@
   
   <header>
     
-      <h1 class="entry-title">当Entity继承遇到@PreCreate</h1>
+      <h1 class="entry-title">当Entity继承遇到Hibernate的insert@PrePersist和@PreUpdate</h1>
     
     
       <p class="meta">
@@ -94,7 +93,9 @@
   </header>
 
 
-<div class="entry-content"><p>假设你的数据库是这样设计的：</p>
+<div class="entry-content"><p>上周做项目的时候遇到的关于实现审计日志方式的问题，这里记录一下。</p>
+
+<p>假设你的数据库是这样设计的：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -106,7 +107,6 @@
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-<span class='line-number'>11</span>
 </pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
 </span><span class='line'>    <span class="nt">&quot;Customer&quot;</span><span class="p">:</span> <span class="p">{</span>
 </span><span class='line'>        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
@@ -116,7 +116,6 @@
 </span><span class='line'>        <span class="nt">&quot;customerId&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
 </span><span class='line'>        <span class="nt">&quot;level&quot;</span><span class="p">:</span> <span class="mi">1</span>
 </span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -154,7 +153,84 @@
 
 <p>Joind策略的含义是：A strategy in which fields that are specific to a subclass are mapped to a separate table than the fields that are common to the parent class, and a join is performed to instantiate the subclass.</p>
 
-<p>通用的属性定义在父类中表，特殊的属性映射到另一个独立的表</p>
+<p>通用的属性定义在父类中表，特殊的属性映射到另一个独立的表。</p>
+
+<p>此时，你想要给应用添加一个审计功能。</p>
+
+<p>你给Customer表添加LastModifiedBy和LastModifiedDate两个字段。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;Customer&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;benwei&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;lastModifiedBy&quot;</span><span class="p">:</span> <span class="s2">&quot;benwei&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;lastModifiedDate&quot;</span><span class="p">:</span> <span class="s2">&quot;21/6/2015 23:01:11&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nt">&quot;AdvancedCustomer&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;customerId&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;level&quot;</span><span class="p">:</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>做法是使用EntityListener，在Listener中使用Hibernate的@PrePersist和@PreUpdate来监听事件的发生。</p>
+
+<p>public class AuditListener {</p>
+
+<pre><code>@PrePersist
+public void prePersist(Object entity) {
+    if(entity instanceOf AdvancedCustomer) {
+        ((AdvancedCustomer)entity).setLastModifiedDate(Datetime.now()); 
+    }
+}
+
+@PreUpdate
+public void preUpdate(Object entity) {
+    ...
+}
+</code></pre>
+
+<p>}</p>
+
+<p>@Entity
+@Table
+@EntityListeners([AuditListener.class])
+public class AdvancedCustomer extends Customer {</p>
+
+<p>}</p>
+
+<h3>问题来了，这个prePersist或者preUpdate方法会在什么时候触发呢？当修改AdvancedCustomer中的任意变量时，比如name，level，都会触发prePersist或者preUpdate。</h3>
+
+<p>但是，你到数据库中去查看审计事件变化时会发现，当创建一个新的Customer，或者更新Customer的名字字段都没有问题。</p>
+
+<p>当update子类中的变量level的时候，lastModifiedDate并没有发生变化。这是为什么？</p>
+
+<h3>要找到原因，必须打开showSql属性，来查看Hibernate到底产生的SQL语句是什么。</h3>
+
+<p>你会发现，当修改level变量时，Hibernate只产生了一条update语句来更新AdvancedCustomer这张表。而创建Customer会同时更新AdvancedCustomer和Customer两张表，更新name字段，会更新Customer这张表。</p>
+
+<p>也就是说，在PreUpdate触发之前，Hibernate在策略上已经决定了只更新AdvancedCustomer。即便之后改变了Customer中的lastModifiedDate，也没有改变它的行为。这里并不是说PreUpdate没有起到作用，而是Hibernate之决定更新一张表，至于更新什么内容，要等到PreUpdate之后决定（这一点可以从更新name时，lastModifiedDate发生了改变来证明）。</p>
+
+<h2>如何解决：</h2>
+
+<p>目前，我们没有完美的解决方案可以在仍然使用PreUpdate的情况下，保证审计信息更新正确。</p>
+
+<p>出现这个问题的主要原因是因为我们的实现受到框架实现机制的限制。</p>
+
+<p>所以，我们改变了实现的策略，既然受到框架本身实现策略的限制，我们就脱离框架，在还未计入框架管理范围之内，就将审计信息写入Entity内，那么可行的一种方式就是AOP。在触发Hibernate的save方法之前，将审计信息写入Entity。</p>
 </div>
 
 
@@ -178,7 +254,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-precreate/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-precreate/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-preinsert-and-preupdate/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-preinsert-and-preupdate/" >Tweet</a>
   
   
   
@@ -198,7 +274,7 @@
   <section>
     <h1>Comments</h1>
     <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
-<div class="ds-thread" data-title="当Entity继承遇到@PreCreate"></div>
+<div class="ds-thread" data-title="当Entity继承遇到Hibernate的insert@PrePersist和@PreUpdate"></div>
 <script type="text/javascript">
   var duoshuoQuery = {short_name:"benweizhu"};
   (function() {
@@ -228,7 +304,7 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-precreate/">当Entity继承遇到@PreCreate</a>
+        <a href="/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-preinsert-and-preupdate/">当Entity继承遇到Hibernate的insert@PrePersist和@PreUpdate</a>
       </li>
     
       <li class="post">
