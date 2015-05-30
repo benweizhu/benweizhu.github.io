@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-05-30T19:08:10+08:00</updated>
+  <updated>2015-05-30T19:09:48+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[当Entity继承遇到Hibernate的insert@PrePersist和@PreUpdate]]></title>
+    <title type="html"><![CDATA[当Entity继承遇到Hibernate的@PrePersist和@PreUpdate]]></title>
     <link href="http://benweizhu.github.io/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-preinsert-and-preupdate/"/>
     <updated>2015-05-30T17:03:04+08:00</updated>
     <id>http://benweizhu.github.io/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-preinsert-and-preupdate</id>
