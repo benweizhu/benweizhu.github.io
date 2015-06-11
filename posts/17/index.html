@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="Web Service是一种独立的、低耦合的Web服务，它由几个核心技术组成：XML、XSD、WSDL、SOAP、UDDI。我们根据这些知识点，来一个个的学习。 XML 呵呵，这个太简单了，这个没什么好谈的，跳过。 XSD XSD（XML Schema Definition）是DTD（ &hellip;">
+  <meta name="description" content="SLF4j Simple Logging Facade for Java (SLF4J) SLF4J，简单日志门面（Facade），是各个不同日志框架的抽象，它不是具体的日志解决方案，只服务于各种各样的日志系统，例如java.util.logging, log4j等， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,427 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/06/01/slf4j-and-log4j/">logger（SLF4j和log4j）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-06-01T12:33:00+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>12:33 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2><strong>SLF4j</strong></h2>
+
+<p>Simple Logging Facade for Java (SLF4J)</p>
+
+<p>SLF4J，简单日志门面（Facade），是各个不同日志框架的抽象，它不是具体的日志解决方案，只服务于各种各样的日志系统，例如java.util.logging, log4j等，它允许最终用户在部署其应用时使用其所希望的日志系统。</p>
+
+<p><strong>什么意思？</strong>SLF4J就像一个接口，是一个门面，在写代码时，我们只需要根据这个接口提供的方法去记录日志。这个接口可以和不同的日志框架绑定，比如Java自带的java.util.logging，或者大家常听到的log4j。这样，你可以在不修改代码的情况下，去替换不同的日志框架。</p>
+
+<p>基本概念明白之后，看下面这个例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.logger</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.loggerFactory</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">loggerFactory</span><span class="o">.</span><span class="na">getlogger</span><span class="o">(</span><span class="n">HelloWorld</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;Hello World&quot;</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>输出的结果是：</p>
+
+<p>SLF4J: Failed to load class &ldquo;org.slf4j.impl.StaticloggerBinder&rdquo;.<br/>
+SLF4J: Defaulting to no-operation (NOP) logger implementation<br/>
+SLF4J: See <a href="http://www.slf4j.org/codes.html#StaticloggerBinder">http://www.slf4j.org/codes.html#StaticloggerBinder</a> for further details.</p>
+
+<p>原因是你没有将SLF4j和某一个具体的日志框架绑定。怎么绑定呢？不需要你做任何事情，简单的加一个依赖就可以了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-simple:1.7.7&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>输出是：[main] INFO log.HelloWorld - Hello World</p>
+
+<p><strong>SLF4J支持对很多不同框架的绑定：</strong></p>
+
+<p>slf4j-log4j12-1.7.7.jar<br/>
+slf4j-jdk14-1.7.7.jar<br/>
+slf4j-nop-1.7.7.jar<br/>
+slf4j-simple-1.7.7.jar<br/>
+slf4j-jcl-1.7.7.jar</p>
+
+<p><strong>那么有个问题，SLF4J支不支持对多个日志框架的绑定呢？答案是不支持，也感觉一般这是不必要需求。</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-simple:1.7.7&#39;</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-log4j12:1.7.7&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>输出：</p>
+
+<p>SLF4J: Class path contains multiple SLF4J bindings.<br/>
+&hellip;</p>
+
+<p><strong>在SLF4J的官方文档上也说明了这点：</strong></p>
+
+<p>“SLF4J does not rely on any special class loader machinery. In fact, each SLF4J binding is hardwired at compile time to use one and only one specific logging framework. For example, the slf4j-log4j12-1.7.7.jar binding is bound at compile time to use log4j. In your code, in addition to slf4j-api-1.7.7.jar, you simply drop one and only one binding of your choice onto the appropriate class path location. Do not place more than one binding on your class path.”</p>
+
+<p>OK，关于SLF4J的内容就到这里，该进入重头戏&ndash;log4J。</p>
+
+<h2><strong>log4j</strong></h2>
+
+<p>log4j相对于SLF4j就复杂许多了，毕竟SLF4j只是接口，log4j则是具体的实现了。</p>
+
+<p>log4j由三个重要的组件组成：</p>
+
+<ol>
+<li>类型和级别(logger)</li>
+<li>输出目的地(Appender)</li>
+<li>输出格式(Layout)</li>
+</ol>
+
+
+<h3><strong>logger</strong></h3>
+
+<p><strong>logger hierarchy（logger的层次级别）</strong></p>
+
+<p><strong>Named Hierarchy（以名字分层）</strong></p>
+
+<p>logger的名字是大小写敏感的，并且根据名字的不同，logger之间存在父子层次关系。举例来说，com.foo是com.foo.bar的父logger，com是com.foo.bar的祖先logger。</p>
+
+<p>在这些logger之间，存在一个root logger，位于这个层次的顶层，它是永久存在，并且不能够通过名字获取，要获取它，只能通过logger.getRootlogger()方法获取。而这样一个层次关系，也决定了logger和logger之间存在着一些继承关系。</p>
+
+<p><strong>Level Inheritance（级别继承）</strong></p>
+
+<p>子类继承父类的级别：如果子类级别没有显示的指定，子类的级别等于第一个级别非空的父类logger的级别，直到追溯到根logger。</p>
+
+<p>前面提到logger的级别，它们分别是TRACE, DEBUG, INFO, WARN, ERROR和FATAL。</p>
+
+<p>这些级别存在高低关系：DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL。</p>
+
+<p>如果你以前有用过一点点log4j，这些级别映射到你的记忆中，一定是反映成logger的各个方法。没错，在logger这个对象中，你会看到很多的打印方法，debug, info, warn, error, fatal和log。</p>
+
+<p><strong>回过头来想想，如果你给一个logger指定了级别，但是你打印日志时，又不是调用对应级别的方法，会发生什么事情呢？</strong></p>
+
+<p>答案是：对这些方法的调用，不光是打印日志信息，也是对logger对象级别改变的请求。</p>
+
+<p>但是，并不是你调用它，级别就一定会改变，对级别改变的请求还是取决于logger对象本身的级别（无论是被显示的指定，还是继承）。如果请求的级别低于该logger当前的级别，那么改变就不会成功。</p>
+
+<h3><strong>Appender</strong></h3>
+
+<p>Appender的作用是指出日志信息的输出位置，比如控制台，文件。而且好处是，你可以给一个logger指定多个appender，比如同时在控制台和文件中输出日志。</p>
+
+<h4><strong>Appender Additivity(附加性)</strong></h4>
+
+<p>每一个Appender都有一个属性，叫做additivity flag，默认是true。什么意思呢？</p>
+
+<p>子类会继承它直接父类的appender（包括该父类自己继承的appender），如果设置为false，则不继承其父类的appender。</p>
+
+<p><strong>这句话应该好理解，那下面这种情况呢？</strong></p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">Logger </th>
+<th style="text-align:center;"> Appender </th>
+<th style="text-align:center;"> Additivity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">root         </td>
+<td style="text-align:center;"> A1        </td>
+<td style="text-align:center;"> null</td>
+</tr>
+<tr>
+<td style="text-align:left;">appenderFather</td>
+<td style="text-align:center;"> A2        </td>
+<td style="text-align:center;"> false</td>
+</tr>
+<tr>
+<td style="text-align:left;">appenderFather.appenderChild</td>
+<td style="text-align:center;"> A3</td>
+<td style="text-align:center;">true</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>appenderFather的flag设置为了false，所以他拥有的appender的结果应该比较明显，就是A2。</p>
+
+<p>appenderFather.appenderChild的结果应该是什么？答案是A2和A3。因为它只是继承它直接父类的appender。</p>
+
+<p><strong>log4j提供的Appender有哪些呢？</strong></p>
+
+<p>org.apache.log4j.ConsoleAppender（控制台）</p>
+
+<p>org.apache.log4j.FileAppender（文件）</p>
+
+<p>org.apache.log4j.DailyRollingFileAppender（每天产生一个日志文件）</p>
+
+<p>org.apache.log4j.RollingFileAppender（文件大小到达指定尺寸的时候产生新文件，用的较多，限制文件大小）</p>
+
+<p>org.apache.log4j.WriterAppender（将日志信息以流格式发送到任意指定的地方）</p>
+
+<h3><strong>Layout</strong></h3>
+
+<p>日志信息布局（格式）是log4j提供的另外一个非常有用的特性。</p>
+
+<p><strong>log4j提供四种Layout方式：</strong></p>
+
+<p>org.apache.log4j.HTMLLayout（以HTML表格形式布局），</p>
+
+<p>org.apache.log4j.PatternLayout（可以灵活地指定布局模式，比较常用），</p>
+
+<p>org.apache.log4j.SimpleLayout（包含日志信息的级别和信息字符串），</p>
+
+<p>org.apache.log4j.TTCCLayout（包含日志产生的时间、线程、类别等等信息）</p>
+
+<p><strong>log4j采用类似C语言中的printf函数的打印格式格式化日志信息，打印参数如下：</strong></p>
+
+<p>%m 输出代码中指定的消息 　</p>
+
+<p>%p 输出优先级，即DEBUG，INFO，WARN，ERROR，FATAL 　　</p>
+
+<p>%r 输出自应用启动到输出该log信息耗费的毫秒数 　　</p>
+
+<p>%c 输出所属的类目，通常就是所在类的全名 　　</p>
+
+<p>%t 输出产生该日志事件的线程名 　　</p>
+
+<p>%n 输出一个回车换行符，Windows平台为“rn”，Unix平台为“n” 　　</p>
+
+<p>%d 输出日志时间点的日期或时间，默认格式为ISO8601，也可以在其后指定格式，比如：%d{yyy MMM dd HH:mm:ss,SSS}，输出类似：2002年10月18日 22：10：28，921 　　</p>
+
+<p>%l 输出日志事件的发生位置，包括类目名、发生的线程，以及在代码中的行数。举例：Testlog4.main(TestLog4.java:10)</p>
+
+<p>%x: 输出和当前线程相关联的NDC(嵌套诊断环境),尤其用到像java servlets这样的多客户多线程的应用中。</p>
+
+<p>%%: 输出一个”%”字符 %F: 输出日志消息产生时所在的文件名称</p>
+
+<p>%L: 输出代码中的行号</p>
+
+<p>%m: 输出代码中指定的消息,产生的日志具体信息</p>
+
+<p>%n: 输出一个回车换行符，Windows平台为”\r\n”，Unix平台为”\n”输出日志信息换行 可以在%与模式字符之间加上修饰符来控制其最小宽度、最大宽度、和文本的对齐方式。</p>
+
+<p>Ok，基本知识就到这里，看一个例子。</p>
+
+<h2><strong>Example</strong></h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-log4j12:1.7.7&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在配置依赖时，将SLF4J和log4j绑定</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">log</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.Logger</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.LoggerFactory</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">HelloWorld</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">say</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;start time&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hello, world!!!&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">logger</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+</span><span class='line'>      <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;end time&quot;</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">HelloWorld</span> <span class="n">helloWorld</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HelloWorld</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">helloWorld</span><span class="o">.</span><span class="na">say</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过SLF4J的LoggerFactory.getLogger()方法得到一个logger的实力。logger的名字就是类名（全限定的类名）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="na">log4j.rootLogger</span><span class="o">=</span><span class="s">info, console, file</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">log4j.appender.console</span><span class="o">=</span><span class="s">org.apache.log4j.ConsoleAppender</span>
+</span><span class='line'><span class="na">log4j.appender.console.layout</span><span class="o">=</span><span class="s">org.apache.log4j.PatternLayout</span>
+</span><span class='line'><span class="na">log4j.appender.console.layout.ConversionPattern</span><span class="o">=</span><span class="s">%p %l %d{yyy MMM dd HH:mm:ss,SSS} %m %n</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">log4j.appender.file</span><span class="o">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
+</span><span class='line'><span class="na">log4j.appender.file.File</span><span class="o">=</span><span class="s">logger.log</span>
+</span><span class='line'><span class="na">log4j.appender.file.layout</span><span class="o">=</span><span class="s">org.apache.log4j.PatternLayout</span>
+</span><span class='line'><span class="na">log4j.appender.file.layout.ConversionPattern</span><span class="o">=</span><span class="s">%p %l %d{yyy MMM dd HH:mm:ss,SSS} %m %n</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在log4j的properties文件中，指定了根logger的级别，以及它的两个appender，分别是console和file。然后定义这两个appender，并指定它们的layout使用PatternLayout，让它们输出：级别，日志输出的位置，时间，指定的信息和换行。</p>
+
+<p>输出结果如下：</p>
+
+<p>INFO log.HelloWorld.say(HelloWorld.java:11) 2014 Jun 01 16:57:54,807 start time <br/>
+Hello, world!!!<br/>
+INFO log.HelloWorld.say(HelloWorld.java:13) 2014 Jun 01 16:57:54,809 end time<br/>
+log.HelloWorld</p>
+
+<p>总结，log不算是功能代码，但是他对于开发人员和维护人员，非常有用了，往往是解决问题的唯一线索，特别是对于后台系统，往往只能通过log来分析问题。</p>
+
+<p>参考资料：</p>
+
+<p>1.<a href="http://logging.apache.org/log4j/1.2/manual.html  ">http://logging.apache.org/log4j/1.2/manual.html  </a>
+2.<a href="http://www.slf4j.org/manual.html  ">http://www.slf4j.org/manual.html  </a>
+3.<a href="http://www.cnblogs.com/dennisit/archive/2013/01/01/2841603.html">http://www.cnblogs.com/dennisit/archive/2013/01/01/2841603.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -770,149 +1191,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/05/03/what-is-war-and-ear/">了解war包和ear包</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-05-03T17:06:00+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2014</span></span> <span class='time'>5:06 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>上一次，讲到了如何如何手动编译Java，简单的介绍打Jar包（提示：在classpath的基础上，一定将包的目录结构打进去）。Jar包的目的，将编译过的class文件有效合理的组装起来，方便管理和使用。这一次，滕老板继续跟我们讲解了如何打War包。</p>
-
-<p>在本篇文章中，将分别介绍War包和Ear包（在项目中遇到的Ear包的模块，不清楚是什么，所以随便一起弄清楚）。</p>
-
-<h2><strong>War包</strong></h2>
-
-<p>只要做过Java开发的同志，肯定知道War包，至少听说过。</p>
-
-<p>War包（Web application ARchieve）也是一种Jar包文件，它被用来描述由JSP，Servlet，Java类，XML文件，tag库，静态web页面等资源组成的集合，它们组合在一起成文一个web应用。</p>
-
-<p>从命令上说，打War包的命令和打Jar包的命令一样，比较简单，主要是要了解一个War包的目录结构：</p>
-
-<p><image src="/../images/ear/war.png" height="50%" width=50%" style="text-align: center"/></p>
-
-<p>MANIFEST.MF是一个可选文件，用来描述额外的元数据信息。</p>
-
-<p>WEB-INF目录包含了War中的私有文件，也就是说，当web应用被部署之后，该目录下的文件不能够由Web客户端（浏览器）直接访问的。</p>
-
-<p>WEB-INF/lib/用来放置你代码中需要使用的第三方的jar文件。</p>
-
-<p>WEB-INF/classes/用来放置你自己编译的class文件。</p>
-
-<p>WEB-INF/web.xml是web部署描述器，JavaEE配置web模块的标准描述器，这里不详细解释。</p>
-
-<p>最后是公共的静态文件。</p>
-
-<p>那么在打包的时候，按照这个目录结构打包，然后将War包放置到tomcat的webapp目录下，tomcat在运行时就会自动帮你解包并运行，或者你也可以直接将包含该目录结构的目录直接拷贝到tomcat的webapp下，一样可以运行，打包只不过是一个封装和压缩过程。</p>
-
-<h2><strong>那什么是Ear包呢？</strong></h2>
-
-<p>Ear(Enterprise ARchieve)用于在Java EE中将一个或者多个模块封装到一个文件中，这样，多个不同模块在应用服务器上的部署就可以同时并持续的进行。</p>
-
-<p>Java EE应用以Jar文件，War文件和Ear文件形式呈现。War或者Ear文件都是标准的Jar文件，只不过扩展名是.war和.ear。通过Jar，War和Ear等文件或模块的方式，使得用一些相同组件，来构建不同的JavaEE应用成为可能。不需要额外的编码，只需要将不同的JavaEE模块打包到不同的Java EE的Jar包，War包或Ear包的文件中。</p>
-
-<p>一个Ear文件是由Java EE模块和可选的部署描述器组成。部署描述器是一个带有.xml扩展名的XML文档，描述了一个应用，模块或者组件的部署设置。因为部署描述其的信息是声明式的，所以可以直接修改它，与我们的源代码没有关系。在运行时中，Java EE的服务器会读取部署描述器的内容，并根据描述对应用，模块或者组件做相对应的操作。</p>
-
-<p><image src="/../images/ear/ear.png" height="50%" width=50%" style="text-align: center"/>
-<image src="http://docs.oracle.com/javaee/6/tutorial/doc/figures/overview-applicationModule.gif" style="text-align: center"/>
-上面两个图，分别摘自Jboss at Work(A practice guide)和JavaEE6 Tutorial。</p>
-
-<p>一个Java EE模块是由一个或者多个为同一个容器类型准备的Java EE组件组成，当然还包含一个可选的部署描述器文件。</p>
-
-<p>Java EE模块有以下几种类型：</p>
-
-<p>EJB模块，它包含企业级别的bean类文件，一个EJB的部署描述器（可选），EJB模块会以Jar包形式组装。</p>
-
-<p>Web模块，它包含了servlet类文件，web文件，其他相关class文件，图片，html静态文件，和一个web.xml部署文件（可选），并最终以war包形式组装。</p>
-
-<p>应用客户端模块，包含了class文件，应用客户端部署描述器文件（可选）并以Jar包形式组装。</p>
-
-<p>资源适配模块，包含所有的Java接口，类，原生库，部署描述器（可选）。组合在一起，实现JavaEE的Connector架构。同样是以Jar包方式组装，但是文件以.rar扩展名结尾。</p>
-
-<p>就和War包包含一个web.xml的部署描述器，一个Ear包文件包含一个名字为application.xml的文件。它是一个必要的打包列表，告诉Java EE服务器Ear包种包含什么东西，以及去哪里找。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;application</span> <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>             <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee             http://java.sun.com/xml/ns/j2ee/application_1_4.xsd&quot;</span>
-</span><span class='line'>             <span class="na">version=</span><span class="s">&quot;1.4&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;display-name&gt;</span>JBossAtWorkEAR<span class="nt">&lt;/display-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;module&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;web&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;web-uri&gt;</span>webapp.war<span class="nt">&lt;/web-uri&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;context-root&gt;</span>jaw<span class="nt">&lt;/context-root&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/web&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/module&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;module&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;java&gt;</span>common.jar<span class="nt">&lt;/java&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/module&gt;</span>
-</span><span class='line'><span class="nt">&lt;/application&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>application.xml中的元素都应该是自解释的。在告诉应用程序服务器每一个Jar包的名字，以及它的作用（功能）。</p>
-
-<p>例如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;module&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;web&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;web-uri&gt;</span>webapp.war<span class="nt">&lt;/web-uri&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;context-root&gt;</span>jaw<span class="nt">&lt;/context-root&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/web&gt;</span>
-</span><span class='line'><span class="nt">&lt;/module&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><context-root>用来告诉你web应用站点名字，如果你是直接打成War包，那么War包的名字就是这个站点名。</p>
-
-<p>总而言之，Ear包是由Java EE多个模块组成，相互配合，完成各自职责，形成完整的Java EE应用。</p>
-
-<p>参考资料：</p>
-
-<p><a href="http://docs.oracle.com/javaee/6/tutorial/doc/bnaby.html">http://docs.oracle.com/javaee/6/tutorial/doc/bnaby.html</a></p>
-
-<p>Jboss at work A practice guide(Chapter 3)(<a href="http://oreilly.com/catalog/jboss/chapter/ch03.pdf">http://oreilly.com/catalog/jboss/chapter/ch03.pdf</a>)</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/18">&larr; Older</a>
@@ -936,6 +1214,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/06/11/spring-boot-starter-2/">Spring Boot 深入浅出系列（二） - 用Gradle启动应用</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/06/10/spring-boot-starter-1/">Spring Boot 深入浅出系列（一） - 习惯使用注解</a>
       </li>
     
@@ -949,10 +1231,6 @@
     
       <li class="post">
         <a href="/blog/2015/04/18/angularjs-resolve-and-promise-q/">Promise/Q和AngularJS中的resolve</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/03/31/deep-into-gradle-in-action-6/">Gradle深入与实战（六）Gradle的背后是什么？</a>
       </li>
     
   </ul>
