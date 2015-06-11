@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "用Spring Boot开发Spring项目（一） - 快速上手"
+title: "用Spring Boot开发Spring项目 快速上手"
 date: 2015-03-10 16:44:18 +0800
 comments: true
 categories: 
