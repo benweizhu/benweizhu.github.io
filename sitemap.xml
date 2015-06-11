@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://benweizhu.github.io/blog/2015/06/10/spring-boot-starter-1/</loc>
+    <lastmod>2015-06-10T22:19:19+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://benweizhu.github.io/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-preinsert-and-preupdate/</loc>
     <lastmod>2015-05-30T17:03:04+08:00</lastmod>
     <priority>0.8</priority>
@@ -257,13 +262,13 @@
   </url>
   <url>
     <loc>http://benweizhu.github.io/blog/archives/</loc>
-    <lastmod>2015-05-30T19:10:58+08:00</lastmod>
+    <lastmod>2015-06-11T11:19:09+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>http://benweizhu.github.io/</loc>
-    <lastmod>2015-05-30T19:10:58+08:00</lastmod>
+    <lastmod>2015-06-11T11:19:09+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

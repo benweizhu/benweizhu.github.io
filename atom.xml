@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-05-30T19:10:58+08:00</updated>
+  <updated>2015-06-11T11:19:09+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,237 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Spring Boot 深入浅出系列（一） - 习惯使用注解]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/06/10/spring-boot-starter-1/"/>
+    <updated>2015-06-10T22:19:19+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/06/10/spring-boot-starter-1</id>
+    <content type="html"><![CDATA[<p>Spring Boot从一开始就告诉你，它更喜欢基于Java的配置，即注解的方式。所以它提供了你一大堆注解，并让你习惯使用注解。</p>
+
+<p>@Bean</p>
+
+<p>Indicates that a method produces a bean to be managed by the Spring container.</p>
+
+<p>@Configuration</p>
+
+<p>Indicates that a class declares one or more @Bean methods and may be processed by the Spring container to generate bean definitions and service requests for those beans at runtime</p>
+
+<p>@EnableAutoConfiguration</p>
+
+<p>Enable auto-configuration of the Spring Application Context, attempting to guess and configure beans that you are likely to need. Auto-configuration classes are usually applied based on your classpath and what beans you have defined.</p>
+
+<p>@ComponentScan</p>
+
+<p>Configures component scanning directives for use with @Configuration classes. Provides support parallel with Spring XML&rsquo;s &lt;context:component-scan> element.</p>
+
+<h2>指定main application class的位置</h2>
+
+<p>SpringBoot建议你将主应用class（main application class）放在包根路径上，即其他子包之上。@EnableAutoConfiguration通常放在你的main class上，这样也隐含的指定了对某些配置项的搜索路径。比如，对@Entity的搜索。</p>
+
+<p>在主应用class上指定@ComponentScan，同样也隐式的指定了扫描时basePackage的路径。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Configuration</span>
+</span><span class='line'><span class="nd">@EnableAutoConfiguration</span>
+</span><span class='line'><span class="nd">@ComponentScan</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Application</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">Application</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果你的main application class的位置确实在包的根路径上，上面的三个注解，可以用@SpringBootApplication这一个注解代替。</p>
+
+<h2>多种方式加载Bean</h2>
+
+<p>你必然不会在main application class定义很多的@Bean，Spring提供两种方式将定义在另外一个带有@Configuration的类中的Bean加载，第一种，在Application类中使用@Import指定该类，第二种，让@ComponentScan扫描到该类。大部分情况都会选择第二种。</p>
+
+<h2>加载XML的配置</h2>
+
+<p>如果你必须使用XML的配置，你可以使用@ImportResource来加载指定的XML配置。</p>
+
+<h2>Bean的自动配置</h2>
+
+<p>SpringBoot有一个非常神秘的注解@EnableAutoConfiguration，官方的解释已经在上面的部分给出，简单点说就是它会根据定义在classpath下的类，自动的给你生成一些Bean，并加载到Spring的Context中。</p>
+
+<p>它的神秘之处，不在于它能做什么，而在于它会生成什么样的Bean对于开发人员是不可预知（或者说不容易预知）。举个例子：</p>
+
+<p>要开发一个基于Spring JPA的应用，会涉及到下面三个Bean的配置，DataSource，EntityManagerFactory，PlatformTransactionManager。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Configuration</span>
+</span><span class='line'><span class="nd">@EnableJpaRepositories</span>
+</span><span class='line'><span class="nd">@EnableTransactionManagement</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ApplicationConfig</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@Bean</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">DataSource</span> <span class="nf">dataSource</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="o">...</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Bean</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">EntityManagerFactory</span> <span class="nf">entityManagerFactory</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="o">..</span>
+</span><span class='line'>      <span class="n">factory</span><span class="o">.</span><span class="na">setDataSource</span><span class="o">(</span><span class="n">dataSource</span><span class="o">());</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">factory</span><span class="o">.</span><span class="na">getObject</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Bean</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">PlatformTransactionManager</span> <span class="nf">transactionManager</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">JpaTransactionManager</span> <span class="n">txManager</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">JpaTransactionManager</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">txManager</span><span class="o">.</span><span class="na">setEntityManagerFactory</span><span class="o">(</span><span class="n">entityManagerFactory</span><span class="o">());</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">txManager</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>@EnableJpaRepositories会查找满足作为Repository条件（继承父类或者使用注解）的类。</p>
+
+<p>@EnableTransactionManagement的作用：Enables Spring&rsquo;s annotation-driven transaction management capability, similar to the support found in Spring&rsquo;s &lt;tx:*> XML namespace。</p>
+
+<p>但是，如果你使用了@EnableAutoConfiguration，那么上面三个Bean，你都不需要配置。在classpath下面只引入了MySQL的驱动和SpringJpa。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">compile</span> <span class="err">&#39;</span><span class="nl">mysql:</span><span class="n">mysql</span><span class="o">-</span><span class="n">connector</span><span class="o">-</span><span class="nl">java:</span><span class="mf">5.1</span><span class="o">.</span><span class="mi">18</span><span class="err">&#39;</span>
+</span><span class='line'><span class="n">compile</span> <span class="err">&#39;</span><span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">boot</span><span class="o">:</span><span class="n">spring</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">starter</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">jpa</span><span class="err">&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在Application类中写下下面这段代码，可以查看SpringBoot给你生成了这些Bean：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">ConfigurableApplicationContext</span> <span class="n">ctx</span> <span class="o">=</span> <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">Application</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Let&#39;s inspect the beans provided by Spring Boot:&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Object</span> <span class="n">dataSource</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="s">&quot;dataSource&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">Object</span> <span class="n">transactionManager</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="s">&quot;transactionManager&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">Object</span> <span class="n">entityManagerFactory</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="s">&quot;entityManagerFactory&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">dataSource</span><span class="o">);</span>
+</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">entityManagerFactory</span><span class="o">);</span>
+</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">transactionManager</span><span class="o">);</span>
+</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(((</span><span class="n">JpaTransactionManager</span><span class="o">)</span><span class="n">transactionManager</span><span class="o">).</span><span class="na">getDataSource</span><span class="o">());</span>
+</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(((</span><span class="n">JpaTransactionManager</span><span class="o">)</span><span class="n">transactionManager</span><span class="o">).</span><span class="na">getEntityManagerFactory</span><span class="o">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>输出如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">tomcat</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">pool</span><span class="o">.</span><span class="na">DataSource</span><span class="err">@</span><span class="mi">4</span><span class="n">f0e94db</span><span class="o">{</span><span class="n">ConnectionPool</span><span class="o">[</span><span class="n">defaultAutoCommit</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span> <span class="n">defaultReadOnly</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span> <span class="n">defaultTransactionIsolation</span><span class="o">=-</span><span class="mi">1</span><span class="o">;</span> <span class="n">defaultCatalog</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span> <span class="n">driverClassName</span><span class="o">=</span><span class="n">com</span><span class="o">.</span><span class="na">mysql</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">Driver</span><span class="o">;</span> <span class="n">maxActive</span><span class="o">=</span><span class="mi">100</span><span class="o">;</span> <span class="n">maxIdle</span><span class="o">=</span><span class="mi">100</span><span class="o">;</span> <span class="n">minIdle</span><span class="o">=</span><span class="mi">10</span><span class="o">;</span> <span class="n">initialSize</span><span class="o">=</span><span class="mi">10</span><span class="o">;</span> <span class="n">maxWait</span><span class="o">=</span><span class="mi">30000</span><span class="o">;</span> <span class="n">testOnBorrow</span><span class="o">=</span><span class="kc">true</span><span class="o">;</span> <span class="n">testOnReturn</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span> <span class="n">timeBetweenEvictionRunsMillis</span><span class="o">=</span><span class="mi">5000</span><span class="o">;</span> <span class="n">numTestsPerEvictionRun</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">minEvictableIdleTimeMillis</span><span class="o">=</span><span class="mi">60000</span><span class="o">;</span> <span class="n">testWhileIdle</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span> <span class="n">testOnConnect</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span> <span class="n">password</span><span class="o">=********;</span> <span class="o">...</span> <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">orm</span><span class="o">.</span><span class="na">jpa</span><span class="o">.</span><span class="na">LocalContainerEntityManagerFactoryBean</span><span class="err">@</span><span class="mi">5109</span><span class="n">d386</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">orm</span><span class="o">.</span><span class="na">jpa</span><span class="o">.</span><span class="na">JpaTransactionManager</span><span class="err">@</span><span class="mi">5</span><span class="n">c1e2bfa</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">tomcat</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">pool</span><span class="o">.</span><span class="na">DataSource</span><span class="err">@</span><span class="mi">4</span><span class="n">f0e94db</span><span class="o">{</span><span class="n">ConnectionPool</span><span class="o">[</span><span class="n">defaultAutoCommit</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span> <span class="n">defaultReadOnly</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span> <span class="n">defaultTransactionIsolation</span><span class="o">=-</span><span class="mi">1</span><span class="o">;</span> <span class="n">defaultCatalog</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span> <span class="n">driverClassName</span><span class="o">=</span><span class="n">com</span><span class="o">.</span><span class="na">mysql</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">Driver</span><span class="o">;</span> <span class="n">maxActive</span><span class="o">=</span><span class="mi">100</span><span class="o">;</span> <span class="n">maxIdle</span><span class="o">=</span><span class="mi">100</span><span class="o">;</span> <span class="n">minIdle</span><span class="o">=</span><span class="mi">10</span><span class="o">;</span> <span class="n">initialSize</span><span class="o">=</span><span class="mi">10</span><span class="o">;</span> <span class="n">maxWait</span><span class="o">=</span><span class="mi">30000</span><span class="o">;</span> <span class="n">testOnBorrow</span><span class="o">=</span><span class="kc">true</span><span class="o">;</span> <span class="n">testOnReturn</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span> <span class="n">timeBetweenEvictionRunsMillis</span><span class="o">=</span><span class="mi">5000</span><span class="o">;</span> <span class="n">numTestsPerEvictionRun</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">minEvictableIdleTimeMillis</span><span class="o">=</span><span class="mi">60000</span><span class="o">;</span> <span class="n">testWhileIdle</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span> <span class="n">testOnConnect</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span> <span class="n">password</span><span class="o">=********;...</span> <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">orm</span><span class="o">.</span><span class="na">jpa</span><span class="o">.</span><span class="na">LocalContainerEntityManagerFactoryBean</span><span class="err">@</span><span class="mi">5109</span><span class="n">d386</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Bean中的URL，username和password是在属性文件中配置的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="err">#</span><span class="n">Database</span>
+</span><span class='line'><span class="n">spring</span><span class="o">.</span><span class="na">datasource</span><span class="o">.</span><span class="na">url</span><span class="o">=</span><span class="nl">jdbc:mysql:</span><span class="c1">//localhost:3306/xxxx      </span>
+</span><span class='line'><span class="n">spring</span><span class="o">.</span><span class="na">datasource</span><span class="o">.</span><span class="na">username</span><span class="o">=</span><span class="n">root</span>
+</span><span class='line'><span class="n">spring</span><span class="o">.</span><span class="na">datasource</span><span class="o">.</span><span class="na">password</span><span class="o">=</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Disable自动配置</h2>
+
+<p>如果你发现自动转配的Bean不是你想要的，你也可以disable它。比如说，我不想要自动装配Database的那些Bean</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.EnableAutoConfiguration</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Configuration</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Configuration</span>
+</span><span class='line'><span class="nd">@EnableAutoConfiguration</span><span class="o">(</span><span class="n">exclude</span> <span class="o">=</span> <span class="o">{</span><span class="n">DataSourceAutoConfiguration</span><span class="o">.</span><span class="na">class</span><span class="o">})</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyConfiguration</span> <span class="o">{</span>
+</span><span class='line'>  
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>此时，就会报下面的错了</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Caused</span> <span class="nl">by:</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">beans</span><span class="o">.</span><span class="na">factory</span><span class="o">.</span><span class="na">NoSuchBeanDefinitionException</span><span class="o">:</span> <span class="n">No</span> <span class="n">qualifying</span> <span class="n">bean</span> <span class="n">of</span> <span class="n">type</span> <span class="o">[</span><span class="n">javax</span><span class="o">.</span><span class="na">sql</span><span class="o">.</span><span class="na">DataSource</span><span class="o">]</span> <span class="n">found</span> <span class="k">for</span> <span class="n">dependency</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>习惯使用和正确使用上面这些注解，是正确使用Spring Boot的重要起步。</p>
+
+<p>参考资料： <br/>
+1.Spring Boot Reference <br/>
+2.Spring JPA Reference</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[当Entity继承遇到Hibernate的@PrePersist和@PreUpdate]]></title>
@@ -3994,189 +4225,6 @@ orderBy：此排序过滤器根据给定的条件对数组中的元素进行排�
 1.<a href="http://www.ngnice.com/docs/guide/di">http://www.ngnice.com/docs/guide/di</a>  <br/>
 2.<a href="http://www.ngnice.com/docs/api/auto/service/$injector">http://www.ngnice.com/docs/api/auto/service/$injector</a>  <br/>
 3.<a href="http://www.ngnice.com/docs/tutorial/step_05">http://www.ngnice.com/docs/tutorial/step_05</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[开始！AngularJS!（五）- 模块化]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/01/03/yes-angularjs-5/"/>
-    <updated>2015-01-03T10:47:01+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/01/03/yes-angularjs-5</id>
-    <content type="html"><![CDATA[<p>我们都知道JavaScript很容易就写出全局函数，所以无论是用jQuery还是纯JavaScript，我们都会使用模块化的策略避免写出来的函数污染全局。</p>
-
-<p>而模块化的办法一般都是利用函数对象立即执行。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">feature</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Private variables and functions</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">privateThing</span> <span class="o">=</span> <span class="s2">&quot;secret&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">publicThing</span> <span class="o">=</span> <span class="s2">&quot;not secret&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">changePrivateThing</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">privateThing</span> <span class="o">=</span> <span class="s2">&quot;super secret&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">sayPrivateThing</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">privateThing</span> <span class="p">);</span>
-</span><span class='line'>        <span class="nx">changePrivateThing</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Public API</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">publicThing</span><span class="o">:</span> <span class="nx">publicThing</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">sayPrivateThing</span><span class="o">:</span> <span class="nx">sayPrivateThing</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'><span class="p">})();</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">feature</span><span class="p">.</span><span class="nx">publicThing</span><span class="p">;</span> <span class="c1">// &quot;not secret&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Logs &quot;secret&quot; and changes the value of privateThing</span>
-</span><span class='line'><span class="nx">feature</span><span class="p">.</span><span class="nx">sayPrivateThing</span><span class="p">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>模块与ng-app指令</h3>
-
-<p>Angular也有模块的概念，但是它不只是为了解决全局函数的问题。</p>
-
-<p>看一个最简单的例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;textApp&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;textController&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;textApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;textController&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Benwei&#39;</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/73kn66kd/">http://jsfiddle.net/benweizhu/73kn66kd/</a></p>
-
-<p>在前面我们已经无数次的看到ng-app指令。它的作用是自动启动一个AngularJS应用，ng-app指令一般指派在应用的根元素上，比如，body或者html标签。在每一个HTML文档中，只能有一个AngularJS应用可以被自动启动，在HTML文档中第一个被找到定义在根元素上的ng-app指令将会作为自动启动的应用。</p>
-
-<p>可以理解它为AngularJS应用启动的触发点。</p>
-
-<p>那我们在js代码中定义的模块和ng-app有什么关系呢？很明显，它是告诉AngularJS应用在启动时加载指定的模块，假设这里ng-app只是放一个纯标签，而不给它赋值。那么它就不知道这里该加载什么模块，于是，它也不认识在模块中定义的textController控制器。</p>
-
-<p>但是，赋值与否和启动一个AngularJS的应用无关：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
-</span><span class='line'>     <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这样也是可以启动AngularJS应用，并实现name模型的绑定。</p>
-
-<h3>模块化的目的</h3>
-
-<p>模块化除了像Java中分包，分类那样来划分职责，还带来什么好处呢？（以下摘自官方文档）</p>
-
-<p>整个过程是声明式的，更容易理解<br/>
-在单元测试中，没有必要加载所有模块，这样有利于单元测试的代码书写<br/>
-在场景测试中，额外的模块可以被加载进来，进而重写一些配置，这样有助于实现应用的端到端的测试<br/>
-第三方代码可以很容易被打包成可重用的模块<br/>
-模块可以用任意顺序或并行顺序加载（得益于模块执行的延迟性）</p>
-
-<h3>子模块</h3>
-
-<p>对于大型应用，根据不同职责，建议把它像这样分成多个模块（参考官方文档）：</p>
-
-<p>服务模块<br/>
-指令模块<br/>
-过滤器模块<br/>
-一个应用的模块，依赖于上述的三个模块，而且包含应用的初始化及启动代码</p>
-
-<p><strong>模块依赖</strong></p>
-
-<p>模块声明时可以列出它所需要依赖的其它模块。一个模块依赖某模块，意味着这个被依赖的模块需要在模块被加载之前加载完毕。更具体些，假设模块A依赖于模块B，那么模块A的配置代码块的执行，必须发生在模块B的配置代码块之后；模块A的执行代码块亦同理，也在模块B的执行代码块之后被执行。每个模块只能被加载一次，即使有多个别的模块依赖它。</p>
-
-<p><strong>创建模块，获取模块，如何实现模块的依赖</strong></p>
-
-<p>使用 angular.module(&lsquo;myModule&rsquo;, []) 将创建名为 myModule 的模块并重写已有的同名模块。而使用 angular.module(&lsquo;myModule&rsquo;) 则只会获取已有的模块实例。</p>
-
-<p>你会注意到，创建和获取的区别，在于module函数的第二参数，该参数的作用是定义创建模块时的所依赖的模块（子模块）。</p>
-
-<p>这样做的好处是，不同的服务或者一组服务被放置在不同的可重用模块，那么应用模块只需要声明应用所需要的全部依赖模块即可。</p>
-
-<p>来看一个模块依赖的例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;restApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngResource&#39;</span><span class="p">])</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;personRest&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$resource</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/app/person&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;myApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;restApp&#39;</span><span class="p">])</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;parentsController&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">personRest</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">personRest</span><span class="p">.</span><span class="nx">get</span><span class="p">({},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">person</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">person</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">});</span>
-</span><span class='line'>    <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>我需要写一个Rest的客户端模块restApp，需要使用到AngularJS提供的$resource服务，那么首先我需要引入AngularJS的ngResource服务模块，最后在我的应用模块，引入我自己定义的restApp模块然后，我就可以注入我自己定义personRest服务，继而使用它，这是一个典型的模块依赖例子。</p>
-
-<p>本来上一节，说好了要讲解依赖注入，但是我发现先介绍模块和模块化更好，一个是尽快帮助学习写更规范的AngularJS应用，二个也会有助于之后对理解依赖注入。下一节，我们来讨论AngularJS中的依赖注入。</p>
 ]]></content>
   </entry>
   
