@@ -128,9 +128,9 @@ web.xml的配置中<context-param>配置作用：（为了不赘述，引用文�
 
 2.紧接着,容器创建一个ServletContext(上下文),这个WEB项目所有部分都将共享这个上下文.
 
-3.容器将<context-param></context-param>转化为键值对,并交给ServletContext.
+3.容器将context-param转化为键值对,并交给ServletContext.
 
-4.容器创建<listener></listener>中的类实例,即创建监听.
+4.容器创建listener中的类实例,即创建监听.
 
 5.在监听中会有contextInitialized(ServletContextEvent args)初始化方法,在这个方法中获得ServletContext = ServletContextEvent.getServletContext();context-param的值 = ServletContext.getInitParameter("context-param的键");
 
