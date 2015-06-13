@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>如何用Octopress在github上建立博客? - NO END FOR LEARNING</title>
+  <title>Spring Web Security 实战 - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="这个问题，我也花了大概半天时间才解决。因为之前有用github做博客，所以算是已经有些经验。 这里提供一些我查的比较有用的资料,方便需要的人查询。 octopress doc 第一手资料当然是Octopress的官方网站，但是实际上不是太好用。 update ruby for mac &hellip;">
+  <meta name="description" content="As you probably know two major areas of application security are &ldquo;authentication&rdquo; and &ldquo;authorization&rdquo; (or &ldquo;access- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io/blog/2013/09/21/how-to-use-octopress-to-set-up-blog-on-github">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/06/12/spring-web-security">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -67,7 +67,7 @@
   
   <header>
     
-      <h1 class="entry-title">如何用Octopress在github上建立博客?</h1>
+      <h1 class="entry-title">Spring Web Security 实战</h1>
     
     
       <p class="meta">
@@ -76,36 +76,31 @@
 
 
 
-<time class='entry-date' datetime='2013-09-21T15:46:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>3:46 pm</span></time>
+<time class='entry-date' datetime='2015-06-12T21:12:38+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:12 pm</span></time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>这个问题，我也花了大概半天时间才解决。因为之前有用github做博客，所以算是已经有些经验。</p>
+<div class="entry-content"><p>As you probably know two major areas of application security are &ldquo;authentication&rdquo; and &ldquo;authorization&rdquo; (or &ldquo;access-control&rdquo;). These are the two main areas that Spring Security targets. &ldquo;Authentication&rdquo; is the process of establishing a principal is who they claim to be (a &ldquo;principal&rdquo; generally means a user, device or some other system which can perform an action in your application).&ldquo;Authorization&rdquo; refers to the process of deciding whether a principal is allowed to perform an action within your application. To arrive at the point where an authorization decision is needed, the identity of the principal has already been established by the authentication process. These concepts are common, and not at all specific to Spring Security.</p>
 
-<p>这里提供一些我查的比较有用的资料,方便需要的人查询。</p>
+<p>HTTPBASICauthenticationheaders(anIETFRFC-basedstandard)
+HTTPDigestauthenticationheaders(anIETFRFC-basedstandard)
+HTTPX.509clientcertificateexchange(anIETFRFC-basedstandard)
+Form-basedauthentication(forsimpleuserinterfaceneeds)</p>
 
-<p><a href="http://octopress.org/docs/">octopress doc</a></p>
+<p>In many of the examples you will see (and in the sample) applications, we will often use &ldquo;security&rdquo; as the default namespace rather than &ldquo;beans&rdquo;, which means we can omit the prefix on all the security namespace elements, making the content easier to read.</p>
 
-<p>第一手资料当然是Octopress的官方网站，但是实际上不是太好用。</p>
+<p>The namespace is designed to capture the most common uses of the framework and provide a simplified and concise syntax for enabling them within an application. The design is based around the large-scale dependencies within the framework, and can be divided up into the following areas:
+• Web/HTTP Security - the most complex part. Sets up the filters and related service beans used to apply the framework authentication mechanisms, to secure URLs, render login and error pages and much more.
+• BusinessObject(Method)Security-optionsforsecuringtheservicelayer.
+• AuthenticationManager-handlesauthenticationrequestsfromotherpartsoftheframework.
+• AccessDecisionManager-providesaccessdecisionsforwebandmethodsecurity.Adefaultonewill be registered, but you can also choose to use a custom one, declared using normal Spring bean syntax.
+• AuthenticationProviders - mechanisms against which the authentication manager authenticates users. The namespace provides supports for several standard options and also a means of adding custom beans declared using a traditional syntax.
+• UserDetailsService - closely related to authentication providers, but often also required by other beans.</p>
 
-<p><a href="http://www.cnblogs.com/simonshi2012/archive/2012/03/30/2425141.html">update ruby for mac</a></p>
-
-<p>需要做一些前期准备，例如更新ruby1.9.3。这里更新ruby，由于repository在国外，所以我用了代理，据说可以改用taobao的，会方便点。</p>
-
-<p><a href="http://code.dblock.org/octopress-setting-up-a-blog-and-contributing-to-an-existing-one">Octopress: Setting up a Blog and Contributing to an Existing One</a></p>
-
-<p>由于官方资料我没有看明白。所以我参考的另外一篇文章成功将文章发布到github。</p>
-
-<p><a href="http://zerodie.github.io/blog/2012/01/19/octopress-github-pages/">Github Page + Octopress</a></p>
-
-<p>还有一篇中文文章可以结合英文的看，虽然看上面一篇英文的就可以了。</p>
-
-<p>这个博客建立好，还是花了很多时间，一个是ruby升级很花时间，二个是学习如何使用Octopress。</p>
-
-<p>今天就写这么多，Octopress还有很多好用的feature，可以在官方网站上找到。</p>
+<p>This provides a hook into the Spring Security web infrastructure. DelegatingFilterProxy is a Spring Framework class which delegates to a filter implementation which is defined as a Spring bean in your application context. In this case, the bean is named &ldquo;springSecurityFilterChain&rdquo;, which is an internal infrastructure bean created by the namespace to handle web security. Note that you should not use this bean name yourself. Once you’ve added this to your web.xml, you’re ready to start editing your application context file.</p>
 </div>
 
 
@@ -121,21 +116,15 @@
 
 
 
-<time class='entry-date' datetime='2013-09-21T15:46:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>3:46 pm</span></time>
+<time class='entry-date' datetime='2015-06-12T21:12:38+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:12 pm</span></time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/octopresstech/'>octopresstech</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2013/09/21/how-to-use-octopress-to-set-up-blog-on-github/" data-via="" data-counturl="http://benweizhu.github.io/blog/2013/09/21/how-to-use-octopress-to-set-up-blog-on-github/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/06/12/spring-web-security/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/06/12/spring-web-security/" >Tweet</a>
   
   
   
@@ -144,8 +133,8 @@
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/blog/2015/06/11/spring-boot-starter-2/" title="Previous Post: Spring Boot 深入浅出系列（二） - 用Gradle启动应用">&laquo; Spring Boot 深入浅出系列（二） - 用Gradle启动应用</a>
       
-        <a class="basic-alignment right" href="/blog/2013/09/22/what-is-spring-ioc/" title="Next Post: 什么是Spring IoC？">什么是Spring IoC？ &raquo;</a>
       
     </p>
   </footer>
@@ -155,7 +144,7 @@
   <section>
     <h1>Comments</h1>
     <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
-<div class="ds-thread" data-title="如何用Octopress在github上建立博客?"></div>
+<div class="ds-thread" data-title="Spring Web Security 实战"></div>
 <script type="text/javascript">
   var duoshuoQuery = {short_name:"benweizhu"};
   (function() {
