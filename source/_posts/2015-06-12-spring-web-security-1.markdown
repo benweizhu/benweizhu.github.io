@@ -39,6 +39,9 @@ Config - spring-security-config.jar
 
 包含security命名空间解析代码。如果你要使用XML方式的配置Security，那么你就会需要它。主要包含的包：org.springframework.security.config。
 
+
+以web应用和xml配置为例，要开始使用Spring Security，需要至少下面的两个依赖，web和config，web会自动依赖于core，所以不用显示的指定core。
+
 {% codeblock lang:groovy %}
 dependencies {
     compile 'org.springframework.security:spring-security-web:3.2.7.RELEASE'
@@ -46,7 +49,9 @@ dependencies {
 }
 {% endcodeblock %}
 
-为了能够支持更多的Spring使用，我们以XML方法来配置Security框架。下面介绍下在Security命名空间下，都有哪些重要的元素节点。
+为了能够支持更多的Spring使用，我们以XML方法来配置Security框架。
+
+下面介绍下在Security命名空间下，都有哪些重要的元素节点。
 
 • Web/HTTP Security - 设置filter和相关的Service Bean，以应用框架的用户认证机制，安全化URL，渲染登录，错误页面等。
 
@@ -59,6 +64,8 @@ dependencies {
 • AuthenticationProviders - 与Authentication Manager相对应的身份认真机制提供方，提供了多种标准选择，同样也支持自定义。
 
 • UserDetailsService - 与authentication providers联系紧密，也会被其他Bean使用。
+
+接下来，我们开始正式写代码。
 
 首先，你需要在web.xml中定义一个名字是springSecurityFilterChain的filter。它提供了一个“钩子“，来启动Spring Security Web的基础架构。DelegatingFilterProxy是Spring框架中一个类，它代理着一个以Spring Bean方式定义在Spring上下文中的filter。在本例中，bean的名字是springSecurityFilterChain，它是Spring提供的内部基础架构Bean，所以，我们定义的一些自定义的Bean的时候，就不可以使用这个名字springSecurityFilterChain。代码如下：
 
