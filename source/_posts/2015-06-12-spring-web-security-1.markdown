@@ -82,7 +82,7 @@ dependencies {
 {% endcodeblock %}
 
 springSecurityFilterChain是由Spring框架定义。
-{% codeblock lang:xml %}
+{% codeblock lang:java %}
 package org.springframework.security.config.annotation.web.configuration;
 public class WebSecurityConfiguration{
 	@org.springframework.context.annotation.Bean(name = {"springSecurityFilterChain"})
