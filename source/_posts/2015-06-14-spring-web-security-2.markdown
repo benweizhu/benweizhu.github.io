@@ -57,7 +57,7 @@ public class LoginController {
 }
 {% endcodeblock %}
 
-最后一步，就是配置http标签的内容，有两点，第一，设置form-login的属性login-page为登录页面的url，第二，设置login页面的访问权限为IS_AUTHENTICATED_ANONYMOUSLY，必须允许非授权用户可以访问，否则怎么登录呢。代码如下：
+最后一步，就是配置http标签的内容，有两点，第一，设置form-login的属性login-page为登录页面的url，第二，设置login页面的访问权限为IS_AUTHENTICATED_ANONYMOUSLY，必须允许匿名用户可以访问，否则怎么登录呢。代码如下：
 
 {% codeblock lang:xml %}
 <security:http>
@@ -76,19 +76,19 @@ public class LoginController {
 
 ##匿名登录
 
-你肯定会问，这和IS_AUTHENTICATED_ANONYMOUSLY有什么区别？这里参考：http://www.mossle.com/docs/auth/html/ch107-anonymous.html
+你肯定会问，上面那样写和IS_AUTHENTICATED_ANONYMOUSLY有什么区别？这里参考：http://www.mossle.com/docs/auth/html/ch107-anonymous.html
 
 ”匿名登录，即用户尚未登录系统，系统会为所有未登录的用户分配一个匿名用户，这个用户也拥有自己的权限，不过他是不能访问任何被保护资源的。
 
 设置一个匿名用户的好处是，我们在进行权限判断时，可以保证SecurityContext中永远是存在着一个权限主体的，启用了匿名登录功能之后，我们所需要做的工作就是从SecurityContext中取出权限主体，然后对其拥有的权限进行校验，不需要每次去检验这个权限主体是否为空了。这样做的好处是我们永远认为请求的主体是拥有权限的，即便他没有登录，系统也会自动为他赋予未登录系统角色的权限，这样后面所有的安全组件都只需要在当前权限主体上进行处理，不用一次一次的判断当前权限主体是否存在。这就更容易保证系统中操作的一致性。“
 
-这种一致性，统一了业务层代码的实现，将匿名用户看做是用户的一种类型，只是访问权限不一样而已。关于它们的优缺点http://www.mossle.com/docs/auth/html/ch107-anonymous.html的最后一部分有介绍。
+这种一致性，统一了业务层代码的实现，将匿名用户看做是用户的一种类型，只是访问权限不一样而已。关于它们的优缺点 http://www.mossle.com/docs/auth/html/ch107-anonymous.html 的最后一部分有介绍。
 
-设置登录后的跳转页面，form-login还提供了两个属性default-target-url和always-use-default-target。如果用户进入登录页面是因为要访问某个受限制的资源，当用户登录后，就会回到该访问资源，但是如果不是，default-target-url，就起到作用，指定了登录后的跳转页面，它的默认值是”/“。always-use-default-target的含义就很简单了，是否永远跳转，不管用户之前访问的资源。
+设置登录后的跳转页面，form-login还提供了两个属性default-target-url和always-use-default-target。如果用户进入登录页面是因为要访问某个受限制的资源，当用户登录后，就会回到该访问资源，但是如果不是，default-target-url，就起到作用，指定了登录后的跳转页面，它的默认值是“/”。always-use-default-target的含义就很简单了，是否永远跳转，不管用户之前访问的资源。
 
 ##处理登出
 
-因为在xml配置中添加了security:logout，所以Spring Security也默认提供了一个登出URL："/j_spring_security_logout"。
+因为在xml配置中添加了security:logout，所以Spring Security也默认提供了一个登出URL：“/j_spring_security_logout”。
 
 ##获得用户名
 
