@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Spring Web Security 实战 (1)- 最少配置启动"
+title: "Spring Web Security 实战 (一) - 最少配置启动"
 date: 2015-06-12 21:12:38 +0800
 comments: true
 categories: 
