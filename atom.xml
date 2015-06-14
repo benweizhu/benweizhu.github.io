@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-06-14T17:01:55+08:00</updated>
+  <updated>2015-06-14T17:05:50+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -102,7 +102,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>最后一步，就是配置http标签的内容，有两点，第一，设置form-login的属性login-page为登录页面的url，第二，设置login页面的访问权限为IS_AUTHENTICATED_ANONYMOUSLY，必须允许非授权用户可以访问，否则怎么登录呢。代码如下：</p>
+<p>最后一步，就是配置http标签的内容，有两点，第一，设置form-login的属性login-page为登录页面的url，第二，设置login页面的访问权限为IS_AUTHENTICATED_ANONYMOUSLY，必须允许匿名用户可以访问，否则怎么登录呢。代码如下：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
