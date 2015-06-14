@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-06-13T11:10:34+08:00</updated>
+  <updated>2015-06-14T12:21:38+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -14,28 +14,154 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Spring Web Security 实战]]></title>
+    <title type="html"><![CDATA[Spring Web Security 实战 - 最少配置启动]]></title>
     <link href="http://benweizhu.github.io/blog/2015/06/12/spring-web-security/"/>
     <updated>2015-06-12T21:12:38+08:00</updated>
     <id>http://benweizhu.github.io/blog/2015/06/12/spring-web-security</id>
-    <content type="html"><![CDATA[<p>As you probably know two major areas of application security are &ldquo;authentication&rdquo; and &ldquo;authorization&rdquo; (or &ldquo;access-control&rdquo;). These are the two main areas that Spring Security targets. &ldquo;Authentication&rdquo; is the process of establishing a principal is who they claim to be (a &ldquo;principal&rdquo; generally means a user, device or some other system which can perform an action in your application).&ldquo;Authorization&rdquo; refers to the process of deciding whether a principal is allowed to perform an action within your application. To arrive at the point where an authorization decision is needed, the identity of the principal has already been established by the authentication process. These concepts are common, and not at all specific to Spring Security.</p>
+    <content type="html"><![CDATA[<p>你大概应该知道对于应用的安全性（无论是Web应用还是非Web应用），都包含两个方面“身份认证”（authentication）和“权限认证”（authorization，access-control）。身份认证是确立“访问者”所声称的“当事人”（principal）的一个过程（当事人可以是一个用户，设备，或者其他任何要在该应用操作的系统）。权限认证指的是确定该“当事人”是否可以在应用执行某一个操作的过程。</p>
 
-<p>HTTPBASICauthenticationheaders(anIETFRFC-basedstandard)
-HTTPDigestauthenticationheaders(anIETFRFC-basedstandard)
-HTTPX.509clientcertificateexchange(anIETFRFC-basedstandard)
-Form-basedauthentication(forsimpleuserinterfaceneeds)</p>
+<p>Spring Security能提供的功能亦围绕着这两个核心概念展开。</p>
 
-<p>In many of the examples you will see (and in the sample) applications, we will often use &ldquo;security&rdquo; as the default namespace rather than &ldquo;beans&rdquo;, which means we can omit the prefix on all the security namespace elements, making the content easier to read.</p>
+<p>在“身份认证”方面，Spring Security能提供什么样的支持呢？如下：</p>
 
-<p>The namespace is designed to capture the most common uses of the framework and provide a simplified and concise syntax for enabling them within an application. The design is based around the large-scale dependencies within the framework, and can be divided up into the following areas:
-• Web/HTTP Security - the most complex part. Sets up the filters and related service beans used to apply the framework authentication mechanisms, to secure URLs, render login and error pages and much more.
-• BusinessObject(Method)Security-optionsforsecuringtheservicelayer.
-• AuthenticationManager-handlesauthenticationrequestsfromotherpartsoftheframework.
-• AccessDecisionManager-providesaccessdecisionsforwebandmethodsecurity.Adefaultonewill be registered, but you can also choose to use a custom one, declared using normal Spring bean syntax.
-• AuthenticationProviders - mechanisms against which the authentication manager authenticates users. The namespace provides supports for several standard options and also a means of adding custom beans declared using a traditional syntax.
-• UserDetailsService - closely related to authentication providers, but often also required by other beans.</p>
+<p>HTTP BASIC authentication headers(an IETF RFC-based standard)   <br/>
+HTTP Digest authentication headers(an IETF RFC-based standard)   <br/>
+HTTPX.509 client certificate exchange(an IETF RFC-based standard)   <br/>
+Form-based authentication(for simple user interface needs)   <br/>
+&hellip;
+更多类型，请参考Spring Security官文。</p>
 
-<p>This provides a hook into the Spring Security web infrastructure. DelegatingFilterProxy is a Spring Framework class which delegates to a filter implementation which is defined as a Spring bean in your application context. In this case, the bean is named &ldquo;springSecurityFilterChain&rdquo;, which is an internal infrastructure bean created by the namespace to handle web security. Note that you should not use this bean name yourself. Once you’ve added this to your web.xml, you’re ready to start editing your application context file.</p>
+<p>好吧，概念性的东西就介绍到这，本篇文章以实战为主，下面我们还是来聊聊大家更关心的实现：</p>
+
+<p>在Spring Security 3.0中，相应的功能代码被分到了不同的Jar包中，以清晰的区分不同的功能和第三方依赖。下面介绍三个主要的Jar包：</p>
+
+<p>Core - spring-security-core.jar</p>
+
+<p>包含核心的“身份认证”和“访问控制”类和接口。任何Spring Security的应用都需要这个包，支持独立应用，远程客户端，方法级别（服务层）的安全，以及JDBC，主要包含下面几个顶级包：      <br/>
+org.springframework.security.core  <br/>
+org.springframework.security.access  <br/>
+org.springframework.security.authentication    <br/>
+org.springframework.security.provisioning</p>
+
+<p>Web - spring-security-web.jar</p>
+
+<p>包含对应的filter和web security相关的基础架构代码。任何与Servlet API相关的依赖。如果你需要Spring Security对web身份认证和URL级别的访问控制的支持，就需要它。里面主要包含的包是：org.springframework.security.web。</p>
+
+<p>Config - spring-security-config.jar</p>
+
+<p>包含security命名空间解析代码。如果你要使用XML方式的配置Security，那么你就会需要它。主要包含的包：org.springframework.security.config。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework.security:spring-security-web:3.2.7.RELEASE&#39;</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework.security:spring-security-config:3.2.7.RELEASE&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>为了能够支持更多的Spring使用，我们以XML方法来配置Security框架。下面介绍下在Security命名空间下，都有哪些重要的元素节点。</p>
+
+<p>• Web/HTTP Security - 设置filter和相关的Service Bean，以应用框架的用户认证机制，安全化URL，渲染登录，错误页面等。</p>
+
+<p>• Business Object(Method) Security - 用来保证业务层的安全。</p>
+
+<p>• Authentication Manager - 处理身份认证请求</p>
+
+<p>• Access Decision Manager - 为web和method提供访问决策。框架提供了一个默认实现，你也可以自定义一个，语法和普通Bean定义一样。</p>
+
+<p>• AuthenticationProviders - 与Authentication Manager相对应的身份认真机制提供方，提供了多种标准选择，同样也支持自定义。</p>
+
+<p>• UserDetailsService - 与authentication providers联系紧密，也会被其他Bean使用。</p>
+
+<p>首先，你需要在web.xml中定义一个名字是springSecurityFilterChain的filter。它提供了一个“钩子“，来启动Spring Security Web的基础架构。DelegatingFilterProxy是Spring框架中一个类，它代理着一个以Spring Bean方式定义在Spring上下文中的filter。在本例中，bean的名字是springSecurityFilterChain，它是Spring提供的内部基础架构Bean，所以，我们定义的一些自定义的Bean的时候，就不可以使用这个名字springSecurityFilterChain。代码如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;filter&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;filter-name&gt;</span>springSecurityFilterChain<span class="nt">&lt;/filter-name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;filter-class&gt;</span>org.springframework.web.filter.DelegatingFilterProxy<span class="nt">&lt;/filter-class&gt;</span>
+</span><span class='line'><span class="nt">&lt;/filter&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;filter-mapping&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;filter-name&gt;</span>springSecurityFilterChain<span class="nt">&lt;/filter-name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;url-pattern&gt;</span>/*<span class="nt">&lt;/url-pattern&gt;</span>
+</span><span class='line'><span class="nt">&lt;/filter-mapping&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>springSecurityFilterChain是由Spring框架定义。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>package org.springframework.security.config.annotation.web.configuration;
+</span><span class='line'>public class WebSecurityConfiguration{
+</span><span class='line'>  @org.springframework.context.annotation.Bean(name = {&quot;springSecurityFilterChain&quot;})
+</span><span class='line'>  public javax.servlet.Filter springSecurityFilterChain() throws java.lang.Exception { /* compiled code */ }  
+</span><span class='line'>}
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>做完上面的”钩子”配置，你就可以正式开始Spring上下文的定义。首先来配置Web/HTTP Security节点部分“http”：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;ROLE_USER&#39;)&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;form-login/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;logout/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/http&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面是使得Spring Security工作的最小http节点配置。安全拦截所有应用中的URL，要求访问者（“当事人”）含有ROLE_USER权限，要求使用带有用户名和密码的表单登录，并提供一个登出的URL。上面的pattern可以使用正则表达式来匹配对应路径，access中的hasRole必须配合use-expressions=&ldquo;true&#8221;才能使用（4.0以上有所不同）。如果提供多种权限，ROLE_USER后面可以以逗号分隔以允许多种权限（如果是4.0以上版本，Spring会自动给hasRole中的值加上ROLE_作为前缀，所以需要注意）。</p>
+
+<p>这里允许定义多个intercept-url以应对不同的url，比如，css，js的访问，自定义登陆页面的访问，等。由于该intercept-url会根据定义的先后顺序来解析输入的url，所以，越明确的url模式，越应该放在前面。</p>
+
+<p>note：如果你对filter比较熟悉，你应该能明白intercept-url其实是在配置FilterChainProxy所使用的filter。</p>
+
+<p>接下来，需要配置Authentication Manager：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;authentication-provider&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;user-service&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;ben&quot;</span> <span class="na">password=</span><span class="s">&quot;ben&quot;</span> <span class="na">authorities=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/user-service&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/authentication-provider&gt;</span>
+</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>authentication-provider和user-service分别创建了两个bean，DaoAuthenticationProvider和InMemoryDaoImpl。它们作为authentication-manager的子元素存在，而authentication-manager则创建了一个ProviderManager的Bean，并将authentication-provider注册到该ProviderManager。理解这段代码的含义很简单，一个用户ben，密码ben，拥有ROLE_USER这个权限。</p>
+
+<p>你还可以通过user-service上的properties属性来指定一个properties文件作为用户定义的输入。</p>
+
+<p>到此，你就完成了一个最简单的Spring Web Security的配置。拦截所有url，需要输入用户名和密码登录访问。</p>
+
+<p>参考资料：   <br/>
+1. Spring Security Reference。</p>
 ]]></content>
   </entry>
   
