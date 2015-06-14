@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-06-14T17:06:38+08:00</updated>
+  <updated>2015-06-14T17:07:51+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -136,13 +136,13 @@
 
 <p>设置一个匿名用户的好处是，我们在进行权限判断时，可以保证SecurityContext中永远是存在着一个权限主体的，启用了匿名登录功能之后，我们所需要做的工作就是从SecurityContext中取出权限主体，然后对其拥有的权限进行校验，不需要每次去检验这个权限主体是否为空了。这样做的好处是我们永远认为请求的主体是拥有权限的，即便他没有登录，系统也会自动为他赋予未登录系统角色的权限，这样后面所有的安全组件都只需要在当前权限主体上进行处理，不用一次一次的判断当前权限主体是否存在。这就更容易保证系统中操作的一致性。“</p>
 
-<p>这种一致性，统一了业务层代码的实现，将匿名用户看做是用户的一种类型，只是访问权限不一样而已。关于它们的优缺点<a href="http://www.mossle.com/docs/auth/html/ch107-anonymous.html%E7%9A%84%E6%9C%80%E5%90%8E%E4%B8%80%E9%83%A8%E5%88%86%E6%9C%89%E4%BB%8B%E7%BB%8D%E3%80%82">http://www.mossle.com/docs/auth/html/ch107-anonymous.html%E7%9A%84%E6%9C%80%E5%90%8E%E4%B8%80%E9%83%A8%E5%88%86%E6%9C%89%E4%BB%8B%E7%BB%8D%E3%80%82</a></p>
+<p>这种一致性，统一了业务层代码的实现，将匿名用户看做是用户的一种类型，只是访问权限不一样而已。关于它们的优缺点 <a href="http://www.mossle.com/docs/auth/html/ch107-anonymous.html">http://www.mossle.com/docs/auth/html/ch107-anonymous.html</a> 的最后一部分有介绍。</p>
 
-<p>设置登录后的跳转页面，form-login还提供了两个属性default-target-url和always-use-default-target。如果用户进入登录页面是因为要访问某个受限制的资源，当用户登录后，就会回到该访问资源，但是如果不是，default-target-url，就起到作用，指定了登录后的跳转页面，它的默认值是”/“。always-use-default-target的含义就很简单了，是否永远跳转，不管用户之前访问的资源。</p>
+<p>设置登录后的跳转页面，form-login还提供了两个属性default-target-url和always-use-default-target。如果用户进入登录页面是因为要访问某个受限制的资源，当用户登录后，就会回到该访问资源，但是如果不是，default-target-url，就起到作用，指定了登录后的跳转页面，它的默认值是“/”。always-use-default-target的含义就很简单了，是否永远跳转，不管用户之前访问的资源。</p>
 
 <h2>处理登出</h2>
 
-<p>因为在xml配置中添加了security:logout，所以Spring Security也默认提供了一个登出URL：&#8221;/j_spring_security_logout&#8221;。</p>
+<p>因为在xml配置中添加了security:logout，所以Spring Security也默认提供了一个登出URL：“/j_spring_security_logout”。</p>
 
 <h2>获得用户名</h2>
 
