@@ -9,10 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="什么是构建工具? 一个可编程的工具，能够以可执行和有序的任务来表达满足需要的自动化过程。 以Java为例，要得到一个简单可运行的Jar文件，需要下面几步： 1.编译源代码
-2.运行测试（前提是你有测试）
-3.拷贝Class文件到目标目录
-4.打包Class文件为Jar文件 &hellip;">
+  <meta name="description" content="没有介绍Gradle的基础知识，直接开始实战，目的是为了更快的让大家开始使用Gradle做构建，快速上手，当需要实现的自动化需求更复杂时，在深入学习基础知识。 这一篇，我们直接开始Java插件的使用。 应用Java插件 Gradle是一个通用构建工具，也就是说，它不单是为Java而生。比如， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +64,223 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/01/31/deep-into-gradle-in-action-2/">Gradle深入与实战（二）Java插件</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-31T13:57:55+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>1:57 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>没有介绍Gradle的基础知识，直接开始实战，目的是为了更快的让大家开始使用Gradle做构建，快速上手，当需要实现的自动化需求更复杂时，在深入学习基础知识。</p>
+
+<p>这一篇，我们直接开始Java插件的使用。</p>
+
+<h3>应用Java插件</h3>
+
+<p>Gradle是一个通用构建工具，也就是说，它不单是为Java而生。比如，还可以做Groovy，Scala的构建。这取决于你使用什么样的插件。</p>
+
+<p>大部分Java项目的基本步骤都非常类似，编译Java源代码，运行单元测试，拷贝生成的class文件到目标目录，打包Jar文件（或者War包，Ear包），而这些重复且约定俗成的任务，如果可以不用写一行构建代码就实现，是多么的棒！Maven就做到这一点，采用约定由于配置的思想，预先定义常用的任务，并定义它们的执行顺序。</p>
+
+<p>Gradle吸收了Maven的这个优点，通过插件，实现预定义任务和任务之间依赖关系的导入，这样就可以在一行代码都不写的情况下（如果应用插件，你觉得也算一行的话，那就写一行吧），直接使用已经定义的任务。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>SourceSet和项目布局</h3>
+
+<p>就和Maven一样，在默认的情况下，项目的目录结构是固定的Java世界的标准项目目录布局，只不过Maven的不可以改，但是Gradle可以改。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">src</span> <span class="o">{</span><span class="c1">//目录结构而已，不是代码</span>
+</span><span class='line'>   <span class="n">main</span> <span class="o">{</span>
+</span><span class='line'>       <span class="n">java</span>
+</span><span class='line'>       <span class="n">resources</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>   <span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>       <span class="n">java</span>
+</span><span class='line'>       <span class="n">resources</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Java插件引入了一个概念叫做SourceSets，它代表了一组源文件，通过修改SourceSets中的属性，可以指定哪些源文件（或文件夹下的源文件）要被编译，哪些源文件要被排除。Gradle就是通过它实现Java项目的布局定义。</p>
+
+<p>Java插件默认实现了两个SourceSet，main和test。每个SourceSet都提供了一系列的属性，通过这些属性，可以定义该SourceSet所包含的源文件。比如，java.srcDirs，resources.srcDirs。Java插件中定义的其他任务，就根据main和test的这两个SourceSet的定义来寻找产品代码和测试代码等。</p>
+
+<p>在构建脚本中，怎么样定义或者修改SourceSet呢？Gradle提供了一系列的DSL，可以让你方便的定义或者修改配置。比如，sourceSets的DSL。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">main</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="s1">&#39;src/java&#39;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="s1">&#39;src/resources&#39;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的这个例子，在sourceSets中，修改了Java插件中已经定义的SourceSet main，修改了它的java.srcDir和resources.srcDir。于是，项目的目录结构就改变了。</p>
+
+<p>改变Java插件中预定义的项目目录结构，不是我们最终的目的，因为它是目前Java世界，标准的项目布局，或者说大家都遵守的项目布局。</p>
+
+<p>sourceSets最主要的作用是增加新的目录约定，比如，你想要定义一个新的SourceSet来管理集成测试的源文件，这样可以将单元测试和集成测试分开管理。</p>
+
+<p>至于，关于具体如何为集成测试写一个新的SourceSet会在后面介绍依赖管理时举例说明。</p>
+
+<h3>Java插件提供的任务</h3>
+
+<p>Java插件提供了一系列的任务给你使用，包括编译，运行测试，打包等等。当你在项目中应用Java插件时，就已经将这些任务集成到你的项目中了。</p>
+
+<p>在命令行中，运行gradle tasks命令，可以查看当前项目下主要的task。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">Build</span> <span class="n">tasks</span>
+</span><span class='line'><span class="n">assemble</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="n">the</span> <span class="n">outputs</span> <span class="n">of</span> <span class="n">this</span> <span class="n">project</span><span class="o">.</span>
+</span><span class='line'><span class="n">build</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="ow">and</span> <span class="n">tests</span> <span class="n">this</span> <span class="n">project</span><span class="o">.</span>
+</span><span class='line'><span class="n">buildDependents</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="ow">and</span> <span class="n">tests</span> <span class="n">this</span> <span class="n">project</span> <span class="ow">and</span> <span class="nb">all</span> <span class="n">projects</span> <span class="n">that</span> <span class="n">depend</span> <span class="n">on</span> <span class="n">it</span><span class="o">.</span>
+</span><span class='line'><span class="n">buildNeeded</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="ow">and</span> <span class="n">tests</span> <span class="n">this</span> <span class="n">project</span> <span class="ow">and</span> <span class="nb">all</span> <span class="n">projects</span> <span class="n">it</span> <span class="n">depends</span> <span class="n">on</span><span class="o">.</span>
+</span><span class='line'><span class="n">clean</span> <span class="o">-</span> <span class="n">Deletes</span> <span class="n">the</span> <span class="n">build</span> <span class="n">directory</span><span class="o">.</span>
+</span><span class='line'><span class="n">jar</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="n">a</span> <span class="n">jar</span> <span class="n">archive</span> <span class="n">containing</span> <span class="n">the</span> <span class="n">main</span> <span class="n">classes</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Documentation</span> <span class="n">tasks</span>
+</span><span class='line'><span class="n">javadoc</span> <span class="o">-</span> <span class="n">Generates</span> <span class="n">Javadoc</span> <span class="n">API</span> <span class="n">documentation</span> <span class="k">for</span> <span class="n">the</span> <span class="n">main</span> <span class="n">source</span> <span class="n">code</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Verification</span> <span class="n">tasks</span>
+</span><span class='line'><span class="n">check</span> <span class="o">-</span> <span class="n">Runs</span> <span class="nb">all</span> <span class="n">checks</span><span class="o">.</span>
+</span><span class='line'><span class="n">test</span> <span class="o">-</span> <span class="n">Runs</span> <span class="n">the</span> <span class="n">unit</span> <span class="n">tests</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>你可以对比Java插件应用前和应用后该命令的输出，Java插件提供的任务有很多，至于每个任务是做什么，这里就不赘述了。</p>
+
+<p>Java插件除了为你预定义这些任务，该预定义了这些任务之间的依赖关系。如下图：</p>
+
+<p><img src="http://gradle.org/docs/current/userguide/img/javaPluginTasks.png"></p>
+
+<p>你也可以通过命令gradle tasks &ndash;all来查看每个task各自有什么依赖。</p>
+
+<p>当然，这里还是重点提下，Java插件中四个重要和常用的任务，assemble，check，build，clean。</p>
+
+<p><strong>assemble</strong> <br/>
+All archive tasks in the project, including jar. Some plugins add additional archive tasks to the project. <br/>
+<strong>check</strong> <br/>
+All verification tasks in the project, including test. Some plugins add additional verification tasks to the project. <br/>
+<strong>build</strong> <br/>
+check and assemble   <br/>
+<strong>clean</strong>  <br/>
+Deletes the project build directory.</p>
+
+<p>assemble被用来产生Jar文件，输出目录在build/libs下。</p>
+
+<p>check用来运行所有的验收任务，包括test任务，以及其他验收任务，比如checkstyle。</p>
+
+<h3>Tips：在命令行中运行单个测试</h3>
+
+<p>JAVA插件中的test任务提供了一个filter属性，可以帮助指定运行test任务时，什么测试源文件要包含，什么要排除。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">filter</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">//include specific method in any of the tests</span>
+</span><span class='line'>        <span class="n">includeTestsMatching</span> <span class="s2">&quot;*UiCheck&quot;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">//include all tests from package</span>
+</span><span class='line'>        <span class="n">includeTestsMatching</span> <span class="s2">&quot;org.gradle.internal.*&quot;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">//include all integration tests</span>
+</span><span class='line'>        <span class="n">includeTestsMatching</span> <span class="s2">&quot;*IntegTest&quot;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然一般情况下，你不会这么去做。</p>
+
+<p>但重点是，你可以通过<strong>命令行传递的参数</strong>来指定这个matching规则，这样你就可以通过命令行来指定跑某一类测试，或者单个测试。你一定遇到过，某个测试在命令行中可以运行，在IDE中不能运行，或者反过来。这时，你可以不会想要跑全部的测试来验证某一个测试。于是，你就可以通过命令行来运行某一个测试：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">gradle</span> <span class="n">test</span> <span class="o">--</span><span class="n">tests</span> <span class="n">org</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">SomeTest</span><span class="o">.</span><span class="na">someSpecificFeature</span>
+</span><span class='line'><span class="n">gradle</span> <span class="n">test</span> <span class="o">--</span><span class="n">tests</span> <span class="o">*</span><span class="n">IntegTest</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>到目前为止，你已经了解了Java插件提供的一些核心功能和有用小技巧。虽然还未涉及到Jar任务和uploadfile任务（这些任务当需要时，再去看就行了），但是就启动项目而言，对Java插件的使用所需要了解的知识已经足够了。</p>
+
+<p>下一节，讲解依赖管理</p>
+
+<p>参考资料： <br/>
+1.Gradle官方文档</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -187,232 +401,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/01/23/yes-angularjs-8/">开始！AngularJS!（八）- 路由</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-01-23T22:18:10+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>10:18 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>传统的Web应用，以Java栈为例，无论是纯Servlet还是MVC框架，比如，SpringMVC，Struts。在页面上的导航都比较简单，只需要在浏览器地址栏输入URL，一个URL用来指向服务器上一个单一的物理资源（页面文件）。当页面加载后，就可以点击链接跳转到其他资源，或者使用前进后退按钮跳转到已访问的页面。</p>
-
-<p>通过修改DOM，动态生成页面的Web应用改变了这一现状，因为对页面内容的改变是直接对页面DOM元素的修改，而不是向服务器发出请求。于是，前进后退按钮在这种情况受到了影响。</p>
-
-<h2>URL</h2>
-
-<p>那么，对于单页应用，如何能够修改浏览器的URL，让浏览器可以前进后退，但是又不会向服务器发出请求？</p>
-
-<h3>HashBang URL</h3>
-
-<p>通过修改URL定制中#符号后面的部分，而不会触发当前页面重新加载。比如， <a href="http://localhost:3000/#/user/123">http://localhost:3000/#/user/123</a> ，浏览器会选取URL中#号后面的差异部分来提供前进后退。</p>
-
-<h3>另一种方式，HTML5的historyAPI</h3>
-
-<p>这里首先要说明浏览器的前进和后退都依赖于浏览器的history堆栈（window.history对象），保证浏览器history堆栈的记录正确，前进后退的按钮就可以正常工作。HTML5中的history正好提供了方法来将URL推送到浏览器的history堆栈。然后只要监听window.onpopstate事件就可以修改应用的状态。</p>
-
-<p>但是当直接在服务器上输入URL时，还是会向服务器发送请求，这个时候还需要在服务器端做些事情，让服务器始终返回应用首页。所以这种方式会相对麻烦一些。</p>
-
-<p>当看到#号，你可能会想到另一个东西，HTML中的锚点，定位页面的位置。在HashBang方式下，需要借助AngularJS的一个服务$anchorScroll以及两个#来实现锚点。比如 <a href="http://localhost:3000/#/user/123#name">http://localhost:3000/#/user/123#name</a></p>
-
-<h2>使用AngularJS的路由服务</h2>
-
-<p>AngularJS内置了$route服务来处理Web应用的路由，并通过ng-view指令来显示匹配路由的内容，看下面的例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;routeApp&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;#/admin&quot;</span><span class="nt">&gt;</span>admin<span class="nt">&lt;/a&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-view</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>被插入的模板，动态渲染部分</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;adminController&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>   I am admin.
-</span><span class='line'><span class="nt">&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;routeApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngRoute&#39;</span><span class="p">])</span>
-</span><span class='line'><span class="p">.</span><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$routeProvider</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/admin&#39;</span><span class="p">,</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/admin/admin.html&#39;</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'><span class="p">}])</span>
-</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;adminController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{}</span>
-</span><span class='line'><span class="p">]);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里引入了.config方法，需要穿插介绍一点知识：模块的生命周期。AngularJS将模块的生命周期分为两个阶段，配置阶段和运行阶段。其中模块的.config方法可以用来注册一些需要在模块加载时候执行的动作或者进行的配置，比如这里的路由配置。</p>
-
-<p>AngularJS的路由服务在angular-route.js中，所以首先需要引入它，然后引入子模块ngRoute，在config方法中注入$routeProvider服务，然后剩下的就很清楚了，和Java技术栈中道理一样，URL和资源文件的Mapping。</p>
-
-<p>ng-view指令可以通过当前匹配的路由找到要显示的内容。</p>
-
-<h3>URL查询参数</h3>
-
-<p><a href="http://localhost:3000/#/user?id=123">http://localhost:3000/#/user?id=123</a> 或者 <a href="http://localhost:3000/#/user/123">http://localhost:3000/#/user/123</a></p>
-
-<p>几乎所有Web应用，遇到这样的URL是太平常的事情了，那么这种动态的URL应该怎么匹配呢？在AngularJS中，URL中任何以冒号（:）开头的字符串都会作为通配符。无论是这里的$routeProvider.when(/user/id=:userid)还是之后会介绍的与后端restful api通信的$resource服务在定义URL的时候。</p>
-
-<p>那么如何在controller中获取该参数呢？$routeParams服务。我们可以在controller中注入该服务，看下面的例子。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;routeApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngRoute&#39;</span><span class="p">])</span>
-</span><span class='line'><span class="p">.</span><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$routeProvider</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/user/:userid&#39;</span><span class="p">,</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/user/user.html&#39;</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'><span class="p">}])</span>
-</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;userController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope, &#39;</span><span class="nx">$routeParams</span><span class="err">&#39;</span><span class="p">,</span>
-</span><span class='line'>       <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$routeParams</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>          <span class="nx">$scope</span><span class="p">.</span><span class="nx">userid</span> <span class="o">=</span> <span class="nx">$routeParams</span><span class="p">.</span><span class="nx">userid</span><span class="p">;</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'><span class="p">]);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>多个控制器重用模块</h3>
-
-<p>在上面的例子中，url对应的页面文件是这样的：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;adminController&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>   I am admin.
-</span><span class='line'><span class="nt">&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>模板的作用域固定为adminController的，如果不同路由下的其他controller也想用该模块，那么就得重新建一个新的html文件。</p>
-
-<p>还有一种办法，就是将controller的声明放在路由的定义中。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div&gt;</span>
-</span><span class='line'>   I am admin.
-</span><span class='line'><span class="nt">&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;routeApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngRoute&#39;</span><span class="p">])</span>
-</span><span class='line'><span class="p">.</span><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$routeProvider</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/admin&#39;</span><span class="p">,</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/admin/adminOrSuperUser.html&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;adminController&#39;</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/superUser&#39;</span><span class="p">,</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/admin/adminOrSuperUser.html&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;superUserController&#39;</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'><span class="p">}])</span>
-</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;adminController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{}</span>
-</span><span class='line'><span class="p">])</span>
-</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;superUserController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{}</span>
-</span><span class='line'><span class="p">]);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这样多个控制器就可以使用相同的模板。</p>
-
-<h3>指定默认路由</h3>
-
-<p>就和编程语言中的switch一样，在$routeProvider还提供了otherwise方法来设置默认路由，很明显它只能是一个，一般的做法是通过redirectTo属性，跳转到一个已有的路由上。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">$routeProvider</span><span class="p">.</span><span class="nx">otherwise</span><span class="p">({</span><span class="nx">redirectTo</span><span class="o">:</span> <span class="s1">&#39;/home&#39;</span><span class="p">});</span>
-</span><span class='line'><span class="p">}]);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>下一节，学习通过$Resource与后端restful的API通信。</p>
-
-<p>参考资料：</p>
-
-<ol>
-<li>精通AngularJS</li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/10">&larr; Older</a>
@@ -436,6 +424,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/06/14/spring-web-security-2/">Spring Web Security 实战 (二) - 自定义登录页面</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/06/12/spring-web-security-1/">Spring Web Security 实战 (一) - 最少配置启动</a>
       </li>
     
@@ -449,10 +441,6 @@
     
       <li class="post">
         <a href="/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-preinsert-and-preupdate/">当Entity继承遇到Hibernate的@PrePersist和@PreUpdate</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/05/21/write-unit-test-in-angularjs/">在AngularJS环境下写单元测试：module，inject和$httpBackend</a>
       </li>
     
   </ul>
