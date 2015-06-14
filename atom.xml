@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-06-14T12:21:38+08:00</updated>
+  <updated>2015-06-14T12:22:19+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -14,10 +14,10 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Spring Web Security 实战 - 最少配置启动]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/06/12/spring-web-security/"/>
+    <title type="html"><![CDATA[Spring Web Security 实战 (1)- 最少配置启动]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/06/12/spring-web-security-1/"/>
     <updated>2015-06-12T21:12:38+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/06/12/spring-web-security</id>
+    <id>http://benweizhu.github.io/blog/2015/06/12/spring-web-security-1</id>
     <content type="html"><![CDATA[<p>你大概应该知道对于应用的安全性（无论是Web应用还是非Web应用），都包含两个方面“身份认证”（authentication）和“权限认证”（authorization，access-control）。身份认证是确立“访问者”所声称的“当事人”（principal）的一个过程（当事人可以是一个用户，设备，或者其他任何要在该应用操作的系统）。权限认证指的是确定该“当事人”是否可以在应用执行某一个操作的过程。</p>
 
 <p>Spring Security能提供的功能亦围绕着这两个核心概念展开。</p>
