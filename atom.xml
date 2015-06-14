@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-06-14T12:28:53+08:00</updated>
+  <updated>2015-06-14T12:30:18+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -112,11 +112,11 @@ org.springframework.security.provisioning</p>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>package org.springframework.security.config.annotation.web.configuration;
-</span><span class='line'>public class WebSecurityConfiguration{
-</span><span class='line'>  @org.springframework.context.annotation.Bean(name = {&quot;springSecurityFilterChain&quot;})
-</span><span class='line'>  public javax.servlet.Filter springSecurityFilterChain() throws java.lang.Exception { /* compiled code */ }  
-</span><span class='line'>}
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">security</span><span class="o">.</span><span class="na">config</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">configuration</span><span class="o">;</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebSecurityConfiguration</span><span class="o">{</span>
+</span><span class='line'>  <span class="nd">@org.springframework.context.annotation.Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="o">{</span><span class="s">&quot;springSecurityFilterChain&quot;</span><span class="o">})</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">javax</span><span class="o">.</span><span class="na">servlet</span><span class="o">.</span><span class="na">Filter</span> <span class="nf">springSecurityFilterChain</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Exception</span> <span class="o">{</span> <span class="cm">/* compiled code */</span> <span class="o">}</span>   
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
