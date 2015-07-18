@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="Web Service是一种独立的、低耦合的Web服务，它由几个核心技术组成：XML、XSD、WSDL、SOAP、UDDI。我们根据这些知识点，来一个个的学习。 XML 呵呵，这个太简单了，这个没什么好谈的，跳过。 XSD XSD（XML Schema Definition）是DTD（ &hellip;">
+  <meta name="description" content="JDBC（Java Data Base Connectivity，Java数据库连接）是一种用于执行SQL语句的Java API，可以为多种关系数据库提供统一访问，它由一组用Java语言编写的类和接口组成。 API 先来了解JDBC中几个非常重要的API（以下内容来自JDBC API中文文档， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/05/11/spring-web-service-by-example/">Spring Web Service by Example</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/07/06/learning-jdbc-from-class-forname-to-datasource/">再次了解JDBC（上）- 从Class.forName到DataSource</a></h1>
     
     
       <p class="meta">
@@ -79,535 +79,30 @@
 
 
 
-<time class='entry-date' datetime='2014-05-11T17:05:00+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>5:05 pm</span></time>
+<time class='entry-date' datetime='2014-07-06T18:21:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>6:21 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Web Service是一种独立的、低耦合的Web服务，它由几个核心技术组成：XML、XSD、WSDL、SOAP、UDDI。我们根据这些知识点，来一个个的学习。</p>
+  <div class="entry-content"><p>JDBC（Java Data Base Connectivity，Java数据库连接）是一种用于执行SQL语句的Java API，可以为多种关系数据库提供统一访问，它由一组用Java语言编写的类和接口组成。</p>
 
-<h2><strong>XML</strong></h2>
+<h2><strong>API</strong></h2>
 
-<p>呵呵，这个太简单了，这个没什么好谈的，跳过。</p>
+<p>先来了解JDBC中几个非常重要的API（以下内容来自JDBC API中文文档，但未完全拷贝，建议还是阅读一下）：</p>
 
-<h2><strong>XSD</strong></h2>
+<p><strong>java.sql.DriverManager（类）</strong>：管理一组 JDBC 驱动程序的基本服务。（注：DataSource 接口是 JDBC 2.0 API 中的新增内容，它提供了连接到数据源的另一种方法。使用 DataSource 对象是连接到数据源的首选方法。）作为初始化的一部分，DriverManager 类会尝试加载在 &ldquo;jdbc.drivers&rdquo; 系统属性中引用的驱动程序类。这允许用户定制由他们的应用程序使用的 JDBC Driver。应用程序不再需要使用 Class.forName() 显式地加载 JDBC 驱动程序。当前使用 Class.forName() 加载 JDBC 驱动程序的现有程序将在不作修改的情况下继续工作。在调用getConnection方法时，DriverManager会试着从初始化时加载的那些驱动程序以及使用与当前applet或应用程序相同的类加载器显式加载的那些驱动程序中查找合适的驱动程序。</p>
 
-<p>XSD（XML Schema Definition）是DTD（Document Type Definition）的替代品，作用是定义XML文档的合法构建模块。</p>
+<p><strong>java.sql.Connection（接口）</strong>：与特定数据库的连接（会话）。在连接上下文中执行 SQL 语句并返回结果。（注：在配置 Connection 时，JDBC 应用程序应该使用适当的Connection方法，比如setAutoCommit或setTransactionIsolation。在有可用的JDBC方法时，应用程序不能直接调用 SQL 命令更改连接的配置。默认情况下，Connection对象处于自动提交模式下，这意味着它在执行每个语句后都会自动提交更改。如果禁用了自动提交模式，那么要提交更改就必须显式调用commit方法；否则无法保存数据库更改。）</p>
 
-<p>它能够做的事情有很多：</p>
+<p><strong>java.sql.Statement（接口）</strong>：用于执行静态SQL语句并返回它所生成结果的对象。</p>
 
-<ol>
-<li>定义可出现在文档中的元素</li>
-<li>定义可出现在文档中的属性</li>
-<li>定义哪个元素是子元素</li>
-<li>定义子元素的次序</li>
-<li>定义子元素的数目</li>
-<li>定义元素是否为空，或者是否可包含文本</li>
-<li>定义元素和属性的数据类型</li>
-<li>定义元素和属性的默认值以及固定值</li>
-</ol>
+<p><strong>java.sql.ResultSet（接口）</strong>：表示数据库结果集的数据表，通常通过执行查询数据库的语句生成。ResultSet对象具有指向其当前数据行的光标。最初，光标被置于第一行之前。next方法将光标移动到下一行；因为该方法在ResultSet对象没有下一行时返回false，所以可以在while循环中使用它来迭代结果集。默认的ResultSet对象不可更新，仅有一个向前移动的光标。因此，只能迭代它一次，并且只能按从第一行到最后一行的顺序进行。ResultSet 接口提供用于从当前行获取列值的获取方法（getBoolean、getLong 等）。可以使用列的索引编号或列的名称获取值。一般情况下，使用列索引较为高效。列从1开始编号。为了获得最大的可移植性，应该按从左到右的顺序读取每行中的结果集列，每列只能读取一次。对于获取方法，JDBC 驱动程序尝试将底层数据转换为在获取方法中指定的Java类型，并返回适当的Java值。JDBC规范有一个表，显示允许的从SQL类型到ResultSet获取方法所使用的Java类型的映射关系。</p>
 
+<p><strong>java.sql.Driver（接口）</strong>：每个驱动程序类必须实现的接口。Java SQL框架允许多个数据库驱动程序。每个驱动程序都应该提供一个实现 Driver 接口的类。DriverManager会试着加载尽可能多的它可以找到的驱动程序，然后，对于任何给定连接请求，它会让每个驱动程序依次试着连接到目标URL。强烈建议每个Driver类应该是小型的并且是单独的，这样就可以在不必引入大量支持代码的情况下加载和查询Driver类。在加载某一Driver类时，它应该创建自己的实例并向DriverManager注册该实例。这意味着用户可以通过调用以下程序加载和注册一个驱动程序Class.forName(&ldquo;foo.bah.Driver&rdquo;)。</p>
 
-<p>&hellip;.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;xs:schema</span> <span class="na">xmlns:xs=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema&quot;</span>
-</span><span class='line'>           <span class="na">targetNamespace=</span><span class="s">&quot;http://benweizhu.github.io&quot;</span>
-</span><span class='line'>           <span class="na">elementFormDefault=</span><span class="s">&quot;qualified&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;SearchBookRequest&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;xs:complexType&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;xs:sequence&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;author&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span> <span class="na">minOccurs=</span><span class="s">&quot;0&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;/xs:sequence&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/xs:complexType&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/xs:element&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;SearchBookResponse&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;xs:complexType&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;xs:sequence&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;id&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:int&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;/xs:sequence&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/xs:complexType&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/xs:element&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/xs:schema&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>我们来分析一下这个schema的含义：</p>
-
-<p>（1）xmlns:xs= &ldquo;<a href="http://www.w3.org/2001/XMLSchema">http://www.w3.org/2001/XMLSchema</a>&#8220;，它表示在这个schema中使用的元素，例如element，complexType，sequence等，都来自于命名空间&#8221;<a href="http://www.w3.org/2001/XMLSchema">http://www.w3.org/2001/XMLSchema</a>&#8220;，并且在使用这些元素时，要以xs最为前缀。</p>
-
-<p>（2）targetNamespace= &ldquo;<a href="http://benweizhu.github.io">http://benweizhu.github.io</a>&#8220;，它表示在这个schema中定义的元素，例如SearchBookRequest，name，author等，都是来自于命名空间&#8221;<a href="http://benweizhu.github.io">http://benweizhu.github.io</a>&#8220;。它表示在基于该schema构建XML时，XML中使用的元素来自于该命名空间。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;z:SearchBookRequest</span> <span class="na">xmlns:z=</span><span class="s">&quot;http://benweizhu.github.io&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;z:name&gt;</span>SpringWebService<span class="nt">&lt;/z:name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;z:author&gt;</span>Spring<span class="nt">&lt;/z:author&gt;</span>
-</span><span class='line'><span class="nt">&lt;/z:SearchBookRequest&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>（3）xmlns=&ldquo;<a href="http://benweizhu.github.io">http://benweizhu.github.io</a>&#8220;，指定了一个默认的命名空间，什么意思呢？就是说如果schema中使用的元素，没有xs这样前缀，则都是来自于这个默认的命名空间的。</p>
-
-<p>（4）elementFormDefault=&ldquo;qualified&#8221;，指出任何在XML实例文档所使用的元素，只要在此schema中声明过，就必须被命名空间限定。</p>
-
-<p>（5）&lt;xs:element name=&ldquo;xxx&rdquo; type=&ldquo;yyy&rdquo;/>，此处 xxx 指元素的名称，yyy 指元素的数据类型。XML Schema 拥有很多内建的数据类型。最常用的类型有：</p>
-
-<ul>
-<li> xs:string</li>
-<li> xs:decimal</li>
-<li> xs:integer</li>
-<li> xs:boolean</li>
-<li> xs:date</li>
-<li> xs:time</li>
-</ul>
-
-
-<p>（6）复杂元素，定义复杂元素的方式有两种，例子已经在上面给出，一种是直接在元素内部定义，一种是通过type引用该复杂类型。</p>
-
-<p>（7）属性，element元素包含有很多的属性，例如，minOccurs=&ldquo;0&#8221;，它表示出现最少次数为0，就是说这个元素是optional的，可选的。</p>
-
-<h2><strong>SOAP</strong></h2>
-
-<p>SOAP（Simple Object Access Protocol，简单对象访问协议），是交换数据的一种协议规范，它是一种通信协议，基于XML，用于发送和接受消息，它是真正在WebService的服务端和客户端传送的信息。</p>
-
-<p>SOAP使用应用层协议作为其传输协议。SMTP以及HTTP协议都可以用来传输SOAP消息，但是由于HTTP在如今的因特网结构中工作得很好，特别是在网络防火墙下仍然正常工作，所以被广泛采纳。</p>
-
-<p>SOAP基于XML，所以归根到底，SOAP发送的消息就是一个XML格式的文档消息。</p>
-
-<p>一条SOAP消息的基本结构如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;soap:Envelope</span>
-</span><span class='line'><span class="na">xmlns:soap=</span><span class="s">&quot;http://www.w3.org/2001/12/soap-envelope&quot;</span>
-</span><span class='line'><span class="na">soap:encodingStyle=</span><span class="s">&quot;http://www.w3.org/2001/12/soap-encoding&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;soap:Header&gt;</span>
-</span><span class='line'>  ...
-</span><span class='line'><span class="nt">&lt;/soap:Header&gt;</span>
-</span><span class='line'><span class="nt">&lt;soap:Body&gt;</span>
-</span><span class='line'>  ...
-</span><span class='line'>  <span class="nt">&lt;soap:Fault&gt;</span>
-</span><span class='line'>    ...
-</span><span class='line'>  <span class="nt">&lt;/soap:Fault&gt;</span>
-</span><span class='line'><span class="nt">&lt;/soap:Body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/soap:Envelope&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>一条SOAP消息包含下列元素：</p>
-
-<ol>
-<li>必需的Envelope元素，它是用来将一个XML文档标识为一条SOAP消息。</li>
-<li>可选的Header元素，包含头部信息</li>
-<li>必需的Body元素，包含所有的调用和响应信息</li>
-<li>可选的Fault元素，提供有关在处理此消息所发生错误的信息</li>
-</ol>
-
-
-<p>所有以上的元素均被声明为，命名空间 <a href="http://www.w3.org/2001/12/soap-envelope">http://www.w3.org/2001/12/soap-envelope</a> 中的元素，以及针对SOAP编码和数据类型的命名空间： <a href="http://www.w3.org/2001/12/soap-encoding">http://www.w3.org/2001/12/soap-encoding</a> 。</p>
-
-<p>关于 xmlns:soap=&ldquo;<a href="http://www.w3.org/2001/12/soap-envelope">http://www.w3.org/2001/12/soap-envelope</a>&rdquo; 应该比较容易理解，在上面的XSD介绍中已经解释过了，用于说明该XML的命名空间，相当于该SOAP的XSD中的targetNamespace。</p>
-
-<p>可选的SOAP Header元素可包含有关SOAP消息的应用程序专用信息（比如认证、支付等）。如果Header元素被提供，则它必须是Envelope元素的第一个子元素。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;soap:Header&gt;</span>
-</span><span class='line'><span class="nt">&lt;m:Trans</span> <span class="na">xmlns:m=</span><span class="s">&quot;http://www.w3school.com.cn/transaction/&quot;</span> <span class="na">soap:mustUnderstand=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>234<span class="nt">&lt;/m:Trans&gt;</span>
-</span><span class='line'><span class="nt">&lt;/soap:Header&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>必需的SOAP Body元素包含打算传送到消息最终端点的实际SOAP消息。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;soap:Body&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;z:SearchBookRequest</span> <span class="na">xmlns:z=</span><span class="s">&quot;http://benweizhu.github.io&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;z:name&gt;</span>SpringWebService<span class="nt">&lt;/z:name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;z:author&gt;</span>Spring<span class="nt">&lt;/z:author&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/z:SearchBookRequest&gt;</span>
-</span><span class='line'><span class="nt">&lt;/soap:Body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>而可选的SOAP Fault元素用于指示错误消息。</p>
-
-<h2><strong>WSDL</strong></h2>
-
-<p>WSDL指网络服务描述语言(Web Services Description Language)，也就是WebService的描述语言。</p>
-
-<p>WSDL是一种使用XML编写的文档。这种文档用于描述某个web service，规定服务的位置，以及此服务提供的操作（或方法）。</p>
-
-<p>一个WSDL文档是由如下几种元素组成：
-元素定义:\<types>, \<message>, \<portType>, \<binding></p>
-
-<p>WSDL类型</p>
-
-<p>\<types>元素定义web service使用的数据类型。为了最大程度的平台中立性，WSDL使用XML Schema语法来定义数据类型。</p>
-
-<p>WSDL消息</p>
-
-<p>\<message>元素定义一个操作的数据元素。每个消息均由一个或多个部件组成。可以把这些部件比作传统编程语言中一个函数调用的参数。</p>
-
-<p>WSDL端口</p>
-
-<p>\<portType>元素是最重要的WSDL元素。它可描述一个web service、可被执行的操作，以及相关的消息。可以把\<portType>元素比作传统编程语言中的一个函数库（或一个模块、或一个类）。</p>
-
-<p>WSDL绑定协议</p>
-
-<p>\<binding> 元素为每个端口定义消息格式和协议细节。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;definitions&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;types&gt;</span>
-</span><span class='line'>        definition of types........
-</span><span class='line'>    <span class="nt">&lt;/types&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;message&gt;</span>
-</span><span class='line'>        definition of a message....
-</span><span class='line'>    <span class="nt">&lt;/message&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;portType&gt;</span>
-</span><span class='line'>        definition of a port.......
-</span><span class='line'>    <span class="nt">&lt;/portType&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;binding&gt;</span>
-</span><span class='line'>        definition of a binding....
-</span><span class='line'>    <span class="nt">&lt;/binding&gt;</span>
-</span><span class='line'><span class="nt">&lt;/definitions&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>这里要说明一点，WSDL是WebService的描述语言，只是用来描述WebService，当客户端想要使用该WebService时，根据这个描述，可以知道该WebService的服务端口有哪些，服务内容有什么。但对于WebService本身的功能没有任何影响，换句话说，如果是你自己写的WebService，提供给自己使用，你根本不需要关心WSDL是什么，因为你知道自己提供的服务内容和端口。</strong></p>
-
-<p>关于这点，我会在后面的Spring WebService代码中证明。</p>
-
-<h2><strong>Spring WebService</strong></h2>
-
-<p>OK，到这里几个重要的概念都谈到了，应该开始正题，如果上面的内容没看懂，特别是WSDL，没关系，接下来，我们根据Spring WebService的例子，来一个个分析。</p>
-
-<h3>Contract First 契约优先</h3>
-
-<p>首先实现WebService的消息通信协议，也就是提供什么样的服务，接收什么消息，返回什么消息。</p>
-
-<p>根据前面的知识：要根据XSD来约束发送和接收的XML长什么样子。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;xs:schema</span> <span class="na">xmlns:xs=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema&quot;</span>
-</span><span class='line'>           <span class="na">targetNamespace=</span><span class="s">&quot;http://benweizhu.github.io&quot;</span>
-</span><span class='line'>           <span class="na">elementFormDefault=</span><span class="s">&quot;qualified&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;SearchBookRequest&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;xs:complexType&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;xs:sequence&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;author&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span> <span class="na">minOccurs=</span><span class="s">&quot;0&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;/xs:sequence&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/xs:complexType&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/xs:element&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;SearchBookResponse&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;xs:complexType&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;xs:sequence&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;id&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:int&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;/xs:sequence&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/xs:complexType&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/xs:element&gt;</span>
-</span><span class='line'><span class="nt">&lt;/xs:schema&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在这个例子中，我提供了一个图书搜索的服务，传给我书名name和作者author，我返回对应书的id。</p>
-
-<p>根据这个XSD文件，发送出去的请求的XML的应该是长类似下面这个样子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;z:SearchBookRequest</span> <span class="na">xmlns:z=</span><span class="s">&quot;http://benweizhu.github.io&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;z:name&gt;</span>SpringWebService<span class="nt">&lt;/z:name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;z:author&gt;</span>Spring<span class="nt">&lt;/z:author&gt;</span>
-</span><span class='line'><span class="nt">&lt;/z:SearchBookRequest&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>JAXB</h3>
-
-<p>根据这个定义的XSD文件，可以生成对应的Java类文件，这一步很简单，在Eclipse或者IntellIj中都有提供XSD到Java文件的转换插件。你只需要转换一下，就会生成的两个类SearchBookRequest和SearchBookResponse，它们会在下面的Endpoint中被使用。</p>
-
-<h3>Endpoint</h3>
-
-<p>实现Endpoint，也就是，这个请求消息给服务端后，有谁来处理，并返回响应结果。</p>
-
-<p>Spring提供了注解的方式来配置一个Endpoint。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">ws</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">endpoint</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">jaxbgen.SearchBookRequest</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">jaxbgen.SearchBookResponse</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ws.server.endpoint.annotation.Endpoint</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ws.server.endpoint.annotation.PayloadRoot</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ws.server.endpoint.annotation.RequestPayload</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ws.server.endpoint.annotation.ResponsePayload</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Endpoint</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookEndpoint</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@PayloadRoot</span><span class="o">(</span><span class="n">localPart</span> <span class="o">=</span> <span class="s">&quot;SearchBookRequest&quot;</span><span class="o">,</span> <span class="n">namespace</span> <span class="o">=</span> <span class="s">&quot;http://benweizhu.github.io&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="nd">@ResponsePayload</span> <span class="n">SearchBookResponse</span> <span class="nf">searchBook</span><span class="o">(</span><span class="nd">@RequestPayload</span> <span class="n">SearchBookRequest</span> <span class="n">searchBookRequest</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">SearchBookResponse</span> <span class="n">searchBookResponse</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">SearchBookResponse</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">searchBookResponse</span><span class="o">.</span><span class="na">setId</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">searchBookResponse</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>第一个注解@Endpoint不用我解释了，就是说明这个类是一个WebService的Endpoint。
-第二个注解@PayloadRoot里面有两个参数，localPart和namespace，它们分别匹配到XML中的根元素名字和命名空间，也就是说，如果发送过来消息的满足这两个条件，就交给该函数处理。这样就形成了消息到Endpoint的映射。
-第三和第四个注解@RequestPayload和@ResponsePayload就简单了，分别用来指明请求和响应的对象。</p>
-
-<h3>Spring的XML配置</h3>
-
-<p>配置比较简单，提供组件扫描和对Endpoint注解的支持即可。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:sws=</span><span class="s">&quot;http://www.springframework.org/schema/web-services&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd</span>
-</span><span class='line'><span class="s">      http://www.springframework.org/schema/web-services</span>
-</span><span class='line'><span class="s">      http://www.springframework.org/schema/web-services/web-services-2.0.xsd</span>
-</span><span class='line'><span class="s">      http://www.springframework.org/schema/context</span>
-</span><span class='line'><span class="s">      http://www.springframework.org/schema/context/spring-context.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;sws:annotation-driven/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;me.zeph.spring.ws.example&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>web.xml</h3>
-
-<p>最后再来看web.xml怎么配置。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">version=</span><span class="s">&quot;2.4&quot;</span>
-</span><span class='line'>         <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span>
-</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee</span>
-</span><span class='line'><span class="s">         http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;servlet&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>spring-ws<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-class&gt;</span>org.springframework.ws.transport.http.MessageDispatcherServlet<span class="nt">&lt;/servlet-class&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/servlet&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;servlet-mapping&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>spring-ws<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;url-pattern&gt;</span>/services/*<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/servlet-mapping&gt;</span>
-</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>和SpringMVC一样，WebService也需要一个前端的请求分发的Servlet，MessageDispatcherServlet。你可能会想为什么是Servlet？</p>
-
-<p>其实，这点，我在前面已经提到过，WebService的协议是绑定在Soap上面的，而Soap又是以http协议作为应用层协议的载体，发出去的Request固然是http请求。不配置对应Servlet，不配置对应的URL，那应该怎么做呢？</p>
-
-<p>到此为止，一个Spring Web Service的服务端代码就写完了。你肯定会想，说好的WSDL呢？它去哪了？我这里刻意没有配置WSDL，就是要证明WSDL本身对于WebService没有影响，所以WSDL可以不用配。</p>
-
-<p>我们先把WSDL放在一边，先把客户端代码完成。</p>
-
-<h3>Spring WebService Template 客户端</h3>
-
-<p>这里的客户端代码使用Spring提供的WebServiceTemplate完成。</p>
-
-<p>在applicationContext中配置WebServiceTemplate，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;webServiceTemplate&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.ws.client.core.WebServiceTemplate&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;defaultUri&quot;</span> <span class="na">value=</span><span class="s">&quot;http://localhost:8080/spring-ws/services/&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;marshaller&quot;</span> <span class="na">ref=</span><span class="s">&quot;marshaller&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;unmarshaller&quot;</span> <span class="na">ref=</span><span class="s">&quot;marshaller&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;marshaller&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.oxm.jaxb.Jaxb2Marshaller&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;packagesToScan&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;list&gt;</span>
-</span><span class='line'>                <span class="nt">&lt;value&gt;</span>jaxbgen<span class="nt">&lt;/value&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;/list&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>defaultUri用来说明该Template会向哪个URL发出请求。关于这个URL，因为在web.xml配置时，该MessageServlet是接受spring-ws/services/*的任何请求，而Spring WebService的Endpoint映射并不是根据URL来判断，所以这里你可以写任何满足该模式的URL，例如： <a href="http://localhost:8080/spring-ws/services/ssss">http://localhost:8080/spring-ws/services/ssss</a> 。</p>
-
-<p>Marshaller用于实现XML到Java和Java到XML的转换。在Template需要配置marshaller和unmarshaller，这里它们用的同一个Marshaller对象。</p>
-
-<p>客户端Java代码：</p>
+<p>来看一段比较老式风格的JDBC代码：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -642,72 +137,113 @@
 <span class='line-number'>31</span>
 <span class='line-number'>32</span>
 <span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">integration</span><span class="o">;</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">dao</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">jaxbgen.SearchBookRequest</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">jaxbgen.SearchBookResponse</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.junit.Test</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.junit.runner.RunWith</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.test.context.ContextConfiguration</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.test.context.junit4.SpringJUnit4ClassRunner</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ws.client.core.WebServiceTemplate</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.jdbc.example.model.Book</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">hamcrest</span><span class="o">.</span><span class="na">CoreMatchers</span><span class="o">.</span><span class="na">is</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">Assert</span><span class="o">.</span><span class="na">assertThat</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.*</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="nd">@RunWith</span><span class="o">(</span><span class="n">SpringJUnit4ClassRunner</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
-</span><span class='line'><span class="nd">@ContextConfiguration</span><span class="o">(</span><span class="n">locations</span> <span class="o">=</span> <span class="o">{</span><span class="s">&quot;classpath:applicationContext.xml&quot;</span><span class="o">})</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookClientIntegrationTest</span> <span class="o">{</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookDaoWithDM</span> <span class="o">{</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="nd">@Autowired</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">WebServiceTemplate</span> <span class="n">webServiceTemplate</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">url</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">username</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">password</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">driverName</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="nd">@Test</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">shouldGetResponseFromWebService</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="c1">//given</span>
-</span><span class='line'>      <span class="n">SearchBookRequest</span> <span class="n">searchBookRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">SearchBookRequest</span><span class="o">();</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">BookDaoWithDM</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">String</span> <span class="n">username</span><span class="o">,</span> <span class="n">String</span> <span class="n">password</span><span class="o">,</span> <span class="n">String</span> <span class="n">driverName</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">;</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">username</span> <span class="o">=</span> <span class="n">username</span><span class="o">;</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">password</span> <span class="o">=</span> <span class="n">password</span><span class="o">;</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">driverName</span> <span class="o">=</span> <span class="n">driverName</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>      <span class="c1">//when</span>
-</span><span class='line'>      <span class="n">SearchBookResponse</span> <span class="n">searchBookResponse</span> <span class="o">=</span> <span class="o">(</span><span class="n">SearchBookResponse</span><span class="o">)</span> <span class="n">webServiceTemplate</span><span class="o">.</span><span class="na">marshalSendAndReceive</span><span class="o">(</span><span class="n">searchBookRequest</span><span class="o">);</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">Book</span> <span class="nf">findBookByISBN</span><span class="o">(</span><span class="kt">int</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>      <span class="n">Statement</span> <span class="n">statement</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>      <span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">connection</span> <span class="o">=</span> <span class="n">getConnection</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">statement</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createStatement</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">book</span> <span class="o">=</span> <span class="n">getBook</span><span class="o">(</span><span class="n">statement</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">(</span><span class="n">getQuerySqlFor</span><span class="o">(</span><span class="n">isbn</span><span class="o">)));</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ClassNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>          <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>              <span class="k">if</span> <span class="o">(</span><span class="n">statement</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                  <span class="n">statement</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>              <span class="o">}</span>
+</span><span class='line'>              <span class="k">if</span> <span class="o">(</span><span class="n">connection</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                  <span class="n">connection</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>              <span class="o">}</span>
+</span><span class='line'>          <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>              <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>          <span class="o">}</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">book</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>      <span class="c1">//then</span>
-</span><span class='line'>      <span class="n">assertThat</span><span class="o">(</span><span class="n">searchBookResponse</span><span class="o">.</span><span class="na">getId</span><span class="o">(),</span> <span class="n">is</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Connection</span> <span class="nf">getConnection</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">ClassNotFoundException</span><span class="o">,</span> <span class="n">SQLException</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="n">driverName</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">DriverManager</span><span class="o">.</span><span class="na">getConnection</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">username</span><span class="o">,</span> <span class="n">password</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="nf">getQuerySqlFor</span><span class="o">(</span><span class="kt">int</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;select * from book where isbn = &quot;</span> <span class="o">+</span> <span class="n">isbn</span> <span class="o">+</span> <span class="s">&quot;;&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Book</span> <span class="nf">getBook</span><span class="o">(</span><span class="n">ResultSet</span> <span class="n">resultSet</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>      <span class="k">while</span> <span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">next</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">book</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Book</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setIsbn</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getInt</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span>
+</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="mi">2</span><span class="o">));</span>
+</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setPrice</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getDouble</span><span class="o">(</span><span class="mi">3</span><span class="o">));</span>
+</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setAuthor</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="mi">4</span><span class="o">));</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">book</span><span class="o">;</span>
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>OK，到此为止，Spring WebService的服务端和客户端代码完成。</p>
 
-<p>所以，现在我们再回过头来，看看WSDL。</p>
-
-<h3>WSDL</h3>
-
-<h5>Automatic WSDL exposure 自动生成WSDL</h5>
-
-<p>在刚才的Spring XML配置中（/WEB-INF/[servlet-name]-servlet.xml）中加一段XML配置：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;sws:dynamic-wsdl</span> <span class="na">id=</span><span class="s">&quot;book&quot;</span> <span class="na">portTypeName=</span><span class="s">&quot;SearchBookRequest&quot;</span>
-</span><span class='line'>                      <span class="na">locationUri=</span><span class="s">&quot;http://tobereplacedbyws:8080/spring-ws/services/&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;sws:xsd</span> <span class="na">location=</span><span class="s">&quot;classpath:book.xsd&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/sws:dynamic-wsdl&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>要注意位置有两点：</p>
-
-<ol>
-<li>属性id，除了唯一指定一个元素之外，它还有个更重要的作用，是说明该wsdl的名字。当你要访问该wsdl时，访问的url是 <a href="http://localhost:8080/spring-ws/services/book.wsdl">http://localhost:8080/spring-ws/services/book.wsdl</a> 。</li>
-<li>属性locationUri，前面已经看到WSDL跟WebService的功能性服务没有半毛钱关系，所以这里的locationUri属性配置也不会影响到WebService的功能，它只是在你在wsdl中看到的一个字段，用来描述服务端的服务端口（URL）是什么。如果你看上面例子中的locationUri，你会发现不是写的localhost，而是tobereplacedbyws。为什么呢？因为MessageDispatcherServlet提供了一个特性，可以在部署时，根据主机的名字，替换这个位置的内容。如何开启这个特性呢？</li>
-</ol>
-
-
-<p>在web.xml中配置一个initparam即可。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -731,119 +267,72 @@
 <span class='line-number'>20</span>
 <span class='line-number'>21</span>
 <span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">version=</span><span class="s">&quot;2.4&quot;</span>
-</span><span class='line'>         <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span>
-</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee</span>
-</span><span class='line'><span class="s">         http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd&quot;</span><span class="nt">&gt;</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">dao</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;servlet&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>spring-ws<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-class&gt;</span>org.springframework.ws.transport.http.MessageDispatcherServlet<span class="nt">&lt;/servlet-class&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;init-param&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;param-name&gt;</span>transformWsdlLocations<span class="nt">&lt;/param-name&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;param-value&gt;</span>true<span class="nt">&lt;/param-value&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/init-param&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/servlet&gt;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.jdbc.example.model.Book</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.junit.Before</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.junit.Test</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;servlet-mapping&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>spring-ws<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;url-pattern&gt;</span>/services/*<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/servlet-mapping&gt;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">hamcrest</span><span class="o">.</span><span class="na">CoreMatchers</span><span class="o">.</span><span class="na">is</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">hamcrest</span><span class="o">.</span><span class="na">CoreMatchers</span><span class="o">.</span><span class="na">nullValue</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">Assert</span><span class="o">.</span><span class="na">assertThat</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookDaoWithDMTest</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;jdbc:mysql://localhost:3306/bookshelf&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">username</span> <span class="o">=</span> <span class="s">&quot;username&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">password</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">driverName</span> <span class="o">=</span> <span class="s">&quot;com.mysql.jdbc.Driver&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">BookDaoWithDM</span> <span class="n">bookDaoWithDM</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Before</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">bookDaoWithDM</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">BookDaoWithDM</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">username</span><span class="o">,</span> <span class="n">password</span><span class="o">,</span> <span class="n">driverName</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Test</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">shouldFindBookFromDatabaseWhenISBNIs12</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="c1">//when</span>
+</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="n">bookDaoWithDM</span><span class="o">.</span><span class="na">findBookByISBN</span><span class="o">(</span><span class="mi">12</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">//then</span>
+</span><span class='line'>      <span class="n">assertThat</span><span class="o">(</span><span class="n">book</span><span class="o">.</span><span class="na">getName</span><span class="o">(),</span> <span class="n">is</span><span class="o">(</span><span class="s">&quot;benwei&quot;</span><span class="o">));</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Test</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">shouldNotFindBookFromDatabaseWhenISBNIs1</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="c1">//when</span>
+</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="n">bookDaoWithDM</span><span class="o">.</span><span class="na">findBookByISBN</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">//then</span>
+</span><span class='line'>      <span class="n">assertThat</span><span class="o">(</span><span class="n">book</span><span class="o">,</span> <span class="n">is</span><span class="o">(</span><span class="n">nullValue</span><span class="o">()));</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这个时候，你访问 <a href="http://localhost:8080/spring-ws/services/book.wsdl">http://localhost:8080/spring-ws/services/book.wsdl</a> ，就可以看到对应的WSDL信息，然后你就可以用SoapUI等类似软件去测试你的Webservice。</p>
 
-<p>参考资料：</p>
-
-<p>(1) spring webservice reference</p>
-
-<p>(2) <a href="http://www.w3school.com.cn/ws.asp">http://www.w3school.com.cn/ws.asp</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/05/03/what-is-war-and-ear/">了解war包和ear包</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-05-03T17:06:00+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2014</span></span> <span class='time'>5:06 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>上一次，讲到了如何如何手动编译Java，简单的介绍打Jar包（提示：在classpath的基础上，一定将包的目录结构打进去）。Jar包的目的，将编译过的class文件有效合理的组装起来，方便管理和使用。这一次，滕老板继续跟我们讲解了如何打War包。</p>
-
-<p>在本篇文章中，将分别介绍War包和Ear包（在项目中遇到的Ear包的模块，不清楚是什么，所以随便一起弄清楚）。</p>
-
-<h2><strong>War包</strong></h2>
-
-<p>只要做过Java开发的同志，肯定知道War包，至少听说过。</p>
-
-<p>War包（Web application ARchieve）也是一种Jar包文件，它被用来描述由JSP，Servlet，Java类，XML文件，tag库，静态web页面等资源组成的集合，它们组合在一起成文一个web应用。</p>
-
-<p>从命令上说，打War包的命令和打Jar包的命令一样，比较简单，主要是要了解一个War包的目录结构：</p>
-
-<p><image src="/../images/ear/war.png" height="50%" width=50%" style="text-align: center"/></p>
-
-<p>MANIFEST.MF是一个可选文件，用来描述额外的元数据信息。</p>
-
-<p>WEB-INF目录包含了War中的私有文件，也就是说，当web应用被部署之后，该目录下的文件不能够由Web客户端（浏览器）直接访问的。</p>
-
-<p>WEB-INF/lib/用来放置你代码中需要使用的第三方的jar文件。</p>
-
-<p>WEB-INF/classes/用来放置你自己编译的class文件。</p>
-
-<p>WEB-INF/web.xml是web部署描述器，JavaEE配置web模块的标准描述器，这里不详细解释。</p>
-
-<p>最后是公共的静态文件。</p>
-
-<p>那么在打包的时候，按照这个目录结构打包，然后将War包放置到tomcat的webapp目录下，tomcat在运行时就会自动帮你解包并运行，或者你也可以直接将包含该目录结构的目录直接拷贝到tomcat的webapp下，一样可以运行，打包只不过是一个封装和压缩过程。</p>
-
-<h2><strong>那什么是Ear包呢？</strong></h2>
-
-<p>Ear(Enterprise ARchieve)用于在Java EE中将一个或者多个模块封装到一个文件中，这样，多个不同模块在应用服务器上的部署就可以同时并持续的进行。</p>
-
-<p>Java EE应用以Jar文件，War文件和Ear文件形式呈现。War或者Ear文件都是标准的Jar文件，只不过扩展名是.war和.ear。通过Jar，War和Ear等文件或模块的方式，使得用一些相同组件，来构建不同的JavaEE应用成为可能。不需要额外的编码，只需要将不同的JavaEE模块打包到不同的Java EE的Jar包，War包或Ear包的文件中。</p>
-
-<p>一个Ear文件是由Java EE模块和可选的部署描述器组成。部署描述器是一个带有.xml扩展名的XML文档，描述了一个应用，模块或者组件的部署设置。因为部署描述其的信息是声明式的，所以可以直接修改它，与我们的源代码没有关系。在运行时中，Java EE的服务器会读取部署描述器的内容，并根据描述对应用，模块或者组件做相对应的操作。</p>
-
-<p><image src="/../images/ear/ear.png" height="50%" width=50%" style="text-align: center"/>
-<image src="http://docs.oracle.com/javaee/6/tutorial/doc/figures/overview-applicationModule.gif" style="text-align: center"/>
-上面两个图，分别摘自Jboss at Work(A practice guide)和JavaEE6 Tutorial。</p>
-
-<p>一个Java EE模块是由一个或者多个为同一个容器类型准备的Java EE组件组成，当然还包含一个可选的部署描述器文件。</p>
-
-<p>Java EE模块有以下几种类型：</p>
-
-<p>EJB模块，它包含企业级别的bean类文件，一个EJB的部署描述器（可选），EJB模块会以Jar包形式组装。</p>
-
-<p>Web模块，它包含了servlet类文件，web文件，其他相关class文件，图片，html静态文件，和一个web.xml部署文件（可选），并最终以war包形式组装。</p>
-
-<p>应用客户端模块，包含了class文件，应用客户端部署描述器文件（可选）并以Jar包形式组装。</p>
-
-<p>资源适配模块，包含所有的Java接口，类，原生库，部署描述器（可选）。组合在一起，实现JavaEE的Connector架构。同样是以Jar包方式组装，但是文件以.rar扩展名结尾。</p>
-
-<p>就和War包包含一个web.xml的部署描述器，一个Ear包文件包含一个名字为application.xml的文件。它是一个必要的打包列表，告诉Java EE服务器Ear包种包含什么东西，以及去哪里找。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -860,27 +349,83 @@
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;application</span> <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>             <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee             http://java.sun.com/xml/ns/j2ee/application_1_4.xsd&quot;</span>
-</span><span class='line'>             <span class="na">version=</span><span class="s">&quot;1.4&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;display-name&gt;</span>JBossAtWorkEAR<span class="nt">&lt;/display-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;module&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;web&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;web-uri&gt;</span>webapp.war<span class="nt">&lt;/web-uri&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;context-root&gt;</span>jaw<span class="nt">&lt;/context-root&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/web&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/module&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;module&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;java&gt;</span>common.jar<span class="nt">&lt;/java&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/module&gt;</span>
-</span><span class='line'><span class="nt">&lt;/application&gt;</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">model</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Book</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">isbn</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">double</span> <span class="n">price</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">author</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setIsbn</span><span class="o">(</span><span class="kt">int</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">isbn</span> <span class="o">=</span> <span class="n">isbn</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getIsbn</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">isbn</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPrice</span><span class="o">(</span><span class="kt">double</span> <span class="n">price</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">price</span> <span class="o">=</span> <span class="n">price</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">double</span> <span class="nf">getPrice</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">price</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAuthor</span><span class="o">(</span><span class="n">String</span> <span class="n">author</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">author</span> <span class="o">=</span> <span class="n">author</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getAuthor</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">author</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>application.xml中的元素都应该是自解释的。在告诉应用程序服务器每一个Jar包的名字，以及它的作用（功能）。</p>
+<h2><strong>Class.forName()</strong></h2>
 
-<p>例如：</p>
+<p>上面这个例子是很普通的JDBC编程，这里有一点要讲的，那就是DriverManager会加载注册到它自己的Driver。但是，在上面的例子中，好像没有看到哪里有显示的注册Driver到DriverManager。为什么DriverManager能够找到MySQL的Driver呢？</p>
+
+<p>回头看API文档中的一句话：</p>
+
+<p>“这意味着用户可以通过调用以下程序加载和注册一个驱动程序Class.forName(&ldquo;foo.bah.Driver&rdquo;)。”。</p>
+
+<p>我们知道Class.forName()方法是将一个指定名字的Class加载到JVM中。这和注册Driver有什么关系呢？看下MySQL实现的Driver源码你就明白了。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -888,24 +433,507 @@
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;module&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;web&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;web-uri&gt;</span>webapp.war<span class="nt">&lt;/web-uri&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;context-root&gt;</span>jaw<span class="nt">&lt;/context-root&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/web&gt;</span>
-</span><span class='line'><span class="nt">&lt;/module&gt;</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">mysql</span><span class="o">.</span><span class="na">jdbc</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.SQLException</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Driver</span> <span class="kd">extends</span> <span class="n">NonRegisteringDriver</span> <span class="kd">implements</span> <span class="n">java</span><span class="o">.</span><span class="na">sql</span><span class="o">.</span><span class="na">Driver</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">static</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">java</span><span class="o">.</span><span class="na">sql</span><span class="o">.</span><span class="na">DriverManager</span><span class="o">.</span><span class="na">registerDriver</span><span class="o">(</span><span class="k">new</span> <span class="nf">Driver</span><span class="o">());</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">E</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="s">&quot;Can&#39;t register driver!&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">Driver</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+</span><span class='line'>      
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><context-root>用来告诉你web应用站点名字，如果你是直接打成War包，那么War包的名字就是这个站点名。</p>
+<p>原来在这个Driver实现类中一段静态代码块，在类加载时，会被执行，此时就实现了将自己注册到DriverManager。</p>
 
-<p>总而言之，Ear包是由Java EE多个模块组成，相互配合，完成各自职责，形成完整的Java EE应用。</p>
+<h2><strong>DataSource</strong></h2>
+
+<p>OK，继续，前面的API文档中提到，目前一种更好的连接到数据源也就是获得Connection的方式是使用DataSource。我们来看下DataSource是什么？同样，先来读一下DataSource的API文档。</p>
+
+<p><strong>javax.sql.DataSource（接口）</strong>：该工厂用于提供到此DataSource对象所表示的物理数据源的连接（A factory for connections to the physical data source that this DataSource object represents.）。作为 DriverManager工具的替代项，DataSource对象是获取连接的首选方法。实现DataSource接口的对象通常在基于JavaTM Naming and Directory Interface(JNDI) API的命名服务中注册。</p>
+
+<p>DataSource接口由驱动程序供应商实现。共有三种类型的实现：</p>
+
+<p>基本实现 - 生成标准的Connection对象<br/>
+连接池实现 - 生成自动参与连接池的Connection对象。此实现与中间层连接池管理器一起使用。<br/>
+分布式事务实现 - 生成一个Connection对象，该对象可用于分布式事务，大多数情况下总是参与连接池。此实现与中间层事务管理器一起使用，大多数情况下总是与连接池管理器一起使用。</p>
+
+<p>DataSource对象的属性在必要时可以修改。例如，如果将数据源移动到另一个服务器，则可更改与服务器相关的属性。其优点在于，由于可以更改数据源的属性，所以任何访问该数据源的代码都无需更改。</p>
+
+<p>通过DataSource对象访问的驱动程序本身不会向DriverManager注册。通过查找操作获取DataSource对象，然后使用该对象创建Connection对象。使用基本的实现，通过DataSource对象获取的连接与通过DriverManager设施获取的连接相同。</p>
+
+<p>——————————————————————————————————————————————————————</p>
+
+<p>上面提到了几点：</p>
+
+<p>1.使用JNDI方式注册DataSource，然后在使用时根据名字将DataSource取出。<br/>
+2.通过DataSource对象访问的驱动程序本身不会向DriverManager注册。</p>
+
+<p>JNDI(Java Naming and Directory Interface，Java命名和目录接口)是一组在Java应用中访问命名和目录服务的API。命名服务将名称和对象联系起来，使得我们可以用名称访问对象。不过在本文中暂时不去涉及这个内容。</p>
+
+<p>DataSource是一个接口，那么它的实现者有哪些呢？有一个比较常用的，Apache Commons的DBCP（Database Connection Pool），它是Apache Commons提供的一种数据库连接池组件，也是tomcat的数据库连接池组件。（回头看一下API文档上说的三种实现类型的第二种）。</p>
+
+<p>将上面例子中使用DriverManager创建连接的方式，换成使用DataSource非常简单，替换上面的getConnection方法。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="n">Connection</span> <span class="nf">getConnection</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">BasicDataSource</span> <span class="n">dataSource</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">BasicDataSource</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">dataSource</span><span class="o">.</span><span class="na">setUrl</span><span class="o">(</span><span class="n">url</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">dataSource</span><span class="o">.</span><span class="na">setUsername</span><span class="o">(</span><span class="n">username</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">dataSource</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="n">password</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">dataSource</span><span class="o">.</span><span class="na">getConnection</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>从这段代码可以看出，映射了上面我说的的第二点，不需要向DriverManager注册，所以这里没有传入MySQL的ClassName。</p>
+
+<p>OK，到此，我们回顾了JDBC最基础的几个接口：DriverManager，Driver，Connection，Statement，ResultSet，以及JDBC推荐的数据库连接方式DataSource。在下一章，我们会继续了解与JDBC相关的核心技术和概念，包括事务，JNDI等。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/06/01/slf4j-and-log4j/">logger（SLF4j和log4j）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-06-01T12:33:00+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>12:33 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2><strong>SLF4j</strong></h2>
+
+<p>Simple Logging Facade for Java (SLF4J)</p>
+
+<p>SLF4J，简单日志门面（Facade），是各个不同日志框架的抽象，它不是具体的日志解决方案，只服务于各种各样的日志系统，例如java.util.logging, log4j等，它允许最终用户在部署其应用时使用其所希望的日志系统。</p>
+
+<p><strong>什么意思？</strong>SLF4J就像一个接口，是一个门面，在写代码时，我们只需要根据这个接口提供的方法去记录日志。这个接口可以和不同的日志框架绑定，比如Java自带的java.util.logging，或者大家常听到的log4j。这样，你可以在不修改代码的情况下，去替换不同的日志框架。</p>
+
+<p>基本概念明白之后，看下面这个例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.logger</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.loggerFactory</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">loggerFactory</span><span class="o">.</span><span class="na">getlogger</span><span class="o">(</span><span class="n">HelloWorld</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;Hello World&quot;</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>输出的结果是：</p>
+
+<p>SLF4J: Failed to load class &ldquo;org.slf4j.impl.StaticloggerBinder&rdquo;.<br/>
+SLF4J: Defaulting to no-operation (NOP) logger implementation<br/>
+SLF4J: See <a href="http://www.slf4j.org/codes.html#StaticloggerBinder">http://www.slf4j.org/codes.html#StaticloggerBinder</a> for further details.</p>
+
+<p>原因是你没有将SLF4j和某一个具体的日志框架绑定。怎么绑定呢？不需要你做任何事情，简单的加一个依赖就可以了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-simple:1.7.7&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>输出是：[main] INFO log.HelloWorld - Hello World</p>
+
+<p><strong>SLF4J支持对很多不同框架的绑定：</strong></p>
+
+<p>slf4j-log4j12-1.7.7.jar<br/>
+slf4j-jdk14-1.7.7.jar<br/>
+slf4j-nop-1.7.7.jar<br/>
+slf4j-simple-1.7.7.jar<br/>
+slf4j-jcl-1.7.7.jar</p>
+
+<p><strong>那么有个问题，SLF4J支不支持对多个日志框架的绑定呢？答案是不支持，也感觉一般这是不必要需求。</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-simple:1.7.7&#39;</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-log4j12:1.7.7&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>输出：</p>
+
+<p>SLF4J: Class path contains multiple SLF4J bindings.<br/>
+&hellip;</p>
+
+<p><strong>在SLF4J的官方文档上也说明了这点：</strong></p>
+
+<p>“SLF4J does not rely on any special class loader machinery. In fact, each SLF4J binding is hardwired at compile time to use one and only one specific logging framework. For example, the slf4j-log4j12-1.7.7.jar binding is bound at compile time to use log4j. In your code, in addition to slf4j-api-1.7.7.jar, you simply drop one and only one binding of your choice onto the appropriate class path location. Do not place more than one binding on your class path.”</p>
+
+<p>OK，关于SLF4J的内容就到这里，该进入重头戏&ndash;log4J。</p>
+
+<h2><strong>log4j</strong></h2>
+
+<p>log4j相对于SLF4j就复杂许多了，毕竟SLF4j只是接口，log4j则是具体的实现了。</p>
+
+<p>log4j由三个重要的组件组成：</p>
+
+<ol>
+<li>类型和级别(logger)</li>
+<li>输出目的地(Appender)</li>
+<li>输出格式(Layout)</li>
+</ol>
+
+
+<h3><strong>logger</strong></h3>
+
+<p><strong>logger hierarchy（logger的层次级别）</strong></p>
+
+<p><strong>Named Hierarchy（以名字分层）</strong></p>
+
+<p>logger的名字是大小写敏感的，并且根据名字的不同，logger之间存在父子层次关系。举例来说，com.foo是com.foo.bar的父logger，com是com.foo.bar的祖先logger。</p>
+
+<p>在这些logger之间，存在一个root logger，位于这个层次的顶层，它是永久存在，并且不能够通过名字获取，要获取它，只能通过logger.getRootlogger()方法获取。而这样一个层次关系，也决定了logger和logger之间存在着一些继承关系。</p>
+
+<p><strong>Level Inheritance（级别继承）</strong></p>
+
+<p>子类继承父类的级别：如果子类级别没有显示的指定，子类的级别等于第一个级别非空的父类logger的级别，直到追溯到根logger。</p>
+
+<p>前面提到logger的级别，它们分别是TRACE, DEBUG, INFO, WARN, ERROR和FATAL。</p>
+
+<p>这些级别存在高低关系：DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL。</p>
+
+<p>如果你以前有用过一点点log4j，这些级别映射到你的记忆中，一定是反映成logger的各个方法。没错，在logger这个对象中，你会看到很多的打印方法，debug, info, warn, error, fatal和log。</p>
+
+<p><strong>回过头来想想，如果你给一个logger指定了级别，但是你打印日志时，又不是调用对应级别的方法，会发生什么事情呢？</strong></p>
+
+<p>答案是：对这些方法的调用，不光是打印日志信息，也是对logger对象级别改变的请求。</p>
+
+<p>但是，并不是你调用它，级别就一定会改变，对级别改变的请求还是取决于logger对象本身的级别（无论是被显示的指定，还是继承）。如果请求的级别低于该logger当前的级别，那么改变就不会成功。</p>
+
+<h3><strong>Appender</strong></h3>
+
+<p>Appender的作用是指出日志信息的输出位置，比如控制台，文件。而且好处是，你可以给一个logger指定多个appender，比如同时在控制台和文件中输出日志。</p>
+
+<h4><strong>Appender Additivity(附加性)</strong></h4>
+
+<p>每一个Appender都有一个属性，叫做additivity flag，默认是true。什么意思呢？</p>
+
+<p>子类会继承它直接父类的appender（包括该父类自己继承的appender），如果设置为false，则不继承其父类的appender。</p>
+
+<p><strong>这句话应该好理解，那下面这种情况呢？</strong></p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">Logger </th>
+<th style="text-align:center;"> Appender </th>
+<th style="text-align:center;"> Additivity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">root         </td>
+<td style="text-align:center;"> A1        </td>
+<td style="text-align:center;"> null</td>
+</tr>
+<tr>
+<td style="text-align:left;">appenderFather</td>
+<td style="text-align:center;"> A2        </td>
+<td style="text-align:center;"> false</td>
+</tr>
+<tr>
+<td style="text-align:left;">appenderFather.appenderChild</td>
+<td style="text-align:center;"> A3</td>
+<td style="text-align:center;">true</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>appenderFather的flag设置为了false，所以他拥有的appender的结果应该比较明显，就是A2。</p>
+
+<p>appenderFather.appenderChild的结果应该是什么？答案是A2和A3。因为它只是继承它直接父类的appender。</p>
+
+<p><strong>log4j提供的Appender有哪些呢？</strong></p>
+
+<p>org.apache.log4j.ConsoleAppender（控制台）</p>
+
+<p>org.apache.log4j.FileAppender（文件）</p>
+
+<p>org.apache.log4j.DailyRollingFileAppender（每天产生一个日志文件）</p>
+
+<p>org.apache.log4j.RollingFileAppender（文件大小到达指定尺寸的时候产生新文件，用的较多，限制文件大小）</p>
+
+<p>org.apache.log4j.WriterAppender（将日志信息以流格式发送到任意指定的地方）</p>
+
+<h3><strong>Layout</strong></h3>
+
+<p>日志信息布局（格式）是log4j提供的另外一个非常有用的特性。</p>
+
+<p><strong>log4j提供四种Layout方式：</strong></p>
+
+<p>org.apache.log4j.HTMLLayout（以HTML表格形式布局），</p>
+
+<p>org.apache.log4j.PatternLayout（可以灵活地指定布局模式，比较常用），</p>
+
+<p>org.apache.log4j.SimpleLayout（包含日志信息的级别和信息字符串），</p>
+
+<p>org.apache.log4j.TTCCLayout（包含日志产生的时间、线程、类别等等信息）</p>
+
+<p><strong>log4j采用类似C语言中的printf函数的打印格式格式化日志信息，打印参数如下：</strong></p>
+
+<p>%m 输出代码中指定的消息 　</p>
+
+<p>%p 输出优先级，即DEBUG，INFO，WARN，ERROR，FATAL 　　</p>
+
+<p>%r 输出自应用启动到输出该log信息耗费的毫秒数 　　</p>
+
+<p>%c 输出所属的类目，通常就是所在类的全名 　　</p>
+
+<p>%t 输出产生该日志事件的线程名 　　</p>
+
+<p>%n 输出一个回车换行符，Windows平台为“rn”，Unix平台为“n” 　　</p>
+
+<p>%d 输出日志时间点的日期或时间，默认格式为ISO8601，也可以在其后指定格式，比如：%d{yyy MMM dd HH:mm:ss,SSS}，输出类似：2002年10月18日 22：10：28，921 　　</p>
+
+<p>%l 输出日志事件的发生位置，包括类目名、发生的线程，以及在代码中的行数。举例：Testlog4.main(TestLog4.java:10)</p>
+
+<p>%x: 输出和当前线程相关联的NDC(嵌套诊断环境),尤其用到像java servlets这样的多客户多线程的应用中。</p>
+
+<p>%%: 输出一个”%”字符 %F: 输出日志消息产生时所在的文件名称</p>
+
+<p>%L: 输出代码中的行号</p>
+
+<p>%m: 输出代码中指定的消息,产生的日志具体信息</p>
+
+<p>%n: 输出一个回车换行符，Windows平台为”\r\n”，Unix平台为”\n”输出日志信息换行 可以在%与模式字符之间加上修饰符来控制其最小宽度、最大宽度、和文本的对齐方式。</p>
+
+<p>Ok，基本知识就到这里，看一个例子。</p>
+
+<h2><strong>Example</strong></h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-log4j12:1.7.7&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在配置依赖时，将SLF4J和log4j绑定</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">log</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.Logger</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.LoggerFactory</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">HelloWorld</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">say</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;start time&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hello, world!!!&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">logger</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+</span><span class='line'>      <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;end time&quot;</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">HelloWorld</span> <span class="n">helloWorld</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HelloWorld</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">helloWorld</span><span class="o">.</span><span class="na">say</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过SLF4J的LoggerFactory.getLogger()方法得到一个logger的实力。logger的名字就是类名（全限定的类名）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="na">log4j.rootLogger</span><span class="o">=</span><span class="s">info, console, file</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">log4j.appender.console</span><span class="o">=</span><span class="s">org.apache.log4j.ConsoleAppender</span>
+</span><span class='line'><span class="na">log4j.appender.console.layout</span><span class="o">=</span><span class="s">org.apache.log4j.PatternLayout</span>
+</span><span class='line'><span class="na">log4j.appender.console.layout.ConversionPattern</span><span class="o">=</span><span class="s">%p %l %d{yyy MMM dd HH:mm:ss,SSS} %m %n</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">log4j.appender.file</span><span class="o">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
+</span><span class='line'><span class="na">log4j.appender.file.File</span><span class="o">=</span><span class="s">logger.log</span>
+</span><span class='line'><span class="na">log4j.appender.file.layout</span><span class="o">=</span><span class="s">org.apache.log4j.PatternLayout</span>
+</span><span class='line'><span class="na">log4j.appender.file.layout.ConversionPattern</span><span class="o">=</span><span class="s">%p %l %d{yyy MMM dd HH:mm:ss,SSS} %m %n</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在log4j的properties文件中，指定了根logger的级别，以及它的两个appender，分别是console和file。然后定义这两个appender，并指定它们的layout使用PatternLayout，让它们输出：级别，日志输出的位置，时间，指定的信息和换行。</p>
+
+<p>输出结果如下：</p>
+
+<p>INFO log.HelloWorld.say(HelloWorld.java:11) 2014 Jun 01 16:57:54,807 start time <br/>
+Hello, world!!!<br/>
+INFO log.HelloWorld.say(HelloWorld.java:13) 2014 Jun 01 16:57:54,809 end time<br/>
+log.HelloWorld</p>
+
+<p>总结，log不算是功能代码，但是他对于开发人员和维护人员，非常有用了，往往是解决问题的唯一线索，特别是对于后台系统，往往只能通过log来分析问题。</p>
 
 <p>参考资料：</p>
 
-<p><a href="http://docs.oracle.com/javaee/6/tutorial/doc/bnaby.html">http://docs.oracle.com/javaee/6/tutorial/doc/bnaby.html</a></p>
-
-<p>Jboss at work A practice guide(Chapter 3)(<a href="http://oreilly.com/catalog/jboss/chapter/ch03.pdf">http://oreilly.com/catalog/jboss/chapter/ch03.pdf</a>)</p>
+<p>1.<a href="http://logging.apache.org/log4j/1.2/manual.html  ">http://logging.apache.org/log4j/1.2/manual.html  </a>
+2.<a href="http://www.slf4j.org/manual.html  ">http://www.slf4j.org/manual.html  </a>
+3.<a href="http://www.cnblogs.com/dennisit/archive/2013/01/01/2841603.html">http://www.cnblogs.com/dennisit/archive/2013/01/01/2841603.html</a></p>
 </div>
   
   
@@ -936,6 +964,14 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/07/13/linux-you-dont-understand-all-these-years/">《Linux就是这个范儿》读书笔记（一） - 理解Linux用户和用户组</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/06/17/spring-web-security-4/">Spring Web Security 实战 (四) - 了解Security基础架构</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/06/14/spring-web-security-3/">Spring Web Security 实战 (三) - 改变用户认证方式和安全性</a>
       </li>
     
@@ -945,14 +981,6 @@
     
       <li class="post">
         <a href="/blog/2015/06/12/spring-web-security-1/">Spring Web Security 实战 (一) - 最少配置启动</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/06/11/spring-boot-starter-2/">Spring Boot 深入浅出系列（二） - 用Gradle启动应用</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/06/10/spring-boot-starter-1/">Spring Boot 深入浅出系列（一） - 习惯使用注解</a>
       </li>
     
   </ul>
