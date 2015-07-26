@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="Spring Boot从一开始就告诉你，它更喜欢基于Java的配置，即注解的方式。所以它提供了你一大堆注解，并让你习惯使用注解。 @Bean Indicates that a method produces a bean to be managed by the Spring container &hellip;">
+  <meta name="description" content="在前面介绍的《用Spring Boot开发Spring项目 快速上手》上介绍过： “通过Spring Boot创建的Java应用可以直接通过java -jar启动（即便它是Web应用）。也就是说，在这里，首先运行gradle assemble，得到jar文件，然后运行java -jar gs- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,163 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/06/11/spring-boot-starter-2/">Spring Boot 深入浅出系列（二） - 用Gradle启动应用</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-06-11T12:56:12+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:56 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在前面介绍的《用Spring Boot开发Spring项目 快速上手》上介绍过：</p>
+
+<p>“通过Spring Boot创建的Java应用可以直接通过java -jar启动（即便它是Web应用）。也就是说，在这里，首先运行gradle assemble，得到jar文件，然后运行java -jar gs-spring-boot-0.1.0.jar。”</p>
+
+<p>但是，我们肯定不能每次这样去启动SpringBoot的应用。好在是，官方提供了与构建相关的插件Spring Boot Gradle plugin，插件中提供了对应的task给你使用：</p>
+
+<h2>Application tasks     </h2>
+
+<p>bootRun - Run the project with support for auto-detecting main class and reloading static resources.  <br/>
+distTar - Bundles the project as a JVM application with libs and OS specific scripts.  <br/>
+distZip - Bundles the project as a JVM application with libs and OS specific scripts.  <br/>
+installApp - Installs the project as a JVM application along with libs and OS specific scripts. <br/>
+run - Runs this project as a JVM application.</p>
+
+<h2>在构建中引入Spring Boot Gradle plugin</h2>
+
+<p>首先，你需要在构建中加入该插件：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">classpath</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-gradle-plugin:1.2.4.RELEASE&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;spring-boot&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>省略依赖的版本号</h2>
+
+<p>SpringBoot插件会注册一个定制的依赖解析策略，允许你省略对依赖版本的配置。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-web&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.thymeleaf:thymeleaf-spring4&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么问题来了，这个省略的版本号从哪里来呢？它有Spring Boot Plugin的版本号决定，比如，当前定义的插件是org.springframework.boot:spring-boot-gradle-plugin:1.2.4.RELEASE，版本号是1.2.4，那么对应的spring-boot-starter-web的版本号，也是1.2.4。</p>
+
+<p>当然，如果你想显示的指定版本号也是可以的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.thymeleaf:thymeleaf-spring4:2.1.1.RELEASE&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>打包可执行的jar包或者war包</h2>
+
+<p>一旦使用了Spring boot插件，它就会用bootRepackage任务改写archive的过程。</p>
+
+<p>你可以在配置选项中指定main class，或者在Manifest添加Main-Class，如果你不指定，它会去搜索含有public static void main(String[] args)方法的类。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">bootRepackage</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mainClass</span> <span class="o">=</span> <span class="s1">&#39;demo.Application&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果你想要打成War包，并部署到外部容器里面，除了要使用war插件，还需要将embedded container的依赖放在providedRuntime里。如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;war&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">war</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">baseName</span> <span class="o">=</span> <span class="s1">&#39;myapp&#39;</span>
+</span><span class='line'>    <span class="n">version</span> <span class="o">=</span>  <span class="s1">&#39;0.5.0&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">jcenter</span><span class="o">()</span>
+</span><span class='line'>    <span class="n">maven</span> <span class="o">{</span> <span class="n">url</span> <span class="s2">&quot;http://repo.spring.io/libs-snapshot&quot;</span> <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">configurations</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">providedRuntime</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-web&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">providedRuntime</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-tomcat&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料： <br/>
+1.<a href="http://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-gradle-plugin.html">http://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-gradle-plugin.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -316,193 +473,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-preinsert-and-preupdate/">当Entity继承遇到Hibernate的@PrePersist和@PreUpdate</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-05-30T17:03:04+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>5:03 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>上周做项目的时候遇到的关于实现审计日志方式的问题，这里记录一下。</p>
-
-<p>假设你的数据库是这样设计的：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="nt">&quot;Customer&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span class='line'>        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;benwei&quot;</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nt">&quot;AdvancedCustomer&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nt">&quot;customerId&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span class='line'>        <span class="nt">&quot;level&quot;</span><span class="p">:</span> <span class="mi">1</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>一个Customer表和一个AdvancedCustomer表，AdvancedCustomer表中含有CustomerId作为外键。</p>
-
-<p>在Java中的Entity实现是这样的：AdvancedCustomer继承自Customer，父类定义的继承策略是Joind。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
-</span><span class='line'><span class="nd">@Table</span>
-</span><span class='line'><span class="nd">@Inheritance</span><span class="o">(</span><span class="n">Strategy</span><span class="o">=</span><span class="n">InheritanceType</span><span class="o">.</span><span class="na">JOINED</span><span class="o">)</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Customer</span> <span class="o">{</span>
-</span><span class='line'>  
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Entity</span>
-</span><span class='line'><span class="nd">@Table</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AdvancedCustomer</span> <span class="kd">extends</span> <span class="n">Customer</span> <span class="o">{</span>
-</span><span class='line'>  
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Joind策略的含义是：A strategy in which fields that are specific to a subclass are mapped to a separate table than the fields that are common to the parent class, and a join is performed to instantiate the subclass.</p>
-
-<p>通用的属性定义在父类中表，特殊的属性映射到另一个独立的表。</p>
-
-<p>此时，你想要给应用添加一个审计功能。</p>
-
-<p>你给Customer表添加LastModifiedBy和LastModifiedDate两个字段。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="nt">&quot;Customer&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span class='line'>        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;benwei&quot;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nt">&quot;lastModifiedBy&quot;</span><span class="p">:</span> <span class="s2">&quot;benwei&quot;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nt">&quot;lastModifiedDate&quot;</span><span class="p">:</span> <span class="s2">&quot;21/6/2015 23:01:11&quot;</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nt">&quot;AdvancedCustomer&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nt">&quot;customerId&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span class='line'>        <span class="nt">&quot;level&quot;</span><span class="p">:</span> <span class="mi">1</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>做法是使用EntityListener，在Listener中使用Hibernate的@PrePersist和@PreUpdate来监听事件的发生。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AuditListener</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@PrePersist</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">prePersist</span><span class="o">(</span><span class="n">Object</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">if</span><span class="o">(</span><span class="n">entity</span> <span class="n">instanceOf</span> <span class="n">AdvancedCustomer</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="o">((</span><span class="n">AdvancedCustomer</span><span class="o">)</span><span class="n">entity</span><span class="o">).</span><span class="na">setLastModifiedDate</span><span class="o">(</span><span class="n">Datetime</span><span class="o">.</span><span class="na">now</span><span class="o">());</span>  
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@PreUpdate</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">preUpdate</span><span class="o">(</span><span class="n">Object</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="o">...</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Entity</span>
-</span><span class='line'><span class="nd">@Table</span>
-</span><span class='line'><span class="nd">@EntityListeners</span><span class="o">([</span><span class="n">AuditListener</span><span class="o">.</span><span class="na">class</span><span class="o">])</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AdvancedCustomer</span> <span class="kd">extends</span> <span class="n">Customer</span> <span class="o">{</span>
-</span><span class='line'>  
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>问题来了，这个prePersist或者preUpdate方法会在什么时候触发呢？当修改AdvancedCustomer中的任意变量时，比如name，level，都会触发prePersist或者preUpdate。</h3>
-
-<p>但是，你到数据库中去查看审计事件变化时会发现，当创建一个新的Customer，或者更新Customer的名字字段都没有问题。</p>
-
-<p>当update子类中的变量level的时候，lastModifiedDate并没有发生变化。这是为什么？</p>
-
-<h3>要找到原因，必须打开showSql属性，来查看Hibernate到底产生的SQL语句是什么。</h3>
-
-<p>你会发现，当修改level变量时，Hibernate只产生了一条update语句来更新AdvancedCustomer这张表。而创建Customer会同时更新AdvancedCustomer和Customer两张表，更新name字段，会更新Customer这张表。</p>
-
-<p>也就是说，在PreUpdate触发之前，Hibernate在策略上已经决定了只更新AdvancedCustomer。即便之后改变了Customer中的lastModifiedDate，也没有改变它的行为。这里并不是说PreUpdate没有起到作用，而是Hibernate之决定更新一张表，至于更新什么内容，要等到PreUpdate之后决定（这一点可以从更新name时，lastModifiedDate发生了改变来证明）。</p>
-
-<h2>如何解决：</h2>
-
-<p>目前，我们没有完美的解决方案可以在仍然使用PreUpdate的情况下，保证审计信息更新正确。</p>
-
-<p>出现这个问题的主要原因是因为我们的实现受到框架实现机制的限制。</p>
-
-<p>所以，我们改变了实现的策略，既然受到框架本身实现策略的限制，我们就脱离框架，在还未计入框架管理范围之内，就将审计信息写入Entity内，那么可行的一种方式就是AOP。在触发Hibernate的save方法之前，将审计信息写入Entity。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/5">&larr; Older</a>
@@ -518,12 +488,15 @@
     <section>
   <h1>About Me</h1>
   <p>A ThoughtWorker</p>
-  <div>A Java Application Developer</div>
-  <div>Now I am learning AngularJS.</div>
+  <div>A Java/RoR Application Developer</div>
 </section>
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/07/25/restful-web-api-part-1/">理解设计RESTful API - 资源、表述和HTTP协议语义</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2015/07/13/linux-you-dont-understand-all-these-years/">《Linux就是这个范儿》读书笔记（一） - 理解Linux用户和用户组</a>
@@ -539,10 +512,6 @@
     
       <li class="post">
         <a href="/blog/2015/06/14/spring-web-security-2/">Spring Web Security 实战 (二) - 自定义登录页面</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/06/12/spring-web-security-1/">Spring Web Security 实战 (一) - 最少配置启动</a>
       </li>
     
   </ul>
