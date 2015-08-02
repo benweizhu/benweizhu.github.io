@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="什么是命名服务？什么是目录服务？什么是命名服务的上下文？ 命名服务NS（Naming Service）是命名系统提供的服务功能，通过名字访问命名系统中的对象。 目录服务DS(Directory Service)是命名服务的扩展，它不仅把名字与对象对应在一起，并且把名字与对象属性(Attribute &hellip;">
+  <meta name="description" content="事务就是将一条或者多条语句作为一个单元一起执行，要么全部执行，要么全都不执行。 如果你读过数据库的书，肯定知道数据库事务有四个基本特性：原子性，一致性，隔离性，持久性。 在JDBC中，事务的操作建立在Connection对象上，Connection对象提供了与事务相关的操作函数，例如： &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,98 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/07/13/learning-jdbc-transaction/">再次了解JDBC（下）- 事务</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-07-13T13:37:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:37 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>事务就是将一条或者多条语句作为一个单元一起执行，要么全部执行，要么全都不执行。</p>
+
+<p>如果你读过数据库的书，肯定知道数据库事务有四个基本特性：原子性，一致性，隔离性，持久性。</p>
+
+<p>在JDBC中，事务的操作建立在Connection对象上，Connection对象提供了与事务相关的操作函数，例如：setAutoCommit()，commit()，rollback()等。</p>
+
+<h2><strong>autocommit</strong></h2>
+
+<p>JDBC Connection默认的情况是AutoCommit模式，即每一条SQL语句在执行完之后都会提交到数据库中。对于简单的应用是可以的，但是关闭自动提交模式，由自己管理实务是有必要的，提高执行效率，保证业务处理过程完整性，使用分布式事务。</p>
+
+<p>事务可以让你控制对数据库的改变，它将一条或多条SQL语句作为一个逻辑单元，如果任何一条语句失败，则整个事务失败。</p>
+
+<p>关闭自动提交模式的方法很简单，调用setAutoCommit()方法：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">setAutoCommit</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2><strong>commit &amp; rollback</strong></h2>
+
+<p>一旦你完成了对数据库的改变操作，你需要执行commit()方法来提交改变，当执行过程中出现异常，你需要执行rollback()方法来回滚该事物。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>调用rollback方法会终结一个事务，并返回到数据被修改之前的值。如果你尝试在一个事务中去执行一条或多条语句，结果得到一个SQLException，调用rollback去结束一个事务，然后重新开始事务。这是唯一知道什么被提交，什么没有被提交的办法。因为捕获到SQLException会告诉你什么样的错误发生了，但是不会告诉你什么已经提交，什么没有。回滚是唯一的可靠办法。</p>
+
+<h2><strong>完整性</strong></h2>
+
+<p>除了将语句分组以一个单元统一执行，事务还帮助保证一张表中数据的完整性。事务会提供某种程度的保护，以防止两个用户同时访问数据时，造成的冲突。</p>
+
+<p>DBMS会使用锁机制，来防止其他用户对已经被事务访问的数据进行访问。一旦加锁，它会强制保证不变直到事务被提交。锁机制的目的是防止用户读到脏数据，也就是读到一些还没有被永久保存的数据（访问一个被更新但是还没有被提交的值，被认为是访问到脏数据，因为这个值很有可能会被回滚到以前的结果，那么你读到的值就是无效的）。</p>
+
+<p>锁是如何被设置的是由一个叫做事务隔离级别决定的。举例来说，如果事务隔离级别被设置为TRANSACTION_READ_COMMITTED，那么它就不会允许数据被访问，直到事务提交。换句话说，DBMS不允许读取脏数据的事件发生。</p>
+
+<p>TRANSACTION_NONE JDBC 驱动不支持事务<br/>
+TRANSACTION_READ_UNCOMMITTED 允许脏读，不可重复读和幻读。<br/>
+TRANSACTION_READ_COMMITTED 禁止脏读，但允许不可重复读和幻读。<br/>
+TRANSACTION_REPEATABLE_READ 禁止脏读和不可重复读，单运行幻读。<br/>
+TRANSACTION_SERIALIZABLE 禁止脏读，不可重复读和幻读。</p>
+
+<p>不可重复读的场景发生在事务A读取一行数据，事务B后续的改变了这一行，当事务A再次去读时，两次读取的事务就不一致了。</p>
+
+<p>幻读的场景是事务A读取到满足一定条件的一部分数据，事务B后续插入或者更新了一行数据，但是同样满足该条件，此时A再去读取发现多了一行数据。</p>
+
+<p>通常，你不需要对事务隔离级别做任何操作，只要使用默认的即可，但默认值取决于DBMS。例如，对于Java数据库，默认值是TRANSACTION_READ_COMMITTED。JDBC允许你获取和改变该级别，方法是getTransactionIsolation()和setTransactionIsolation()。</p>
+
+<p>参考资料：</p>
+
+<p><a href="http://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html">http://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html</a></p>
+
+<p><a href="http://www.tutorialspoint.com/jdbc/jdbc-transactions.htm">http://www.tutorialspoint.com/jdbc/jdbc-transactions.htm</a></p>
+
+<p><a href="http://blog.csdn.net/chenyongsuda/article/details/5641412">http://blog.csdn.net/chenyongsuda/article/details/5641412</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -407,461 +499,6 @@ Domain Name Service (DNS)</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/06/learning-jdbc-from-class-forname-to-datasource/">再次了解JDBC（上）- 从Class.forName到DataSource</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-07-06T18:21:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>6:21 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>JDBC（Java Data Base Connectivity，Java数据库连接）是一种用于执行SQL语句的Java API，可以为多种关系数据库提供统一访问，它由一组用Java语言编写的类和接口组成。</p>
-
-<h2><strong>API</strong></h2>
-
-<p>先来了解JDBC中几个非常重要的API（以下内容来自JDBC API中文文档，但未完全拷贝，建议还是阅读一下）：</p>
-
-<p><strong>java.sql.DriverManager（类）</strong>：管理一组 JDBC 驱动程序的基本服务。（注：DataSource 接口是 JDBC 2.0 API 中的新增内容，它提供了连接到数据源的另一种方法。使用 DataSource 对象是连接到数据源的首选方法。）作为初始化的一部分，DriverManager 类会尝试加载在 &ldquo;jdbc.drivers&rdquo; 系统属性中引用的驱动程序类。这允许用户定制由他们的应用程序使用的 JDBC Driver。应用程序不再需要使用 Class.forName() 显式地加载 JDBC 驱动程序。当前使用 Class.forName() 加载 JDBC 驱动程序的现有程序将在不作修改的情况下继续工作。在调用getConnection方法时，DriverManager会试着从初始化时加载的那些驱动程序以及使用与当前applet或应用程序相同的类加载器显式加载的那些驱动程序中查找合适的驱动程序。</p>
-
-<p><strong>java.sql.Connection（接口）</strong>：与特定数据库的连接（会话）。在连接上下文中执行 SQL 语句并返回结果。（注：在配置 Connection 时，JDBC 应用程序应该使用适当的Connection方法，比如setAutoCommit或setTransactionIsolation。在有可用的JDBC方法时，应用程序不能直接调用 SQL 命令更改连接的配置。默认情况下，Connection对象处于自动提交模式下，这意味着它在执行每个语句后都会自动提交更改。如果禁用了自动提交模式，那么要提交更改就必须显式调用commit方法；否则无法保存数据库更改。）</p>
-
-<p><strong>java.sql.Statement（接口）</strong>：用于执行静态SQL语句并返回它所生成结果的对象。</p>
-
-<p><strong>java.sql.ResultSet（接口）</strong>：表示数据库结果集的数据表，通常通过执行查询数据库的语句生成。ResultSet对象具有指向其当前数据行的光标。最初，光标被置于第一行之前。next方法将光标移动到下一行；因为该方法在ResultSet对象没有下一行时返回false，所以可以在while循环中使用它来迭代结果集。默认的ResultSet对象不可更新，仅有一个向前移动的光标。因此，只能迭代它一次，并且只能按从第一行到最后一行的顺序进行。ResultSet 接口提供用于从当前行获取列值的获取方法（getBoolean、getLong 等）。可以使用列的索引编号或列的名称获取值。一般情况下，使用列索引较为高效。列从1开始编号。为了获得最大的可移植性，应该按从左到右的顺序读取每行中的结果集列，每列只能读取一次。对于获取方法，JDBC 驱动程序尝试将底层数据转换为在获取方法中指定的Java类型，并返回适当的Java值。JDBC规范有一个表，显示允许的从SQL类型到ResultSet获取方法所使用的Java类型的映射关系。</p>
-
-<p><strong>java.sql.Driver（接口）</strong>：每个驱动程序类必须实现的接口。Java SQL框架允许多个数据库驱动程序。每个驱动程序都应该提供一个实现 Driver 接口的类。DriverManager会试着加载尽可能多的它可以找到的驱动程序，然后，对于任何给定连接请求，它会让每个驱动程序依次试着连接到目标URL。强烈建议每个Driver类应该是小型的并且是单独的，这样就可以在不必引入大量支持代码的情况下加载和查询Driver类。在加载某一Driver类时，它应该创建自己的实例并向DriverManager注册该实例。这意味着用户可以通过调用以下程序加载和注册一个驱动程序Class.forName(&ldquo;foo.bah.Driver&rdquo;)。</p>
-
-<p>来看一段比较老式风格的JDBC代码：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">dao</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.jdbc.example.model.Book</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.*</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookDaoWithDM</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">url</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">username</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">password</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">driverName</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="nf">BookDaoWithDM</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">String</span> <span class="n">username</span><span class="o">,</span> <span class="n">String</span> <span class="n">password</span><span class="o">,</span> <span class="n">String</span> <span class="n">driverName</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">username</span> <span class="o">=</span> <span class="n">username</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">password</span> <span class="o">=</span> <span class="n">password</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">driverName</span> <span class="o">=</span> <span class="n">driverName</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">Book</span> <span class="nf">findBookByISBN</span><span class="o">(</span><span class="kt">int</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="n">Statement</span> <span class="n">statement</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">connection</span> <span class="o">=</span> <span class="n">getConnection</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">statement</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createStatement</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">book</span> <span class="o">=</span> <span class="n">getBook</span><span class="o">(</span><span class="n">statement</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">(</span><span class="n">getQuerySqlFor</span><span class="o">(</span><span class="n">isbn</span><span class="o">)));</span>
-</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ClassNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
-</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
-</span><span class='line'>      <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-</span><span class='line'>          <span class="k">try</span> <span class="o">{</span>
-</span><span class='line'>              <span class="k">if</span> <span class="o">(</span><span class="n">statement</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                  <span class="n">statement</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
-</span><span class='line'>              <span class="o">}</span>
-</span><span class='line'>              <span class="k">if</span> <span class="o">(</span><span class="n">connection</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                  <span class="n">connection</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
-</span><span class='line'>              <span class="o">}</span>
-</span><span class='line'>          <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>              <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
-</span><span class='line'>          <span class="o">}</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">book</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">Connection</span> <span class="nf">getConnection</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">ClassNotFoundException</span><span class="o">,</span> <span class="n">SQLException</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="n">driverName</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">DriverManager</span><span class="o">.</span><span class="na">getConnection</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">username</span><span class="o">,</span> <span class="n">password</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="nf">getQuerySqlFor</span><span class="o">(</span><span class="kt">int</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;select * from book where isbn = &quot;</span> <span class="o">+</span> <span class="n">isbn</span> <span class="o">+</span> <span class="s">&quot;;&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">Book</span> <span class="nf">getBook</span><span class="o">(</span><span class="n">ResultSet</span> <span class="n">resultSet</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">while</span> <span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">next</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">book</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Book</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setIsbn</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getInt</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span>
-</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="mi">2</span><span class="o">));</span>
-</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setPrice</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getDouble</span><span class="o">(</span><span class="mi">3</span><span class="o">));</span>
-</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setAuthor</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="mi">4</span><span class="o">));</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">book</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">dao</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.jdbc.example.model.Book</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.junit.Before</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.junit.Test</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">hamcrest</span><span class="o">.</span><span class="na">CoreMatchers</span><span class="o">.</span><span class="na">is</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">hamcrest</span><span class="o">.</span><span class="na">CoreMatchers</span><span class="o">.</span><span class="na">nullValue</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">Assert</span><span class="o">.</span><span class="na">assertThat</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookDaoWithDMTest</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;jdbc:mysql://localhost:3306/bookshelf&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">username</span> <span class="o">=</span> <span class="s">&quot;username&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">password</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">driverName</span> <span class="o">=</span> <span class="s">&quot;com.mysql.jdbc.Driver&quot;</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">BookDaoWithDM</span> <span class="n">bookDaoWithDM</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Before</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">bookDaoWithDM</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">BookDaoWithDM</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">username</span><span class="o">,</span> <span class="n">password</span><span class="o">,</span> <span class="n">driverName</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Test</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">shouldFindBookFromDatabaseWhenISBNIs12</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="c1">//when</span>
-</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="n">bookDaoWithDM</span><span class="o">.</span><span class="na">findBookByISBN</span><span class="o">(</span><span class="mi">12</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="c1">//then</span>
-</span><span class='line'>      <span class="n">assertThat</span><span class="o">(</span><span class="n">book</span><span class="o">.</span><span class="na">getName</span><span class="o">(),</span> <span class="n">is</span><span class="o">(</span><span class="s">&quot;benwei&quot;</span><span class="o">));</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Test</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">shouldNotFindBookFromDatabaseWhenISBNIs1</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="c1">//when</span>
-</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="n">bookDaoWithDM</span><span class="o">.</span><span class="na">findBookByISBN</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="c1">//then</span>
-</span><span class='line'>      <span class="n">assertThat</span><span class="o">(</span><span class="n">book</span><span class="o">,</span> <span class="n">is</span><span class="o">(</span><span class="n">nullValue</span><span class="o">()));</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">model</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Book</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">isbn</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">double</span> <span class="n">price</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">author</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setIsbn</span><span class="o">(</span><span class="kt">int</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">isbn</span> <span class="o">=</span> <span class="n">isbn</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getIsbn</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">isbn</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPrice</span><span class="o">(</span><span class="kt">double</span> <span class="n">price</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">price</span> <span class="o">=</span> <span class="n">price</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">double</span> <span class="nf">getPrice</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">price</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAuthor</span><span class="o">(</span><span class="n">String</span> <span class="n">author</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">author</span> <span class="o">=</span> <span class="n">author</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getAuthor</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">author</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2><strong>Class.forName()</strong></h2>
-
-<p>上面这个例子是很普通的JDBC编程，这里有一点要讲的，那就是DriverManager会加载注册到它自己的Driver。但是，在上面的例子中，好像没有看到哪里有显示的注册Driver到DriverManager。为什么DriverManager能够找到MySQL的Driver呢？</p>
-
-<p>回头看API文档中的一句话：</p>
-
-<p>“这意味着用户可以通过调用以下程序加载和注册一个驱动程序Class.forName(&ldquo;foo.bah.Driver&rdquo;)。”。</p>
-
-<p>我们知道Class.forName()方法是将一个指定名字的Class加载到JVM中。这和注册Driver有什么关系呢？看下MySQL实现的Driver源码你就明白了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">mysql</span><span class="o">.</span><span class="na">jdbc</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.SQLException</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Driver</span> <span class="kd">extends</span> <span class="n">NonRegisteringDriver</span> <span class="kd">implements</span> <span class="n">java</span><span class="o">.</span><span class="na">sql</span><span class="o">.</span><span class="na">Driver</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">static</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">java</span><span class="o">.</span><span class="na">sql</span><span class="o">.</span><span class="na">DriverManager</span><span class="o">.</span><span class="na">registerDriver</span><span class="o">(</span><span class="k">new</span> <span class="nf">Driver</span><span class="o">());</span>
-</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">E</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="s">&quot;Can&#39;t register driver!&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="nf">Driver</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
-</span><span class='line'>      
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>原来在这个Driver实现类中一段静态代码块，在类加载时，会被执行，此时就实现了将自己注册到DriverManager。</p>
-
-<h2><strong>DataSource</strong></h2>
-
-<p>OK，继续，前面的API文档中提到，目前一种更好的连接到数据源也就是获得Connection的方式是使用DataSource。我们来看下DataSource是什么？同样，先来读一下DataSource的API文档。</p>
-
-<p><strong>javax.sql.DataSource（接口）</strong>：该工厂用于提供到此DataSource对象所表示的物理数据源的连接（A factory for connections to the physical data source that this DataSource object represents.）。作为 DriverManager工具的替代项，DataSource对象是获取连接的首选方法。实现DataSource接口的对象通常在基于JavaTM Naming and Directory Interface(JNDI) API的命名服务中注册。</p>
-
-<p>DataSource接口由驱动程序供应商实现。共有三种类型的实现：</p>
-
-<p>基本实现 - 生成标准的Connection对象<br/>
-连接池实现 - 生成自动参与连接池的Connection对象。此实现与中间层连接池管理器一起使用。<br/>
-分布式事务实现 - 生成一个Connection对象，该对象可用于分布式事务，大多数情况下总是参与连接池。此实现与中间层事务管理器一起使用，大多数情况下总是与连接池管理器一起使用。</p>
-
-<p>DataSource对象的属性在必要时可以修改。例如，如果将数据源移动到另一个服务器，则可更改与服务器相关的属性。其优点在于，由于可以更改数据源的属性，所以任何访问该数据源的代码都无需更改。</p>
-
-<p>通过DataSource对象访问的驱动程序本身不会向DriverManager注册。通过查找操作获取DataSource对象，然后使用该对象创建Connection对象。使用基本的实现，通过DataSource对象获取的连接与通过DriverManager设施获取的连接相同。</p>
-
-<p>——————————————————————————————————————————————————————</p>
-
-<p>上面提到了几点：</p>
-
-<p>1.使用JNDI方式注册DataSource，然后在使用时根据名字将DataSource取出。<br/>
-2.通过DataSource对象访问的驱动程序本身不会向DriverManager注册。</p>
-
-<p>JNDI(Java Naming and Directory Interface，Java命名和目录接口)是一组在Java应用中访问命名和目录服务的API。命名服务将名称和对象联系起来，使得我们可以用名称访问对象。不过在本文中暂时不去涉及这个内容。</p>
-
-<p>DataSource是一个接口，那么它的实现者有哪些呢？有一个比较常用的，Apache Commons的DBCP（Database Connection Pool），它是Apache Commons提供的一种数据库连接池组件，也是tomcat的数据库连接池组件。（回头看一下API文档上说的三种实现类型的第二种）。</p>
-
-<p>将上面例子中使用DriverManager创建连接的方式，换成使用DataSource非常简单，替换上面的getConnection方法。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="n">Connection</span> <span class="nf">getConnection</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">BasicDataSource</span> <span class="n">dataSource</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">BasicDataSource</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">dataSource</span><span class="o">.</span><span class="na">setUrl</span><span class="o">(</span><span class="n">url</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">dataSource</span><span class="o">.</span><span class="na">setUsername</span><span class="o">(</span><span class="n">username</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">dataSource</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="n">password</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">dataSource</span><span class="o">.</span><span class="na">getConnection</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>从这段代码可以看出，映射了上面我说的的第二点，不需要向DriverManager注册，所以这里没有传入MySQL的ClassName。</p>
-
-<p>OK，到此，我们回顾了JDBC最基础的几个接口：DriverManager，Driver，Connection，Statement，ResultSet，以及JDBC推荐的数据库连接方式DataSource。在下一章，我们会继续了解与JDBC相关的核心技术和概念，包括事务，JNDI等。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/20">&larr; Older</a>
@@ -885,6 +522,10 @@ Domain Name Service (DNS)</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/08/01/css-selector-basic/">CSS后代选择器以及选择器特殊性</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/07/25/restful-web-api-part-1/">理解设计RESTful API - 资源、表述和HTTP协议语义</a>
       </li>
     
@@ -898,10 +539,6 @@ Domain Name Service (DNS)</p>
     
       <li class="post">
         <a href="/blog/2015/06/14/spring-web-security-3/">Spring Web Security 实战 (三) - 改变用户认证方式和安全性</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/06/14/spring-web-security-2/">Spring Web Security 实战 (二) - 自定义登录页面</a>
       </li>
     
   </ul>
