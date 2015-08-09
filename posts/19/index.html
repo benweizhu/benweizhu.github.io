@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="事务就是将一条或者多条语句作为一个单元一起执行，要么全部执行，要么全都不执行。 如果你读过数据库的书，肯定知道数据库事务有四个基本特性：原子性，一致性，隔离性，持久性。 在JDBC中，事务的操作建立在Connection对象上，Connection对象提供了与事务相关的操作函数，例如： &hellip;">
+  <meta name="description" content="在Web开发中，一个重要的特性，那就是对表单提交的内容进行合法性校验。 校验的方式根据方式的不同，分为两类：前端校验和后端校验。 前端校验的优点是，不用与服务器交互，由JavaScript直接对页面元素中的内容进行校验，速度更快。但这种方式的安全性不高， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,736 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/07/19/spring-validation-by-example/">Spring Validation 深入浅出</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-07-19T19:12:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>7:12 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在Web开发中，一个重要的特性，那就是对表单提交的内容进行合法性校验。</p>
+
+<p>校验的方式根据方式的不同，分为两类：前端校验和后端校验。</p>
+
+<p>前端校验的优点是，不用与服务器交互，由JavaScript直接对页面元素中的内容进行校验，速度更快。但这种方式的安全性不高，对于了解web开发的人可以通过修改页面内容的方式绕过前端验证。</p>
+
+<p>后端验证需要表单提交，一般情况下会刷新页面，对于用户体验不是太理想。</p>
+
+<p>所以，一般前端验证会和后端验证会配合在一起。</p>
+
+<p>今天我们一起来学习一下，在Spring MVC中，是如何进行后端的校验，它又是如何通过Spring提供的Form标签，将错误警告信息传递到前端来显示。</p>
+
+<h2><strong>基本了解</strong></h2>
+
+<p>我们先来简单的写一个demo，这种HelloWorld式例子最容易让人有信心去理解和学习，要实现它，你只需要了解下面五样或者四样东西。</p>
+
+<p><strong>一个重要的包：</strong></p>
+
+<p>Spring框架中有一个非常重要的包，org.springframework.validation，它提供了两个重要的特性：数据绑定和校验。</p>
+
+<p>数据绑定允许用户的输入动态的绑定到应用的领域模型，实现字符串类型和其他类型的转换。</p>
+
+<p>在Spring MVC，数据绑定机制允许你使用任何的命令对象或者表单对象-你不需要实现一个框架指定的接口或者类。</p>
+
+<p><strong>一个重要接口：</strong></p>
+
+<p>Errors：用于存储和暴露于某个对象相关的数据绑定和错误校验信息。</p>
+
+<p><strong>一个重要的类：</strong></p>
+
+<p>BeanPropertyBindingResult：Spring中，Errors和BindingResult接口的默认实现类，主要给JavaBean对象的绑定错误进行注册和评估。</p>
+
+<p><strong>一个重要的Form标签：</strong></p>
+
+<p>&lt;form:errors>:这个标签会将对象field的错误渲染成一个HTML的span标签。它能够访问由Controller或者与Controller相关的的Validator创建出来的errors对象。（关于Validator，后面会介绍）</p>
+
+<p><strong>两个重要的函数：</strong></p>
+
+<p>那么，要在Controller中实现一个最简单的校验，并将校验结果显示在前端就非常简单了，你只需要在了解Errors接口的两个函数：</p>
+
+<p>reject():使用给定的错误描述信息，给这个目标对象注册一个全局的错误信息</p>
+
+<p>rejectValue()：使用给定的错误描述信息，注册一个field的错误到当前对象的某个指定field上（或者该对象的某个成员变量的field上，比如customer.name.firstName）。这个field名字也可以是null或者空串来说明是指定该对象而不是该对象的一个field（不过这样容易导致一些错误）。</p>
+
+<p>看下面的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:mvc=</span><span class="s">&quot;http://www.springframework.org/schema/mvc&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/mvc</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/beans</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/beans/spring-beans-3.1.xsd</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/context</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/context/spring-context-3.1.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;me.zeph.springview.demo&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;viewResolver&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;viewClass&quot;</span> <span class="na">value=</span><span class="s">&quot;org.springframework.web.servlet.view.JstlView&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;prefix&quot;</span> <span class="na">value=</span><span class="s">&quot;/WEB-INF/view/&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;suffix&quot;</span> <span class="na">value=</span><span class="s">&quot;.jsp&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">&lt;!-- bind your messages.properties --&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;messageSource&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.context.support.ResourceBundleMessageSource&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;basename&quot;</span> <span class="na">value=</span><span class="s">&quot;messages&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;mvc:annotation-driven/&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里唯一特殊的一点就是配置了一个ResourceBundle，它指向一个messages.properties文件，里面存放这校验错误码对应的信息。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>NotEmpty.customer.name=Name is required
+</span><span class='line'>NotEmpty.customer.password=Password is required
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.Customer</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.Errors</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">StringUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Controller</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ErrorController</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">ERROR</span> <span class="o">=</span> <span class="s">&quot;error&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">ERROR_SUCCESS</span> <span class="o">=</span> <span class="s">&quot;error-success&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;error&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">view</span><span class="o">(</span><span class="n">Customer</span> <span class="n">customer</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">ERROR</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;error&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">commit</span><span class="o">(</span><span class="n">Customer</span> <span class="n">customer</span><span class="o">,</span> <span class="n">Errors</span> <span class="n">errors</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">isEmpty</span><span class="o">(</span><span class="n">customer</span><span class="o">.</span><span class="na">getName</span><span class="o">()))</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">errors</span><span class="o">.</span><span class="na">rejectValue</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;NotEmpty.customer.name&quot;</span><span class="o">,</span> <span class="s">&quot;name is empty&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">isEmpty</span><span class="o">(</span><span class="n">customer</span><span class="o">.</span><span class="na">getPassword</span><span class="o">()))</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">errors</span><span class="o">.</span><span class="na">rejectValue</span><span class="o">(</span><span class="s">&quot;password&quot;</span><span class="o">,</span> <span class="s">&quot;NotEmpty.customer.password&quot;</span><span class="o">,</span> <span class="s">&quot;password is empty&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="c1">//Just for demonstrating reject the object itself</span>
+</span><span class='line'>      <span class="n">errors</span><span class="o">.</span><span class="na">reject</span><span class="o">(</span><span class="s">&quot;customer.invalid&quot;</span><span class="o">,</span> <span class="s">&quot;Customer is invalid&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">errors</span><span class="o">.</span><span class="na">hasErrors</span><span class="o">()</span> <span class="o">?</span> <span class="n">ERROR</span> <span class="o">:</span> <span class="n">ERROR_SUCCESS</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在Controller里面，通过参数让Spring帮我们注入Errors对象（注意Errors作为参数的位置一定要在领域对象（表单对象）的后面，猜测原因是Spring需要知道Errors对象是与哪个对象绑定的）。这里自己写校验逻辑，然后调用errors的rejectValue方法，将错误信息保存起来。如果你在这里打断点，你会看到，Errors真正的类型是BeanPropertyBindingResult。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ taglib prefix=&quot;form&quot; uri=&quot;http://www.springframework.org/tags/form&quot; %&gt;
+</span><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
+</span><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'><span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Spring MVC View Demo<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'><span class="nt">&lt;/head&gt;</span>
+</span><span class='line'><span class="nt">&lt;body&gt;</span>
+</span><span class='line'><span class="nt">&lt;h1&gt;</span>Spring MVC View Demo<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'><span class="nt">&lt;form:form</span> <span class="na">commandName=</span><span class="s">&quot;customer&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">action=</span><span class="s">&quot;error&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;form:errors</span> <span class="na">path=</span><span class="s">&quot;*&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;name&quot;</span><span class="nt">&gt;</span>name :<span class="nt">&lt;/label&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;form:input</span> <span class="na">path=</span><span class="s">&quot;name&quot;</span> <span class="na">id=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;password&quot;</span><span class="nt">&gt;</span>password :<span class="nt">&lt;/label&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;form:password</span> <span class="na">path=</span><span class="s">&quot;password&quot;</span> <span class="na">id=</span><span class="s">&quot;password&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;submit&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="nt">&lt;/form:form&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>path=&ldquo;*&rdquo; - 显示全部的内容</strong>   <br/>
+<strong>path=&ldquo;name&rdquo; - 显示与name这个field相关的错误信息</strong><br/>
+<strong>如果path不填 - 只显示与表单对象本身相关的错误信息</strong></p>
+
+<p>到这里，你就可以去试一试，看能不能正常显示出你想要的信息。但是是不是到这里就为止了呢？远远没有。这只是Spring Validation最根本和最简单的实现，这种方式并不被Spring推荐，我们继续。</p>
+
+<h2><strong>JSR-303</strong></h2>
+
+<p>在Spring 3.0之后，Spring Validation的功能增强了，支持结合使用JSR-303标准进行校验。</p>
+
+<p>先讲讲什么是JSR-303，它是Java标准中Bean Validation的1.0版本。</p>
+
+<p>它可以让你通过注解的方式来对对象模型添加限制，它提供的开箱即用的常用限制注解，同时也允许你写自己的限制规则。</p>
+
+<p>不过就像之前学习的，它只是标准，具体实现由第三方提供，默认的参考实现是Hibernate Validator。</p>
+
+<p>结合JSR-303，对表单的对象的校验就是成为了简单的给领域对象添加限定规则的注解。</p>
+
+<p>来看看怎么写</p>
+
+<p>首先给领域对象的field添加你需要的注解</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">domain</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.hibernate.validator.constraints.NotEmpty</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@NotEmpty</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="nd">@NotEmpty</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">password</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getPassword</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">password</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPassword</span><span class="o">(</span><span class="n">String</span> <span class="n">password</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">password</span> <span class="o">=</span> <span class="n">password</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>接下来，Controller就简单了，没有写任何校验逻辑。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.User</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.Errors</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.validation.Valid</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Controller</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ValidController</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VALID</span> <span class="o">=</span> <span class="s">&quot;valid&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VALID_SUCCESS</span> <span class="o">=</span> <span class="s">&quot;valid-success&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;valid&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">view</span><span class="o">(</span><span class="n">User</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">VALID</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;valid&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">commit</span><span class="o">(</span><span class="nd">@Valid</span> <span class="n">User</span> <span class="n">user</span><span class="o">,</span> <span class="n">Errors</span> <span class="n">errors</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">errors</span><span class="o">.</span><span class="na">hasErrors</span><span class="o">()</span> <span class="o">?</span> <span class="n">VALID</span> <span class="o">:</span> <span class="n">VALID_SUCCESS</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>看下面的错误码和消息的写法，你应该知道JSR-303生成错误码的规则。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">NotEmpty</span><span class="o">.</span><span class="na">user</span><span class="o">.</span><span class="na">name</span><span class="o">=</span><span class="n">Name</span> <span class="n">is</span> <span class="n">required</span>
+</span><span class='line'><span class="n">NotEmpty</span><span class="o">.</span><span class="na">user</span><span class="o">.</span><span class="na">password</span><span class="o">=</span><span class="n">Password</span> <span class="n">is</span> <span class="n">required</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果你觉得它提供的注解不够你用，你还可以写自己的注解，具体的内容就不在这里谈了，这是JSR-303的内容。如果你想了解，可以参考Hibernate Validation的指南： <a href="http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#validator-customconstraints">http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#validator-customconstraints</a></p>
+
+<p>还没讲完呢，继续深入。</p>
+
+<h2><strong>深入理解</strong></h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="n">String</span> <span class="nf">commit</span><span class="o">(</span><span class="nd">@Valid</span> <span class="n">User</span> <span class="n">user</span><span class="o">,</span> <span class="n">Errors</span> <span class="n">errors</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>看到没，在我们的领域对象User上有一个注解@Valid，它是JSR-303标准API提供的。</p>
+
+<p>在Spring3.0之后，Spring MVC提供了一种能力可以让Controller输入参数进行自动的校验，之前后需要我们自己去触发校验逻辑。方法就是在输入参数加一个@Valid注解。</p>
+
+<p>关于Spring Validation与JSR-303的结合使用，暂时到这里，我们再来看点别的。如果你也在学习Spring的Validation，那么你肯定会看到Spring的文档的第六章（ <a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/validation.html">http://docs.spring.io/spring/docs/current/spring-framework-reference/html/validation.html</a> ）。</p>
+
+<p>它没有像我这样讲解Errors对象，讲解form怎么显示错误信息，而是介绍了一个Validator接口。那它是什么呢？</p>
+
+<p>如果你有看它的API的解释，它会告诉你，它只是一个单纯的接口，期待将校验逻辑与web层，数据访问层解耦，它提供两个方法supports和validate。</p>
+
+<p>根据它在指南中给的信息，我写出来下面的这段代码。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.Account</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.validator.AccountValidator</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.Errors</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.validation.Valid</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Controller</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ValidatorController</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Autowired</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">AccountValidator</span> <span class="n">accountValidator</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VALIDATOR</span> <span class="o">=</span> <span class="s">&quot;validator&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VALIDATOR_SUCCESS</span> <span class="o">=</span> <span class="s">&quot;validator-success&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;validator&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">view</span><span class="o">(</span><span class="n">Account</span> <span class="n">account</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">VALIDATOR</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;validator&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">commit</span><span class="o">(</span><span class="n">Account</span> <span class="n">account</span><span class="o">,</span> <span class="n">Errors</span> <span class="n">errors</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">accountValidator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="n">account</span><span class="o">,</span> <span class="n">errors</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">errors</span><span class="o">.</span><span class="na">hasErrors</span><span class="o">()</span> <span class="o">?</span> <span class="n">VALIDATOR</span> <span class="o">:</span> <span class="n">VALIDATOR_SUCCESS</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">validator</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.Account</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.Errors</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.ValidationUtils</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.Validator</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Component</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AccountValidator</span> <span class="kd">implements</span> <span class="n">Validator</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@Override</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">supports</span><span class="o">(</span><span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">clazz</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">Account</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">clazz</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Override</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">validate</span><span class="o">(</span><span class="n">Object</span> <span class="n">target</span><span class="o">,</span> <span class="n">Errors</span> <span class="n">errors</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">ValidationUtils</span><span class="o">.</span><span class="na">rejectIfEmpty</span><span class="o">(</span><span class="n">errors</span><span class="o">,</span> <span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;NotEmpty.account.name&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">ValidationUtils</span><span class="o">.</span><span class="na">rejectIfEmpty</span><span class="o">(</span><span class="n">errors</span><span class="o">,</span> <span class="s">&quot;password&quot;</span><span class="o">,</span> <span class="s">&quot;NotEmpty.account.password&quot;</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>和我写的第一个例子比较，是不是很简洁，将校验逻辑和Controller分离。</p>
+
+<p>等等，你这只是分了一个Service层来专门做校验，你在Controller层还是手动触发了校验逻辑，哪里像Validator API中说的那么理想，完全解耦了。</p>
+
+<p>那是因为我写错了，正确的写法应该是这样的。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.Account</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.validator.AccountValidator</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.Errors</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.WebDataBinder</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.InitBinder</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.validation.Valid</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Controller</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ValidatorController</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Autowired</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">AccountValidator</span> <span class="n">accountValidator</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VALIDATOR</span> <span class="o">=</span> <span class="s">&quot;validator&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VALIDATOR_SUCCESS</span> <span class="o">=</span> <span class="s">&quot;validator-success&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@InitBinder</span>
+</span><span class='line'>  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">initBinder</span><span class="o">(</span><span class="n">WebDataBinder</span> <span class="n">binder</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">binder</span><span class="o">.</span><span class="na">setValidator</span><span class="o">(</span><span class="n">accountValidator</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;validator&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">view</span><span class="o">(</span><span class="n">Account</span> <span class="n">account</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">VALIDATOR</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;validator&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">commit</span><span class="o">(</span><span class="nd">@Valid</span> <span class="n">Account</span> <span class="n">account</span><span class="o">,</span> <span class="n">Errors</span> <span class="n">errors</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">errors</span><span class="o">.</span><span class="na">hasErrors</span><span class="o">()</span> <span class="o">?</span> <span class="n">VALIDATOR</span> <span class="o">:</span> <span class="n">VALIDATOR_SUCCESS</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的代码说明了两件事情：</p>
+
+<p>1.我在Account的前面加了@Valid，导致自动触发校验过程<br/>
+2.校验逻辑是由我写的Validator实现</p>
+
+<p>你先不要去想@InitBinder是干什么，简单的说，它是Controller中的一个回调函数，Controller容器会在Controller的生命周期的某个阶段调用它。</p>
+
+<p>WebDataBinder到是可以看看，它是web请求参数转换为JavaBean对象时，使用的特殊的数据绑定（DataBinder）对象。因为我们这里不涉及到数据绑定的内容，所以不细聊，但是你可以想象，该数据绑定的过程，必然在进入Controller的某个请求方法之前完成的（因为Spring必须在给我们注入领域对象啊）。</p>
+
+<h3><strong>回头想一个问题</strong></h3>
+
+<p>好了，如果这里你想清楚了，可以再回头想一个问题，前面使用JSR-303方式定义校验，怎么没有定义一个Validator呢？</p>
+
+<p>原因在这个对象：LocalValidatorFactoryBean，它是Spring为支持JSR-303标准专门实现的一个类，为了同时支持Spring的Validation机制和JSR-303，它同时实现了Spring的Validator接口和JSR-303中Validator接口（这两个不一样哦）。</p>
+
+<p>那么，如果我要使用JSR-303标准，需要显示的在容器中声明这个bean吗？需要也不需要。</p>
+
+<p>在你的xxx-servlet.xml中定义的&lt;mvc:annotation-driven/>标签会帮你声明。</p>
+
+<p>所以如果你在initBinder方法那打个断点，你可以看到WebDataBinder中的Validator对象就是LocalValidatorFactoryBean。</p>
+
+<p>现在是不是比较清楚了？</p>
+
+<h2><strong>再讲一个重要的东西</strong></h2>
+
+<p>还需要再讲一个东西：MessageCodesResolver和DefaultMessageCodesResolver</p>
+
+<p>MessageCodesResolver是从Validation的ErrorCode映射到MessageCode的策略接口，被DataBinder使用，给ObjectErrors和FieldErrors构建MessageCode列表。</p>
+
+<p>DefaultMessageCodesResolver是MessageCodesResolver提供的一个默认实现。</p>
+
+<p>策略是：</p>
+
+<p>针对object的错误，会去找两种错误信息码：</p>
+
+<p>1.code + &ldquo;.&rdquo; + object name<br/>
+2.code</p>
+
+<p>针对field的错误，会去找三种错误信息码：</p>
+
+<p>1.code + &ldquo;.&rdquo; + object name + &ldquo;.&rdquo; + field<br/>
+2.code + &ldquo;.&rdquo; + field<br/>
+3.code + &ldquo;.&rdquo; + field type<br/>
+4.code</p>
+
+<p>举例来说：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">//field, error code, default message</span>
+</span><span class='line'><span class="n">errors</span><span class="o">.</span><span class="na">rejectValue</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;NotEmpty&quot;</span><span class="o">,</span> <span class="s">&quot;name is empty&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">errors</span><span class="o">.</span><span class="na">rejectValue</span><span class="o">(</span><span class="s">&quot;password&quot;</span><span class="o">,</span> <span class="s">&quot;NotEmpty&quot;</span><span class="o">,</span> <span class="s">&quot;password is empty&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">errors</span><span class="o">.</span><span class="na">reject</span><span class="o">(</span><span class="s">&quot;Invalid&quot;</span><span class="o">,</span> <span class="s">&quot;Customer is invalid&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//messages.properties</span>
+</span><span class='line'><span class="n">NotEmpty</span><span class="o">=</span><span class="n">Name</span> <span class="n">is</span> <span class="n">required</span>
+</span><span class='line'><span class="n">NotEmpty</span><span class="o">.</span><span class="na">password</span><span class="o">=</span><span class="n">Password</span> <span class="n">is</span> <span class="n">required</span>
+</span><span class='line'><span class="n">Invalid</span><span class="o">=</span><span class="n">Customer</span> <span class="n">is</span> <span class="n">invalid</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>所以，如果你回过头去，看我写的第一个例子，实际上，它是使用的最后一个策略。</p>
+
+<p>好了，关于Spring Validation的基本内容到此为止，应该比较清楚了，如果你要正确使用它，应该没有任何问题。</p>
+
+<p>其实，我很早就想写这篇文章，一直拖到在项目上遇到问题，才促使我完成，实在惭愧。希望这篇文章对大家有所帮助</p>
+
+<p>参考资料：</p>
+
+<p>1.<a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/validation.html">http://docs.spring.io/spring/docs/current/spring-framework-reference/html/validation.html</a></p>
+
+<p>2.<a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/view.html">http://docs.spring.io/spring/docs/current/spring-framework-reference/html/view.html</a></p>
+
+<p>3.<a href="http://docs.spring.io/spring/docs/2.5.x/api/org/springframework/validation/package-summary.html">http://docs.spring.io/spring/docs/2.5.x/api/org/springframework/validation/package-summary.html</a></p>
+
+<p>4.<a href="http://docs.huihoo.com/spring/3.0.x/en-us/ch05s07.html">http://docs.huihoo.com/spring/3.0.x/en-us/ch05s07.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -157,348 +887,6 @@ TRANSACTION_SERIALIZABLE 禁止脏读，不可重复读和幻读。</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/07/learning-jdbc-with-jndi/">再次了解JDBC（中）- 引入JNDI</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-07-07T13:56:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:56 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2><strong>什么是命名服务？什么是目录服务？什么是命名服务的上下文？</strong></h2>
-
-<p>命名服务NS（Naming Service）是命名系统提供的服务功能，通过名字访问命名系统中的对象。</p>
-
-<p>目录服务DS(Directory Service)是命名服务的扩展，它不仅把名字与对象对应在一起，并且把名字与对象属性(Attribute) 联系在一起，因此不仅可以通过名字还可以通过属性来搜索对象。</p>
-
-<p>对象名与对应的对象构成的集合叫对象上下文（Context）。
-例如，在文件命名系统中，一个目录就是一个Context，其内容是文件名（名）和对应的文件的集合。</p>
-
-<h2><strong>那什么是JNDI？</strong></h2>
-
-<p>Java Naming and Dirctory Interface - Java命名和目录接口，它是sun公司提出的方便应用程序访问命名和目录服务的的API。</p>
-
-<p>和其他设计一样，JNDI是接口API，它独立于任何命名或者目录服务的具体实现。这样，你就可以用相同的API去访问多种不同类型的命名和目录服务。</p>
-
-<p>根据它们作用的不同，典型应用场景也就分为两个部分：</p>
-
-<p>（1）将Java应用程序连接到外部的目录服务。</p>
-
-<p>（2）允许Java的Servlet在web容器中寻找定义配置信息。</p>
-
-<p>JNDI的架构是有一套API和一套SPI（Service Provider Interface）接口组成。Java应用程序使用JNDI API来访问不同的命名和目录服务。SPI则让不同的命名和目录服务可以透明和无缝插入，这样Java应用程序才能使用JNDI API来访问它们的服务。</p>
-
-<p><img class="center" src="/../images/jndi/arch.png"></p>
-
-<p>JNDI是包含在Java SE平台中。要使用JNDI，你必须有JNDI的类库和一个到多个服务提供商。JDK本身包含一些服务提供商：</p>
-
-<p>Lightweight Directory Access Protocol (LDAP)<br/>
-Common Object Request Broker Architecture (CORBA) Common Object Services (COS) name service<br/>
-Java Remote Method Invocation (RMI) Registry<br/>
-Domain Name Service (DNS)</p>
-
-<p>JNDI API是访问任何命名或者目录服务的通用API。实际访问一个命名或目录服务需要在JNDI下插入一个服务提供商。</p>
-
-<p>服务提供商是一个映射到JNDI API能实际调用命名或目录服务器的软件。一般情况，服务提供商的角色和命名或目录服务器的角色是不一样的。从C/S软件角度说，JNDI和服务器提供商是JNDI的客户端，命名或者目录服务器是服务端。</p>
-
-<p>客户端和服务器端交互的方式有很多。一种比较常用的方式是，使用网络协议。而服务器通常支持不同的客户端，不仅仅是JNDI的客户端，只是它们要遵循不同协议。JNDI也不规定JNDI客户端和服务端交互的方式。</p>
-
-<h2><strong>JDNI的Context（上下文）</strong></h2>
-
-<p>上下文这个概念在Java的开发中经常出现，比如，ServletContext，Spring的Context，Android中也有Context，JNDI也不例外。</p>
-
-<p>JNDI的上下文，依赖于一个重要的接口Context和一个重要的类InitialContext</p>
-
-<p>Context接口 它表示一个命名上下文，由一组名称到对象的绑定组成。它提供了查找，绑定，重命名，创建和销毁子上下文的接口。</p>
-
-<p>InitialContext类 所有命名操作都相对于某一上下文，它是JNDI提供的，执行命名和目录操作的初始上下文，是根上下文，为命名和目录服务提供起点。一旦你有了初始化上下文，你就可以去查找其他的上下文和对象。</p>
-
-<h2><strong>JNDI的环境变量</strong></h2>
-
-<p>JNDI需要定义许多环境变量来说明访问什么样的命名和目录服务。</p>
-
-<p>而为了简化设置JNDI应用需要的环境变量，应用程序组件和服务提供商会和资源文件一起发布。JNDI的资源文件就是常用的properties文件格式，包含的是键值对。</p>
-
-<p>JNDI的资源文件有两种类型：provider和application</p>
-
-<p>每个服务商都有一个可选的资源文件：[prefix/]jndiprovider.properties，这个prefix前缀是context实现类的包名。例如：</p>
-
-<p>com.sun.jndi.ldap.LdapCtx对应的资源文件是com/sun/jndi/ldap/jndiprovider.properties</p>
-
-<p>JNDI会使用ClassLoader.getResources()方法在应用程序的所有资源文件中查找一个叫jndi.properties的文件。该文件中定义的所有属性都会放到InitialContext里面，而其他的Context会继承自该InitialContext。</p>
-
-<p>当InitialContext被构建时，它的环境会被初始化，要么通过传递进来的HashMap参数，要么通过定义的Java应用properties文件。而IntialContext的具体实现是在运行时决定的，默认的策略是使用环境变量“java.naming.factory.initial”定义的InitContextFactory（工厂类）。</p>
-
-<p><strong>回到我们的例子当中：</strong></p>
-
-<p>那么在<a href="http://benweizhu.github.io/blog/2014/07/06/learning-jdbc/" title="再次了解JDBC（上）">上一篇</a>中，DataSource API文档里提到的“实现DataSource接口的对象通常在基于JavaTM Naming and Directory Interface(JNDI) API的命名服务中注册。”就是JNDI的第二种应用方式。</p>
-
-<p>我们使用的Apache Common的DBCP作为DataSource的实现，而DBCP也是Tomcat的数据库连接池组建，所以针对它，我么可以使用Tomcat实现的JNDI服务。</p>
-
-<p>首先需要把上一篇中的例子改为一个Java Web应用。</p>
-
-<p>定义Context.xml，位置在webapp/META-INF/context.xml</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&#39;1.0&#39; encoding=&#39;utf-8&#39;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;Context&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;Resource</span> <span class="na">name=</span><span class="s">&quot;jdbc/mysql/bookshelf&quot;</span> <span class="na">auth=</span><span class="s">&quot;Container&quot;</span> <span class="na">type=</span><span class="s">&quot;javax.sql.DataSource&quot;</span>
-</span><span class='line'>              <span class="na">maxActive=</span><span class="s">&quot;100&quot;</span> <span class="na">maxIdle=</span><span class="s">&quot;30&quot;</span> <span class="na">maxWait=</span><span class="s">&quot;10000&quot;</span>
-</span><span class='line'>              <span class="na">username=</span><span class="s">&quot;root&quot;</span> <span class="na">password=</span><span class="s">&quot;&quot;</span> <span class="na">driverClassName=</span><span class="s">&quot;com.mysql.jdbc.Driver&quot;</span>
-</span><span class='line'>              <span class="na">url=</span><span class="s">&quot;jdbc:mysql://localhost:3306/bookshelf&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/Context&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在JDNI中，对象是一种资源，Tomcat指定资源的入口出在<Context>元素中，有两个位置可以定义，一个是在$CATALINA_BASE/conf/server.xml，一个是在每个web应用需的META-INF/context.xml中。前一种方式，Tomcat容器中所有的Web应用都可以使用，算是一种全局的资源。不过一般第二种方式会更好。</p>
-
-<p>我在使用第一种方式的时候，遇到了MySQL的Driver文件找不到的问题，应该是需要将MySQL的驱动拷贝的Tomcat的lib下。</p>
-
-<p>定义web.xml文件，位置在webapp/WEB-INF/web.xml</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">version=</span><span class="s">&quot;2.4&quot;</span>
-</span><span class='line'>         <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span>
-</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee</span>
-</span><span class='line'><span class="s">        http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;servlet&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>helloDataSource<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-class&gt;</span>me.zeph.jdbc.example.servlet.HelloDataSourceServlet<span class="nt">&lt;/servlet-class&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/servlet&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;servlet-mapping&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>helloDataSource<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;url-pattern&gt;</span>/helloDataSource<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/servlet-mapping&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;resource-ref&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;description&gt;</span>DB Connection<span class="nt">&lt;/description&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;res-ref-name&gt;</span>jdbc/mysql/bookshelf<span class="nt">&lt;/res-ref-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;res-type&gt;</span>javax.sql.DataSource<span class="nt">&lt;/res-type&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;res-auth&gt;</span>Application<span class="nt">&lt;/res-auth&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/resource-ref&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>光定义资源还不行，web应用必须要有个办法知道资源有哪些？所以需要在web.xml定义资源的引用。</p>
-
-<p>此时，获取Connection的方式就可以换成JNDI的方式了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">dao</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.jdbc.example.model.Book</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.naming.Context</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.naming.InitialContext</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.naming.NamingException</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.sql.DataSource</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.Connection</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.ResultSet</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.SQLException</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.Statement</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookDaoWithDS</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">Book</span> <span class="nf">findBookByISBN</span><span class="o">(</span><span class="kt">int</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="n">Statement</span> <span class="n">statement</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">connection</span> <span class="o">=</span> <span class="n">getConnection</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">statement</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createStatement</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">book</span> <span class="o">=</span> <span class="n">getBook</span><span class="o">(</span><span class="n">statement</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">(</span><span class="n">getQuerySqlFor</span><span class="o">(</span><span class="n">isbn</span><span class="o">)));</span>
-</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
-</span><span class='line'>      <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-</span><span class='line'>          <span class="k">try</span> <span class="o">{</span>
-</span><span class='line'>              <span class="k">if</span> <span class="o">(</span><span class="n">statement</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                  <span class="n">statement</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
-</span><span class='line'>              <span class="o">}</span>
-</span><span class='line'>              <span class="k">if</span> <span class="o">(</span><span class="n">connection</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>                  <span class="n">connection</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
-</span><span class='line'>              <span class="o">}</span>
-</span><span class='line'>          <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>              <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
-</span><span class='line'>          <span class="o">}</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">book</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">Connection</span> <span class="nf">getConnection</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">DataSource</span> <span class="n">dataSource</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">InitialContext</span> <span class="n">initialContext</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">InitialContext</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">Context</span> <span class="n">envContext</span> <span class="o">=</span> <span class="o">(</span><span class="n">Context</span><span class="o">)</span> <span class="n">initialContext</span><span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="s">&quot;java:/comp/env&quot;</span><span class="o">);</span>
-</span><span class='line'>          <span class="n">dataSource</span> <span class="o">=</span> <span class="o">(</span><span class="n">DataSource</span><span class="o">)</span> <span class="n">envContext</span><span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="s">&quot;jdbc/mysql/bookshelf&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">NamingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">dataSource</span><span class="o">.</span><span class="na">getConnection</span><span class="o">();</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="nf">getQuerySqlFor</span><span class="o">(</span><span class="kt">int</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;select * from book where isbn = &quot;</span> <span class="o">+</span> <span class="n">isbn</span> <span class="o">+</span> <span class="s">&quot;;&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">Book</span> <span class="nf">getBook</span><span class="o">(</span><span class="n">ResultSet</span> <span class="n">resultSet</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>      <span class="k">while</span> <span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">next</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">book</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Book</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setIsbn</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getInt</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span>
-</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="mi">2</span><span class="o">));</span>
-</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setPrice</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getDouble</span><span class="o">(</span><span class="mi">3</span><span class="o">));</span>
-</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setAuthor</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="mi">4</span><span class="o">));</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">book</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里你可以将java.naming.factory.initial和java.naming.factory.url.pkgs打印出来，结果是：org.apache.naming.java.javaURLContextFactory和org.apache.naming。</p>
-
-<p>java.naming.factory.url.pkgs的作用是告诉JNDI去哪个包下面，找满足java.javaURLContextFactory的类。</p>
-
-<p>你应该还看到一点有点疑惑，我的资源名字命名就是：jdbc/mysql/bookshelf，为什么前面还有java:/comp/env。</p>
-
-<p>java:/comp/env是环境命名上下文，是针对Java EE组件中使用JNDI引入的，目的是为了防止冲突。Java EE环境下，被访问的系统或者用户定义的对象都是存储在java:comp/env的环境命名上下文中。</p>
-
-<p>到此，我们实现了JNDI的引入，可以通过JNDI来配置DataSource，此时，如果我们希望从MySQL迁移到Oracle就不需要修改Java代码，只需要更改一下配置文件即可，这也就是JNDI的好处。</p>
-
-<p>再下一篇，我们继续讨论，JDBC的事务。</p>
-
-<p>参考资料：</p>
-
-<p><a href="http://docs.oracle.com/javase/tutorial/jndi/overview/index.html">http://docs.oracle.com/javase/tutorial/jndi/overview/index.html</a></p>
-
-<p><a href="http://tomcat.apache.org/tomcat-7.0-doc/jndi-resources-howto.html">http://tomcat.apache.org/tomcat-7.0-doc/jndi-resources-howto.html</a></p>
-
-<p><a href="http://docs.oracle.com/javase/jndi/tutorial/">http://docs.oracle.com/javase/jndi/tutorial/</a></p>
-
-<p><a href="http://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html">http://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/20">&larr; Older</a>
@@ -522,6 +910,10 @@ Domain Name Service (DNS)</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/08/09/postgres-full-text-search-1/">如何使用Postgres全文搜索特性（一）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/08/01/css-selector-basic/">CSS后代选择器以及选择器特殊性</a>
       </li>
     
@@ -535,10 +927,6 @@ Domain Name Service (DNS)</p>
     
       <li class="post">
         <a href="/blog/2015/06/17/spring-web-security-4/">Spring Web Security 实战 (四) - 了解Security基础架构</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/06/14/spring-web-security-3/">Spring Web Security 实战 (三) - 改变用户认证方式和安全性</a>
       </li>
     
   </ul>

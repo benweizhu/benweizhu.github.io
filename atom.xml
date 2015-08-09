@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-08-02T10:12:30+08:00</updated>
+  <updated>2015-08-09T20:42:12+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,198 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[如何使用Postgres全文搜索特性（一）]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/08/09/postgres-full-text-search-1/"/>
+    <updated>2015-08-09T08:24:23+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/08/09/postgres-full-text-search-1</id>
+    <content type="html"><![CDATA[<h2>基本概念</h2>
+
+<p>全文搜索提供了一种能力来鉴别的自然语言文档是否满足某个查询语句，并根据与查询语句的相关性来对查询结果排序。最常见的查询就是找到所有包含查询术语（term）的文档，并根据他们的相似性进行排序。</p>
+
+<p>文字查询已经在数据库中存在多年。PostgreSQL有~，~*，LIKE和ILIKE这样的对应文字数据类型的操作符，但它们缺少现代信息系统需要的必要属性：</p>
+
+<p>1.没有语言特性的支持，比如，英语中的单数和复数，用正则表达式是做不到识别复数单词的。<br/>
+2.没有查询结果的相似性的排序。 <br/>
+3.因为没有索引支持，所以会比较慢</p>
+
+<p>全文搜索允许对文档进行预处理，比允许建立索引来提供搜索速度。预处理一般包括：</p>
+
+<p>1.将文档解析为符号。这对于解析不同类型的符号非常有用。比如，数字，单词，复杂单词，email，这样它们就可以用不同的方式被处理。原则上，符号类型取决于文档，但是大部分情况，可以使用预定义的类型就足够了。Postgres提供了一个标准的解析器，但也可以建立自定义的解析器。</p>
+
+<p>2.将符号转化为分词。一个分词（词位，单词单位）是一个字符串，跟符号相似，但是它被正常化，这样就可以匹配同一个单词的不同形式，比如，正常化允许将大写字母转换为小写，更常见的是英语单词的前缀和后缀（复数单词），这就允许搜索同一个单词的不同形式，而不需要输入该单词的全部可能变形式。（话句话说，符号是文档文本的直接片段，而分词是可以用来索引和搜索的有用单词）。而Postgres实现这种方式的办法就是利用词典，可以提供不同标准的词典，或者自定义的词典来满足不同的需要。</p>
+
+<p>3.Storing preprocessed documents optimized for searching. For example, each document can be represented as a sorted array of normalized lexemes. Along with the lexemes it is often desirable to store positional information to use for proximity ranking, so that a document that contains a more &ldquo;dense&rdquo; region of query words is assigned a higher rank than one with scattered query words.(这段没看明白)</p>
+
+<h2>文档</h2>
+
+<p>上面提到一个很重要的概念，叫做文档（Document）。那么，它的含义是什么？</p>
+
+<p>在PostgresSQL的搜索中，文档可以是数据库表中某一行的某一个文字字段（textual field），或者是多个这样的字段的组合，也许他们存储在不同表中，又或者是动态获取到的结果。话句话说，文档是由不同的部分组成，可能并不会作为一个整体存在某一个位置。比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">title</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span>  <span class="n">author</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span>  <span class="n">abstract</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">body</span> <span class="k">AS</span> <span class="n">document</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">mid</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">SELECT</span> <span class="n">m</span><span class="p">.</span><span class="n">title</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">m</span><span class="p">.</span><span class="n">author</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">m</span><span class="p">.</span><span class="n">abstract</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">d</span><span class="p">.</span><span class="n">body</span> <span class="k">AS</span> <span class="n">document</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span> <span class="n">m</span><span class="p">,</span> <span class="n">docs</span> <span class="n">d</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">mid</span> <span class="o">=</span> <span class="n">did</span> <span class="k">AND</span> <span class="n">mid</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span> 
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>title，author，abstract作为了文档，它们是message的不同字段。</p>
+
+<p>还有一种可能，文档以简单文本的方式存储在文件系统中，这样的情况下，数据库中可以存放全文的索引来执行搜索，并使用一些独立的标识符来从文件系统中获取文档。</p>
+
+<h2>TSVECTOR（分词向量）</h2>
+
+<p>以文本搜索为目的，每个文档必须缩减为预处理的tsvector（某种向量）形式，搜索和排名都是在这个可以代表文档的tsvector上执行，文档只是在需要用户需要使用时才去获取，因此，我们常常将tsvector作为一种文档，当然它只是全文文档的一种压缩形式。</p>
+
+<p>PostgreSQL全文搜索是基于匹配操作符@@实现，当一个tsvector（document）匹配一个tsquery（query）时，返回true。至于哪个写在前面，哪个写在后面不重要：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="s1">&#39;a fat cat sat on a mat and ate a fat rat&#39;</span><span class="p">::</span><span class="n">tsvector</span> <span class="o">@@</span> <span class="s1">&#39;cat &amp; rat&#39;</span><span class="p">::</span><span class="n">tsquery</span><span class="p">;</span>
+</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
+</span><span class='line'><span class="c1">----------</span>
+</span><span class='line'> <span class="n">t</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">SELECT</span> <span class="s1">&#39;fat &amp; cow&#39;</span><span class="p">::</span><span class="n">tsquery</span> <span class="o">@@</span> <span class="s1">&#39;a fat cat sat on a mat and ate a fat rat&#39;</span><span class="p">::</span><span class="n">tsvector</span><span class="p">;</span>
+</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
+</span><span class='line'><span class="c1">----------</span>
+</span><span class='line'> <span class="n">f</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如上面的例子中，一个tsquery不是单纯的文本，tsvector也是一样。一个tsquery包含搜索术语（term），它们是已经做过正常化的分词，并且可能通过AND，OR和NOT操作将多个术语结合。函数to_tsquery和plainto_tsquery可以帮助将用户写的文本转化为适当的tsquery。简单来说，to_tsvector是用来解析和正常化一个文档字符串的。所以，在实际应用中，一个文本搜索匹配应该长如下这样：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;fat cats ate fat rats&#39;</span><span class="p">)</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;fat &amp; rat&#39;</span><span class="p">);</span>
+</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
+</span><span class='line'><span class="c1">----------</span>
+</span><span class='line'> <span class="n">t</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>注意，如果写成如下方式将不会成功：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="s1">&#39;fat cats ate fat rats&#39;</span><span class="p">::</span><span class="n">tsvector</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;fat &amp; rat&#39;</span><span class="p">);</span>
+</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
+</span><span class='line'><span class="c1">----------</span>
+</span><span class='line'> <span class="n">f</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>@@操作符也支持文本输入，简单情况下，允许跳过具体的tsvector或者tsquery的转换。使用如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="n">tsvector</span> <span class="o">@@</span> <span class="n">tsquery</span>
+</span><span class='line'><span class="n">tsquery</span>  <span class="o">@@</span> <span class="n">tsvector</span>
+</span><span class='line'><span class="nb">text</span> <span class="o">@@</span> <span class="n">tsquery</span>
+</span><span class='line'><span class="nb">text</span> <span class="o">@@</span> <span class="nb">text</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>如何在数据库表中进行搜索，并使用索引呢？</h2>
+
+<p>我们是可以再没有索引的情况下做全文搜索的，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">title</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">pgweb</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="s1">&#39;friend&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>创建索引</h3>
+
+<p>我们可以创建GIN索引来提供文本搜索的速度：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">pgweb_idx</span> <span class="k">ON</span> <span class="n">pgweb</span> <span class="k">USING</span> <span class="n">gin</span><span class="p">(</span><span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">body</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>注意这里使用两个参数的to_tsvector方法。只有文本搜索指定了一个配置名字才能使用在表达式索引中。这是因为索引内容必须不被default_text_search_config所影响。如果它们被影响了，索引内容有可能不一致，因为不同的条目（entries）可以包含有不同配置生成的tsvector，所以没有办法猜测谁是谁。所以也就没办法正确的删除和还原这样是索引。</p>
+
+<p>因为上面使用了两个参数版本的to_tsvector，只有也使用了两参数版本to_tsvector并且配置相同的查询语句才能使用。也就说，WHERE to_tsvector(&lsquo;english&rsquo;, body) @@ &lsquo;a &amp; b&#8217;可以使用索引，WHERE to_tsvector(body) @@ &#8216;a &amp; b&#8217;就不行。</p>
+
+<p>索引可以建立在联合的字段中：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">pgweb_idx</span> <span class="k">ON</span> <span class="n">pgweb</span> <span class="k">USING</span> <span class="n">gin</span><span class="p">(</span><span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">title</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">body</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>在单独的字段创建向量</h3>
+
+<p>另外一种办法就是创建一个单独的tsvector字段来保存to_tsvector的输出，本例中，coalesce用来保证即便有一个字段是null，仍然会生成索引：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">pgweb</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">textsearchable_index_col</span> <span class="n">tsvector</span><span class="p">;</span>
+</span><span class='line'><span class="k">UPDATE</span> <span class="n">pgweb</span> <span class="k">SET</span> <span class="n">textsearchable_index_col</span> <span class="o">=</span>
+</span><span class='line'>     <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">coalesce</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们创建一个GIN索引来加快搜索：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">textsearch_idx</span> <span class="k">ON</span> <span class="n">pgweb</span> <span class="k">USING</span> <span class="n">gin</span><span class="p">(</span><span class="n">textsearchable_index_col</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在可以来执行一个快速的全文搜索：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">title</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">pgweb</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">textsearchable_index_col</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;create &amp; table&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="k">ORDER</span> <span class="k">BY</span> <span class="n">last_mod_date</span> <span class="k">DESC</span>
+</span><span class='line'><span class="k">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当使用独立字段来存储tsvector的结果时，非常有必要创建一个触发器（trigger）来保证tsvector的状态，当title或者body发生改变。</p>
+
+<p>独立列的方式比表达式索引方式好的其中一点是当使用索引查询时，不用在查询语句中指定文本查询的配置。正如上面的例子中，查询语句依赖于default_text_search_config。另外一个优点是，查询更快速，因为它不需要重新执行to_tsvector来验证索引的匹配（特别是使用GiST的时候）。唯一的不同时，这种方式需要占据存储空间。</p>
+
+<p>参考自：<a href="http://www.postgresql.org/docs/9.2/static/textsearch-intro.html">http://www.postgresql.org/docs/9.2/static/textsearch-intro.html</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[CSS后代选择器以及选择器特殊性]]></title>
@@ -3150,295 +3342,6 @@ synchronize the service method (or methods dispatched to it)</p>
 <p>参考资料：  <br/>
 1.Servlet Specification  <br/>
 2.深入理解Java虚拟机</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Gradle深入与实战（四）自定义集成测试任务]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-4/"/>
-    <updated>2015-01-31T21:47:45+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-4</id>
-    <content type="html"><![CDATA[<p>由于本小节，涉及到自定义任务，所以穿插一点自定义任务的知识。</p>
-
-<h2>Gradle Task</h2>
-
-<p>在前面已经介绍过Gradle和Ant相似，由任务驱动，以任务依赖的方式形成任务链，从而实现构建生命周期。所以，任务是Gradle中一个完整的可执行单元。</p>
-
-<p>如何定义任务：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">hello</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">println</span> <span class="s1">&#39;hello Gradle&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>执行该任务，只需要输入命令gradle hello。定义task的方式有很多种：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">myTask</span>
-</span><span class='line'><span class="n">task</span> <span class="n">myTask</span> <span class="o">{</span> <span class="n">configure</span> <span class="n">closure</span> <span class="o">}</span>
-</span><span class='line'><span class="n">task</span> <span class="n">myType</span> <span class="o">&lt;&lt;</span> <span class="o">{</span> <span class="n">task</span> <span class="n">action</span> <span class="o">}</span>
-</span><span class='line'><span class="n">task</span> <span class="nf">myTask</span><span class="o">(</span><span class="nl">type:</span> <span class="n">SomeType</span><span class="o">)</span>
-</span><span class='line'><span class="n">task</span> <span class="nf">myTask</span><span class="o">(</span><span class="nl">type:</span> <span class="n">SomeType</span><span class="o">)</span> <span class="o">{</span> <span class="n">configure</span> <span class="n">closure</span> <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>其中有一种定义方式，传入了一个参数type，作用是预定义该task的类型，指定类型之后，在传入的闭包中就可以使用该类型task提供的特殊变量或函数。</p>
-
-<p>比如一个拷贝类型的task</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="nf">copyDocs</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Copy</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">from</span> <span class="s1">&#39;src/main/doc&#39;</span>
-</span><span class='line'>    <span class="n">into</span> <span class="s1">&#39;build/target/doc&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>更过关于Task的内容，在以后的章节中再介绍。</p>
-
-<h2>自定义集成测试任务</h2>
-
-<p><strong>现在我们开始写一个集成测试的task，需求是这样的：</strong></p>
-
-<p>作为一个Java的程序员，我想要将单元测试和集成测试分离</p>
-
-<p>1.我想要 将单元测试全部放在src/test/unit目录中，将集成测试全部放在src/test/intgetaion中   <br/>
-2.我想要 能够单独运行我的集成测试  <br/>
-3.我想要 在运行build命令时，同时跑单元测试和集成测试</p>
-
-<p><strong>根据这样的一个需求，划分几步来做：</strong> <br/>
-1.建立目录  <br/>
-2.目录结构已经和原来的默认规约不同，所以要更改Java插件提供的SourceSet test，来映射单元测试目录结构  <br/>
-3.需要新建一个SourceSet intTest，来映射集成测试目录结构  <br/>
-4.Java插件会给新建的SourceSet intTest定义两个Configuration，分别是intTestCompile和intTestRuntime，那么就需要给这两个分组指定构件内容和依赖  <br/>
-5.定义一个名字叫做integrationTest的测试的task</p>
-
-<p><strong>那么我们从第二步和第三步开始，修改Java插件提供的SourceSet test和新建SourceSet intTest：</strong></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="c1">// 定义一些常量，在其他位置使用</span>
-</span><span class='line'><span class="n">ext</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">unitJavaSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/unit/java&#39;</span>
-</span><span class='line'>    <span class="n">unitResourcesSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/unit/resources&#39;</span>
-</span><span class='line'>    <span class="n">intJavaSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/integration/java&#39;</span>
-</span><span class='line'>    <span class="n">intResourcesSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/integration/resources&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">test</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitJavaSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitResourcesSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">intTest</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intJavaSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intResourcesSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>第三步，给intTestCompile和intTestRuntime指定指定构件内容（产品代码）和依赖</strong></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;junit:junit:4.11&#39;</span>
-</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;org.mockito:mockito-core:1.9.5&#39;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">intTestCompile</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">main</span><span class="o">.</span><span class="na">output</span> <span class="c1">// 将sourceSets.main中的输出class指定到intTestCompile中</span>
-</span><span class='line'>    <span class="n">intTestCompile</span> <span class="n">configurations</span><span class="o">.</span><span class="na">testCompile</span> <span class="c1">// 将configurations.testCompile的依赖拿过来</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>最后一步，定义一个test类型的task，并让check任务依赖于它</strong></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="nf">integrationTest</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Test</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">testClassesDir</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">output</span><span class="o">.</span><span class="na">classesDir</span>
-</span><span class='line'>    <span class="n">classpath</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">runtimeClasspath</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">check</span><span class="o">.</span><span class="na">dependsOn</span> <span class="n">integrationTest</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后，你就可以在命令行中运行gradle integrationTest。</p>
-
-<p>完整版本如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">ext</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">unitJavaSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/unit/java&#39;</span>
-</span><span class='line'>    <span class="n">unitResourcesSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/unit/resources&#39;</span>
-</span><span class='line'>    <span class="n">intJavaSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/integration/java&#39;</span>
-</span><span class='line'>    <span class="n">intResourcesSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/integration/resources&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">test</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitJavaSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitResourcesSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">intTest</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intJavaSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intResourcesSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;junit:junit:4.11&#39;</span>
-</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;org.mockito:mockito-core:1.9.5&#39;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">intTestCompile</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">main</span><span class="o">.</span><span class="na">output</span>
-</span><span class='line'>    <span class="n">intTestCompile</span> <span class="n">configurations</span><span class="o">.</span><span class="na">testCompile</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">task</span> <span class="nf">integrationTest</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Test</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">testClassesDir</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">output</span><span class="o">.</span><span class="na">classesDir</span>
-</span><span class='line'>    <span class="n">classpath</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">runtimeClasspath</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">check</span><span class="o">.</span><span class="na">dependsOn</span> <span class="n">integrationTest</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">idea</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">module</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">unitJavaSrcDir</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">unitResourcesSrcDir</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">intJavaSrcDir</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">intResourcesSrcDir</span><span class="o">)</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料： <br/>
-1.Gradle官方文档 <br/>
-2.<a href="http://selimober.com/blog/2014/01/24/separate-unit-and-integration-tests-using-gradle/">http://selimober.com/blog/2014/01/24/separate-unit-and-integration-tests-using-gradle/</a></p>
 ]]></content>
   </entry>
   
