@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Spring AOP 深入了解（一）还给业务逻辑代码一个干净的世界 - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="本篇博客系列的目的： 之前一直想要实现一个日志类库：https://github.com/benweizhu/LoggerUtil 用来记录某个方法在调用前，调用后，抛出异常后的一些信息，比如方法名，参数，返回值。还希望可以指定记录的格式以及日志的级别（INFO，DEBUG等）。最关键的是， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/09/06/deep-into-spring-aop-1">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Spring AOP 深入了解（一）还给业务逻辑代码一个干净的世界</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-09-06T10:49:31+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:49 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>本篇博客系列的目的：</h2>
+
+<p>之前一直想要实现一个日志类库：<a href="https://github.com/benweizhu/LoggerUtil">https://github.com/benweizhu/LoggerUtil</a></p>
+
+<p>用来记录某个方法在调用前，调用后，抛出异常后的一些信息，比如方法名，参数，返回值。还希望可以指定记录的格式以及日志的级别（INFO，DEBUG等）。最关键的是，这个日志类库，必须有通用性和不可以有侵入性，这就导致它必定通过AOP来实现。</p>
+
+<p>于是，为了做到这一点，现在我们就来深入的学习一次AOP：</p>
+
+<h2>为什么要AOP</h2>
+
+<p>编程语言最终极的目标就是能以更自然、更灵活的语言的方式模拟世界，从原始机器语言到过程语言再到面向对象的语言（OOP）。AOP提供了与OOP不同的另外一种方式来思考软件架构。OOP的模块单元是“类”，而AOP的模块单元“面”（Aspect）。</p>
+
+<h4>那么问题来了，什么是“面”？以及什么“面向切面编程”？</h4>
+
+<p>AOP被翻译成“面向方面编程”，“面向切面编程”，所以这里我更倾向于将“面”理解为“切面”（Aspect）。</p>
+
+<p>从字面上理解，“切面”来自几何学，在立体几何中，切面是指用一个平面去截一个几何体（包括圆柱，圆锥，球，棱柱，棱锥、长方体，正方体等等），得到的平面图形。</p>
+
+<p>那什么是“面向切面编程”？就是在该切面上加入一些逻辑操作（可以简单理解为“面向切面的操作”）。举个最常见的例子：</p>
+
+<p>扑克牌的切牌，你可以将“广告牌”切入在任何你想要切入（或插入）的位置（你可以对扑克牌的任何一个切面做切牌操作）。插入的位置就是切面，插入的广告牌就是逻辑操作。</p>
+
+<p>又或者是“斗地主”中，第一把不知道谁是地主，于是将一张牌反插入到牌的中间。本来应该按照顺序发牌，并不能知道谁是地主，但是因为你在某个位置插入了一个特殊操作（将一张牌反插入），因为多了一个逻辑，所以可以知道谁是地主。（或者将广告牌插入中间，也可以知道谁是地主）</p>
+
+<p>这是“面向切面的编程”的最基础理解。</p>
+
+<h3>也许你还是不能理解面向切面编程，最重要是你并不知道为什么需要它，即何时需要它？</h3>
+
+<p>在OO的世界里，我们操作的是对象，创建一个对象并使用对象的属性和方法，而对象有抽象和继承的特性，因此，我们会利用抽象和继承的特性来消除重复的代码。</p>
+
+<p>我们知道，编程语言是从原始机器语言到过程语言再到面向对象的语言，但是即便是OO的世界，我们也逃离不了面向过程的编程方式，代码的每一步操作一定是有顺序的，因为机器解释代码也是按顺序执行的。</p>
+
+<p>代码按照顺序执行无可厚非，遇到重复的代码，我们利用抽象的方式，将重复的部分抽离成一个独立模块（方法或者类），由所有需要的地方重用即可。</p>
+
+<p>但有一种顺序代码，它重复使用在不同的固定位置，它与业务代码无关，通过OO的常用办法并不能消除这种模式的重复，比如：事务管理，性能监控（和控制）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">addUser</span><span class="o">(){</span>
+</span><span class='line'>  <span class="n">transactionManager</span><span class="o">.</span><span class="na">beginTransaction</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">..</span>
+</span><span class='line'>  <span class="n">transactionManager</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们知道这些重复性的代码逻辑，是可以非常轻松的独立出来，比如，beginTransaction和commit方法，但，我们无法通过抽象的方式来消除这种重复的调用，因为它和业务代码具有关联性，它依附在业务代码的顺序流程中。</p>
+
+<p>有人说，可以采用模板方法（设计模式中的一种模式），这样可以消除重复，但也导致所有使用模板方法的类，都要重写模板中的其中一步（某个方法）来实现业务逻辑，重写方法是不能改变方法的名字。这样就给代码的自描述性带来了困难，得不偿失。</p>
+
+<p>好在AOP希望做得到的就是，将这些分散在各个不同业务逻辑代码中的相同代码，通过切入的方式，将这块具有顺序性关联的逻辑抽离到独立模块，而在逻辑代码中将看不到之前重复的逻辑。</p>
+
+<p>从而，还给业务逻辑代码一个干净的世界。这就是AOP给我们带来的好处。</p>
+
+<p>参考资料：  <br/>
+1.Spring 3.0就是这么简单  <br/>
+2.<a href="http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/aop.html">http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/aop.html</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-09-06T10:49:31+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:49 am</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/09/06/deep-into-spring-aop-1/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/09/06/deep-into-spring-aop-1/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/08/09/postgres-full-text-search-1/" title="Previous Post: 如何使用Postgres全文搜索特性（一）">&laquo; 如何使用Postgres全文搜索特性（一）</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="Spring AOP 深入了解（一）还给业务逻辑代码一个干净的世界"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>A ThoughtWorker</p>
+  <div>A Java/RoR Application Developer</div>
+  <div>A Gradle fan</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/09/06/deep-into-spring-aop-1/">Spring AOP 深入了解（一）还给业务逻辑代码一个干净的世界</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/09/postgres-full-text-search-1/">如何使用Postgres全文搜索特性（一）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/01/css-selector-basic/">CSS后代选择器以及选择器特殊性</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/25/restful-web-api-part-1/">理解设计RESTful API - 资源、表述和HTTP协议语义</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/13/linux-you-dont-understand-all-these-years/">《Linux就是这个范儿》读书笔记（一） - 理解Linux用户和用户组</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
