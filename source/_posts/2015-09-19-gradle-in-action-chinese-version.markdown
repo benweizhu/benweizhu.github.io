@@ -1,0 +1,54 @@
+---
+layout: post
+title: "《实战Gradle》译者序"
+date: 2015-09-19 10:02:36 +0800
+comments: true
+categories: 
+---
+![Alt text](/images/gradle_in_action_preview.jpg =500x "《实战Gradle》")
+
+<a href="http://search.jd.com/Search?keyword=%E5%AE%9E%E6%88%98gradle&enc=utf-8&wq=%E5%AE%9E%E6%88%98gradle&pvid=31qzkqei.dn8ieh" target="_blank">在京东搜索《实战Gradle》</a>
+
+<a href="https://s.taobao.com/search?initiative_id=tbindexz_20150919&spm=a21bo.7724922.8452-taobao-item.2&sourceId=tb.index&search_type=item&ssid=s5-e&commend=all&imgfile=&q=%E5%AE%9E%E6%88%98gradle&suggest=0_1&_input_charset=utf-8&wq=gradle&suggest_query=gradle&source=suggest" target="_blank">在淘宝搜索《实战Gradle》</a>
+
+<a href="http://www.amazon.cn/s/ref=nb_sb_noss?__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&url=search-alias%3Daps&field-keywords=%E5%AE%9E%E6%88%98+gradle " target="_blank">在亚马逊搜索《实战Gradle》</a>
+
+<a href="http://www.amazon.cn/s/ref=nb_sb_noss?__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&url=search-alias%3Daps&field-keywords=%E5%AE%9E%E6%88%98+gradle" target="_blank">在当当网搜索《实战Gradle》</a>
+
+
+#内容简介
+
+Gradle是Java软件开发中的自动化构建工具，类似的传统工具如Ant和Maven。Gradle吸收或沿用了Maven中比较成功的一些实践，但相对于Maven或Ant又有极强的扩展。
+
+《Gradle in Action》一书全方位的讲解了Gradle这一工具相关的知识，包括Gradle的基本知识，自动化构建的基本概念和最佳实践，以实际案例的方式解释如何使用Gradle进行软件项目构建。
+
+除了基础知识外，由于软件开发绝对不仅仅是实现业务逻辑代码，书中还介绍了一些解决软件开发中常见问题的实践，如多语言，多项目构建，Gradle在持续集成和持续交付中的应用，Gradle构建JVM其他语言，以及Gradle集成Javascript构建等。
+云计算和DevOps的兴起，给软件行业带来了翻天覆地的变化，书中对于云计算平台，开源社区中的一些工具与Gradle的结合使用也做了相关的介绍。
+
+因为Groovy用于编写Gradle构建配置的DSL，所以为了帮助读者更好的理解Gradle，本书还讲解了Groovy的基本知识，虽然不足以全方位的讲解Groovy，但是理解Gradle足矣。
+
+#译者序
+
+提到自动化构建，你能想到的是什么？是经典的make脚本语言？是曾经统治了Java构建世界的Ant?或者是颠覆了Ant统治地位的Maven? 抑或是即将也正在颠覆Maven的Gradle?不管你想到的哪一个，如果你还在使用Java语言开发软件，那Gradle将是你工具箱中必不可少的一样利器。而《Gradle in Action》将可能是你不可或缺的教材，或者参考书。
+
+第一次接触到Gradle是加入ThoughtWorks的第一个项目，从此以后，我几乎认为Gradle应该是一个Java软件项目的标配，是每一个Java程序员都应该了如指掌的东西。本书结合简单实用的案例，由浅入深地讲解Gradle，正是我在学习Gradle时所希望拥有的一本教材，所以我便欣然接受并参与此书的翻译工作。希望本书能帮助所有将软件质量和开发效率视为软件项目中不可或缺的一环的程序员，把软件开发带到另一个高度。
+
+虽然本书是Gradle的一本实用指南，但本书不仅仅局限于此。软件构建在现代软件开发过程中并不是独立工作的，开发人员通常面临的问题还包括持续集成，持续交付，以及云平台下的基础设施搭建，多语言项目构建等。本书还对如何结合Gradle解决此类问题以及一些常用的工具有一定的说明，如用于持续集成和交付的Jenkins，虚拟化技术工具vagrant等。Groovy语言用于实现Gradle DSL，因此理解基础的Groovy语言对理解Gradle也有极大的帮助，因此本书对Gradle语言的基本功能也做了讲解。
+
+与另外两位同事合作翻译此书的过程，并非一帆风顺，由于物理位置的不同，使得沟通变得困难，我们不得不采用通读对方译文的形式使各自的行文风格尽量保持一致。但这同时也是一个充实有趣的过程，想要把一个单词或一句话翻译的精准到位从而反复推敲，有些技术语言如果直译又会生硬难懂，我们得寻求适合中文的准确表达方式。这些过程无疑是翻译中最大的趣味所在。在这里我想感谢朱本威和杨柳的智慧结晶，感谢出版社同事的辛勤劳作，感谢滕云的严格审校，更感谢Benjamin为Gradle社区带来如此优秀的读物。
+
+
+李建，Java软件开发工程师，《实战Gradle》译者之一
+> Gradle是Java软件开发中的自动化构建工具，类似的传统工具如Ant和Maven。Gradle吸收或沿用了Maven中比较成功的一些实践，但相对于Maven或Ant又有极强的扩展。 - 李建
+
+杨柳，Java/Ruby/Scala软件开发工程师，武汉Open Party长期贡献者，《实战Gradle》译者之一
+> Gradle是Java软件开发中的自动化构建工具，类似的传统工具如Ant和Maven。Gradle吸收或沿用了Maven中比较成功的一些实践，但相对于Maven或Ant又有极强的扩展。 - 杨柳
+
+朱本威，Java/Ruby软件开发工程师，Gradle系列博客<a href="http://benweizhu.github.io/blog/categories/gradleshen-ru-yu-shi-zhan/" target="_blank">Gradle深入与实战</a>，《实战Gradle》译者之一
+> 《实战Gradle》是一本既适合初学者，也适合有经验人员的经典参考书。它以故事的方式，简单而生动的解释了软件开发对构建的刚需，对比了Gradle的前辈Ant、Maven的优缺点，详细的介绍了Gradle优秀的特性集，并通过范例的方式生动的介绍了如何使用Gradle，是一本不可多得的优秀的Gradle书籍。 - 朱本威
+
+滕云，ThoughtWorks高级咨询师，<a href="http://baike.baidu.com/view/12391227.htm" target="_blank">《实现领域驱动设计》</a>译者
+> Gradle是Java软件开发中的自动化构建工具，类似的传统工具如Ant和Maven。Gradle吸收或沿用了Maven中比较成功的一些实践，但相对于Maven或Ant又有极强的扩展。 
+> - 滕云   
+
+

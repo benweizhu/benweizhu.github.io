@@ -3,7 +3,7 @@ layout: post
 title: "Gradle深入与实战（二）Java插件"
 date: 2015-01-31 13:57:55 +0800
 comments: true
-categories: 
+categories: [Gradle深入与实战]
 ---
 没有介绍Gradle的基础知识，直接开始实战，目的是为了更快的让大家开始使用Gradle做构建，快速上手，当需要实现的自动化需求更复杂时，在深入学习基础知识。
 

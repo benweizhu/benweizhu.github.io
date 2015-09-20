@@ -3,7 +3,7 @@ layout: post
 title: "Gradle深入与实战（五）自定义插件"
 date: 2015-03-15 14:18:10 +0800
 comments: true
-categories: 
+categories: [Gradle深入与实战]
 ---
 利用Gradle做构建，必然逃不掉Gradle的插件的使用，即便是最简单的Java或Groovy的应用都需要使用Java插件或者Groovy插件。
 

@@ -3,7 +3,7 @@ layout: post
 title: "Gradle深入与实战（六）Gradle的背后是什么？"
 date: 2015-03-31 23:20:24 +0800
 comments: true
-categories: 
+categories: [Gradle深入与实战]
 ---
 
 ##理解DSL（领域特定语言）

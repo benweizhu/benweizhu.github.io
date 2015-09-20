@@ -3,7 +3,7 @@ layout: post
 title: "Gradle深入与实战（四）自定义集成测试任务"
 date: 2015-01-31 21:47:45 +0800
 comments: true
-categories: 
+categories: [Gradle深入与实战]
 ---
 由于本小节，涉及到自定义任务，所以穿插一点自定义任务的知识。
 

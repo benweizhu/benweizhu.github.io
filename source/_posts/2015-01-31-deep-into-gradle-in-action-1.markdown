@@ -3,7 +3,7 @@ layout: post
 title: "Gradle深入与实战（一）什么是构建工具"
 date: 2015-01-31 11:31:34 +0800
 comments: true
-categories: 
+categories: [Gradle深入与实战]
 ---
 ###什么是构建工具?
 

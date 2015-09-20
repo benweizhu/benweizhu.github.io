@@ -3,7 +3,7 @@ layout: post
 title: "Gradle深入与实战（三）依赖管理工具"
 date: 2015-01-31 18:41:46 +0800
 comments: true
-categories: 
+categories: [Gradle深入与实战]
 ---
 大部分的项目都不是自包含的，也就是说，需要使用到其他项目的构建结果，比如一些Jar文件。它们作为输入文件，必须存在于项目的ClassPath下，程序才能编译和运行。这些输入文件有一个很表意的名字，叫做依赖。
 
