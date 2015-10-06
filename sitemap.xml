@@ -11,11 +11,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://benweizhu.github.io/blog/2015/09/26/rails-env-and-capistrano/</loc>
-    <lastmod>2015-09-26T10:09:49+08:00</lastmod>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>http://benweizhu.github.io/blog/2015/09/19/gradle-in-action-chinese-version/</loc>
     <lastmod>2015-09-19T10:02:36+08:00</lastmod>
     <priority>0.8</priority>
@@ -337,13 +332,13 @@
   </url>
   <url>
     <loc>http://benweizhu.github.io/blog/archives/</loc>
-    <lastmod>2015-10-05T10:23:12+08:00</lastmod>
+    <lastmod>2015-10-06T16:28:47+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>http://benweizhu.github.io/</loc>
-    <lastmod>2015-10-05T10:23:12+08:00</lastmod>
+    <lastmod>2015-10-06T16:28:47+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
