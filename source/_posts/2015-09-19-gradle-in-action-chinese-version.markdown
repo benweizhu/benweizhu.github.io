@@ -38,17 +38,8 @@ Gradle是Java软件开发中的自动化构建工具，类似的传统工具如A
 与另外两位同事合作翻译此书的过程，并非一帆风顺，由于物理位置的不同，使得沟通变得困难，我们不得不采用通读对方译文的形式使各自的行文风格尽量保持一致。但这同时也是一个充实有趣的过程，想要把一个单词或一句话翻译的精准到位从而反复推敲，有些技术语言如果直译又会生硬难懂，我们得寻求适合中文的准确表达方式。这些过程无疑是翻译中最大的趣味所在。在这里我想感谢朱本威和杨柳的智慧结晶，感谢出版社同事的辛勤劳作，感谢滕云的严格审校，更感谢Benjamin为Gradle社区带来如此优秀的读物。
 
 
-李建，Java软件开发工程师，《实战Gradle》译者之一
-> Gradle是Java软件开发中的自动化构建工具，类似的传统工具如Ant和Maven。Gradle吸收或沿用了Maven中比较成功的一些实践，但相对于Maven或Ant又有极强的扩展。 - 李建
-
-杨柳，Java/Ruby/Scala软件开发工程师，武汉Open Party长期贡献者，《实战Gradle》译者之一
-> Gradle是Java软件开发中的自动化构建工具，类似的传统工具如Ant和Maven。Gradle吸收或沿用了Maven中比较成功的一些实践，但相对于Maven或Ant又有极强的扩展。 - 杨柳
+博主评论：
 
 朱本威，Java/Ruby软件开发工程师，Gradle系列博客<a href="http://benweizhu.github.io/blog/categories/gradleshen-ru-yu-shi-zhan/" target="_blank">Gradle深入与实战</a>，《实战Gradle》译者之一
 > 《实战Gradle》是一本既适合初学者，也适合有经验人员的经典参考书。它以故事的方式，简单而生动的解释了软件开发对构建的刚需，对比了Gradle的前辈Ant、Maven的优缺点，详细的介绍了Gradle优秀的特性集，并通过范例的方式生动的介绍了如何使用Gradle，是一本不可多得的优秀的Gradle书籍。 - 朱本威
-
-滕云，ThoughtWorks高级咨询师，<a href="http://baike.baidu.com/view/12391227.htm" target="_blank">《实现领域驱动设计》</a>译者
-> Gradle是Java软件开发中的自动化构建工具，类似的传统工具如Ant和Maven。Gradle吸收或沿用了Maven中比较成功的一些实践，但相对于Maven或Ant又有极强的扩展。 
-> - 滕云   
-
 
