@@ -128,6 +128,8 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>如果想将Spring Loaded和Gradle，IntelliJ结合起来，那你需要付出代价。默认情况下，IntelliJ将类编译到一个跟Gradle不同的位置，这会导致Spring Loaded监控失败，所以使用idea模块修改编译输出位置和Gradle一样。</p>
+
 <p>注：IntelliJ必须配置跟命令行Gradle任务相同的Java版本，并且springloaded必须作为一个buildscript依赖被包含进去。</p>
 
 <p>官方文档的springloaded版本是1.2.0.RELEASE，这个版本有问题，会出现：</p>
@@ -136,14 +138,12 @@
 
 <p>依赖下载完成之后，正常启动Spring Boot Run。</p>
 
-<p>如果你自己有仔细阅读官方文档的代码，你会发现官方少了一行testOutputDir的配置。官方文档上没有设置testOutputDir，这就会导致，intellij编译代码时，输出test下面的class到了out目录的main中。从而改变了Gradle默认的输出测试路径（main和test分开的），所以最好还是手动配置一下。</p>
-
-<p>如果想将Spring Loaded和Gradle，IntelliJ结合起来，那你需要付出代价。默认情况下，IntelliJ将类编译到一个跟Gradle不同的位置，这会导致Spring Loaded监控失败，所以使用idea模块修改编译输出位置和Gradle一样。</p>
-
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">./</span><span class="n">gradlew</span> <span class="n">bRun</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+<p>如果你自己有仔细阅读官方文档的代码，你会发现官方少了一行testOutputDir的配置。官方文档上没有设置testOutputDir，这就会导致，intellij编译代码时，输出test下面的class到了out目录的main中。从而改变了Gradle默认的输出测试路径（main和test分开的），所以最好还是手动配置一下。</p>
 
 <p>此时，如果你在应用启动的时候修改了Java代码，只需要点击Intellij的编译按钮，重新编译代码即可。</p>
 
