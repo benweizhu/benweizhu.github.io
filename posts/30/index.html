@@ -9,7 +9,8 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在Cordova中有一个很重要的概念：插件。 插件会提供访问Cordova核心API的接口。 插件是一些附加的代码，它能够提供访问原生组件的接口。一般情况下，你都需要添加一些插件以启动Cordova设备级别的特性。 插件由官方和社区提供，可以在plugins.cordova.io上找到， &hellip;">
+  <meta name="description" content="自从3.0之后，Cordova默认是关闭所有关于设备原生特性功能的，所以我们要通过添加插件来启动原生特性。 这里以Accelerometer（加速度感应器）为例，来学习如何使用设备原生特性。 1.添加插件 首先，需要在工程目录下，通过CLI命令添加插件。 1
+cordova plugin add &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +65,419 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/01/19/cordova-using-accelerometer/">Cordova探索之旅系列（三）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-01-19T15:39:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>3:39 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>自从3.0之后，Cordova默认是关闭所有关于设备原生特性功能的，所以我们要通过添加插件来启动原生特性。</p>
+
+<p>这里以Accelerometer（加速度感应器）为例，来学习如何使用设备原生特性。</p>
+
+<p><strong>1.添加插件</strong></p>
+
+<p>首先，需要在工程目录下，通过CLI命令添加插件。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin add org.apache.cordova.device-motion
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过ls命令，可以查看当前项目下，已经安装的插件。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin ls
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>2.在config.xml文件中配置该特性</strong></p>
+
+<p>路径：res/xml/config.xml</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;feature</span> <span class="na">name=</span><span class="s">&quot;Accelerometer&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;android-package&quot;</span> <span class="na">value=</span><span class="s">&quot;org.apache.cordova.devicemotion.AccelListener&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/feature&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>完整配置如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&#39;1.0&#39; encoding=&#39;utf-8&#39;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;widget</span> <span class="na">id=</span><span class="s">&quot;com.example.hello.HelloWorld&quot;</span> <span class="na">version=</span><span class="s">&quot;0.0.1&quot;</span>
+</span><span class='line'><span class="na">xmlns=</span><span class="s">&quot;http://www.w3.org/ns/widgets&quot;</span> <span class="na">xmlns:cdv=</span><span class="s">&quot;http://cordova.apache.org/ns/1.0&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;name&gt;</span>HelloCordova<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;description&gt;</span>
+</span><span class='line'>        A sample Apache Cordova application that responds to the deviceready event.
+</span><span class='line'>    <span class="nt">&lt;/description&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;author</span> <span class="na">email=</span><span class="s">&quot;dev@cordova.apache.org&quot;</span> <span class="na">href=</span><span class="s">&quot;http://cordova.io&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        Apache Cordova Team
+</span><span class='line'>    <span class="nt">&lt;/author&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;content</span> <span class="na">src=</span><span class="s">&quot;index.html&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;access</span> <span class="na">origin=</span><span class="s">&quot;*&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;feature</span> <span class="na">name=</span><span class="s">&quot;Accelerometer&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;android-package&quot;</span> <span class="na">value=</span><span class="s">&quot;org.apache.cordova.devicemotion.AccelListener&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/feature&gt;</span>
+</span><span class='line'><span class="nt">&lt;/widget&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>某些插件还需要在Android的AndroidManifest.xml中添加uses-permission</p>
+
+<p>例如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;uses-permission</span> <span class="na">android:name=</span><span class="s">&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;</span> <span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然，这里不需要！</p>
+
+<p><strong>3.API</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">navigator</span><span class="p">.</span><span class="nx">accelerometer</span><span class="p">.</span><span class="nx">getCurrentAcceleration</span><span class="p">(</span><span class="nx">onSuccess</span><span class="p">,</span> <span class="nx">onError</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>onSuccess和onError是对应的回调函数</p>
+
+<p><strong>4.完整例子</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Acceleration Example<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span> <span class="na">src=</span><span class="s">&quot;cordova.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;deviceready&quot;</span><span class="p">,</span> <span class="nx">onDeviceReady</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">onDeviceReady</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">getCurrrentAcceleration</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">navigator</span><span class="p">.</span><span class="nx">accelerometer</span><span class="p">.</span><span class="nx">getCurrentAcceleration</span><span class="p">(</span><span class="nx">onSuccess</span><span class="p">,</span> <span class="nx">onError</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">onSuccess</span><span class="p">(</span><span class="nx">acceleration</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Acceleration X: &#39;</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">x</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span>
+</span><span class='line'>              <span class="s1">&#39;Acceleration Y: &#39;</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">y</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span>
+</span><span class='line'>              <span class="s1">&#39;Acceleration Z: &#39;</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">z</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span>
+</span><span class='line'>              <span class="s1">&#39;Timestamp: &#39;</span>      <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">onError</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;onError!&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;button</span> <span class="na">onClick=</span><span class="s">&quot;getCurrrentAcceleration()&quot;</span><span class="nt">&gt;</span>click<span class="nt">&lt;/button&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果用Android的原生API，用Java代码来实现相同功能呢，如下：</p>
+
+<p>Activity</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">android.app.Activity</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.Sensor</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.SensorEvent</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.SensorEventListener</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.SensorManager</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.view.View</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.shakeshake.R</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.shakeshake.fragment.FireMissilesDialogFragment</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">android</span><span class="o">.</span><span class="na">hardware</span><span class="o">.</span><span class="na">Sensor</span><span class="o">.</span><span class="na">TYPE_ACCELEROMETER</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">android</span><span class="o">.</span><span class="na">hardware</span><span class="o">.</span><span class="na">SensorManager</span><span class="o">.</span><span class="na">SENSOR_DELAY_NORMAL</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">SensorManager</span> <span class="n">sensorManager</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Sensor</span> <span class="n">sensor</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">AccelerometerListener</span> <span class="n">listener</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">text</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">main</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">initSensor</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">initSensor</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">sensorManager</span> <span class="o">=</span> <span class="o">(</span><span class="n">SensorManager</span><span class="o">)</span> <span class="n">getSystemService</span><span class="o">(</span><span class="n">SENSOR_SERVICE</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">sensor</span> <span class="o">=</span> <span class="n">sensorManager</span><span class="o">.</span><span class="na">getDefaultSensor</span><span class="o">(</span><span class="n">TYPE_ACCELEROMETER</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">listener</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">AccelerometerListener</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">sensorManager</span><span class="o">.</span><span class="na">registerListener</span><span class="o">(</span><span class="n">listener</span><span class="o">,</span> <span class="n">sensor</span><span class="o">,</span> <span class="n">SENSOR_DELAY_NORMAL</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onStop</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">onStop</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">sensorManager</span><span class="o">.</span><span class="na">unregisterListener</span><span class="o">(</span><span class="n">listener</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">sendMessage</span><span class="o">(</span><span class="n">View</span> <span class="n">view</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">FireMissilesDialogFragment</span> <span class="n">fireMissilesDialogFragment</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">FireMissilesDialogFragment</span><span class="o">(</span><span class="n">text</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">fireMissilesDialogFragment</span><span class="o">.</span><span class="na">show</span><span class="o">(</span><span class="n">getFragmentManager</span><span class="o">(),</span> <span class="s">&quot;some tag&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">class</span> <span class="nc">AccelerometerListener</span> <span class="kd">implements</span> <span class="n">SensorEventListener</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nd">@Override</span>
+</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onSensorChanged</span><span class="o">(</span><span class="n">SensorEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">text</span> <span class="o">=</span> <span class="s">&quot;Acceleration X: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">values</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span> <span class="o">+</span>
+</span><span class='line'>                    <span class="s">&quot;Acceleration Y: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">values</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span> <span class="o">+</span>
+</span><span class='line'>                    <span class="s">&quot;Acceleration Z: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">values</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span> <span class="o">+</span>
+</span><span class='line'>                    <span class="s">&quot;Timestamp: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">timestamp</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nd">@Override</span>
+</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAccuracyChanged</span><span class="o">(</span><span class="n">Sensor</span> <span class="n">sensor</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Dialog</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">android.app.AlertDialog</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.app.Dialog</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.app.DialogFragment</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.content.DialogInterface</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.shakeshake.R</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FireMissilesDialogFragment</span> <span class="kd">extends</span> <span class="n">DialogFragment</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">text</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">FireMissilesDialogFragment</span><span class="o">(</span><span class="n">String</span> <span class="n">text</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">Dialog</span> <span class="nf">onCreateDialog</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">AlertDialog</span><span class="o">.</span><span class="na">Builder</span> <span class="n">builder</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AlertDialog</span><span class="o">.</span><span class="na">Builder</span><span class="o">(</span><span class="n">getActivity</span><span class="o">());</span>
+</span><span class='line'>        <span class="n">builder</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">setTitle</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">dialog_accelerometer</span><span class="o">)</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">setMessage</span><span class="o">(</span><span class="n">text</span><span class="o">)</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">setNeutralButton</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">ok</span><span class="o">,</span> <span class="k">new</span> <span class="n">DialogInterface</span><span class="o">.</span><span class="na">OnClickListener</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>                    <span class="nd">@Override</span>
+</span><span class='line'>                    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onClick</span><span class="o">(</span><span class="n">DialogInterface</span> <span class="n">dialogInterface</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>                    <span class="o">}</span>
+</span><span class='line'>                <span class="o">});</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">builder</span><span class="o">.</span><span class="na">create</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>main.xml</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;LinearLayout</span> <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span>
+</span><span class='line'>              <span class="na">android:orientation=</span><span class="s">&quot;vertical&quot;</span>
+</span><span class='line'>              <span class="na">android:layout_width=</span><span class="s">&quot;fill_parent&quot;</span>
+</span><span class='line'>              <span class="na">android:layout_height=</span><span class="s">&quot;fill_parent&quot;</span>
+</span><span class='line'>        <span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;Button</span> <span class="na">android:layout_width=</span><span class="s">&quot;fill_parent&quot;</span>
+</span><span class='line'>            <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
+</span><span class='line'>            <span class="na">android:text=</span><span class="s">&quot;@string/click&quot;</span>
+</span><span class='line'>            <span class="na">android:onClick=</span><span class="s">&quot;sendMessage&quot;</span>
+</span><span class='line'>            <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/LinearLayout&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -194,173 +608,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/01/11/android-service-translation/">Android Service(译)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-01-11T23:51:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>11:51 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Service是Android应用程序中的一个组件，它能够长时间在后台运行，并且不提供界面。另一个应用程序的组件可以启动一个Service并持续在后台运行即便用户切换到别的应用程序。而且，组件可以和Service绑定并与它进行交互，甚至执行进程间通信（IPC）。例如，一个Service可以处理网络通信，播放音乐，执行IO操作，或者和启动它的组件交互，这些都是在后台进行。</p>
-
-<p>使用Service有两种方式：</p>
-
-<h2>启动Start</h2>
-
-<p>当一个应用组件（例如Activity）调用startService()方法时，可以启动一个Service。一旦被启动，一个Service会无止境的运行在后台，即使启动它的组件被销毁了。通常启动一个Service会去执行一个单独的操作，并且不会返回任何的结果给调用者。例如，它可以下载或者上传文件。当这件事情完成，Service自己会停止。</p>
-
-<h2>绑定Bound</h2>
-
-<p>当一个应用组件调用bindService()方法时，可以绑定一个Service。一个被绑定的Service提供了一个CS模式的接口，它允许组件与Service进行交互，发送请求，返回结果，与进程间通信。被绑定的Service会一直运行只要有其他应用组件绑定它。多个组件可以绑定到同一个Service，但是当所有的组件都解除绑定，该Service就会被销毁。</p>
-
-<p>对应于这两种方式，有两个回调函数去实现，onStartCommand()对应启动方式，onBind()对应绑定方式。</p>
-
-<p>无论你的应用程序是启动还是绑定一个Service还是两种方式有用到，对于任何一个应用程序都可以使用该Service（即便是另外一个应用程序）。同理，任何组件也可以使用一个Activity（通过Intent）。然而，你可以在Manifest文件中将Service定义为私有的，并禁止其他应用访问它。</p>
-
-<p>Service运行在宿主进程的的主线程中——Service不会创建它自己的进程，也不会运行在分开的进程中（除非你特别指定）。这意味着，如果你的Service要做任何占用CPU或者阻塞操作（例如播放音乐或者网络操作），你应该单独为Service创建一个线程。通过使用单独的线程，你会减小应用程序未响应（ANR-Application Not Responding）错误，并且让应用程序主线程保持用户与Activity进行交互。</p>
-
-<p>创建Service，你必须创建一个Service的子类（或者一个已经存在的子类）。在实现类中，你需要重写一些回调函数，这些回调函数处理着Service的生命周期，并且提供一个机制让组件去绑定Service。</p>
-
-<p><strong>onStartCommand()</strong></p>
-
-<p>该方法被调用，当另一个组件，例如Activity通过调用startService()，请求一个Service启动。一旦该方法被执行，Service会启动，并在后台无止境运行。如果你实现这个方法，你就应该负责停止它（通过调用stopSelf()或者stopService()，但如果是绑定，就不用实现这些方法）。</p>
-
-<p><strong>onBind()</strong></p>
-
-<p>该方法被调用，当一个组件想要绑定该Service（例如执行RPC），需要调用bindService()。在这个实现方法中，你需要提供一个接口（返回一个IBinder）给调用者，以便调用者与Service进行交互。你必须实现这方法，但是如果你不希望该Service被绑定，那么你可以放回一个null。</p>
-
-<p><strong>onCreate()</strong></p>
-
-<p>该方法被调用，当Service被第一次创建，要去执行一次性的配置过程（在该方法被调用的要么是onStartCommand()或者onBind()）。如果一个Service已经在运行，则这个方法不会再被调用。</p>
-
-<p><strong>onDestroy()</strong></p>
-
-<p>当Service不在被使用时，系统会去调这个方法。你的Service应该执行一些清理资源的工作，例如线程，已注册的监听器等。它是Service最后被调用的方法。</p>
-
-<p>Android系统会强制停止一个Service，仅仅当内存不足且系统必须会已经有用户焦点的Activity恢复一些系统资源时。如果Service绑定到一个拥有用户焦点的Activity，那么一般不会被杀掉，如果该Service被定义在后台运行，那么它几乎不会被杀掉。否则，如果Service被启动且长时间运行，那么系统会降低它在后台任务中的位置，然后该Service会变成最容易被杀掉的服务。如果你的Service被启动，那么你必须将它优雅的设计成能够被系统重启。如果系统杀掉你的Service，它会在资源够用的时候立刻重启你的Service（虽然它也依赖于onStartCommand()方法返回的值）。</p>
-
-<h2>LifeCycle</h2>
-
-<p><img src="http://developer.android.com/images/service_lifecycle.png" alt="Jasmine" /></p>
-
-<p>Service的整个生命周期发生在onCreate()方法和onDestory()方法之间，就像Activity一样，分别进行一些初始化工作和清理资源工作。且无论是启动Service还是绑定Service，这两个方法都会被调用到。</p>
-
-<p>Service活动周期开始于onStartCommand()或者onBind()方法，每一个方法都会被传入一个Intent对象。</p>
-
-<p>如果Service以启动方式开始，那么活动周期与整个生命周期同时结束。如果Service是绑定的，那么活动周期是以onUnbind()方法结束。</p>
-
-<figure class='code'><figcaption><span>Service </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">android.app.Service</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.content.Intent</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.os.IBinder</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ExampleService</span> <span class="kd">extends</span> <span class="n">Service</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">mStartMode</span><span class="o">;</span>       <span class="c1">// indicates how to behave if the service is killed</span>
-</span><span class='line'>    <span class="n">IBinder</span> <span class="n">mBinder</span><span class="o">;</span>      <span class="c1">// interface for clients that bind</span>
-</span><span class='line'>    <span class="kt">boolean</span> <span class="n">mAllowRebind</span><span class="o">;</span> <span class="c1">// indicates whether onRebind should be used</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="c1">// The service is being created</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">onStartCommand</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="o">,</span> <span class="kt">int</span> <span class="n">startId</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="c1">// The service is starting, due to a call to startService()</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">mStartMode</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="n">IBinder</span> <span class="nf">onBind</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="c1">// A client is binding to the service with bindService()</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">mBinder</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">onUnbind</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="c1">// All clients have unbound with unbindService()</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">mAllowRebind</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onRebind</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="c1">// A client is binding to the service with bindService(),</span>
-</span><span class='line'>        <span class="c1">// after onUnbind() has already been called</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onDestroy</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="c1">// The service is no longer used and is being destroyed</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>文献参考自：<a href="http://developer.android.com/guide/components/services.html">http://developer.android.com/guide/components/services.html</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/31">&larr; Older</a>
@@ -390,6 +637,10 @@
       </li>
     
       <li class="post">
+        <a href="/blog/2015/10/06/learning-js-well-2/">学好JavaScript（二）- 被我忽视的东西(2)对象</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/10/05/learning-js-well-1/">学好JavaScript（一）- 被我忽视的东西(1)</a>
       </li>
     
@@ -399,10 +650,6 @@
     
       <li class="post">
         <a href="/blog/2015/09/26/rails-env-and-capistrano/">Rails环境和Capistrano部署</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/09/19/gradle-in-action-chinese-version/">《实战Gradle》译者序</a>
       </li>
     
   </ul>

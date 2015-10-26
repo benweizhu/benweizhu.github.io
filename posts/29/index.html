@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="OOP编程中以对象为核心，系统软件是由相互依赖、相互协作的对象组成。对象在程序中被抽象为类，它们拥有一组属性和行为。类与类之间可以通过继承和组合实现分层和协作，它可以将具有相同属性或者相同功能的代码抽象到一个分明的层次，从而有效的管理代码，降低复杂度。 但随着业务复杂度的增加，客户不断提出新的需求 &hellip;">
+  <meta name="description" content="批处理应用（Batch Application）主要是在没有人工干预的情况下处理大量数据。比如，不同系统之间数据文件的导入和导出，数据的计算，定期生成财务报告等等。 Spring Batch是一个轻量级的，复杂的Batch框架，能够让你开发针对企业级系统日常操作的Batch应用。 Spring &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,317 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/08/spring-batch-job-by-example/">一起学学Spring Batch（一）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-08T17:52:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>5:52 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>批处理应用（Batch Application）主要是在没有人工干预的情况下处理大量数据。比如，不同系统之间数据文件的导入和导出，数据的计算，定期生成财务报告等等。</p>
+
+<p>Spring Batch是一个轻量级的，复杂的Batch框架，能够让你开发针对企业级系统日常操作的Batch应用。</p>
+
+<p><strong>Spring Batch提供的有用特性：</strong></p>
+
+<ol>
+<li>Spring框架中的基础，依赖注入，切面编程，企业级别的支持</li>
+<li>面向批处理的运行时，有效的驱动批处理应用的流程</li>
+<li>有效处理数据，以最佳策略读写数据</li>
+<li>可用的现成组件，提供能够定位到不同批处理场景的组件</li>
+</ol>
+
+
+<p>Spring框架以轻量级容器闻名，提供配置方式来完成应用程序组件的组装。</p>
+
+<p>Spring Batch对Spring框架进行了扩展，提供了专用的xml的命名空间来配置批处理的过程。</p>
+
+<p><strong>有效处理数据</strong></p>
+
+<p>以一种经典场景为例：从一个数据系统读取数据存储到另一个数据系统中。如果一次将整个数据系统中的数据读入到内存，JVM随时可能Out of Memory。当然将所有数据读入到内存肯定不是最好的办法。</p>
+
+<p>Spring Batch使用一种更加有效的办法，叫做Chunk Processing（块处理方式）：以数据流的方式读取输入的源数据，并处理一定数量（这一块）的记录，并写入到对应的组件。</p>
+
+<p>这个块的大小可以改变，所以仍然可以让批处理一条一条的处理数据。</p>
+
+<p><strong>Ready-to-use Component</strong></p>
+
+<p>Spring Batch提供了基础设施来执行块处理，并代理I/O到专用的组件，并命名为reader和writer。</p>
+
+<p>Spring为一些通用的批处理场景提供可用的组件，这些组件可以让你更加专注于业务逻辑。</p>
+
+<p>Spring Batch对reader和writer场景的支持技术。</p>
+
+<table>
+<thead>
+<tr>
+<th>数据类型     </th>
+<th> 技术格式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Database </td>
+<td> JDBC</td>
+</tr>
+<tr>
+<td>Database </td>
+<td> Hibernate</td>
+</tr>
+<tr>
+<td>Database </td>
+<td> JPA</td>
+</tr>
+<tr>
+<td>Database </td>
+<td> iBatis</td>
+</tr>
+<tr>
+<td>File </td>
+<td> Flatfile</td>
+</tr>
+<tr>
+<td>File </td>
+<td> XML</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>当然Spring Batch支持的不止这些技术。当然如果没有你需要的实现，你也可以自己是实现对应的组件。</p>
+
+<p><strong>Spring Batch不是Scheduler</strong></p>
+
+<p>Spring Batch可以驱动批处理流程但是不会提供启动它们的支持，特别是基于时间的启动。Spring Batch一般会讲这些工作代理给其他Scheduler工具，例如Quartz或者Cron。</p>
+
+<p><strong>下面是一个Spring Batch Job的Hello World Example</strong></p>
+
+<figure class='code'><figcaption><span>build.gradle </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'> <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'> <span class="n">compile</span> <span class="s1">&#39;org.springframework.batch:spring-batch-core:2.2.5.RELEASE&#39;</span>
+</span><span class='line'> <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-context:3.2.8.RELEASE&#39;</span>
+</span><span class='line'> <span class="n">testCompile</span> <span class="nl">group:</span> <span class="s1">&#39;junit&#39;</span><span class="o">,</span> <span class="nl">name:</span> <span class="s1">&#39;junit&#39;</span><span class="o">,</span> <span class="nl">version:</span> <span class="s1">&#39;4.+&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在这里定义一个具体的task。</p>
+
+<figure class='code'><figcaption><span>tasklet.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">tasklet</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.StepContribution</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.scope.context.ChunkContext</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.step.tasklet.Tasklet</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.repeat.RepeatStatus</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">repeat</span><span class="o">.</span><span class="na">RepeatStatus</span><span class="o">.</span><span class="na">FINISHED</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloTasklet</span> <span class="kd">implements</span> <span class="n">Tasklet</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">RepeatStatus</span> <span class="nf">execute</span><span class="o">(</span><span class="n">StepContribution</span> <span class="n">contribution</span><span class="o">,</span> <span class="n">ChunkContext</span> <span class="n">chunkContext</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hello Spring Batch!&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">FINISHED</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>beans.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:batch=</span><span class="s">&quot;http://www.springframework.org/schema/batch&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;transactionManager&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.support.transaction.ResourcelessTransactionManager&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jobRepository&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;transactionManager&quot;</span> <span class="na">ref=</span><span class="s">&quot;transactionManager&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>   <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jobLauncher&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.core.launch.support.SimpleJobLauncher&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;jobRepository&quot;</span> <span class="na">ref=</span><span class="s">&quot;jobRepository&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>   <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在xml中配置一个具体batch job，这里只有一步，那就是执行上面定义的task。</p>
+
+<figure class='code'><figcaption><span>batch-job.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:batch=</span><span class="s">&quot;http://www.springframework.org/schema/batch&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;import</span> <span class="na">resource=</span><span class="s">&quot;spring-batch-beans.xml&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;helloTasklet&quot;</span> <span class="na">class=</span><span class="s">&quot;me.zeph.spring.batch.tasklet.HelloTasklet&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nt">&lt;batch:job</span> <span class="na">id=</span><span class="s">&quot;helloJob&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;batch:step</span> <span class="na">id=</span><span class="s">&quot;helloStep&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;batch:tasklet</span> <span class="na">ref=</span><span class="s">&quot;helloTasklet&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/batch:step&gt;</span>
+</span><span class='line'>   <span class="nt">&lt;/batch:job&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在main函数中，通过JobLauncher来运行一个Job。</p>
+
+<figure class='code'><figcaption><span>main.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">tasklet</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.Job</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.JobExecution</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.JobParameters</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.launch.JobLauncher</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.ApplicationContext</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.support.ClassPathXmlApplicationContext</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">TaskletRunner</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">String</span><span class="o">[]</span> <span class="n">configLocations</span> <span class="o">=</span> <span class="o">{</span><span class="s">&quot;spring-batch-beans.xml&quot;</span><span class="o">,</span> <span class="s">&quot;spring-batch-jobs.xml&quot;</span><span class="o">};</span>
+</span><span class='line'>      <span class="n">ApplicationContext</span> <span class="n">applicationContext</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ClassPathXmlApplicationContext</span><span class="o">(</span><span class="n">configLocations</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">JobLauncher</span> <span class="n">jobLauncher</span> <span class="o">=</span> <span class="n">applicationContext</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">JobLauncher</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">Job</span> <span class="n">job</span> <span class="o">=</span> <span class="n">applicationContext</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">Job</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">JobExecution</span> <span class="n">jobExecution</span> <span class="o">=</span> <span class="n">jobLauncher</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">job</span><span class="o">,</span> <span class="k">new</span> <span class="nf">JobParameters</span><span class="o">());</span>
+</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;JOB EXECUTION STATUS:&quot;</span> <span class="o">+</span> <span class="n">jobExecution</span><span class="o">.</span><span class="na">getExitStatus</span><span class="o">().</span><span class="na">getExitCode</span><span class="o">());</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -334,419 +645,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/01/19/cordova-using-accelerometer/">Cordova探索之旅系列（三）</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-01-19T15:39:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>3:39 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>自从3.0之后，Cordova默认是关闭所有关于设备原生特性功能的，所以我们要通过添加插件来启动原生特性。</p>
-
-<p>这里以Accelerometer（加速度感应器）为例，来学习如何使用设备原生特性。</p>
-
-<p><strong>1.添加插件</strong></p>
-
-<p>首先，需要在工程目录下，通过CLI命令添加插件。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin add org.apache.cordova.device-motion
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>通过ls命令，可以查看当前项目下，已经安装的插件。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin ls
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>2.在config.xml文件中配置该特性</strong></p>
-
-<p>路径：res/xml/config.xml</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;feature</span> <span class="na">name=</span><span class="s">&quot;Accelerometer&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;android-package&quot;</span> <span class="na">value=</span><span class="s">&quot;org.apache.cordova.devicemotion.AccelListener&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/feature&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>完整配置如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&#39;1.0&#39; encoding=&#39;utf-8&#39;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;widget</span> <span class="na">id=</span><span class="s">&quot;com.example.hello.HelloWorld&quot;</span> <span class="na">version=</span><span class="s">&quot;0.0.1&quot;</span>
-</span><span class='line'><span class="na">xmlns=</span><span class="s">&quot;http://www.w3.org/ns/widgets&quot;</span> <span class="na">xmlns:cdv=</span><span class="s">&quot;http://cordova.apache.org/ns/1.0&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;name&gt;</span>HelloCordova<span class="nt">&lt;/name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;description&gt;</span>
-</span><span class='line'>        A sample Apache Cordova application that responds to the deviceready event.
-</span><span class='line'>    <span class="nt">&lt;/description&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;author</span> <span class="na">email=</span><span class="s">&quot;dev@cordova.apache.org&quot;</span> <span class="na">href=</span><span class="s">&quot;http://cordova.io&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        Apache Cordova Team
-</span><span class='line'>    <span class="nt">&lt;/author&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;content</span> <span class="na">src=</span><span class="s">&quot;index.html&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;access</span> <span class="na">origin=</span><span class="s">&quot;*&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;feature</span> <span class="na">name=</span><span class="s">&quot;Accelerometer&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;android-package&quot;</span> <span class="na">value=</span><span class="s">&quot;org.apache.cordova.devicemotion.AccelListener&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/feature&gt;</span>
-</span><span class='line'><span class="nt">&lt;/widget&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>某些插件还需要在Android的AndroidManifest.xml中添加uses-permission</p>
-
-<p>例如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;uses-permission</span> <span class="na">android:name=</span><span class="s">&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;</span> <span class="nt">/&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当然，这里不需要！</p>
-
-<p><strong>3.API</strong></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">navigator</span><span class="p">.</span><span class="nx">accelerometer</span><span class="p">.</span><span class="nx">getCurrentAcceleration</span><span class="p">(</span><span class="nx">onSuccess</span><span class="p">,</span> <span class="nx">onError</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>onSuccess和onError是对应的回调函数</p>
-
-<p><strong>4.完整例子</strong></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Acceleration Example<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span> <span class="na">src=</span><span class="s">&quot;cordova.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;deviceready&quot;</span><span class="p">,</span> <span class="nx">onDeviceReady</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">function</span> <span class="nx">onDeviceReady</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">function</span> <span class="nx">getCurrrentAcceleration</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">navigator</span><span class="p">.</span><span class="nx">accelerometer</span><span class="p">.</span><span class="nx">getCurrentAcceleration</span><span class="p">(</span><span class="nx">onSuccess</span><span class="p">,</span> <span class="nx">onError</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">function</span> <span class="nx">onSuccess</span><span class="p">(</span><span class="nx">acceleration</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Acceleration X: &#39;</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">x</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span>
-</span><span class='line'>              <span class="s1">&#39;Acceleration Y: &#39;</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">y</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span>
-</span><span class='line'>              <span class="s1">&#39;Acceleration Z: &#39;</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">z</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span>
-</span><span class='line'>              <span class="s1">&#39;Timestamp: &#39;</span>      <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">function</span> <span class="nx">onError</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;onError!&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="nt">&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;button</span> <span class="na">onClick=</span><span class="s">&quot;getCurrrentAcceleration()&quot;</span><span class="nt">&gt;</span>click<span class="nt">&lt;/button&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果用Android的原生API，用Java代码来实现相同功能呢，如下：</p>
-
-<p>Activity</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">android.app.Activity</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.Sensor</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.SensorEvent</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.SensorEventListener</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.SensorManager</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.view.View</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.shakeshake.R</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.shakeshake.fragment.FireMissilesDialogFragment</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">android</span><span class="o">.</span><span class="na">hardware</span><span class="o">.</span><span class="na">Sensor</span><span class="o">.</span><span class="na">TYPE_ACCELEROMETER</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">android</span><span class="o">.</span><span class="na">hardware</span><span class="o">.</span><span class="na">SensorManager</span><span class="o">.</span><span class="na">SENSOR_DELAY_NORMAL</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">SensorManager</span> <span class="n">sensorManager</span><span class="o">;</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">Sensor</span> <span class="n">sensor</span><span class="o">;</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">AccelerometerListener</span> <span class="n">listener</span><span class="o">;</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">text</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">main</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">initSensor</span><span class="o">();</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">initSensor</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">sensorManager</span> <span class="o">=</span> <span class="o">(</span><span class="n">SensorManager</span><span class="o">)</span> <span class="n">getSystemService</span><span class="o">(</span><span class="n">SENSOR_SERVICE</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">sensor</span> <span class="o">=</span> <span class="n">sensorManager</span><span class="o">.</span><span class="na">getDefaultSensor</span><span class="o">(</span><span class="n">TYPE_ACCELEROMETER</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">listener</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">AccelerometerListener</span><span class="o">();</span>
-</span><span class='line'>        <span class="n">sensorManager</span><span class="o">.</span><span class="na">registerListener</span><span class="o">(</span><span class="n">listener</span><span class="o">,</span> <span class="n">sensor</span><span class="o">,</span> <span class="n">SENSOR_DELAY_NORMAL</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onStop</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">onStop</span><span class="o">();</span>
-</span><span class='line'>        <span class="n">sensorManager</span><span class="o">.</span><span class="na">unregisterListener</span><span class="o">(</span><span class="n">listener</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">sendMessage</span><span class="o">(</span><span class="n">View</span> <span class="n">view</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">FireMissilesDialogFragment</span> <span class="n">fireMissilesDialogFragment</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">FireMissilesDialogFragment</span><span class="o">(</span><span class="n">text</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">fireMissilesDialogFragment</span><span class="o">.</span><span class="na">show</span><span class="o">(</span><span class="n">getFragmentManager</span><span class="o">(),</span> <span class="s">&quot;some tag&quot;</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">class</span> <span class="nc">AccelerometerListener</span> <span class="kd">implements</span> <span class="n">SensorEventListener</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nd">@Override</span>
-</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onSensorChanged</span><span class="o">(</span><span class="n">SensorEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">text</span> <span class="o">=</span> <span class="s">&quot;Acceleration X: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">values</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span> <span class="o">+</span>
-</span><span class='line'>                    <span class="s">&quot;Acceleration Y: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">values</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span> <span class="o">+</span>
-</span><span class='line'>                    <span class="s">&quot;Acceleration Z: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">values</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span> <span class="o">+</span>
-</span><span class='line'>                    <span class="s">&quot;Timestamp: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">timestamp</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span><span class="o">;</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nd">@Override</span>
-</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAccuracyChanged</span><span class="o">(</span><span class="n">Sensor</span> <span class="n">sensor</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Dialog</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">android.app.AlertDialog</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.app.Dialog</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.app.DialogFragment</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.content.DialogInterface</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.shakeshake.R</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FireMissilesDialogFragment</span> <span class="kd">extends</span> <span class="n">DialogFragment</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">text</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="nf">FireMissilesDialogFragment</span><span class="o">(</span><span class="n">String</span> <span class="n">text</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="n">Dialog</span> <span class="nf">onCreateDialog</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">AlertDialog</span><span class="o">.</span><span class="na">Builder</span> <span class="n">builder</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AlertDialog</span><span class="o">.</span><span class="na">Builder</span><span class="o">(</span><span class="n">getActivity</span><span class="o">());</span>
-</span><span class='line'>        <span class="n">builder</span>
-</span><span class='line'>                <span class="o">.</span><span class="na">setTitle</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">dialog_accelerometer</span><span class="o">)</span>
-</span><span class='line'>                <span class="o">.</span><span class="na">setMessage</span><span class="o">(</span><span class="n">text</span><span class="o">)</span>
-</span><span class='line'>                <span class="o">.</span><span class="na">setNeutralButton</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">ok</span><span class="o">,</span> <span class="k">new</span> <span class="n">DialogInterface</span><span class="o">.</span><span class="na">OnClickListener</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>                    <span class="nd">@Override</span>
-</span><span class='line'>                    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onClick</span><span class="o">(</span><span class="n">DialogInterface</span> <span class="n">dialogInterface</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>                    <span class="o">}</span>
-</span><span class='line'>                <span class="o">});</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">builder</span><span class="o">.</span><span class="na">create</span><span class="o">();</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>main.xml</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;LinearLayout</span> <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span>
-</span><span class='line'>              <span class="na">android:orientation=</span><span class="s">&quot;vertical&quot;</span>
-</span><span class='line'>              <span class="na">android:layout_width=</span><span class="s">&quot;fill_parent&quot;</span>
-</span><span class='line'>              <span class="na">android:layout_height=</span><span class="s">&quot;fill_parent&quot;</span>
-</span><span class='line'>        <span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;Button</span> <span class="na">android:layout_width=</span><span class="s">&quot;fill_parent&quot;</span>
-</span><span class='line'>            <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
-</span><span class='line'>            <span class="na">android:text=</span><span class="s">&quot;@string/click&quot;</span>
-</span><span class='line'>            <span class="na">android:onClick=</span><span class="s">&quot;sendMessage&quot;</span>
-</span><span class='line'>            <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/LinearLayout&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/30">&larr; Older</a>
@@ -776,6 +674,10 @@
       </li>
     
       <li class="post">
+        <a href="/blog/2015/10/06/learning-js-well-2/">学好JavaScript（二）- 被我忽视的东西(2)对象</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/10/05/learning-js-well-1/">学好JavaScript（一）- 被我忽视的东西(1)</a>
       </li>
     
@@ -785,10 +687,6 @@
     
       <li class="post">
         <a href="/blog/2015/09/26/rails-env-and-capistrano/">Rails环境和Capistrano部署</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/09/19/gradle-in-action-chinese-version/">《实战Gradle》译者序</a>
       </li>
     
   </ul>

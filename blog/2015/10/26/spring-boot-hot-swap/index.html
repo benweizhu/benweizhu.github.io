@@ -107,6 +107,7 @@
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
+<span class='line-number'>17</span>
 </pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
 </span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span> <span class="n">jcenter</span><span class="o">()</span> <span class="o">}</span>
 </span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
@@ -121,6 +122,7 @@
 </span><span class='line'>    <span class="n">module</span> <span class="o">{</span>
 </span><span class='line'>        <span class="n">inheritOutputDirs</span> <span class="o">=</span> <span class="kc">false</span>
 </span><span class='line'>        <span class="n">outputDir</span> <span class="o">=</span> <span class="n">file</span><span class="o">(</span><span class="s2">&quot;$buildDir/classes/main/&quot;</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">testOutputDir</span> <span class="o">=</span> <span class="n">file</span><span class="o">(</span><span class="s2">&quot;$buildDir/classes/test/&quot;</span><span class="o">)</span>
 </span><span class='line'>    <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -133,6 +135,8 @@
 <p>org.springsource.loaded.jvm.JVM : Problems copying method. Incompatible JVM? 报错</p>
 
 <p>依赖下载完成之后，正常启动Spring Boot Run。</p>
+
+<p>如果你自己有仔细阅读官方文档的代码，你会发现官方少了一行testOutputDir的配置。官方文档上没有设置testOutputDir，这就会导致，intellij编译代码时，输出test下面的class到了out目录的main中。从而改变了Gradle默认的输出测试路径（main和test分开的），所以最好还是手动配置一下。</p>
 
 <p>如果想将Spring Loaded和Gradle，IntelliJ结合起来，那你需要付出代价。默认情况下，IntelliJ将类编译到一个跟Gradle不同的位置，这会导致Spring Loaded监控失败，所以使用idea模块修改编译输出位置和Gradle一样。</p>
 
@@ -179,7 +183,7 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2015/10/05/learning-js-well-1/" title="Previous Post: 学好JavaScript（一）- 被我忽视的东西(1)">&laquo; 学好JavaScript（一）- 被我忽视的东西(1)</a>
+        <a class="basic-alignment left" href="/blog/2015/10/06/learning-js-well-2/" title="Previous Post: 学好JavaScript（二）- 被我忽视的东西(2)对象">&laquo; 学好JavaScript（二）- 被我忽视的东西(2)对象</a>
       
       
     </p>
@@ -226,6 +230,10 @@
       </li>
     
       <li class="post">
+        <a href="/blog/2015/10/06/learning-js-well-2/">学好JavaScript（二）- 被我忽视的东西(2)对象</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/10/05/learning-js-well-1/">学好JavaScript（一）- 被我忽视的东西(1)</a>
       </li>
     
@@ -235,10 +243,6 @@
     
       <li class="post">
         <a href="/blog/2015/09/26/rails-env-and-capistrano/">Rails环境和Capistrano部署</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/09/19/gradle-in-action-chinese-version/">《实战Gradle》译者序</a>
       </li>
     
   </ul>
