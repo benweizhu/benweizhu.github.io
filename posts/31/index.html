@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="早期的web应用主要是静态页面的浏览。静态页面使用HTML语言来编写，放在服务器上。用户使用浏览器通过HTTP协议请求服务器上的Web页面，服务器上的Web服务器软件接收到用户发送的请求后，读取请求URI所标识的资源，加上消息报头发送给客户端的浏览器；浏览器解析响应中的HTML数据， &hellip;">
+  <meta name="description" content="最早接触PhoneGap平台是在1年多之前，能够使用HTML、CSS和JavaScript跨平台来编写Android或者IOS设备程序，并且应用的核心代码不需要多少修改就可以移植，确实让我感觉的到它应该是未来移动设备开发的趋势。Web程序员，特别是前端程序员， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/12/21/web-mvc-by-example-with-spring-mvc/">Web MVC by Example</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/01/11/cordova-set-up/">Cordova探索之旅系列（一）</a></h1>
     
     
       <p class="meta">
@@ -79,370 +79,165 @@
 
 
 
-<time class='entry-date' datetime='2013-12-21T17:03:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>5:03 pm</span></time>
+<time class='entry-date' datetime='2014-01-11T16:47:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>4:47 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>早期的web应用主要是静态页面的浏览。静态页面使用HTML语言来编写，放在服务器上。用户使用浏览器通过HTTP协议请求服务器上的Web页面，服务器上的Web服务器软件接收到用户发送的请求后，读取请求URI所标识的资源，加上消息报头发送给客户端的浏览器；浏览器解析响应中的HTML数据，从而向用户呈现多姿多彩的HTML页面。</p>
+  <div class="entry-content"><p>最早接触PhoneGap平台是在1年多之前，能够使用HTML、CSS和JavaScript跨平台来编写Android或者IOS设备程序，并且应用的核心代码不需要多少修改就可以移植，确实让我感觉的到它应该是未来移动设备开发的趋势。Web程序员，特别是前端程序员，能够轻松的通过Web技术来编写移动设备软件。</p>
 
-<h3><strong>CGI-Servlet-JSP-Model1-Model2</strong></h3>
+<p><strong>但是当时给我带来的感觉是应用的响应速度太慢，提供的API不全，能够实现的功能不多。PhoneGap经过1年多的沉淀，如今过头再来看PhoneGap，它又是什么样的呢？有哪些进步呢？</strong></p>
 
-<p>早期使用的Web服务器扩展机制是CGI，它允许用户调用Web服务器上的CGI程序。CGI的全称是Common Gateway Interface，即公共网关接口。用户通过单击某个链接或者直接在浏览器的地址栏中输入URL来访问CGI程序，Web服务器接收到请求后，发现这个请求是给CGI程序的，于是就启动并运行这个CGI程序，对用户请求进行处理。CGI程序解析请求中的CGI数据，处理数据，并产生一个响应（通常是HTML页面）。这个响应被返回给Web服务器，Web服务器包装这个响应（例如添加消息报头），以HTTP响应的形式发送给Web浏览器。</p>
+<h2>Cordova是什么？</h2>
 
-<p>Java Servlet（<strong>Java服务器小程序Servlet=Server+Applet</strong>）是一个基于Java技术的Web组件，运行在服务器端，由Servlet容器所管理，用于生成动态的内容。Servlet是平台独立的Java类，编写一个Servlet，实际上就是按照Servlet规范编写一个Java类。</p>
+<p>Apache Cordova是PhoneGap贡献给Apache后的开源项目，是从PhoneGap中抽出的核心代码，是驱动PhoneGap的核心引擎。</p>
 
-<p>Servlet不能独立运行，它必须被部署到Servlet容器（例如：Tomcat）中，由容器来实例化和调用Servlet的方法，Servlet容器在Servlet的生命周期内包容和管理Servlet。</p>
+<p>Cordova是一个设备API的集合，它允许手机开发者通过JavaScript去访问设备原生功能，例如相机，重力感应等。结合UI框架，例如jQuery Mobile，Dojo Mobile或者Sencha Touch，可以让开发者通过HTML，CSS和JavaScript开发手机应用。</p>
 
-<p>用户通过单击某个链接或者直接在浏览器的地址栏中输入URL来访问Servlet，Web服务器接收到该请求后，并不是将请求直接交给Servlet，而是交给Servlet容器。Servlet容器实例化Servlet，调用Servlet的一个特定方法对请求进行处理，并产生一个响应。这个响应由Servlet容器返回给Web服务器，Web服务器包装这个响应，以HTTP响应的形式发送给Web浏览器。</p>
+<p>当使用Cordova的API时，应用可以在没有任何原生代码（Java，Object-C等）的情况下构建。并且，虽然使用着Web开发技术，但是该应用却是在本机运行，而不是远程的Web应用）。</p>
 
-<p>下面是用servlet编写的get和post请求页面例子：</p>
+<p>并且因为提供的JavaScript的API在多个设备平台都保持一致性并且基于web标准，所以，应用可以在几乎没有任何修改的情况下应用到各个不同的设备平台。</p>
 
-<figure class='code'><figcaption><span>web.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee&quot;</span>
-</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee</span>
-</span><span class='line'><span class="s">        http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot;</span>
-</span><span class='line'>         <span class="na">version=</span><span class="s">&quot;2.5&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;servlet&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;servlet-name&gt;</span>hello<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;servlet-class&gt;</span>me.zeph.springview.demo.HelloWorldServlet<span class="nt">&lt;/servlet-class&gt;</span>
-</span><span class='line'>   <span class="nt">&lt;/servlet&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;servlet-mapping&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;servlet-name&gt;</span>hello<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;url-pattern&gt;</span>/hello<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'>   <span class="nt">&lt;/servlet-mapping&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
+<p>使用Cordova开发的应用仍然是使用平台的SDK打包，可以放置到每个设备平台的应用商店中。</p>
+
+<p>Cordova提供了一套统一的JavaScript库，其背后使用平台对应的代码来驱动设备。Cordova支持的平台有：IOS，Android，Blackberry，Windows Phone，Palm WebOS，Bada和Symbian。</p>
+
+<h2>如何开始Cordova编程?</h2>
+
+<p><strong>1.下载并安装node.js（如果你已经安装过，就不用了）</strong></p>
+
+<p><a href="http://nodejs.org/">http://nodejs.org/</a></p>
+
+<p><strong>2.安装Cordova</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo npm install -g cordova
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p><strong>3.创建应用程序</strong></p>
 
-
-<figure class='code'><figcaption><span>servlet.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.ServletException</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServlet</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletRequest</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletResponse</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.io.PrintWriter</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldServlet</span> <span class="kd">extends</span> <span class="n">HttpServlet</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">resp</span><span class="o">.</span><span class="na">setContentType</span><span class="o">(</span><span class="s">&quot;text/html&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">PrintWriter</span> <span class="n">writer</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="na">getWriter</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;h1&gt;HelloWorld&lt;/h1&gt;&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;form action=&#39;hello&#39; method=&#39;post&#39;&gt;&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;input type=&#39;text&#39; name=&#39;value&#39;&gt;&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;input type=&#39;submit&#39; value=&#39;submit&#39;&gt;&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;form/&gt;&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doPost</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">resp</span><span class="o">.</span><span class="na">setContentType</span><span class="o">(</span><span class="s">&quot;text/html&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">String</span> <span class="n">value</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;value&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">PrintWriter</span> <span class="n">writer</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="na">getWriter</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;Hi, &quot;</span> <span class="o">+</span> <span class="n">value</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova create hello com.example.hello HelloWorld
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这样的web开发流程都在实现一个servlet类的实例。也就是无论是业务逻辑还是前端显示，都是放在Servlet类中来完成，通过实现doGet和doPost的方法，来完成前端参数的获取和视图的渲染。</p>
+<p><strong>4.添加应用平台</strong></p>
 
-<p>但这样做的缺点是<strong>表现逻辑、控制逻辑和业务逻辑全部写在了Java类中，导致逻辑有些混乱</strong>。</p>
+<p>这里添加的是Android应用程序</p>
 
-<p>之后，JSP技术出现，它由Sun和许多公司参与共同创建的一种使软件开发者可以响应客户端请求，而动态生成HTML、XML或其他格式文档的Web网页的技术标准。</p>
+<p>你可能会得到如下信息：</p>
 
-<p>它以Java语言作为脚本语言的，使Java代码和特定的预定义动作可以嵌入到静态页面中。</p>
+<p>Error: ERROR : executing command ‘ant’, make sure you have ant installed and added to your path.</p>
 
-<p>Sun这样做提供了非常好的前端显示，<strong>前端开发工程师也可以更好地改善页面体验</strong>，但实际上，它仍然没有解决前端显示和控制逻辑以及业务逻辑的混乱问题。</p>
+<p>说明你需要安装ant，方法如下：</p>
 
-<p><strong>Servlet是将前端显示放在了Java类中，而JSP是将控制和业务逻辑放在了JSP中。</strong></p>
-
-<p>JSP+JavaBean是纯JSP的增强版被称为Model1。特点是使用&lt;jsp:useBean>标准动作，自动将请求参数封装为JavaBean组件。</p>
-
-<p>这样可以将部分业务逻辑封装到JavaBean中。</p>
-
-<p>Model1的架构中，JSP要负责控制逻辑、表现逻辑和业务对象（JavaBean）的调用，所以实际上仍然不理想。</p>
-
-<p><strong>Model2架构其实可以认为就是我们所说的Web MVC模型，只是控制器采用Servlet、模型采用JavaBean、视图采用JSP</strong>。</p>
-
-<p>下面是一个Model2的例子：</p>
-
-<p>web.xml配置和上面一样配置一个Servlet映射。但是Servlet只负责控制逻辑，不进行前端操作，而是直接将前端渲染分发给jsp页面进行。</p>
-
-<figure class='code'><figcaption><span>HelloWorldServlet.java</span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.User</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.ServletException</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServlet</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletRequest</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletResponse</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldServlet</span> <span class="kd">extends</span> <span class="n">HttpServlet</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">GET_PATH</span> <span class="o">=</span> <span class="s">&quot;WEB-INF/view/hello-world.jsp&quot;</span><span class="o">;</span>
-</span><span class='line'>   <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">POST_PATH</span> <span class="o">=</span> <span class="s">&quot;WEB-INF/view/hello-world-confirm.jsp&quot;</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>   <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
-</span><span class='line'>     <span class="n">req</span><span class="o">.</span><span class="na">getRequestDispatcher</span><span class="o">(</span><span class="n">GET_PATH</span><span class="o">).</span><span class="na">forward</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="n">resp</span><span class="o">);</span>
-</span><span class='line'>   <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>   <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doPost</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
-</span><span class='line'>         <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">getUserFromRequest</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
-</span><span class='line'>     <span class="n">String</span> <span class="n">path</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>     <span class="k">if</span> <span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">validate</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">req</span><span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">&quot;user&quot;</span><span class="o">,</span> <span class="n">user</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">path</span> <span class="o">=</span> <span class="n">POST_PATH</span><span class="o">;</span>
-</span><span class='line'>     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">req</span><span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">&quot;error&quot;</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">path</span> <span class="o">=</span> <span class="n">GET_PATH</span><span class="o">;</span>
-</span><span class='line'>     <span class="o">}</span>
-</span><span class='line'>     <span class="n">req</span><span class="o">.</span><span class="na">getRequestDispatcher</span><span class="o">(</span><span class="n">path</span><span class="o">).</span><span class="na">forward</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="n">resp</span><span class="o">);</span>
-</span><span class='line'>   <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="kd">private</span> <span class="n">User</span> <span class="nf">getUserFromRequest</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>     <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">User</span><span class="o">();</span>
-</span><span class='line'>     <span class="n">user</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">req</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">));</span>
-</span><span class='line'>     <span class="n">user</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="n">req</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;password&quot;</span><span class="o">));</span>
-</span><span class='line'>     <span class="k">return</span> <span class="n">user</span><span class="o">;</span>
-</span><span class='line'>   <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>brew update
+</span><span class='line'>brew install ant
 </span></code></pre></td></tr></table></div></figure>
 
 
-<figure class='code'><figcaption><span>hello-world.jsp</span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ taglib prefix=&quot;c&quot; uri=&quot;http://java.sun.com/jsp/jstl/core&quot; %&gt;
-</span><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>hello world<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;helloWorld&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;name&quot;</span><span class="nt">&gt;</span>name:<span class="nt">&lt;/label&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">id=</span><span class="s">&quot;name&quot;</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;password&quot;</span><span class="nt">&gt;</span>password:<span class="nt">&lt;/label&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="na">id=</span><span class="s">&quot;password&quot;</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;submit&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;c:if</span> <span class="na">test=</span><span class="s">&quot;${error}&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        login failed
-</span><span class='line'>    <span class="nt">&lt;/c:if&gt;</span>
-</span><span class='line'><span class="nt">&lt;/form&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+<p>然后添加应用平台</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd </span>hello
 </span></code></pre></td></tr></table></div></figure>
 
 
-<figure class='code'><figcaption><span>hello-world-confirm.jsp</span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>helloWorldConfirm<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'>hi,${user.name}
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+<p>首先进入到hello目录下</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova platform add android
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>这里也可以删除一个应用平台</p>
 
-
-<figure class='code'><figcaption><span>User.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">domain</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">NAME</span> <span class="o">=</span> <span class="s">&quot;zeph&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">PASSWORD</span> <span class="o">=</span> <span class="s">&quot;123456&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">password</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="n">String</span> <span class="nf">getPassword</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">password</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPassword</span><span class="o">(</span><span class="n">String</span> <span class="n">password</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">password</span> <span class="o">=</span> <span class="n">password</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">validate</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">NAME</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">name</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">PASSWORD</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">password</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova platform rm android
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>总结，Model2模式已经很好的将控制逻辑，业务逻辑和显示逻辑分开，但其中也有些位置还可以进一步改进。</p>
+<p>通过ls命令</p>
 
-<p>例如：<strong>从参数到业务模型的转换（数据绑定），视图显示技术不容易更换（View解析）。</strong></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova platforms ls
+</span></code></pre></td></tr></table></div></figure>
 
-<p>不过，Web MVC框架替我们解决的了这些问题（流行的Web MVC框架有：Spring MVC，Struts）。</p>
 
-<p>关于Spring MVC框架的使用将留在下一篇介绍。</p>
+<p>可以查看你安装关于平台的信息，例如，我的是:</p>
+
+<p>Installed platforms: android 3.3.0</p>
+
+<p>Available platforms: blackberry10, firefoxos, ios</p>
+
+<p><strong>5.构建应用程序</strong></p>
+
+<p>在进行构建之前，先确保你的Android SDK配置好了。</p>
+
+<p>需要下载Android的SDK，并设置Path到系统路径下。</p>
+
+<p>安装Android SDK（Mac平台，下载解压缩就行）</p>
+
+<p>配置SDK的Path到系统路径</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>touch ~/.bash_profile<span class="p">;</span> open ~/.bash_profile
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在profile文件中加一句话：</p>
+
+<p>export PATH=${PATH}:/Users/twer/Downloads/adt-bundle-mac-x86_64-20131030/sdk/platform-tools:/Users/twer/Downloads/adt-bundle-mac-x86_64-20131030/sdk/tools</p>
+
+<p>记得要指定你自己的路径。</p>
+
+<p>最后还要执行profile将它更新到你的系统path下。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">source</span> ~/.bash_profile
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后你就可以开始构建了:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova build
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然你也可以正对某一个平台构建：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova build android
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>6.在模拟器上运行</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova emulate android
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>此时，模拟器会启动，并自动安装应用，效果应该如下：</p>
+
+<p><img src="http://cordova.apache.org/docs/zh/3.1.0/img/guide/cli/android_emulate_install.png" alt="Jasmine" /></p>
+
+<p><strong>7.实体机上运行</strong></p>
+
+<p>将你的设备插到电脑上，然后运行命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova run android
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>会将应用安装到你的手机上。</p>
 </div>
   
   
@@ -455,7 +250,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/12/07/why-gradle/">为何要用gradle?</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/01/05/about-android-activity-lifecycle-translate/">About Android Activity LifeCycle(译)</a></h1>
     
     
       <p class="meta">
@@ -464,768 +259,102 @@
 
 
 
-<time class='entry-date' datetime='2013-12-07T11:11:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>11:11 am</span></time>
+<time class='entry-date' datetime='2014-01-05T23:22:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>11:22 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>“Gradle能够取代Maven吗？”</p>
-
-<p>有很多人问这个问题，我没有答案。因为我也想问这个问题。</p>
-
-<p>如果Gradle能够取代Maven，那么“如何取代之？”</p>
-
-<p>取代之后，带来的“好处有哪些呢？”</p>
-
-<p>带着这个3个问题，我们一起好好研究一下这两个项目管理工具。</p>
-
-<p><strong>1.引言</strong></p>
-
-<p>Maven是目前最常用的Java项目管理及自动化构建工具。</p>
-
-<p>与Ant对比时的经典名言：约定由于配置</p>
-
-<p>它包含：</p>
-
-<p>1.一个项目对象模型（Project Object Model）</p>
-
-<p>2.一组标准集合</p>
-
-<p>3.一个项目生命周期（Project Lifecycle）</p>
-
-<p>4.一个依赖管理系统（Dependency Management System）</p>
-
-<p>5.用来运行定义在生命周期阶段（phase）中插件（plugin）目标（goal）的逻辑
-当你使用Maven的时候，你用一个明确定义的项目对象模型（POM）来描述你的项目。</p>
-
-<p>Gradle是一个基于Ant和Maven概念的项目自动化建构工具。</p>
-
-<p>它能提供的是：</p>
-
-<p>1.一个像ant一样，通用的灵活的构建工具。</p>
-
-<p>2.一种可切换的，像Maven一样的基于约定的构建框架，却又从不锁住你。</p>
-
-<p>3.对多项目构建的强大支持。</p>
-
-<p>4.强大的依赖管理（基于Apache Ivy）。</p>
-
-<p>5.全力支持已有的Maven或者Ivy仓库基础建设。</p>
-
-<p>6.在不需要远程仓库或者pom.xml或者ivy配置文件的前提下，支持传递性依赖管理。</p>
-
-<p>7.Ant的任务（Task）和构建是gradle的一等公民。</p>
-
-<p>8.基于Groovy脚本构建，其build脚本使用groovy语言编写。</p>
-
-<p>9.具有广泛的领域模型支持你的构建。</p>
-
-<p>Gradle使用一种基于Groovy的特定领域语言来声明项目的设置。</p>
-
-<p><strong>2.对比</strong></p>
-
-<p><strong>2.1 语言不同</strong></p>
-
-<p>Gradle和Maven最大的也是最明显的不同就是它们对待管理项目的描述方式不一样，这也是导致它们不同的最本质因素。</p>
-
-<p>Maven采用几乎所有程序员都理解项目描述方式：XML。</p>
-
-<p>Gradle则采用JVM的一个替代语言Groovy作为脚本语言，它的语法与Java的语法相似（这里是指你可以像Java那样去些Groovy程序，但Groovy的一些特性会让Gradle的脚本看的更加简洁，也就是说真正的Gradle脚本看着并不是很像Java）。</p>
-
-<p>Maven通过pom.xml描述一个项目。</p>
-
-<p>Gradle通过build.gradle描述一个项目。</p>
-
-<p><strong>2.2 Maven的核心概念1 - 生命周期</strong></p>
-
-<p>生命周期是Maven的一个核心概念，它是理解Maven工作的重点。</p>
-
-<p>生命周期是什么含义呢？它表示一个项目从构建到发布的所有步骤已经是明确预先定义好了。</p>
-
-<p>对于开发者而言，我们只需要输入几个简单的命令，POM就能确保Maven的执行能够得到我们想要的结果。</p>
-
-<p>Maven有三个内置的生命周期：default，clean，site。</p>
-
-<p>default负责项目部署，clean负责项目的清理，site负责站点和文档生成。</p>
-
-<p>每一个生命周期都是由各种不同的phase（阶段）构成。例如default生命周期就包含下面的这些phase：</p>
-
-<p><strong>validate</strong> - validate the project is correct and all necessary information is available</p>
-
-<p><strong>compile</strong> - compile the source code of the project</p>
-
-<p><strong>test</strong> - test the compiled source code using a suitable unit testing framework. These tests
-should not require the code be packaged or deployed</p>
-
-<p><strong>package</strong> - take the compiled code and package it in its distributable format, such as a JAR.</p>
-
-<p><strong>integration-test</strong> - process and deploy the package if necessary into an environment where integration tests can be run</p>
-
-<p><strong>verify</strong> - run any checks to verify the package is valid and meets quality criteria</p>
-
-<p><strong>install</strong> - install the package into the local repository, for use as a dependency in other projects locally</p>
-
-<p><strong>deploy</strong> - done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects.</p>
-
-<p>这些phase会在default生命周期中按照顺序依次执行。</p>
-
-<p>要执行整个default的生命周期。你只需要执行：mvn deploy命令。</p>
-
-<p>这是因为就算你仅仅只是让maven执行deploy这一个phase，它也会把在它之前的所有phase按照顺序全部执行一遍。</p>
-
-<p>例如：mvn integration-test。它会按照顺序从validate开始一直执行到integration-test。</p>
-
-<p>关于mvn clean install命令：它是先执行clean生命周期中的clean（包含pre-clean），然后在执行default生命周期中的install（当然包含install之前的所有phase）。</p>
-
-<p>下面是clean生命周期的所有phase：</p>
-
-<p>pre-clean - executes processes needed prior to the actual project cleaning</p>
-
-<p>clean - remove all files generated by the previous build</p>
-
-<p>post-clean - executes processes needed to finalize the project cleaning</p>
-
-<p><strong>2.3 Maven的核心概念2 - 插件（plugin）及目标（goal）</strong></p>
-
-<p>虽然一个phase代表着Maven生命周期中的一步（阶段），但生命周期（life cycle）和阶段（phase）只是抽象的概念，不涉及具体的功能。</p>
-
-<p>maven去管理和构建一个项目的具体的功能是全都是由goal提供的。</p>
-
-<p>而plugin是goal的容器，plugin和goal之间的关系是包含关系，一个plugin中包含多个goal。</p>
-
-<p>例如：Compiler插件有两个goal: compile和testCompile，分别完成对main和test中源代码的编译。</p>
-
-<p>执行Goal的方式有两种：</p>
-
-<p>绑定到一个或者多个phase上</p>
-
-<p>单独执行</p>
-
-<p>绑定在phase上是比较常做的办法。在Maven执行过程中，所有经历的执行阶段(phase)上绑定的goal都将得到执行。</p>
-
-<p>例如，对于一个jar包应用，当执行mvn package命令时，在执行到compile阶段时，compiler插件的compile goal会被执行，因为这个goal是绑定在compile阶段(phase)上的。</p>
-
-<p>一些插件的goal并不适合绑定到任何阶段(phase)上，或者是，这些goal往往是单独执行，不需要同某个阶段(phase)绑定在一起。</p>
-
-<p>例如jetty插件，它的goal都是将打包或未打包的工程部署到jetty里然后启动jetty容器的，多数情况下，都是独立运行这些goal的，比如：当键入mvn jetty:run后，工程就能完成编译后启动jetty。</p>
-
-<p>生命周期(lifecycle)由多个阶段(phase)组成,每个阶段(phase)会挂接零个到多个goal，如果一个phase没有goal挂载，那么它就不会被执行。</p>
-
-<p><strong>2.4 约定由于配置</strong></p>
-
-<p>这是一个简单的概念。</p>
-
-<p>系统，类库，框架应该假定合理的默认值，而非要求提供不必要的配置。</p>
-
-<p>Maven通过给项目提供明智的默认行为来融合这个概念。</p>
-
-<p>例如：</p>
-
-<p>在没有自定义的情况下,源代码假定是在 ${basedir}/src/main/java</p>
-
-<p>资源文件假定是在 ${basedir}/src/main/resources</p>
-
-<p>测试代码假定是在 ${basedir}/src/test</p>
-
-<p>项目假定会产生一个JAR文件，Maven 假定你想要把编译好的字节码放到 ${basedir}/target/classes，并且在${basedir}/target创建一个可分发的 JAR 文件。</p>
-
-<p>Maven的力量来自它的”武断&#8221;，它有一个定义好的生命周期和一组知道如何构建和装配软件的通用插件。如果你遵循这些约定，</p>
-
-<p>Maven只需要几乎为零的工作—仅仅是将你的源代码放到正确的目录，Maven将会帮你处理剩下的事情。</p>
-
-<p>Maven标准目录结构</p>
-
-<p>src/main/java</p>
-
-<p>src/main/resources</p>
-
-<p>src/main/filters</p>
-
-<p>src/main/assembly</p>
-
-<p>src/main/config</p>
-
-<p>src/main/scripts</p>
-
-<p>src/main/webapp</p>
-
-<p>src/test/java</p>
-
-<p>src/test/resources</p>
-
-<p>src/test/filters</p>
-
-<p>src/site</p>
-
-<p>LICENSE.txt</p>
-
-<p>NOTICE.txt</p>
-
-<p>README.txt</p>
-
-<p>关于更多关于Maven的目录结构请参考这里。</p>
-
-<p>POM是Maven工作的基础。它是一个XML文件，包含了关于项目的信息及提供Maven完成构建工作的配置细节。同时它还包含对于大多数项目都一致的默认值。例如：目录结构。</p>
-
-<p>那么问题来了，这些默认值是在哪里设置的呢？答案是Super POM。</p>
-
-<p>Super POM是Maven的默认POM。除非特别指定，所有的POM都继承自这个Super POM，这意味着所有在Super POM中的配置都会在你的工程中继承。</p>
-
-<p>下面摘抄一些Super POM配置。例如：仓库的配置：</p>
-
-<figure class='code'><figcaption><span>pom.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;repositories&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;repository&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;id&gt;</span>central<span class="nt">&lt;/id&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;name&gt;</span>Maven Repository Switchboard<span class="nt">&lt;/name&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;layout&gt;</span>default<span class="nt">&lt;/layout&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;url&gt;</span>http://repo1.maven.org/maven2<span class="nt">&lt;/url&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;snapshots&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;enabled&gt;</span>false<span class="nt">&lt;/enabled&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;/snapshots&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/repository&gt;</span>
-</span><span class='line'><span class="nt">&lt;/repositories&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>例如，目录的配置：</p>
-
-<figure class='code'><figcaption><span>pom.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;build&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;directory&gt;</span>target<span class="nt">&lt;/directory&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;outputDirectory&gt;</span>target/classes<span class="nt">&lt;/outputDirectory&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;finalName&gt;</span>${artifactId}-${version}<span class="nt">&lt;/finalName&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;testOutputDirectory&gt;</span>target/test-classes<span class="nt">&lt;/testOutputDirectory&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;sourceDirectory&gt;</span>src/main/java<span class="nt">&lt;/sourceDirectory&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;scriptSourceDirectory&gt;</span>src/main/scripts<span class="nt">&lt;/scriptSourceDirectory&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;testSourceDirectory&gt;</span>src/test/java<span class="nt">&lt;/testSourceDirectory&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;resources&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;resource&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;directory&gt;</span>src/main/resources<span class="nt">&lt;/directory&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;/resource&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/resources&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;testResources&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;testResource&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;directory&gt;</span>src/test/resources<span class="nt">&lt;/directory&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;/testResource&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/testResources&gt;</span>
-</span><span class='line'><span class="nt">&lt;/build&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>关于Super POM的具体内容请参考这里。</p>
-
-<p><strong>2.5 对Gradle的基本理解</strong></p>
-
-<p>首先，我们不要深入太多细节，从宏观的角度去理解Gradle的工作原理。</p>
-
-<p>Gradle也提出类似于Maven的两个概念：插件（plugin）和任务（task）。</p>
-
-<p>插件与任务之间的关系也是：包含的关系，插件中包含多个任务。</p>
-
-<p>但是与Maven不同的地方是，Gradle没有像Maven那样的内建生命周期，所以并不是像Maven那样，将目标（goals）绑定到生命周期中对应的不同阶段（phase）上然后顺序执行。</p>
-
-<p>Gradle通过定义task和它们之间的依赖关系，并保证它们根据依赖关系依次执行（且每个task只执行一次），task之间形成一种有向无环图，从而产生类似Maven生命周期的行为。</p>
-
-<p><strong>2.6 Gradle的生命周期</strong></p>
-
-<p>Gradle有严格的三个阶段：</p>
-
-<p>初始化（Initialization）配置（Configuration）执行（Execution）</p>
-
-<p>因为Gradle支持单工程和多工程构建。在初始化阶段，Gradle决定哪些工程将参与构建，并为每一个工程创建一个Project的
-实例对象。</p>
-
-<p>配置阶段是用于配置在初始化阶段产生的Project的实例对象。工程的构建脚本会在这个阶段被执行。</p>
-
-<p>Gradle将执行在配置阶段被创建和配置的一个task的小集合。这个小集合是由task的名字（task的名字是通过gradle的命令传入）和当前的目录决定。</p>
-
-<p>这里可以看出Gradle的生命周期和Maven的生命周期是完全不同的概念。</p>
-
-<p><strong>2.5 Gradle的Project和Task概念</strong></p>
-
-<p>Project和Task，顾名思义，表示工程和任务。</p>
-
-<p>Project在Gradle中表示某一个待构建的组件，可以是Jar文件，或者web应用，Gradle的构建是有一个或者多个Project组成。</p>
-
-<p>Task在Gradle中表示在构建中的一件独立工作，每个Task都属于某一个Project。</p>
-
-<p>在使用Gradle时，创建Task最常见的方式是：</p>
-
-<figure class='code'><figcaption><span>task </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">hello</span> <span class="err">«</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">println</span> <span class="err">‘</span><span class="n">hello</span><span class="err">’</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里的“«”表示追加的意思，即向hello中加入执行过程。</p>
-
-<p><strong>2.6 进一步深入理解</strong></p>
-
-<p>Gradle提供一套DSL语言来描述构建脚本。这套DSL语言是Groovy的内部DSL语言再添加一些东西，所以是基于Groovy语法的。</p>
-
-<p>上面介绍了一个最常见的创建Task的方法，实际上它是在调用Gradle API提供的一个方法task，该方法属于Project类。方法签名如下：</p>
-
-<p>Task task(String name, Closure configClosure);</p>
-
-<p>创建一个Task对象，给它一个名字，并将它添加到Project对象中。</p>
-
-<p>一个构建脚本build.gradle代表着一个工程。</p>
-
-<p>对于构建中的每一个工程，Gradle都会创建一个Project的实例对象，并把它与构建脚本关联。当构建脚本在执行时，它会配置这个Project的实例对象。</p>
-
-<p>配置方式如下：</p>
-
-<p>任何在你脚本中调用的方法（例如：task方法），如果不是在脚本中定义的方法，就把它代理给Project对象（也就是说它认为是Project对象的一个方法）。</p>
-
-<p>任何你访问的属性（例如：name属性），如果不是在脚本中定义的属性，就把它代理给Project对象（也就是project.name属性了）。</p>
-
-<p>那么Project有哪些方法呢？</p>
-
-<p>task()是一个，你已经看到，用于定义一个任务。</p>
-
-<p>apply()是一个，用于向Project对象添加插件，关于插件的具体内容，后面会讲到。</p>
-
-<p>Project有哪些属性呢？</p>
-
-<p>有name属性，表示工程目录的名字</p>
-
-<p>有project属性，也就它自己，所以:</p>
-
-<p>println name和 println project.name是一样的。</p>
-
-<p><strong>2.7 Gradle的另一个重要概念：Plugin，插件</strong></p>
-
-<p>Gradle的插件的目的是包装起可重用的构建逻辑，这样可以重复使用在许多的工程和构建中。</p>
-
-<p>Gradle的插件可以用任何语言去实现，提供的实现最终都将编译为字节码。</p>
-
-<p>你可以把插件当做是对Gradle的扩展，它会以某种方式帮助你配置工程，典型的是添加一些预配置的task提供你使用。</p>
-
-<p>Gradle作为一种通用的构建工具。核心的功能都用插件来提供，以便构建的使用者可以重用一些模式和实践。</p>
-
-<p>Gradle自带了很多插件，已提供常用的功能。</p>
-
-<p>例如，Java插件，Jetty插件，Maven插件（可以使用Maven的仓库），WAR插件，CheckStyle插件，Jacoco插件（测试覆盖率）等等。</p>
-
-<p>Java插件：</p>
-
-<p>使用的方法是在build.gradle构建脚本中加入一段代码:</p>
-
-<figure class='code'><figcaption><span>task </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="err">‘</span><span class="n">java</span><span class="err">’</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在上一篇中已经介绍过，build.gradle的构建脚本在没有明确定义一个函数时，都是代理调用Project对象的方法。这里调用
-的是Project对象中的apply方法：</p>
-
-<p>apply(Map&lt;String, ?> option);</p>
-
-<p>java插件向Project中引入了多个Task和Property。java插件比较与众不同的地方，其中之一便是它在项目中引入了构建生命周期的概念，就像Maven一样。但是，和Maven不同的是，Gradle的项目构建生命周期并不是Gradle的内建机制，而是由Plugin自己引入的（这一点前面介绍过）。</p>
-
-<p>当你在命令行中执行“gradle build”命令，可以看到java插件所引入的主要Task：</p>
-
-<p>:compileJava</p>
-
-<p>:processResources</p>
-
-<p>:classes</p>
-
-<p>:jar</p>
-
-<p>:assemble</p>
-
-<p>:compileTestJava</p>
-
-<p>:processTestResources</p>
-
-<p>:testClasses</p>
-
-<p>:test</p>
-
-<p>:check</p>
-
-<p>:build</p>
-
-<p>当然还有一个有用的Task：</p>
-
-<p>clean：Deletes the build directory, removing all built files.</p>
-
-<p>具体的每一个task的含义，我就不一一解释了，在这里可以查得到。</p>
-
-<p>java插件中每个task之间的关系图，他们之间的依赖关系，构成了类似Maven完整的生命周期。</p>
-
-<p>Gradle是一个结合Ant和Maven的项目管理工具。Maven的约定优于配置的思想固然是要在这里体现的。</p>
-
-<p>java插件会假设你的项目结构如下：</p>
-
-<p>src/main/java Production Java source</p>
-
-<p>src/main/resources Production resources</p>
-
-<p>src/test/java Test Java source</p>
-
-<p>src/test/resources Test resources</p>
-
-<p>src/sourceSet/java Java source for the given source set</p>
-
-<p>src/sourceSet/resources Resources for the given source set</p>
-
-<p>Source Set概念（此处摘抄自腾云的博文，待修改）</p>
-
-<p>Gradle在采用了Maven目录结构的同时，还融入了自己的一些概念，即source set。对于上图中的目录结构，Gradle实际上为我们创建了2个source set，一个名为main，一个名为test。</p>
-
-<p>请注意，这里的source set的名字main与上图目录结构中的main文件夹并无必然的联系，只是在默认情况下，Gradle为了source set概念到文件系统目录结构的映射方便，才采用了相同的名字。对于test， 也是如此。我们完全可以在build.gradle文件中重新配置这些source set所对应的目录结构，同时，我们还可以创建新的source set。</p>
-
-<p>从本质上讲，Gradle的每个source set都包含有一个名字，并且包含有一个名为java的Property和一个名为resources的Property，他们分别用于表示该source set所包含的Java源文件集合和资源文件集合。在实际应用时，我们可以将他们设置成任何目录值。比如，我们可以重新设置main的目录结构：</p>
-
-<figure class='code'><figcaption><span>task </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">main</span> <span class="o">{</span>
-</span><span class='line'>     <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">srcDir</span> <span class="err">‘</span><span class="n">java</span><span class="o">-</span><span class="n">sources</span><span class="err">’</span>
-</span><span class='line'>     <span class="o">}</span>
-</span><span class='line'>     <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">srcDir</span> <span class="err">‘</span><span class="n">resources</span><span class="err">’</span>
-</span><span class='line'>     <span class="o">}</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>2.8 另外一个重点：依赖管理</strong></p>
-
-<p>我们知道依赖管理是项目管理软件中的一个非常重要部分，在Maven的POM文件中，占据最多行配置代码的就是这个部分。</p>
-
-<p>现在我们来看看在Gradle中是如何配置依赖的？</p>
-
-<figure class='code'><figcaption><span>task </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="err">‘</span><span class="n">java</span><span class="err">’</span>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">testCompile</span> <span class="nl">group:</span> <span class="err">‘</span><span class="n">junit</span><span class="err">’</span><span class="o">,</span> <span class="nl">name:</span> <span class="err">‘</span><span class="n">junit</span><span class="err">’</span><span class="o">,</span> <span class="nl">version:</span> <span class="err">‘</span><span class="mi">4</span><span class="o">.+</span><span class="err">’</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面的代码，定义了对junit的依赖，并告诉Gradle到maven的中心仓库去寻找依赖。</p>
-
-<p>在Gradle中，依赖会被分组到不同的configuration对象中。configuration有名字和一些属性，并且他们能够互相扩展。许多Gradle的插件就预定义了一些configuration到工程中。</p>
-
-<p>定义一个configuration的方式如下：</p>
-
-<figure class='code'><figcaption><span>task </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">configurations</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">compile</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面的代码表示定义了一个名字是compile的configuration对象。</p>
-
-<p>实际上他调用的是Project对象的configurations方法：</p>
-
-<p>void configurations(Closure configureClosure)</p>
-
-<p>它是用于配置configuration对象的。</p>
-
-<p>在java插件中已经预先定义了一些configuration，例如：compile，runtime，testCompile，testRuntime。</p>
-
-<p>compile</p>
-
-<p>需要在编译产品代码时使用的依赖</p>
-
-<p>runtime</p>
-
-<p>需要在产品代码的运行时使用的依赖，默认也包含编译时使用的依赖。</p>
-
-<p>testCompile</p>
-
-<p>需要在编译测试代码时使用的依赖。默认也包含编译时和运行时产品代码的依赖。</p>
-
-<p>testRuntime</p>
-
-<p>需要在测试代码运行时的依赖。默认包含产品代码编译时和运行时依赖，以及测试代码编译时依赖。</p>
-
-<figure class='code'><figcaption><span>task </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="err">‘</span><span class="n">java</span><span class="err">’</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//so that we can use ‘compile’, ‘testCompile’ for dependencies</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>        <span class="c1">//for dependencies found in artifact repositories you can use</span>
-</span><span class='line'>         <span class="c1">//the group:name:version notation</span>
-</span><span class='line'>       <span class="n">compile</span> <span class="err">‘</span><span class="n">commons</span><span class="o">-</span><span class="nl">lang:</span><span class="n">commons</span><span class="o">-</span><span class="nl">lang:</span><span class="mf">2.6</span><span class="err">’</span>
-</span><span class='line'>       <span class="n">testCompile</span> <span class="err">‘</span><span class="n">org</span><span class="o">.</span><span class="na">mockito</span><span class="o">:</span><span class="nl">mockito:</span><span class="mf">1.9</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">rc1</span><span class="err">’</span>
-</span><span class='line'>        <span class="c1">//map-style notation:</span>
-</span><span class='line'>       <span class="n">compile</span> <span class="nl">group:</span> <span class="err">‘</span><span class="n">com</span><span class="o">.</span><span class="na">google</span><span class="o">.</span><span class="na">code</span><span class="o">.</span><span class="na">guice</span><span class="err">’</span><span class="o">,</span> <span class="nl">name:</span> <span class="err">‘</span><span class="n">guice</span><span class="err">’</span><span class="o">,</span> <span class="nl">version:</span> <span class="err">‘</span><span class="mf">1.0</span><span class="err">’</span>
-</span><span class='line'>        <span class="c1">//declaring arbitrary files as dependencies</span>
-</span><span class='line'>       <span class="n">compile</span> <span class="nf">files</span><span class="o">(</span><span class="err">‘</span><span class="n">hibernate</span><span class="o">.</span><span class="na">jar</span><span class="err">’</span><span class="o">,</span> <span class="err">‘</span><span class="n">libs</span><span class="s">/spring.jar’)</span>
-</span><span class='line'><span class="s">       /</span><span class="o">/</span><span class="n">putting</span> <span class="n">all</span> <span class="n">jars</span> <span class="n">from</span> <span class="err">‘</span><span class="n">libs</span><span class="err">’</span> <span class="n">onto</span> <span class="n">compile</span> <span class="n">classpath</span>
-</span><span class='line'>       <span class="n">compile</span> <span class="nf">fileTree</span><span class="o">(</span><span class="err">‘</span><span class="n">libs</span><span class="err">’</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当然还有依赖配置的更高级的功能：</p>
-
-<ul>
-<li><p>强制某个依赖的版本号以防止冲突</p></li>
-<li><p>排除某个依赖</p></li>
-<li><p>避免某个依赖的传递依赖</p></li>
-</ul>
-
-
-<p>下面是一个使用了强制，排除和关闭依赖传递性的例子。</p>
-
-<figure class='code'><figcaption><span>task </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="err">‘</span><span class="n">java</span><span class="err">’</span> <span class="c1">//so that I can declare ‘compile’ dependencies</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="err">‘</span><span class="n">org</span><span class="o">.</span><span class="na">hibernate</span><span class="o">:</span><span class="nl">hibernate:</span><span class="mf">3.1</span><span class="err">’</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="c1">//in case of versions conflict ‘3.1’ version of hibernate wins:</span>
-</span><span class='line'>        <span class="n">force</span> <span class="o">=</span> <span class="kc">true</span>
-</span><span class='line'>        <span class="c1">//excluding a particular transitive dependency:</span>
-</span><span class='line'>        <span class="n">exclude</span> <span class="nl">module:</span> <span class="err">‘</span><span class="n">cglib</span><span class="err">’</span> <span class="c1">//by artifact name</span>
-</span><span class='line'>        <span class="n">exclude</span> <span class="nl">group:</span> <span class="err">‘</span><span class="n">org</span><span class="o">.</span><span class="na">jmock</span><span class="err">’</span> <span class="c1">//by group</span>
-</span><span class='line'>        <span class="n">exclude</span> <span class="nl">group:</span> <span class="err">‘</span><span class="n">org</span><span class="o">.</span><span class="na">unwanted</span><span class="err">’</span><span class="o">,</span> <span class="nl">module:</span> <span class="err">‘</span><span class="n">iAmBuggy</span><span class="err">’</span> <span class="c1">//by both name and group</span>
-</span><span class='line'>        <span class="c1">//disabling all transitive dependencies of this dependency</span>
-</span><span class='line'>        <span class="n">transitive</span> <span class="o">=</span> <span class="kc">false</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>关于依赖，暂时先讲到这里，后面还有更详细的分析。</p>
-
-<p><strong>2.9 多个项目的构建</strong></p>
-
-<p>多项目，对于Maven而言，称为多模块（Multi-Module），对于Gradle而言，称为多个工程（Multi-Project）。</p>
-
-<p>多模块的好处是你只需在根模块中执行Maven命令，Maven会分别在各个子模块中执行该命令，执行顺序通过Maven的Reactor机制决定。</p>
-
-<p>收集起所有可构建的模块</p>
-
-<p>对模块的构建顺序进行排序</p>
-
-<p>按照正确的顺序进行构建</p>
-
-<p>排序的规则如下：</p>
-
-<ul>
-<li><p>一个模块的构建依赖于另一个构建中模块</p></li>
-<li><p>一个模块使用的插件来自于构建中的模块（构建的内容是一个插件）</p></li>
-<li><p>插件的依赖于另一个模块</p></li>
-<li><p>一个构建扩展声明来自于另一个构建中的模块</p></li>
-</ul>
-
-
-<p>在<modules>元素中声明的顺序（如果没有其他规则的情况下）</p>
-
-<p>强调一点，在Maven中，由多模块（由上到下）和继承（由下到上）关系并不必同时存在。</p>
-
-<p>在Maven中，定义多模块的方式是在父POM中定义</p>
-
-<figure class='code'><figcaption><span>pom.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;modules&gt;</span>…<span class="nt">&lt;modules&gt;</span>。
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>而实现继承的方式是在子POM中声明</p>
-
-<figure class='code'><figcaption><span>pom.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;parent&gt;</span>…<span class="nt">&lt;/parent&gt;</span>。
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>多模块的目的是让父模块知道子模块及它们之间的关系。</p>
-
-<p>继承是子模块希望从父模块那里继承属性，减少在子模块中对相同属性的重复定义。</p>
-
-<p>在Gradle中，定义project之间的父子关系，要比Maven更简单。</p>
-
-<p>首先在根project中加入名为settings.gradle的配置文件，然后我们在根project目录下创建两个文件夹来表示子project的目录，分别为sub-project1和sub-project2，</p>
-
-<p>根project在自己的目录下拥有build.gradle文件和settings.gradle文件。而两个子Project拥有他们自己的
-build.gradle文件。</p>
-
-<p>目录结构如下：</p>
-
-<p>root-project/</p>
-
-<p> sub-project1/</p>
-
-<p>   build.gradle</p>
-
-<p> sub-project2/</p>
-
-<p>   build.gradle</p>
-
-<p>build.gradle</p>
-
-<p>settings.gradle</p>
-
-<p>最后，需要在settings.gradle中加入一段脚本：</p>
-
-<figure class='code'><figcaption><span>task </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">include</span> <span class="err">‘</span><span class="n">sub</span><span class="o">-</span><span class="n">project1</span><span class="err">’</span><span class="o">,</span> <span class="err">‘</span><span class="n">sub</span><span class="o">-</span><span class="n">project2</span><span class="err">’</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在前面，我们讲过Gradle的声明周期，初始化，配置，执行。</p>
-
-<p>其中初始化的过程就是用来确定多个project的过程。</p>
-
-<p>而配置阶段就是根据构建脚本内容对project对象的配置过程。</p>
-
-<p>Gradle提出一种按需配置的模式。意思是说，根据需要，并不是所有的project都需要配置，根据task的需求而定。</p>
-
-<p>关于这一点的具体内容，后续在继续聊。</p>
-
-<p>定义所有project的共同内容</p>
-
-<p>在父project的build.gradle中定义：</p>
-
-<figure class='code'><figcaption><span>task </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">allprojects</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">task</span> <span class="n">hello</span> <span class="err">«</span> <span class="o">{</span> <span class="n">task</span> <span class="o">-&gt;</span> <span class="n">println</span> <span class="err">“</span><span class="n">I</span><span class="err">’</span><span class="n">m</span> <span class="n">$task</span><span class="o">.</span><span class="na">project</span><span class="o">.</span><span class="na">name</span><span class="err">”</span> <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>它会调用project对象的allprojects方法：</p>
-
-<p>void allprojects(Closure configureClosure)</p>
-
-<p>在这个里面的配置是提供给所有的project，这意味着父project和所有子project。</p>
-
-<p>定义给子project的共同内容</p>
-
-<figure class='code'><figcaption><span>task </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">subprojects</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">hello</span> <span class="err">«</span> <span class="o">{</span><span class="n">println</span> <span class="err">“</span><span class="o">-</span> <span class="n">I</span> <span class="n">depend</span> <span class="n">on</span> <span class="n">water</span><span class="err">”</span><span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>它会调用project对象的subprojects方法：</p>
-
-<p>void subprojects(Closure configureClosure)</p>
-
-<p>这里面的配置是提供给所有的子project使用。</p>
-
-<p>还可以在父project的build.gradle中写一句话来指定某一个子project做一件事情。</p>
-
-<figure class='code'><figcaption><span>task </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">project</span><span class="o">(</span><span class="err">‘</span><span class="o">:</span><span class="n">bluewhale</span><span class="err">’</span><span class="o">).</span><span class="na">hello</span> <span class="err">«</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">println</span> <span class="err">“</span><span class="o">-</span> <span class="n">I</span><span class="err">’</span><span class="n">m</span> <span class="n">the</span> <span class="n">largest</span> <span class="n">animal</span> <span class="n">that</span> <span class="n">has</span> <span class="n">ever</span> <span class="n">lived</span> <span class="n">on</span> <span class="k">this</span> <span class="n">planet</span><span class="o">.</span><span class="err">”</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>传入子project的名字（就是它的目录名），并定义一个task。</p>
+  <div class="entry-content"><p><img src="http://developer.android.com/images/activity_lifecycle.png" alt="Jasmine" /></p>
+
+<p>Activity是应用的一个组件，它提供用户可以交互的屏幕，例如拨打电话，照相，发邮件，看地图。每一个Activity都会被赋予一个窗户用来绘画用户界面。这个窗口通常会占据整个屏幕，但是也可以比屏幕小和悬浮在其他窗口之上。</p>
+
+<p>一个应用程序通常由多个Activity组成，它们之间以一种较为松弛的关系联系在一起。例如，一个Activity作为主要的Activity，它会作为程序启动时第一个展现给用户的Activity。每一个Activity能够启动另外一个Activity，以便去执行其他的动作。每一次一个新的Activity启动，前一个Activity就会停止，但是系统会将它保存在一个栈中（“back stack”）。当一个新的Activity启动时，当前的Activity会被压入栈中，并拿走焦点。这个栈遵守“后进先出”原则，所以，当用户在当前Activity完成对应操作，按下返回按钮的时候，它会从栈顶弹出，并销毁，然后前一个Activity恢复。</p>
+
+<p>当一个Activity因为另一个新的Activity启动而停止时，系统会通过Activity生命周期中的回调函数通知它这个状态的变化。由于状态的改变，Activity会接受到多个回调函数，无论系统是在create，stop，resume还是destroy，并且每一次回调都提供你一个机会去执行适合这个状态变化的操作。例如，当stop时，你的Activity应该释放任何比较大的对象，例如网络和数据库连接。当Activity恢复时，你应该从新获取必要的资源和恢复之前被打断的操作。状态的转换是Activity生命周期的一部分。</p>
+
+<p>通过回调函数去管理Activity的生命周期是实现健壮和灵活应用的关键。Activity的生命周期直接受到其他Activity，Task以及back stack的影响。</p>
+
+<p>一个Activity可以存在于三个状态中：</p>
+
+<p><em>Resumed</em></p>
+
+<p>该状态下，Activity置于屏幕前景，并拥有聚焦，可以把这个状态理解为正在运行。</p>
+
+<p><em>Paused</em></p>
+
+<p>该状态下，另一个Activity正置于屏幕前景并拥有聚焦，但是当前Activity仍然可见。一个暂停的Activity是处于完全存活状态的（Activity对象仍然保有内存，它维持状态和成员信息，并保持与Window Manger的关系），但是如果内存不足时，系统有权利关闭该Activity。</p>
+
+<p><em>Stopped</em></p>
+
+<p>该状态下，该Activity完全被另一个Activity遮挡（该Activity就会进入到背景状态）。进入stopped状态的Activity也是仍然处于存活状态。然而，它对用户是不可见的，同样在系统需要内存的时候，它会被关闭。</p>
+
+<p>如果一个Activity进入paused或者stopped状态，系统可以通过调用finish方法或者终止进程的方式，将Activity从内存中清除。当该Activity从新打开，他必须要重新创建一次。</p>
+
+<p>Activity<strong>完整的生命周期</strong>发生于onCreate()方法和onDestroy()方法之间。Activity应该在onCreate()方法时，设置一些全局状态，例如布局，并且在onDestroy()方法释放所有保持的资源。例如，如果Activity拥有一个线程在后台运行并正在从网络上下载数据，该线程可能是在onCreate()方法中创建的，那么就应该在onDestroy()方法中停止该线程。</p>
+
+<p>Activity的<strong>可见生命周期</strong>发生于onStart()方法和onStop()方法之间。在这段时间，用户可以在屏幕上看见它，并进行交互。例如，onStop()方法被调用发生在当一个新的Activity启动，而当前Activity不在可见时。在这两个方法之间，你可以保有Activity所需要的资源。例如，你可以在onStart()方法调用时，注册一个BroadCartReceiver，让他监控你对UI的操作，并在用户不在看到这个Activity时，在onStop()方法中注销这个BroadCartReceiver。</p>
+
+<p>Activity<strong>前景生命周</strong>发生于onResume()方法和onPause()方法之间。在这段时间中，该Activity处于所有Activity的上方并且拥有用户输入焦点。Activity能够频繁的在前景中出镜和入镜。例如，当设备进入睡眠或者有一个对话框弹出时，在onPause()方法被调用时。因为，这个状态频繁的转变，在这两个方法中的代码要尽量的轻量级，以避免转换太慢，让用户等待。</p>
+
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+<th>Killable after?</th>
+<th>Next</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>onCreate()</td>
+<td>当Activity第一次被创建时调用。在这里，你应该做所有关于静态配置的事情-创建View，绑定数据到List等等。这个方法会传入一个Bundle对象，如果Activity中有捕获自身状态，那么它包含了Activity之前的状态。</td>
+<td>No</td>
+<td>onStart()</td>
+</tr>
+<tr>
+<td>onRestart()</td>
+<td> 在Activity停止之后被调用，指明Activity会被重新启动。</td>
+<td>No</td>
+<td>onStart()</td>
+</tr>
+<tr>
+<td>onStart()</td>
+<td>在Activity变成用户可见状态之前调用。如果Activity要变成前景状态，那么onResume()方法会被调用，如果Activity要被隐藏，则onStop()方法会被调用。</td>
+<td>No</td>
+<td>onResume() or onStop()</td>
+</tr>
+<tr>
+<td>onResume()</td>
+<td>在Activity开始与用户交互之前调用。这个时候，Activity会置于栈顶，并伴随着用户输入。</td>
+<td>No</td>
+<td>onPause()</td>
+</tr>
+<tr>
+<td>onPause()</td>
+<td>在系统开始要恢复另一个Activity时被调用。该方法通常被用于提交未保存数据到持久数据中，停止动画和其他会占用CPU资源的操作。并且应该非常迅速的做这些事情，因为下一个Activity只有在当前方法执行完成之后才会恢复。如果Activity回到前端，则onResume()方法跟在onPaused()方法后面，如果对用户不可见，则onStop()方法跟在后面。</td>
+<td>Yes</td>
+<td>onResume() or onStop()</td>
+</tr>
+<tr>
+<td>onStop()</td>
+<td>当Activity对用户不在可见时被调用。onStop()发生的原因是Activity被销毁，或者另一个Activity被恢复并正在覆盖当前Activity。如果紧跟随着的是onRestart()方法，则说明Activity正在恢复与用户的交互。如果跟着的是onDestory()方法，则说明这个Activity要被销毁了。</td>
+<td>Yes</td>
+<td>onRestart() or onDestroy()</td>
+</tr>
+<tr>
+<td>onDestroy()</td>
+<td>在Activity被销毁时调用。这是Activity最后一个会接收到的调用。被调用的原因要么是因为finish()方法在哪个位置调用，或者因为系统因为要保留资源而临时销毁它。可以通过isFinishing()方法来区分两种不同情况。</td>
+<td>Yes</td>
+<td>nothing</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>文献参考自：<a href="http://developer.android.com/guide/components/activities.html">http://developer.android.com/guide/components/activities.html</a></p>
 </div>
   
   
@@ -1257,6 +386,10 @@ build.gradle文件。</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/10/26/spring-boot-hot-swap/">基于Gradle和Intellij的Spring Boot热交换</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/10/05/learning-js-well-1/">学好JavaScript（一）- 被我忽视的东西(1)</a>
       </li>
     
@@ -1265,15 +398,11 @@ build.gradle文件。</p>
       </li>
     
       <li class="post">
+        <a href="/blog/2015/09/26/rails-env-and-capistrano/">Rails环境和Capistrano部署</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/09/19/gradle-in-action-chinese-version/">《实战Gradle》译者序</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/09/10/active-record-migration/">关于运行Active Record数据迁移</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/09/06/deep-into-spring-aop-1/">Spring AOP 深入了解（一）还给业务逻辑代码一个干净的世界</a>
       </li>
     
   </ul>

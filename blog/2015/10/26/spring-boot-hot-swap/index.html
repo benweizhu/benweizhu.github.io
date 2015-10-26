@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>如何用Octopress在github上建立博客? - NO END FOR LEARNING</title>
+  <title>基于Gradle和Intellij的Spring Boot热交换 - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="这个问题，我也花了大概半天时间才解决。因为之前有用github做博客，所以算是已经有些经验。 这里提供一些我查的比较有用的资料,方便需要的人查询。 octopress doc 第一手资料当然是Octopress的官方网站，但是实际上不是太好用。 update ruby for mac &hellip;">
+  <meta name="description" content="在去年的一篇《Gradle Jetty和Gradle Watch插件实现热部署》中，谈到Java热部署带来的好处，文章地址在： http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/ 。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io/blog/2013/09/21/how-to-use-octopress-to-set-up-blog-on-github">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/10/26/spring-boot-hot-swap">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -67,7 +67,7 @@
   
   <header>
     
-      <h1 class="entry-title">如何用Octopress在github上建立博客?</h1>
+      <h1 class="entry-title">基于Gradle和Intellij的Spring Boot热交换</h1>
     
     
       <p class="meta">
@@ -76,36 +76,75 @@
 
 
 
-<time class='entry-date' datetime='2013-09-21T15:46:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>3:46 pm</span></time>
+<time class='entry-date' datetime='2015-10-26T12:19:43+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:19 pm</span></time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>这个问题，我也花了大概半天时间才解决。因为之前有用github做博客，所以算是已经有些经验。</p>
+<div class="entry-content"><p>在去年的一篇《Gradle Jetty和Gradle Watch插件实现热部署》中，谈到Java热部署带来的好处，文章地址在： <a href="http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/</a> 。</p>
 
-<p>这里提供一些我查的比较有用的资料,方便需要的人查询。</p>
+<p>但是现在越来越多的Spring应用直接使用Spring Boot作为框架，那么这个Jetty插件的配置就不起作用了，好在Spring官方针对热部署问题，提供了解决方案：Spring Reloaded。</p>
 
-<p><a href="http://octopress.org/docs/">octopress doc</a></p>
+<p>项目地址在： <a href="https://github.com/spring-projects/spring-loaded">https://github.com/spring-projects/spring-loaded</a></p>
 
-<p>第一手资料当然是Octopress的官方网站，但是实际上不是太好用。</p>
+<p>这里，我就不多说废话了，直接告诉大家怎么用？</p>
 
-<p><a href="http://www.cnblogs.com/simonshi2012/archive/2012/03/30/2425141.html">update ruby for mac</a></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span> <span class="n">jcenter</span><span class="o">()</span> <span class="o">}</span>
+</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">classpath</span> <span class="s2">&quot;org.springframework.boot:spring-boot-gradle-plugin:1.2.7.RELEASE&quot;</span>
+</span><span class='line'>        <span class="n">classpath</span> <span class="s1">&#39;org.springframework:springloaded:1.2.4.RELEASE&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">idea</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">module</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">inheritOutputDirs</span> <span class="o">=</span> <span class="kc">false</span>
+</span><span class='line'>        <span class="n">outputDir</span> <span class="o">=</span> <span class="n">file</span><span class="o">(</span><span class="s2">&quot;$buildDir/classes/main/&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>需要做一些前期准备，例如更新ruby1.9.3。这里更新ruby，由于repository在国外，所以我用了代理，据说可以改用taobao的，会方便点。</p>
 
-<p><a href="http://code.dblock.org/octopress-setting-up-a-blog-and-contributing-to-an-existing-one">Octopress: Setting up a Blog and Contributing to an Existing One</a></p>
+<p>注：IntelliJ必须配置跟命令行Gradle任务相同的Java版本，并且springloaded必须作为一个buildscript依赖被包含进去。</p>
 
-<p>由于官方资料我没有看明白。所以我参考的另外一篇文章成功将文章发布到github。</p>
+<p>官方文档的springloaded版本是1.2.0.RELEASE，这个版本有问题，会出现：</p>
 
-<p><a href="http://zerodie.github.io/blog/2012/01/19/octopress-github-pages/">Github Page + Octopress</a></p>
+<p>org.springsource.loaded.jvm.JVM : Problems copying method. Incompatible JVM? 报错</p>
 
-<p>还有一篇中文文章可以结合英文的看，虽然看上面一篇英文的就可以了。</p>
+<p>依赖下载完成之后，正常启动Spring Boot Run。</p>
 
-<p>这个博客建立好，还是花了很多时间，一个是ruby升级很花时间，二个是学习如何使用Octopress。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">./</span><span class="n">gradlew</span> <span class="n">bRun</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>今天就写这么多，Octopress还有很多好用的feature，可以在官方网站上找到。</p>
+
+<p>此时，如果你在应用启动的时候修改了Java代码，只需要点击Intellij的编译按钮，重新编译代码即可。</p>
+
+<p>又或者，将我在上篇文章中介绍的Watch引入，监测文件变化，自动运行compileJava等Gradle命令，也是可以的。</p>
+
+<p>参考文献： <br/>
+1.<a href="http://docs.spring.io/spring-boot/docs/current/reference/html/howto-hotswapping.html">http://docs.spring.io/spring-boot/docs/current/reference/html/howto-hotswapping.html</a></p>
 </div>
 
 
@@ -121,21 +160,15 @@
 
 
 
-<time class='entry-date' datetime='2013-09-21T15:46:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>3:46 pm</span></time>
+<time class='entry-date' datetime='2015-10-26T12:19:43+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:19 pm</span></time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/octopresstech/'>octopresstech</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2013/09/21/how-to-use-octopress-to-set-up-blog-on-github/" data-via="" data-counturl="http://benweizhu.github.io/blog/2013/09/21/how-to-use-octopress-to-set-up-blog-on-github/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/10/26/spring-boot-hot-swap/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/10/26/spring-boot-hot-swap/" >Tweet</a>
   
   
   
@@ -144,8 +177,8 @@
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/blog/2015/10/05/learning-js-well-1/" title="Previous Post: 学好JavaScript（一）- 被我忽视的东西(1)">&laquo; 学好JavaScript（一）- 被我忽视的东西(1)</a>
       
-        <a class="basic-alignment right" href="/blog/2013/09/22/what-is-spring-ioc/" title="Next Post: 什么是Spring IoC？">什么是Spring IoC？ &raquo;</a>
       
     </p>
   </footer>
@@ -155,7 +188,7 @@
   <section>
     <h1>Comments</h1>
     <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
-<div class="ds-thread" data-title="如何用Octopress在github上建立博客?"></div>
+<div class="ds-thread" data-title="基于Gradle和Intellij的Spring Boot热交换"></div>
 <script type="text/javascript">
   var duoshuoQuery = {short_name:"benweizhu"};
   (function() {

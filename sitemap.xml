@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://benweizhu.github.io/blog/2015/10/26/spring-boot-hot-swap/</loc>
+    <lastmod>2015-10-26T12:19:43+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://benweizhu.github.io/blog/2015/10/05/learning-js-well-1/</loc>
     <lastmod>2015-10-05T10:06:40+08:00</lastmod>
     <priority>0.8</priority>
@@ -8,6 +13,11 @@
   <url>
     <loc>http://benweizhu.github.io/blog/2015/09/27/whenever-plus-capistrano-plus-rbenv/</loc>
     <lastmod>2015-09-27T11:01:41+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://benweizhu.github.io/blog/2015/09/26/rails-env-and-capistrano/</loc>
+    <lastmod>2015-09-26T10:09:49+08:00</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
@@ -332,13 +342,13 @@
   </url>
   <url>
     <loc>http://benweizhu.github.io/blog/archives/</loc>
-    <lastmod>2015-10-06T16:28:47+08:00</lastmod>
+    <lastmod>2015-10-26T12:36:41+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>http://benweizhu.github.io/</loc>
-    <lastmod>2015-10-06T16:28:47+08:00</lastmod>
+    <lastmod>2015-10-26T12:36:41+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

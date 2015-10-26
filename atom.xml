@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-10-06T16:28:47+08:00</updated>
+  <updated>2015-10-26T12:36:41+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,76 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[基于Gradle和Intellij的Spring Boot热交换]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/10/26/spring-boot-hot-swap/"/>
+    <updated>2015-10-26T12:19:43+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/10/26/spring-boot-hot-swap</id>
+    <content type="html"><![CDATA[<p>在去年的一篇《Gradle Jetty和Gradle Watch插件实现热部署》中，谈到Java热部署带来的好处，文章地址在： <a href="http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/</a> 。</p>
+
+<p>但是现在越来越多的Spring应用直接使用Spring Boot作为框架，那么这个Jetty插件的配置就不起作用了，好在Spring官方针对热部署问题，提供了解决方案：Spring Reloaded。</p>
+
+<p>项目地址在： <a href="https://github.com/spring-projects/spring-loaded">https://github.com/spring-projects/spring-loaded</a></p>
+
+<p>这里，我就不多说废话了，直接告诉大家怎么用？</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span> <span class="n">jcenter</span><span class="o">()</span> <span class="o">}</span>
+</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">classpath</span> <span class="s2">&quot;org.springframework.boot:spring-boot-gradle-plugin:1.2.7.RELEASE&quot;</span>
+</span><span class='line'>        <span class="n">classpath</span> <span class="s1">&#39;org.springframework:springloaded:1.2.4.RELEASE&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">idea</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">module</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">inheritOutputDirs</span> <span class="o">=</span> <span class="kc">false</span>
+</span><span class='line'>        <span class="n">outputDir</span> <span class="o">=</span> <span class="n">file</span><span class="o">(</span><span class="s2">&quot;$buildDir/classes/main/&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>注：IntelliJ必须配置跟命令行Gradle任务相同的Java版本，并且springloaded必须作为一个buildscript依赖被包含进去。</p>
+
+<p>官方文档的springloaded版本是1.2.0.RELEASE，这个版本有问题，会出现：</p>
+
+<p>org.springsource.loaded.jvm.JVM : Problems copying method. Incompatible JVM? 报错</p>
+
+<p>依赖下载完成之后，正常启动Spring Boot Run。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">./</span><span class="n">gradlew</span> <span class="n">bRun</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>此时，如果你在应用启动的时候修改了Java代码，只需要点击Intellij的编译按钮，重新编译代码即可。</p>
+
+<p>又或者，将我在上篇文章中介绍的Watch引入，监测文件变化，自动运行compileJava等Gradle命令，也是可以的。</p>
+
+<p>参考文献： <br/>
+1.<a href="http://docs.spring.io/spring-boot/docs/current/reference/html/howto-hotswapping.html">http://docs.spring.io/spring-boot/docs/current/reference/html/howto-hotswapping.html</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[学好JavaScript（一）- 被我忽视的东西(1)]]></title>
@@ -283,6 +353,47 @@ NaN <br/>
 </span></code></pre></td></tr></table></div></figure>
 
 
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Rails环境和Capistrano部署]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/09/26/rails-env-and-capistrano/"/>
+    <updated>2015-09-26T10:09:49+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/09/26/rails-env-and-capistrano</id>
+    <content type="html"><![CDATA[<p>默认情况下，Rails 提供了三个环境：开发（development），测试（test）和生产（production）。这三个环境能满足大多数需求，但有时需要更多的环境。</p>
+
+<p>假设有个服务器镜像了生产环境，但只用于测试。这种服务器一般叫做“交付准备服务器”（staging server）。要想为这个服务器定义一个名为“staging”的环境，新建文件 config/environments/staging.rb 即可。请使用 config/environments 文件夹中的任一文件作为模板，以此为基础修改设置。</p>
+
+<p>在持续集成开发的场景下，除了开发环境（提供给Dev的验证环境），测试环境（提供QA的测试环境），一般还会有一个UAT环境（用户验收测试环境 - User Acceptance Test），它是离生产环境最近的一个预备环境，就像上面所说的staging。</p>
+
+<p>通过Rails Server命令启动环境，默认是development。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">=&gt;</span> <span class="n">Booting</span> <span class="n">Puma</span>
+</span><span class='line'><span class="o">=&gt;</span> <span class="n">Rails</span> <span class="mf">4.2</span><span class="o">.</span><span class="mi">0</span> <span class="n">application</span> <span class="n">starting</span> <span class="ow">in</span> <span class="n">development</span> <span class="n">on</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span>
+</span><span class='line'><span class="o">=&gt;</span> <span class="n">Run</span> <span class="sb">`rails server -h`</span> <span class="k">for</span> <span class="n">more</span> <span class="n">startup</span> <span class="n">options</span>
+</span><span class='line'><span class="o">=&gt;</span> <span class="n">Ctrl</span><span class="o">-</span><span class="n">C</span> <span class="n">to</span> <span class="n">shutdown</span> <span class="n">server</span>
+</span><span class='line'><span class="n">Puma</span> <span class="mf">2.11</span><span class="o">.</span><span class="mi">1</span> <span class="n">starting</span><span class="o">...</span>
+</span><span class='line'><span class="o">*</span> <span class="n">Min</span> <span class="n">threads</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">max</span> <span class="n">threads</span><span class="p">:</span> <span class="mi">16</span>
+</span><span class='line'><span class="o">*</span> <span class="n">Environment</span><span class="p">:</span> <span class="n">development</span>
+</span><span class='line'><span class="o">*</span> <span class="n">Listening</span> <span class="n">on</span> <span class="n">tcp</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>切换不同的环境启动可以通过参数-e</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">rails</span> <span class="n">server</span> <span class="o">-</span><span class="n">e</span> <span class="n">production</span> <span class="o">-</span><span class="n">p</span> <span class="mi">4000</span>
+</span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
   </entry>
@@ -2297,394 +2408,6 @@ run - Runs this project as a JVM application.</p>
 2.<a href="http://andyshora.com/promises-angularjs-explained-as-cartoon.html">http://andyshora.com/promises-angularjs-explained-as-cartoon.html</a>   <br/>
 3.<a href="https://thinkster.io/a-better-way-to-learn-angularjs/promises">https://thinkster.io/a-better-way-to-learn-angularjs/promises</a>   <br/>
 4.<a href="https://msdn.microsoft.com/en-us/library/windows/apps/hh700330.aspx">https://msdn.microsoft.com/en-us/library/windows/apps/hh700330.aspx</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Gradle深入与实战（六）Gradle的背后是什么？]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/03/31/deep-into-gradle-in-action-6/"/>
-    <updated>2015-03-31T23:20:24+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/03/31/deep-into-gradle-in-action-6</id>
-    <content type="html"><![CDATA[<h2>理解DSL（领域特定语言）</h2>
-
-<p>DSLs come in two main forms: external and internal. An external DSL is a language that&rsquo;s parsed independently of the host general purpose language: good examples include regular expressions and CSS. External DSLs have a strong tradition in the Unix community. Internal DSLs are a particular form of API in a host general purpose language, often referred to as a fluent interface. &mdash;- Martin Fowler</p>
-
-<p>Martin Fowler将DSL分为两类：外部DSL和内部DSL。外部DSL是一种独立的可解析的语言，举一个最常见的是例子，SQL，它专注于数据库的操作。内部DSL是通用语言所暴露的用来执行特定任务的API，它利用语言本身的特性，将API以特殊的形式（或者格式）暴露出来的。比如，Martin Fowler给出了关于流接口（fluent interface）。</p>
-
-<p>总结一下，外部DSL是一种特定的独立语言，内部DSL是通用语言为实现特殊目的提供的API。</p>
-
-<p>我们可以看下Martin Fowler提供的关于流接口的一个例子。流接口的实现方式同样是通用语言的写法，但相对于连续的调用set方法或者add方法，可读性方面要好很多。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="kt">void</span> <span class="nf">makeFluent</span><span class="o">(</span><span class="n">Customer</span> <span class="n">customer</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">customer</span><span class="o">.</span><span class="na">newOrder</span><span class="o">()</span>
-</span><span class='line'>                <span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="mi">6</span><span class="o">,</span> <span class="s">&quot;TAL&quot;</span><span class="o">)</span>
-</span><span class='line'>                <span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="s">&quot;HPK&quot;</span><span class="o">).</span><span class="na">skippable</span><span class="o">()</span>
-</span><span class='line'>                <span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">&quot;LGV&quot;</span><span class="o">)</span>
-</span><span class='line'>                <span class="o">.</span><span class="na">priorityRush</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Gradle的DSL</h2>
-
-<p>Gradle为了很好的描述构建，它提供了一套DSL，它是一种内部DSL。这套语言基于Groovy，但增加了一点点的特殊处理，以便在利用Groovy语言特性的之外，让它更像一个构建语言。</p>
-
-<p>所以，Gradle的构建脚本和Groovy之间的关系是大于(>)。换句话说，如果你在Gradle的构建脚本中，写纯粹的Groovy代码是绝对没有问题的，这一点在官方文档的用户手册中也单独拿出一章来说明。</p>
-
-<h2>构建脚本</h2>
-
-<p>我们先暂且不去验证这一点，也不要着急着用Groovy去写一个功能强大且复杂的task，从构建脚本中跳出来，站在一个更高的位置来俯视Gradle。</p>
-
-<p>在我们写Gradle脚本的时候，我们一般会写两种类型的，一种脚本，默认命名是build.gradle，另一种脚本，命名是settings.gradle。它们各自的作用，相信不用我在这里过多的介绍。在Gradle的世界里面，它们都叫做配置脚本。举个很简单的例子，在settings中配置，多项目结构有哪些模块，或者在build.gradle中，配置Java的sourceset。</p>
-
-<p>那可能就有人问了，那在构建脚本中写一个task也算配置吗？我并没有配置什么东西，而是在用语言实实在在的写一系列的动作。这个算配置吗？</p>
-
-<p>我想，这取决于对“配置”这个概念的理解。如果，我只是应用Java插件，写一个sourceset，或者写一个dependencies，这个配置就有点类似，传统意义上理解的“键值对”的配置。</p>
-
-<p>如果涉及到写一个task的时候，我们就要把它想象成“对某一个对象的配置”，想象成一系列的set或者add操作（即便是sourceset，你也应该这么去理解，因为这才是本质）。</p>
-
-<h2>基于Groovy的本质</h2>
-
-<p>在前面介绍DSL概念的时候，我们了解到Gradle是一种内部DSL，是一系列的API，它基于Groovy。Groovy是什么？它是一种面向对象的编程语言，它的核心概念是对象。</p>
-
-<p>Gradle基于Groovy但大于Groovy，它是经过“定制”的Groovy，是经过“定制”的面向对象语言，所以，由始至终，Gradle都离不开对象这个概念。</p>
-
-<p>如果你明白了这个本质，那么就明白了写Gradle脚本，就和写Java代码是一个道理，写Gradle构建脚本就是写代码调用Gradle的API，只不过因为一些特性和特殊处理，让他看上去不太像一个标准的类C的编程语言（我更倾向于说类Java，因为C语言不是面向对象的），那么接下来，你所需要知道的就是Gradle提供的API长啥样。</p>
-
-<h2>Gradle的对象</h2>
-
-<p>既然我们知道了Gradle的本质是经过“定制”的<strong>面向对象</strong>语言（Groovy语言），那么我们就来看看Gradle里面有些什么对象。</p>
-
-<p>如果你有读过Gradle的用户手册，那么，第六章，Build Script Basics，肯定是你必读的一章节，即便你当时看不太明白，只是依葫芦画瓢。现在你可以回过头来看下，该章节在一开始就进入主题，介绍了Gradle中两个的核心概念，project和task。</p>
-
-<p>从组成关系上来看，我们知道，或者文档是这么说的，一个构建是由多个project组成，一个project是由多个task组成，task之间的依赖关系，构成了整个构建的流水线。</p>
-
-<p>对于task的概念相对比较好理解，因为在命令行中，我们通过gradle build，进行Java的构建，这是一个看得见，摸得着的概念。</p>
-
-<p>那project是什么？从你学习Gradle开始，到应用Java插件，实现Java的构建，好像从头到尾都没有直接接触过project这个概念，至少没有像task这样如此真实的接触。我们需要了解它吗？如果你只是依葫芦画瓢，参考Gradle的文档，进行构建的“配置”，那么你不用。</p>
-
-<p>如果你想知道写的那些配置在本质上是什么？那么就有必要。</p>
-
-<h2>Project对象和build.gradle</h2>
-
-<p>为了不深究Gradle的实现原理（就是去读源代码），又要让大家觉得有据可依。我通过引用官方文档的一些描述来帮助大家理解Project对象。</p>
-
-<p>For each project in the build, Gradle creates an object of type Project and associates this Project object with the build script. (Chapter 13. Writing Build Scripts)   <br/>
-构建中的每一个project，Gradle都会创建一个Project对象，并将这个对象与构建脚本相关联。</p>
-
-<p>There is a one-to-one relationship between a Project and a &ldquo;build.gradle&rdquo; file. (Interface Project API)   <br/>
-Project对象与build.gradle是一对一的关系。</p>
-
-<p>First, Gradle scripts are configuration scripts. As the script executes, it configures an object of a particular type. For example, as a build script executes, it configures an object of type Project. This object is called the delegate object of the script. (Gradle Build Language Reference)   <br/>
-Gradle的脚本是配置脚本，当脚本执行时，它是在配置某一个特殊类型的对象。比如一个构建脚本的执行，它就是在配置一个Project类型的对象。这个对象叫做脚本的代理对象。</p>
-
-<p>读完这三句话，应该可以清楚的明白build.gradle的本质，简单的说，build.gradle是对一个Project对象的配置。</p>
-
-<h2>深入理解</h2>
-
-<p>如果你还没明白，你可以仔细考量这三句话。因为这里，我们要进一步深入探讨上个部分引出的另一个概念：代理。</p>
-
-<p>这个概念并不来自于Gradle，如果你熟悉Groovy，你肯定会立刻想到这是Groovy中很重要的一个概念。</p>
-
-<p>在Groovy中，Object对象提供了一个重要的方法with，这个方法在JavaScript中也是存在的。with方法可以在一个闭包内辅助实现委托调用，在with的作用域内调用的任何方法，都被定向到该上下文对象上，这样就去掉了对该实例的多余引用，举个例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kt">def</span> <span class="n">list</span> <span class="o">=</span> <span class="o">[</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">]</span>
-</span><span class='line'><span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
-</span><span class='line'><span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span>
-</span><span class='line'><span class="n">println</span><span class="o">(</span><span class="n">list</span><span class="o">.</span><span class="na">size</span><span class="o">())</span>
-</span><span class='line'><span class="n">println</span><span class="o">(</span><span class="n">list</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="mi">2</span><span class="o">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">def</span> <span class="n">listWith</span> <span class="o">=</span> <span class="o">[</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">]</span>
-</span><span class='line'><span class="n">listWith</span><span class="o">.</span><span class="na">with</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">add</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
-</span><span class='line'>  <span class="n">add</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span>
-</span><span class='line'>  <span class="n">println</span><span class="o">(</span><span class="n">size</span><span class="o">())</span>
-</span><span class='line'>  <span class="n">println</span><span class="o">(</span><span class="n">contains</span><span class="o">(</span><span class="mi">2</span><span class="o">))</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在with中，省去了对 list对象的引用。</p>
-
-<p>而build.gradle和project对象，虽然从解析的角度不一定是通过with方式实现，但是它们之间就是这样的一个关系。</p>
-
-<p>闭包内的内容就是build.gradle对project对象的操作。</p>
-
-<p>这里我引用Gradle用户手册第十三章的内容来进一步说明，</p>
-
-<p>Any method you call in your build script which is not defined in the build script, is delegated to the Project object.
-Any property you access in your build script, which is not defined in the build script, is delegated to the Project object.（Chapter 13. Writing Build Scripts）</p>
-
-<h2>通过现象看本质</h2>
-
-<p>我们从理论上讲了这么多关于Gradle本质的东西，而且好像还有点道理，但我们还是要验证一下，透过现象来看本质。通过实践，进一步加强我们的理解。</p>
-
-<h4>一个小小的task</h4>
-
-<p>举个例子，我们在build.gradle中，写一个简单的task</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">helloWorld</span> <span class="o">&lt;&lt;</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">println</span> <span class="s1">&#39;helloWorld&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果你熟悉Groovy，并且知道它是针对project为上下文的一段代码，你会怎么看上面这段代码。是不是会有几个疑问？</p>
-
-<p>问题一：是否有一个project的方法叫做task？答案：是，Project.task(String name)，返回一个Task对象。</p>
-
-<p>问题二：helloWorld是一个参数吗？答案：是，它被解析为一个String类型的实参变量</p>
-
-<p>问题三：符号“&lt;&lt;”是什么意思？答案：Groovy的强大特性，操作符重载。Task.leftShift(Closure action)，用来给task的action列表中添加一个action。</p>
-
-<p>如果我用Groovy的写法，把它写成下面这样，是否就更好理解一些呢？</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span><span class="o">(</span><span class="s2">&quot;helloWorld&quot;</span><span class="o">).</span><span class="na">leftShift</span><span class="o">({</span>
-</span><span class='line'>    <span class="n">println</span> <span class="s1">&#39;hello world&#39;</span>
-</span><span class='line'><span class="o">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>总结</h2>
-
-<p>当我们透过现象看到本质之后，你对Gradle的理解是不是不再是冷冰冰的闭包配置。是不是觉得Gradle其实没有那么神秘，不需要为Gradle中的奇怪的DSL感到困惑，它只是个API，读下API文档就好了。</p>
-
-<p>最后总结，Gradle is Groovy but more than Groovy。</p>
-
-<p>参考资料：</p>
-
-<p>1.<a href="http://gradle.org/docs/current/userguide/writing_build_scripts.html">http://gradle.org/docs/current/userguide/writing_build_scripts.html</a>  <br/>
-2.<a href="http://gradle.org/docs/current/javadoc/">http://gradle.org/docs/current/javadoc/</a>   <br/>
-3.<a href="http://docs.groovy-lang.org/latest/html/documentation/index.html#_delegation_strategy">http://docs.groovy-lang.org/latest/html/documentation/index.html#_delegation_strategy</a>   <br/>
-4.Groovy程序设计</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[JPA中的多对多关系]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/03/21/jpa-many-to-many-relationship/"/>
-    <updated>2015-03-21T10:44:43+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/03/21/jpa-many-to-many-relationship</id>
-    <content type="html"><![CDATA[<p>在关系型数据库中，表与表之间的关系是通过外键来实现，而其中最常见的关系有两种：一对多和多对多。</p>
-
-<p>在面向对象的世界，对象与对象之间的关系是通过从源对象到目标对象的对象引用实现。关系是一个对象含有的其他对象或者对象的集合，而在关系型数据库中，关系要么通过定义另一张表的外键建立，要么通过中间表建立。</p>
-
-<p>在Java或者JPA的世界里，所有的关系都是单向性的，一个源对象保有目标对象的索引，并不能保证目标对象和源对象一样包含源对象的索引。这个关系型数据库就不一样了，在关系型数据库中，表之间的关系通过外键来实现，查询语句通过这个外键，可以进行正向和反向的查询。</p>
-
-<p>ManyToMany多对多关系是关系型数据库中一种非常常见的表关系。</p>
-
-<p>在JPA中，如果要实现ManyToMany关系，常常是利用的一种方式是中间表。所有的ManyToMany关系都需要一个JoinTable，在这个JoinTable中，通过JoinColumns定义了两个外键，一个外键来指向源表的主键，另一个外键指向目标表的主键，通常JoinTable的主键是两个外键的组合。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Employee</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@Id</span>
-</span><span class='line'>  <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">...</span>
-</span><span class='line'>  <span class="nd">@ManyToMany</span>
-</span><span class='line'>  <span class="nd">@JoinTable</span><span class="o">(</span>
-</span><span class='line'>      <span class="n">name</span><span class="o">=</span><span class="s">&quot;EMP_PROJ&quot;</span><span class="o">,</span>
-</span><span class='line'>      <span class="n">joinColumns</span><span class="o">={</span><span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;EMP_ID&quot;</span><span class="o">,</span> <span class="n">referencedColumnName</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)},</span>
-</span><span class='line'>      <span class="n">inverseJoinColumns</span><span class="o">={</span><span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;PROJ_ID&quot;</span><span class="o">,</span> <span class="n">referencedColumnName</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)})</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="n">projects</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">.....</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>双向ManyToMany</p>
-
-<p>虽然在数据库中ManyToMany总是双向的，但是在对象模型中定义双向关系时，需要定义映射的发起方（管理方）和映射的接收方。发起方需要定义JoinTable，接收方则需要定义mappedBy。如果不使用mappedBy，则Jpa的实现者会认为，这种多对多关系是两个独立定义的关系，就会有重复的两行记录插入到JoinTable中。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Project</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@Id</span>
-</span><span class='line'>  <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">...</span>
-</span><span class='line'>  <span class="nd">@ManyToMany</span><span class="o">(</span><span class="n">mappedBy</span><span class="o">=</span><span class="s">&quot;projects&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Employee</span><span class="o">&gt;</span> <span class="n">employees</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">...</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>双向关系的共同毛病</p>
-
-<p>需要应用程序自己去维护它们（对象）之间的双向关系，否则就不同步（out of sync）。在写set方法或者，多对多关系中的add方法时，需要注意将自己的引用设置到包含的集合对象中。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Employee</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">List</span> <span class="n">phones</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addPhone</span><span class="o">(</span><span class="n">Phone</span> <span class="n">phone</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">phones</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">phone</span><span class="o">);</span>
-</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">phone</span><span class="o">.</span><span class="na">getOwner</span><span class="o">()</span> <span class="o">!=</span> <span class="k">this</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">phone</span><span class="o">.</span><span class="na">setOwner</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Phone</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">Employee</span> <span class="n">owner</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setOwner</span><span class="o">(</span><span class="n">Employee</span> <span class="n">employee</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">owner</span> <span class="o">=</span> <span class="n">employee</span><span class="o">;</span>
-</span><span class='line'>        <span class="k">if</span> <span class="o">(!</span><span class="n">employee</span><span class="o">.</span><span class="na">getPhones</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="k">this</span><span class="o">))</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">employee</span><span class="o">.</span><span class="na">getPhones</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>多对多关系的管理方的选择</p>
-
-<p>多对多关系的管理方的定义取决于JoinTable的定义方，至于由哪一边作为管理方，取决于业务的关系，所以并不固定。但是必须要理解的时，它们之间建立关系的方式（即谁管理谁）。举个例子，User和Group，这是一个常见的多对多关系，当你将管理方定义在Group这边时，你要做的是将User添加到Group，然后保存Group。而不能将Group添加给User，然后保存User。</p>
-
-<p>应用级联</p>
-
-<p>由某一方来管理对象的操作，需要应用级联属性，来说明是否将级联操作传递到对应的实体类上。如果你在存储一个对象时，该对象关联到另一个对象，而它们之间的关系没有使用级联，则会抛出异常，告诉你，需要先存储关联对象。</p>
-
-<p>级联操作的类型有6种，分别是ALL，PERSIST，MERGE，REMOVE，REFRESH，DETACH。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">enum</span> <span class="n">CascadeType</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** Cascade all operations */</span>
-</span><span class='line'>    <span class="n">ALL</span><span class="o">,</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** Cascade persist operation */</span>
-</span><span class='line'>    <span class="n">PERSIST</span><span class="o">,</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** Cascade merge operation */</span>
-</span><span class='line'>    <span class="n">MERGE</span><span class="o">,</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** Cascade remove operation */</span>
-</span><span class='line'>    <span class="n">REMOVE</span><span class="o">,</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** Cascade refresh operation */</span>
-</span><span class='line'>    <span class="n">REFRESH</span><span class="o">,</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/**</span>
-</span><span class='line'><span class="cm">     * Cascade detach operation</span>
-</span><span class='line'><span class="cm">     *</span>
-</span><span class='line'><span class="cm">     * @since Java Persistence 2.0</span>
-</span><span class='line'><span class="cm">     *</span>
-</span><span class='line'><span class="cm">     */</span>
-</span><span class='line'>    <span class="n">DETACH</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@ManyToMany</span><span class="o">(</span><span class="n">cascade</span> <span class="o">=</span> <span class="n">CascadeType</span><span class="o">.</span><span class="na">ALL</span><span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料：  <br/>
-1.<a href="http://en.wikibooks.org/wiki/Java_Persistence/ManyToMany">http://en.wikibooks.org/wiki/Java_Persistence/ManyToMany</a>   <br/>
-2.<a href="http://stackoverflow.com/questions/4935095/jpa-hibernate-many-to-many-cascading">http://stackoverflow.com/questions/4935095/jpa-hibernate-many-to-many-cascading</a></p>
 ]]></content>
   </entry>
   

@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="JavaScript普通对象 JavaScript中除了数字、字符串、布尔值、null和undefined之外的就是对象了。对象是属性的集合，每个属性都由“名/值对”构成，值可以是原始值，比如数字、字符串，也可以是对象。普通的JavaScript对象就是“命名值”的无序集合。（ &hellip;">
+  <meta name="description" content="在去年的一篇《Gradle Jetty和Gradle Watch插件实现热部署》中，谈到Java热部署带来的好处，文章地址在： http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/ 。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,96 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/10/26/spring-boot-hot-swap/">基于Gradle和Intellij的Spring Boot热交换</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-10-26T12:19:43+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:19 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在去年的一篇《Gradle Jetty和Gradle Watch插件实现热部署》中，谈到Java热部署带来的好处，文章地址在： <a href="http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/</a> 。</p>
+
+<p>但是现在越来越多的Spring应用直接使用Spring Boot作为框架，那么这个Jetty插件的配置就不起作用了，好在Spring官方针对热部署问题，提供了解决方案：Spring Reloaded。</p>
+
+<p>项目地址在： <a href="https://github.com/spring-projects/spring-loaded">https://github.com/spring-projects/spring-loaded</a></p>
+
+<p>这里，我就不多说废话了，直接告诉大家怎么用？</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span> <span class="n">jcenter</span><span class="o">()</span> <span class="o">}</span>
+</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">classpath</span> <span class="s2">&quot;org.springframework.boot:spring-boot-gradle-plugin:1.2.7.RELEASE&quot;</span>
+</span><span class='line'>        <span class="n">classpath</span> <span class="s1">&#39;org.springframework:springloaded:1.2.4.RELEASE&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">idea</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">module</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">inheritOutputDirs</span> <span class="o">=</span> <span class="kc">false</span>
+</span><span class='line'>        <span class="n">outputDir</span> <span class="o">=</span> <span class="n">file</span><span class="o">(</span><span class="s2">&quot;$buildDir/classes/main/&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>注：IntelliJ必须配置跟命令行Gradle任务相同的Java版本，并且springloaded必须作为一个buildscript依赖被包含进去。</p>
+
+<p>官方文档的springloaded版本是1.2.0.RELEASE，这个版本有问题，会出现：</p>
+
+<p>org.springsource.loaded.jvm.JVM : Problems copying method. Incompatible JVM? 报错</p>
+
+<p>依赖下载完成之后，正常启动Spring Boot Run。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">./</span><span class="n">gradlew</span> <span class="n">bRun</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>此时，如果你在应用启动的时候修改了Java代码，只需要点击Intellij的编译按钮，重新编译代码即可。</p>
+
+<p>又或者，将我在上篇文章中介绍的Watch引入，监测文件变化，自动运行compileJava等Gradle命令，也是可以的。</p>
+
+<p>参考文献： <br/>
+1.<a href="http://docs.spring.io/spring-boot/docs/current/reference/html/howto-hotswapping.html">http://docs.spring.io/spring-boot/docs/current/reference/html/howto-hotswapping.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -207,178 +297,6 @@ NaN <br/>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/09/27/whenever-plus-capistrano-plus-rbenv/">当whenever遇到capistrano和rbenv - Linux下的cron Job</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-09-27T11:01:41+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:01 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>当你遇到这样一个需求：用户订阅了很多信息，服务器需要每周，或者每月给用户发送邮件，告知用户订阅信息的更新内容。你需要怎么做？</p>
-
-<p>在RoR的环境下，发送邮件使用Rails Action Mailer。参考资料：<a href="http://guides.ruby-china.org/action_mailer_basics.html">http://guides.ruby-china.org/action_mailer_basics.html</a> 。</p>
-
-<p>那么如何定时呢？答案是Cron Job。</p>
-
-<p>如果大家谷歌rails cron job，就可以得到答案，一个是关于Cron Job的答案， <a href="http://www.gotealeaf.com/blog/cron-jobs-and-rails">http://www.gotealeaf.com/blog/cron-jobs-and-rails</a> ，一个是whener gem， <a href="https://github.com/javan/whenever">https://github.com/javan/whenever</a> 。</p>
-
-<p>Cron是*nux系统中一个基于时间的任务安排软件。通过crontab 命令，我们可以在固定的间隔时间执行指定的系统指令或 shell script脚本。时间间隔的单位可以是分钟、小时、日、月、周及以上的任意组合。</p>
-
-<p>更多关于crontab定时任务，可以查看： <a href="http://linuxtools-rst.readthedocs.org/zh_CN/latest/tool/crontab.html">http://linuxtools-rst.readthedocs.org/zh_CN/latest/tool/crontab.html</a></p>
-
-<p>关于时间的定义：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># +---------------- minute (0 - 59)</span>
-</span><span class='line'><span class="c1"># |  +------------- hour (0 - 23)</span>
-</span><span class='line'><span class="c1"># |  |  +---------- day of month (1 - 31)</span>
-</span><span class='line'><span class="c1"># |  |  |  +------- month (1 - 12)</span>
-</span><span class='line'><span class="c1"># |  |  |  |  +---- day of week (0 - 6) (Sunday=0)</span>
-</span><span class='line'><span class="c1"># |  |  |  |  |</span>
-</span><span class='line'>  <span class="o">*</span>  <span class="o">*</span>  <span class="o">*</span>  <span class="o">*</span>  <span class="o">*</span>  <span class="n">command</span> <span class="n">to</span> <span class="n">be</span> <span class="n">executed</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里，我就不细谈crontab定时任务，大家可以去看上面那个链接。</p>
-
-<p>whenever是一个Ruby的gem，它可以提供一个清晰的语法来编写定时任务。</p>
-
-<p>如果你刚才有停下来看crontab的内容，你会发现crontab任务的语法非常的复杂。</p>
-
-<p>whenever的目的就是为了让你以ruby的语法来编写要执行的任务，再由它来生成真正的crontab任务。</p>
-
-<p>如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">set</span> <span class="ss">:environment</span><span class="p">,</span> <span class="s2">&quot;staging&quot;</span>
-</span><span class='line'><span class="n">set</span> <span class="ss">:output</span><span class="p">,</span> <span class="p">{</span><span class="ss">:error</span> <span class="o">=&gt;</span> <span class="s2">&quot;log/cron_error_log.log&quot;</span><span class="p">,</span> <span class="ss">:standard</span> <span class="o">=&gt;</span> <span class="s2">&quot;log/cron_log.log&quot;</span><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">weekly_of_day</span> <span class="o">=</span> <span class="ss">:sunday</span> <span class="c1"># every sunday</span>
-</span><span class='line'><span class="n">weekly_of_time</span> <span class="o">=</span> <span class="p">{</span><span class="ss">:at</span> <span class="o">=&gt;</span> <span class="s1">&#39;0:00 am&#39;</span><span class="p">}</span> <span class="c1"># every sunday 0:00am</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">monthly</span> <span class="o">=</span> <span class="s1">&#39;0 0 1 * *&#39;</span> <span class="c1"># monthly 0 0 1 * * (every first day of month at 0:00am)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">quarterly</span> <span class="o">=</span> <span class="s1">&#39;0 0 1 1,4,7,10 *&#39;</span> <span class="c1"># quarterly 0 0 1 1,4,7,10 * (every 3 months at 0:00am start from the first day in january)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">job_type</span> <span class="ss">:rbenv_rake</span><span class="p">,</span> <span class="sx">%Q{export PATH=~/.rbenv/shims:~/.rbenv/bin:/usr/bin:$PATH; eval &quot;$(rbenv init -)&quot;; cd :path &amp;&amp; RAILS_ENV=staging bundle exec rake :task --silent &gt;&gt; log/cron_log.log 2&gt;&gt; log/cron_error_log.log}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">every</span> <span class="n">weekly_of_day</span><span class="p">,</span> <span class="n">weekly_of_time</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">rbenv_rake</span> <span class="s2">&quot;email_notification:send_email_notification_weekly&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">every</span> <span class="n">monthly</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">rbenv_rake</span> <span class="s2">&quot;email_notification:send_email_notification_monthly&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>更多关于如何使用whenever的内容，请查看： <a href="https://github.com/javan/whenever">https://github.com/javan/whenever</a></p>
-
-<p>whenever提供提供了四种job类型，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">job_type</span> <span class="ss">:command</span><span class="p">,</span> <span class="s2">&quot;:task :output&quot;</span>
-</span><span class='line'><span class="n">job_type</span> <span class="ss">:rake</span><span class="p">,</span>    <span class="s2">&quot;cd :path &amp;&amp; :environment_variable=:environment bundle exec rake :task --silent :output&quot;</span>
-</span><span class='line'><span class="n">job_type</span> <span class="ss">:runner</span><span class="p">,</span>  <span class="s2">&quot;cd :path &amp;&amp; bin/rails runner -e :environment &#39;:task&#39; :output&quot;</span>
-</span><span class='line'><span class="n">job_type</span> <span class="ss">:script</span><span class="p">,</span>  <span class="s2">&quot;cd :path &amp;&amp; :environment_variable=:environment bundle exec script/:task :output&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>但是，你在我给的例子中可以看到，我并没有使用其中的任何一个，而是自定义了一个rbenv_rake，这便是接下来的重点。</p>
-
-<p>如果你产品环境的Ruby环境是通过rbenv配置，那么在你使用crontab任务的可能会遇到这个问题。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">/</span><span class="n">spec_set</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">92</span><span class="ss">:in</span> <span class="sb">`block in materialize&#39;: Could not find rake-10.4.2 in any of the sources (Bundler::GemNotFound)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>关于原因，可以查看这个： <a href="http://benscheirman.com/2013/12/using-rbenv-in-cron-jobs/">http://benscheirman.com/2013/12/using-rbenv-in-cron-jobs/</a></p>
-
-<p>Crontab运行在一个受限的环境下，所以.bash_profile的配置方式，并不起作用。需要在每次运行该任务前，重新初始化一次rbenv。</p>
-
-<p>最后一点：</p>
-
-<p>关于whenever和capistrano的集成，其实官方网站上也给出了，但是测试过不起作用，至少我这没起作用，所以我在部署的ruby文件中添加了一个task。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">namespace</span> <span class="ss">:deploy</span> <span class="k">do</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">desc</span> <span class="s2">&quot;Update crontab with whenever&quot;</span>
-</span><span class='line'>  <span class="n">task</span> <span class="ss">:update_cron</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">on</span> <span class="n">roles</span><span class="p">(</span><span class="ss">:app</span><span class="p">)</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">within</span> <span class="n">current_path</span> <span class="k">do</span>
-</span><span class='line'>        <span class="n">execute</span> <span class="ss">:bundle</span><span class="p">,</span> <span class="ss">:exec</span><span class="p">,</span> <span class="s2">&quot;whenever --update-crontab </span><span class="si">#{</span><span class="n">fetch</span><span class="p">(</span><span class="ss">:application</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">after</span> <span class="ss">:finishing</span><span class="p">,</span> <span class="s1">&#39;deploy:update_cron&#39;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -401,6 +319,10 @@ NaN <br/>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/10/26/spring-boot-hot-swap/">基于Gradle和Intellij的Spring Boot热交换</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/10/05/learning-js-well-1/">学好JavaScript（一）- 被我忽视的东西(1)</a>
       </li>
     
@@ -409,15 +331,11 @@ NaN <br/>
       </li>
     
       <li class="post">
+        <a href="/blog/2015/09/26/rails-env-and-capistrano/">Rails环境和Capistrano部署</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/09/19/gradle-in-action-chinese-version/">《实战Gradle》译者序</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/09/10/active-record-migration/">关于运行Active Record数据迁移</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/09/06/deep-into-spring-aop-1/">Spring AOP 深入了解（一）还给业务逻辑代码一个干净的世界</a>
       </li>
     
   </ul>
