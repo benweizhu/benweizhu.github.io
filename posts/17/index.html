@@ -9,7 +9,10 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="传统的Web应用，以Java栈为例，无论是纯Servlet还是MVC框架，比如，SpringMVC，Struts。在页面上的导航都比较简单，只需要在浏览器地址栏输入URL，一个URL用来指向服务器上一个单一的物理资源（页面文件）。当页面加载后，就可以点击链接跳转到其他资源， &hellip;">
+  <meta name="description" content="什么是构建工具? 一个可编程的工具，能够以可执行和有序的任务来表达满足需要的自动化过程。 以Java为例，要得到一个简单可运行的Jar文件，需要下面几步： 1.编译源代码
+2.运行测试（前提是你有测试）
+3.拷贝Class文件到目标目录
+4.打包Class文件为Jar文件 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +67,125 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/01/31/deep-into-gradle-in-action-1/">Gradle深入与实战（一）什么是构建工具</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-31T11:31:34+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>11:31 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>什么是构建工具?</h3>
+
+<p>一个可编程的工具，能够以可执行和有序的任务来表达满足需要的自动化过程。</p>
+
+<p>以Java为例，要得到一个简单可运行的Jar文件，需要下面几步：</p>
+
+<p>1.编译源代码<br/>
+2.运行测试（前提是你有测试）
+3.拷贝Class文件到目标目录<br/>
+4.打包Class文件为Jar文件</p>
+
+<p>这是一个完整的可自动化的过程，在没有构建工具之前，是由谁来做？IDE。一个强大的IDE，以上的步骤都只需要按几个按钮，这让开发人员的生活变得很美好，完全集中在写出优秀的代码。</p>
+
+<p>现在，本来整个开发过程只需要你一个人，随着任务的难度和复杂度的加剧，你的团队从一个人变成了3个人或者更多。这时，你肯定会需要代码集成，这个问题好解决，使用版本控制，无论是中心式的SVN还是分布式的Git，总之可以既可以解决版本问题，也解决代码集成的问题。</p>
+
+<p>这种情况下，在没有自动化构建时，你肯定会遇到下面几个问题： <br/>
+1.在我的机器上可以跑 <br/>
+2.从版本控制check out代码，发现编译不过，有人少提交了代码文件<br/>
+3.有个人提交代码时没跑测试，导致其他人check out代码后，测试跑不过<br/>
+4.版本发布时，由一个人来check out所有代码，在他自己的机器上编译打包，结果部署到服务器上运行不了<br/>
+&hellip;</p>
+
+<p>导致上面这些问题出现的原因都有两个特点： <br/>
+1.手动介入<br/>
+2.重复任务</p>
+
+<p>开发人员要关注的应该是编写实现功能的代码，至于编译编译代码，拷贝文件，运行测试等一切重复和可自动化的事情都应该交给机器去做，因为人是容易犯错的。</p>
+
+<h3>Java世界的构建工具</h3>
+
+<p>在Java的世界里，目前在被使用的常用构建工具有三个：Ant，Maven，Gradle。</p>
+
+<p>Ant的核心是由Java编写，采用XML作为构建脚本，这样就允许你在任何环境下，运行构建。Ant基于任务链思想，任务之间定义依赖，形成先后顺序。缺点是使用XML定义构建脚本，导致脚本臃肿，Ant自身没有为项目构建提供指导，导致每个build脚本都不一样，开发人员对于每个项目都需要去熟悉脚本内容，没有提供在Ant生态环境内的依赖管理工具。</p>
+
+<p>Maven团队意识到Ant的缺陷，采用标准的项目布局，和统一的生命周期，采用约定由于配置的思想，减少构建脚本需要的编写内容，活跃的社区，可以方便找到合适的插件，强大的依赖管理工具。缺点是采用默认的结构和生命周期，太过限制，编写插件扩展麻烦，XML作为构建脚本。</p>
+
+<p>如果有一个构建工具可以折中，同时拥有Ant和Maven的优点，是不是很爽？告诉你有，那就是Gradle。</p>
+
+<h2>Gradle</h2>
+
+<p>基于Groovy的DSL，提供声明式的构建语言 <br/>
+采用标准的项目布局，但拥有完全的可配置性，就是可以改 <br/>
+通过插件，提供默认的构建生命周期，也可以自己定义任务，单独运行任务，定义任务间的依赖 <br/>
+强大的依赖管理工具，与Maven和Ivy仓库结合<br/>
+与Ant天生兼容，有效的重用Ant的任务<br/>
+多种实现插件的方式，强大的官方插件库<br/>
+从构建级别，支持从Ant或者Maven的逐步迁移<br/>
+通过包装器，无缝的在各个平台运行</p>
+
+<p>看一个超级简单的例子：</p>
+
+<p>如果你的项目采用标准的Maven布局（Java世界的标准布局）</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">src</span> <span class="o">{</span><span class="c1">//目录结构而已，不是代码</span>
+</span><span class='line'>   <span class="n">main</span> <span class="o">{</span>
+</span><span class='line'>       <span class="n">java</span>
+</span><span class='line'>       <span class="n">resources</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>   <span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>       <span class="n">java</span>
+</span><span class='line'>       <span class="n">resources</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在项目根目录下，创建一个build.gradle，这个是Gradle的构建脚本文件，就和build.xml，POM.xml道理一样。</p>
+
+<p>那么你要实现Java的编译，测试，拷贝class到目标目录，打包Jar文件等，只需要在构建脚本中，使用下面一句话，使用Java插件。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后运行gradle build。</p>
+
+<p>下一篇，我们深入到实战学习Java插件的使用和依赖管理，让你快速开始Java应用开发。</p>
+
+<p>参考资料：<br/>
+1. 《Gradle in Action》Gradle实战</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -291,192 +413,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/01/17/yes-angularjs-7/">开始！AngularJS!（七）- 过滤器</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-01-17T13:38:17+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:38 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>过滤器，按照一般的理解是，按照某个标准（或者阈值），将输入的内容中不满足要求的排除，得到最后的满足要求的输出。</p>
-
-<p>但过滤器还有一个更宽泛的理解，就是数据变换处理器。</p>
-
-<p>在AngularJS中，过滤器就是一个数据变换函数，将输入的数据进行处理，得到对应输出结果。</p>
-
-<h2>AngularJS内置过滤器</h2>
-
-<h4>格式化过滤器</h4>
-
-<p>currency：用两个小数位和一个货币符号来格式化数字 <br/>
-date：根据指定的数据格式来格式化日期，模型包含的日期可表达为Date对象或者字符串（这时字符串会在格式化前被解析为Date对象）  <br/>
-number：用参数指定的小数位数量格式化输入 <br/>
-lowercase和uppercase：转换大小写 <br/>
-json：主要用于调试，它能打印出漂亮的JavaScript对象</p>
-
-<h4>数组变换过滤器</h4>
-
-<p>limitTo：它将数组收缩到参数指定的长度，可以从集合的头或尾开始保留其中的元素（如果是尾部，则参数必须是负数）  <br/>
-Filter：提供通用的过滤功能，它非常灵活，支持很多可以精确从集合中选择元素的选项    <br/>
-orderBy：此排序过滤器根据给定的条件对数组中的元素进行排序</p>
-
-<h2>过滤器的使用</h2>
-
-<h3>在模板中使用</h3>
-
-<p>最简单的过滤使用方式: { { 表达式 | 过滤器名 } }</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;words&quot;</span><span class="nt">/&gt;</span>全部转换成大写
-</span><span class='line'>        { {words | uppercase} }
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>过滤器可以应用在另外一个过滤器的结果上，叫做“链式”调用: { { 表达式 | 过滤器1 | 过滤器2 | &hellip; } }</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;words&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>         { {words | uppercase | lowercase} }
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>过滤器可以拥有（多个）参数: { { 表达式 | 过滤器:参数1:参数2:&hellip; } }</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;num&quot;</span><span class="nt">/&gt;</span>最多显示到小数点后四位
-</span><span class='line'>        { {num | number:4} }
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>内置过滤器是全局的命名函数，在视图中通过管道(|)符号调用，接收用冒号(:)分割的参数。</p>
-
-<h3>控制器和服务中使用过滤器</h3>
-
-<p>过滤器又可以链式的使用又可以传递参数，那它的本质是什么？在前面其实已经讲过，是数据的变换函数，本质是函数。</p>
-
-<p>所以，你同样可以在控制器和服务中使用过滤器。注入过滤器有一种简单的方法，在控制器或者服务中添加以“&lt;过滤器名>Filter”为名的依赖。例如，使用&#8221;uppercaseFilter&#8221;为依赖时，会相应的注入uppercase过滤器。</p>
-
-<p>看下面的例子：在控制器中注入&#8221;uppercaseFilter&#8221;，然后将输入的小写转换成大写</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;filterApp&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;filterController&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;value&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">value=</span><span class="s">&quot;To Upper Case&quot;</span> <span class="na">ng-click=</span><span class="s">&quot;changeToUpperCase()&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;filterApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;filterController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;uppercaseFilter&#39;</span><span class="p">,</span> <span class="s1">&#39;$scope&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">uppercaseFilter</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">changeToUpperCase</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">uppercaseFilter</span><span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'><span class="p">}]);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>自定义过滤器</h2>
-
-<p>除了使用AngularJS内置的过滤器，我们还可以定义自己的过滤器</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;filterApp&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;value&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;filterApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="s1">&#39;subString&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">input</span><span class="p">,</span> <span class="nx">number</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">input</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>优点和缺点</h2>
-
-<p>过滤器的优点就是，它们不需要在作用域上注册函数，而且与规整的函数调用相比，通常具有更简洁的语法</p>
-
-<p>缺点是，过滤器的调用是频繁的，过滤器是函数，当模型发生变换时，使用了过滤器的表达式就是进行一次求值，所以被调用的次数非常的平凡。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/18">&larr; Older</a>
@@ -502,6 +438,10 @@ orderBy：此排序过滤器根据给定的条件对数组中的元素进行排�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/10/27/how-to-use-express/">在Node中使用Express</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/10/26/spring-boot-hot-swap/">基于Gradle和Intellij的Spring Boot热交换</a>
       </li>
     
@@ -515,10 +455,6 @@ orderBy：此排序过滤器根据给定的条件对数组中的元素进行排�
     
       <li class="post">
         <a href="/blog/2015/09/27/whenever-plus-capistrano-plus-rbenv/">当whenever遇到capistrano和rbenv - Linux下的cron Job</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/09/26/rails-env-and-capistrano/">Rails环境和Capistrano部署</a>
       </li>
     
   </ul>
