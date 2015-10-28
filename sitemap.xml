@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://benweizhu.github.io/blog/2015/10/28/js-template-engine/</loc>
+    <lastmod>2015-10-28T08:36:18+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://benweizhu.github.io/blog/2015/10/27/sass-basic/</loc>
     <lastmod>2015-10-27T14:18:48+08:00</lastmod>
     <priority>0.8</priority>
@@ -357,13 +362,13 @@
   </url>
   <url>
     <loc>http://benweizhu.github.io/blog/archives/</loc>
-    <lastmod>2015-10-27T14:53:12+08:00</lastmod>
+    <lastmod>2015-10-28T12:50:50+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>http://benweizhu.github.io/</loc>
-    <lastmod>2015-10-27T14:53:12+08:00</lastmod>
+    <lastmod>2015-10-28T12:50:50+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

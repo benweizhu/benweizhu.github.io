@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="没有介绍Gradle的基础知识，直接开始实战，目的是为了更快的让大家开始使用Gradle做构建，快速上手，当需要实现的自动化需求更复杂时，在深入学习基础知识。 这一篇，我们直接开始Java插件的使用。 应用Java插件 Gradle是一个通用构建工具，也就是说，它不单是为Java而生。比如， &hellip;">
+  <meta name="description" content="大部分的项目都不是自包含的，也就是说，需要使用到其他项目的构建结果，比如一些Jar文件。它们作为输入文件，必须存在于项目的ClassPath下，程序才能编译和运行。这些输入文件有一个很表意的名字，叫做依赖。 Gradle允许你告诉它项目的依赖是什么，然后它就会负责找到这些依赖。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,183 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/01/31/deep-into-gradle-in-action-3/">Gradle深入与实战（三）依赖管理工具</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-31T18:41:46+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>6:41 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>大部分的项目都不是自包含的，也就是说，需要使用到其他项目的构建结果，比如一些Jar文件。它们作为输入文件，必须存在于项目的ClassPath下，程序才能编译和运行。这些输入文件有一个很表意的名字，叫做依赖。</p>
+
+<p>Gradle允许你告诉它项目的依赖是什么，然后它就会负责找到这些依赖。这些依赖会从Maven或者Ivy的远程仓库下载下来（大部分情况），并缓存在本地的某个路径，这个过程叫做依赖解析。</p>
+
+<p>Maven和Gradle一样也提供了类似的功能，而Ant没有，你只能告诉Ant依赖文件的相对或者绝对路径，让它去加载。</p>
+
+<p>常常一个依赖自己也存在依赖，我们称为传递依赖，依赖管理工具又具有解析传递依赖的能力。</p>
+
+<h3>Gradle的依赖管理</h3>
+
+<p>那么如何在Gradle中定义依赖呢？看个最简单的例子。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;junit:junit:4.11&#39;</span><span class="c1">// testCompile group: &#39;junit&#39;, name: &#39;junit&#39;, version: &#39;4.11&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>项目使用了Java的插件，在repositories块中告诉Gradle使用maven的远程仓库作为依赖下载地址，在dependencies块定义了一个junit的依赖，并说明了分组(Maven中的Scope)，后面注释中有一个表意更完整的依赖定义，说明了依赖声明使用的三个坐标group，name，version。</p>
+
+<p>整个看起来是那么的表意，使用过Maven更会觉得是无缝转换，甚至更简洁。</p>
+
+<h3>Dependency configurations 依赖分组</h3>
+
+<p>在Gradle中，依赖都被会分配到某一个具体的configuration中（这里我不倾向于翻译成配置，我觉得布局，或者分组更适合）。Configuration代表着一个或多个构件及构件所需依赖的一个分组。</p>
+
+<p>Java插件已经预定义了一些configuration，比如，compile，runtime，testCompile，testRuntime等。</p>
+
+<p><strong>compile</strong> 放在这个configuration下的依赖是在编译产品代码时所使用的，但它作为一个分组，包含产品代码和编译所需的依赖。  <br/>
+<strong>runtime</strong> 产品代码在运行时需要的依赖，默认，也会包含compile中的依赖。  <br/>
+<strong>testCompile</strong> 编译测试代码时所需要的依赖，默认，被编译的产品代码和产品代码需要的编译依赖也属于该分组。  <br/>
+<strong>testRuntime</strong> 运行测试时需要的依赖。默认，包含compile，runtime和testCompile的分组的构建和依赖。</p>
+
+<p>使用过Maven的都应该知道分组的含义，这里讲解给不明白的同学，依赖之所以要分组，是因为，每个阶段对依赖的需要不一样，最明显的是产品代码和测试代码，比如junit在产品代码中就不需要。</p>
+
+<p>那么，为什么产品代码的编译阶段和运行阶段也分组，一般编译阶段需要的依赖，在运行阶段也需要，但是反过来就不一定了。比如，你通过反射去load一个class，这时该class就不一定需要在编译阶段存在。</p>
+
+<p>一个更常见的例子，做web开发时需要servlet的依赖，但是只是编译阶段，运行时servlet依赖由servlet容器来提供。所以Gradle的War插件也提供了两个configuration，分别是providedCompile和providedRuntime，它们对依赖的使用范围定义和compile以及runtime一致，只不过依赖的Jar包不会被加到War包里面。</p>
+
+<h3>定义SourceSet时，添加的Configuration</h3>
+
+<p>上一节，在介绍Java插件的时候，提到了SourceSet概念。针对每一个新添加的SourceSet，Java插件都会动态的给它添加两个Configuration，分别是sourceSetCompile和sourceSetRuntime。</p>
+
+<p>比如：新添加一个SourceSet，叫做int，那么对应的Configuration是intCompile和intRuntime。</p>
+
+<p>这一特性也正好印证，Java插件是如何识别自定义SourceSet来进行编译和运行。</p>
+
+<h3>依赖的多种定义方式</h3>
+
+<p>除了通过远程仓库和依赖坐标来定义依赖，Gradle还提供了另外两种常用的依赖定义方式，对本地文件的依赖，对某个项目的依赖。</p>
+
+<h4>对文件的依赖</h4>
+
+<p>这种情况看起来是不是很奇葩，都有依赖管理了和Maven仓库了还要什么文件依赖。其实不然，使用这种定义方式，最常见场景是项目构建工具的迁移，从Ant到Gradle。无论任何项目，迁移过程都是小步前进，Gradle提供文件依赖的配置，就是为了解决这些特殊性。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">runtime</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;libs/a.jar&#39;</span><span class="o">,</span> <span class="s1">&#39;libs/b.jar&#39;</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">runtime</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="s1">&#39;libs&#39;</span><span class="o">,</span> <span class="nl">include:</span> <span class="s1">&#39;*.jar&#39;</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>对另一个工程的依赖</h4>
+
+<p>项目中划分子模块是很平常的事情，前端Controller和数据层Dao分离管理就是一个例子，那么在进行前端Controller模块构建时，就需要将数据层模块作为依赖。定义方式如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="nf">project</span><span class="o">(</span><span class="s1">&#39;:shared&#39;</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>依赖版本冲突</h3>
+
+<p>依赖冲突是所以依赖管理中最头痛的问题，这常常出现在传递依赖中。Gradle对解决传递依赖提供了两种策略，使用最新版本或者直接导致构建失败。默认的策略是使用最新版本。虽然这样的策略能够解决一些问题，但是还是不够。常见的一种情况是，NoSuchMethond或者ClassNotFound。这时候，你可能需要一些特殊手段，比如排除不想要的传递依赖。</p>
+
+<h4>排除传递依赖</h4>
+
+<p>排除传递依赖有多种原因，远程仓库中不存在，运行时不需要，或者版本冲突。排除传递依赖的方式有两种：1.直接在configuration中排除 2.在具体的某个dependency中排除</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">configurations</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">.</span><span class="na">exclude</span> <span class="nl">module:</span> <span class="s1">&#39;commons&#39;</span>
+</span><span class='line'>    <span class="n">all</span><span class="o">*.</span><span class="na">exclude</span> <span class="nl">group:</span> <span class="s1">&#39;org.gradle.test.excludes&#39;</span><span class="o">,</span> <span class="nl">module:</span> <span class="s1">&#39;reports&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.gradle.test.excludes:api:1.0&quot;</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">exclude</span> <span class="nl">module:</span> <span class="s1">&#39;shared&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>通过命令行查看依赖关系</h4>
+
+<p>当出现依赖冲突时，最主要的还是要分析依赖冲突的原因，Gradle提供了两个任务来帮助你分析依赖关系</p>
+
+<p>dependencies - Displays all dependencies declared in root project &lsquo;projectReports&rsquo;. <br/>
+dependencyInsight - Displays the insight into a specific dependency in root project &lsquo;projectReports&rsquo;.</p>
+
+<h5><strong>Tips：输出依赖关系图到文件</strong></h5>
+
+<p>在命令行中直接使用gradle dependencies可以打印出依赖图，但是在命令行中查看始终不太方便，我们可以将结果输出到一个文件中，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">gradle</span> <span class="n">dependencies</span> <span class="o">&gt;</span> <span class="n">dependencies</span><span class="o">.</span><span class="n">txt</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>dependencies.txt保存在项目的根目录</p>
+
+<p>Gradle的官方文档中关于Gradle的依赖管理的内容还有很多，比如，如何访问需要用户名密码授权的Maven仓库等等。等多内容，可以参考官方文档：<a href="http://gradle.org/docs/current/userguide/dependency_management.html">http://gradle.org/docs/current/userguide/dependency_management.html</a></p>
+
+<p>下一节，利用前三节学到的知识，编写集成测试任务，并单独划分SourceSet。</p>
+
+<p>参考资料： <br/>
+1.Gradle官方文档</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -282,125 +459,6 @@ Deletes the project build directory.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/01/31/deep-into-gradle-in-action-1/">Gradle深入与实战（一）什么是构建工具</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-01-31T11:31:34+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>11:31 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>什么是构建工具?</h3>
-
-<p>一个可编程的工具，能够以可执行和有序的任务来表达满足需要的自动化过程。</p>
-
-<p>以Java为例，要得到一个简单可运行的Jar文件，需要下面几步：</p>
-
-<p>1.编译源代码<br/>
-2.运行测试（前提是你有测试）
-3.拷贝Class文件到目标目录<br/>
-4.打包Class文件为Jar文件</p>
-
-<p>这是一个完整的可自动化的过程，在没有构建工具之前，是由谁来做？IDE。一个强大的IDE，以上的步骤都只需要按几个按钮，这让开发人员的生活变得很美好，完全集中在写出优秀的代码。</p>
-
-<p>现在，本来整个开发过程只需要你一个人，随着任务的难度和复杂度的加剧，你的团队从一个人变成了3个人或者更多。这时，你肯定会需要代码集成，这个问题好解决，使用版本控制，无论是中心式的SVN还是分布式的Git，总之可以既可以解决版本问题，也解决代码集成的问题。</p>
-
-<p>这种情况下，在没有自动化构建时，你肯定会遇到下面几个问题： <br/>
-1.在我的机器上可以跑 <br/>
-2.从版本控制check out代码，发现编译不过，有人少提交了代码文件<br/>
-3.有个人提交代码时没跑测试，导致其他人check out代码后，测试跑不过<br/>
-4.版本发布时，由一个人来check out所有代码，在他自己的机器上编译打包，结果部署到服务器上运行不了<br/>
-&hellip;</p>
-
-<p>导致上面这些问题出现的原因都有两个特点： <br/>
-1.手动介入<br/>
-2.重复任务</p>
-
-<p>开发人员要关注的应该是编写实现功能的代码，至于编译编译代码，拷贝文件，运行测试等一切重复和可自动化的事情都应该交给机器去做，因为人是容易犯错的。</p>
-
-<h3>Java世界的构建工具</h3>
-
-<p>在Java的世界里，目前在被使用的常用构建工具有三个：Ant，Maven，Gradle。</p>
-
-<p>Ant的核心是由Java编写，采用XML作为构建脚本，这样就允许你在任何环境下，运行构建。Ant基于任务链思想，任务之间定义依赖，形成先后顺序。缺点是使用XML定义构建脚本，导致脚本臃肿，Ant自身没有为项目构建提供指导，导致每个build脚本都不一样，开发人员对于每个项目都需要去熟悉脚本内容，没有提供在Ant生态环境内的依赖管理工具。</p>
-
-<p>Maven团队意识到Ant的缺陷，采用标准的项目布局，和统一的生命周期，采用约定由于配置的思想，减少构建脚本需要的编写内容，活跃的社区，可以方便找到合适的插件，强大的依赖管理工具。缺点是采用默认的结构和生命周期，太过限制，编写插件扩展麻烦，XML作为构建脚本。</p>
-
-<p>如果有一个构建工具可以折中，同时拥有Ant和Maven的优点，是不是很爽？告诉你有，那就是Gradle。</p>
-
-<h2>Gradle</h2>
-
-<p>基于Groovy的DSL，提供声明式的构建语言 <br/>
-采用标准的项目布局，但拥有完全的可配置性，就是可以改 <br/>
-通过插件，提供默认的构建生命周期，也可以自己定义任务，单独运行任务，定义任务间的依赖 <br/>
-强大的依赖管理工具，与Maven和Ivy仓库结合<br/>
-与Ant天生兼容，有效的重用Ant的任务<br/>
-多种实现插件的方式，强大的官方插件库<br/>
-从构建级别，支持从Ant或者Maven的逐步迁移<br/>
-通过包装器，无缝的在各个平台运行</p>
-
-<p>看一个超级简单的例子：</p>
-
-<p>如果你的项目采用标准的Maven布局（Java世界的标准布局）</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">src</span> <span class="o">{</span><span class="c1">//目录结构而已，不是代码</span>
-</span><span class='line'>   <span class="n">main</span> <span class="o">{</span>
-</span><span class='line'>       <span class="n">java</span>
-</span><span class='line'>       <span class="n">resources</span>
-</span><span class='line'>   <span class="o">}</span>
-</span><span class='line'>   <span class="n">test</span> <span class="o">{</span>
-</span><span class='line'>       <span class="n">java</span>
-</span><span class='line'>       <span class="n">resources</span>
-</span><span class='line'>   <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在项目根目录下，创建一个build.gradle，这个是Gradle的构建脚本文件，就和build.xml，POM.xml道理一样。</p>
-
-<p>那么你要实现Java的编译，测试，拷贝class到目标目录，打包Jar文件等，只需要在构建脚本中，使用下面一句话，使用Java插件。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后运行gradle build。</p>
-
-<p>下一篇，我们深入到实战学习Java插件的使用和依赖管理，让你快速开始Java应用开发。</p>
-
-<p>参考资料：<br/>
-1. 《Gradle in Action》Gradle实战</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/18">&larr; Older</a>
@@ -426,6 +484,10 @@ Deletes the project build directory.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/10/28/js-template-engine/">了解JavaScript模板引擎</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/10/27/sass-basic/">重温SASS基础</a>
       </li>
     
@@ -439,10 +501,6 @@ Deletes the project build directory.</p>
     
       <li class="post">
         <a href="/blog/2015/10/06/learning-js-well-2/">学好JavaScript（二）- 被我忽视的东西(2)对象</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/10/05/learning-js-well-1/">学好JavaScript（一）- 被我忽视的东西(1)</a>
       </li>
     
   </ul>
