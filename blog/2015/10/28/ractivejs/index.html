@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Octopresstech - NO END FOR LEARNING</title>
+  <title>了解RactiveJS - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="Category: octopresstech">
+  <meta name="description" content="Ractive is a next-generation DOM manipulation library for creating reactive user interfaces, optimised for developer sanity. It was originally &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io/blog/categories/octopresstech">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/10/28/ractivejs">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -63,36 +63,119 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Octopresstech</h1>
+    
+      <h1 class="entry-title">了解RactiveJS</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-10-28T14:13:53+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:13 pm</span></time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><blockquote><p>Ractive is a next-generation DOM manipulation library for creating reactive user interfaces, optimised for developer sanity. It was originally developed to create interactive news applications at theguardian.com.</p>
 
-  
-  <h2>2013</h2>
+<p>Ractive.js is a template-driven UI library, but unlike other tools that generate inert HTML, it transforms your templates into blueprints for apps that are interactive by default.</p>
 
-<article>
-  
-<h1><a href="/blog/2013/09/21/how-to-use-octopress-to-set-up-blog-on-github/">如何用Octopress在github上建立博客?</a></h1>
-<time datetime="2013-09-21T15:46:00+08:00" pubdate><span class='month'>Sep</span> <span class='day'>21</span> <span class='year'>2013</span></time>
+<p>Two-way binding, animations, SVG support and more are provided out-of-the-box – but you can add whatever functionality you need by downloading and creating plugins.</p></blockquote>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/octopresstech/'>octopresstech</a></span>
-</footer>
+<p>看看Ractive的介绍，你能够看明白，RactiveJS是干嘛的吗？</p>
+
+<p>1.为用户界面交互提供的下一代DOM操作类库（这是要干掉jQuery的节奏吗？）  <br/>
+2.模板驱动的UI库（模板的概念可以看看我一篇关于《JavaScript模板引擎》的文章），但不同于其他工具产生可以插入的HTML代码，它将模板变成了用户交互的蓝图。 <br/>
+3.双向绑定，动画，和SVG支持等开箱即用的功能。</p>
+
+<p>花费60秒去看一下，官方的《60 second setup》， <a href="http://www.ractivejs.org/60-second-setup">http://www.ractivejs.org/60-second-setup</a></p>
+
+<p>你会发现，这不就是JavaScript模板引擎吗？只不过不需要你，手动将编译得到的HTML片段添加到指定的元素上。</p>
+
+<p>但实际上，还远远不止如此。</p>
+
+<h2>双向绑定</h2>
+
+<p>数据双向绑定的概念在后端MVC中用的挺多的，比如，SpringMVC。而实现并标榜这一特性的前端框架也很多，例如Ember.js，AngularJS以及KnockoutJS。</p>
+
+<p>默认情况下，如果你有使用input，textarea或者select等元素，Ractive实例会基于用户的输入更新它的内部模型。</p>
+
+<p>如果你不想在某一个元素上使用双向绑定，你可以通过设置twoway: false属性，将该特性disable。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;input</span> <span class="na">value=</span><span class="s">&quot;{ {foo} }&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;input</span> <span class="na">value=</span><span class="s">&quot;{ {foo} }&quot;</span> <span class="na">twoway=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-</article>
 
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-10-28T14:13:53+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:13 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/10/28/ractivejs/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/10/28/ractivejs/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/10/28/js-template-engine/" title="Previous Post: 了解JavaScript模板引擎">&laquo; 了解JavaScript模板引擎</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="了解RactiveJS"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
 
 </div>
 

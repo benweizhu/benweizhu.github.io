@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="最早接触PhoneGap平台是在1年多之前，能够使用HTML、CSS和JavaScript跨平台来编写Android或者IOS设备程序，并且应用的核心代码不需要多少修改就可以移植，确实让我感觉的到它应该是未来移动设备开发的趋势。Web程序员，特别是前端程序员， &hellip;">
+  <meta name="description" content="Service是Android应用程序中的一个组件，它能够长时间在后台运行，并且不提供界面。另一个应用程序的组件可以启动一个Service并持续在后台运行即便用户切换到别的应用程序。而且，组件可以和Service绑定并与它进行交互，甚至执行进程间通信（IPC）。例如， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,173 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/01/11/android-service-translation/">Android Service(译)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-01-11T23:51:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>11:51 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Service是Android应用程序中的一个组件，它能够长时间在后台运行，并且不提供界面。另一个应用程序的组件可以启动一个Service并持续在后台运行即便用户切换到别的应用程序。而且，组件可以和Service绑定并与它进行交互，甚至执行进程间通信（IPC）。例如，一个Service可以处理网络通信，播放音乐，执行IO操作，或者和启动它的组件交互，这些都是在后台进行。</p>
+
+<p>使用Service有两种方式：</p>
+
+<h2>启动Start</h2>
+
+<p>当一个应用组件（例如Activity）调用startService()方法时，可以启动一个Service。一旦被启动，一个Service会无止境的运行在后台，即使启动它的组件被销毁了。通常启动一个Service会去执行一个单独的操作，并且不会返回任何的结果给调用者。例如，它可以下载或者上传文件。当这件事情完成，Service自己会停止。</p>
+
+<h2>绑定Bound</h2>
+
+<p>当一个应用组件调用bindService()方法时，可以绑定一个Service。一个被绑定的Service提供了一个CS模式的接口，它允许组件与Service进行交互，发送请求，返回结果，与进程间通信。被绑定的Service会一直运行只要有其他应用组件绑定它。多个组件可以绑定到同一个Service，但是当所有的组件都解除绑定，该Service就会被销毁。</p>
+
+<p>对应于这两种方式，有两个回调函数去实现，onStartCommand()对应启动方式，onBind()对应绑定方式。</p>
+
+<p>无论你的应用程序是启动还是绑定一个Service还是两种方式有用到，对于任何一个应用程序都可以使用该Service（即便是另外一个应用程序）。同理，任何组件也可以使用一个Activity（通过Intent）。然而，你可以在Manifest文件中将Service定义为私有的，并禁止其他应用访问它。</p>
+
+<p>Service运行在宿主进程的的主线程中——Service不会创建它自己的进程，也不会运行在分开的进程中（除非你特别指定）。这意味着，如果你的Service要做任何占用CPU或者阻塞操作（例如播放音乐或者网络操作），你应该单独为Service创建一个线程。通过使用单独的线程，你会减小应用程序未响应（ANR-Application Not Responding）错误，并且让应用程序主线程保持用户与Activity进行交互。</p>
+
+<p>创建Service，你必须创建一个Service的子类（或者一个已经存在的子类）。在实现类中，你需要重写一些回调函数，这些回调函数处理着Service的生命周期，并且提供一个机制让组件去绑定Service。</p>
+
+<p><strong>onStartCommand()</strong></p>
+
+<p>该方法被调用，当另一个组件，例如Activity通过调用startService()，请求一个Service启动。一旦该方法被执行，Service会启动，并在后台无止境运行。如果你实现这个方法，你就应该负责停止它（通过调用stopSelf()或者stopService()，但如果是绑定，就不用实现这些方法）。</p>
+
+<p><strong>onBind()</strong></p>
+
+<p>该方法被调用，当一个组件想要绑定该Service（例如执行RPC），需要调用bindService()。在这个实现方法中，你需要提供一个接口（返回一个IBinder）给调用者，以便调用者与Service进行交互。你必须实现这方法，但是如果你不希望该Service被绑定，那么你可以放回一个null。</p>
+
+<p><strong>onCreate()</strong></p>
+
+<p>该方法被调用，当Service被第一次创建，要去执行一次性的配置过程（在该方法被调用的要么是onStartCommand()或者onBind()）。如果一个Service已经在运行，则这个方法不会再被调用。</p>
+
+<p><strong>onDestroy()</strong></p>
+
+<p>当Service不在被使用时，系统会去调这个方法。你的Service应该执行一些清理资源的工作，例如线程，已注册的监听器等。它是Service最后被调用的方法。</p>
+
+<p>Android系统会强制停止一个Service，仅仅当内存不足且系统必须会已经有用户焦点的Activity恢复一些系统资源时。如果Service绑定到一个拥有用户焦点的Activity，那么一般不会被杀掉，如果该Service被定义在后台运行，那么它几乎不会被杀掉。否则，如果Service被启动且长时间运行，那么系统会降低它在后台任务中的位置，然后该Service会变成最容易被杀掉的服务。如果你的Service被启动，那么你必须将它优雅的设计成能够被系统重启。如果系统杀掉你的Service，它会在资源够用的时候立刻重启你的Service（虽然它也依赖于onStartCommand()方法返回的值）。</p>
+
+<h2>LifeCycle</h2>
+
+<p><img src="http://developer.android.com/images/service_lifecycle.png" alt="Jasmine" /></p>
+
+<p>Service的整个生命周期发生在onCreate()方法和onDestory()方法之间，就像Activity一样，分别进行一些初始化工作和清理资源工作。且无论是启动Service还是绑定Service，这两个方法都会被调用到。</p>
+
+<p>Service活动周期开始于onStartCommand()或者onBind()方法，每一个方法都会被传入一个Intent对象。</p>
+
+<p>如果Service以启动方式开始，那么活动周期与整个生命周期同时结束。如果Service是绑定的，那么活动周期是以onUnbind()方法结束。</p>
+
+<figure class='code'><figcaption><span>Service </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">android.app.Service</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.content.Intent</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.os.IBinder</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ExampleService</span> <span class="kd">extends</span> <span class="n">Service</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">mStartMode</span><span class="o">;</span>       <span class="c1">// indicates how to behave if the service is killed</span>
+</span><span class='line'>    <span class="n">IBinder</span> <span class="n">mBinder</span><span class="o">;</span>      <span class="c1">// interface for clients that bind</span>
+</span><span class='line'>    <span class="kt">boolean</span> <span class="n">mAllowRebind</span><span class="o">;</span> <span class="c1">// indicates whether onRebind should be used</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// The service is being created</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">onStartCommand</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="o">,</span> <span class="kt">int</span> <span class="n">startId</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// The service is starting, due to a call to startService()</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">mStartMode</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">IBinder</span> <span class="nf">onBind</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// A client is binding to the service with bindService()</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">mBinder</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">onUnbind</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// All clients have unbound with unbindService()</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">mAllowRebind</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onRebind</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// A client is binding to the service with bindService(),</span>
+</span><span class='line'>        <span class="c1">// after onUnbind() has already been called</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onDestroy</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// The service is no longer used and is being destroyed</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>文献参考自：<a href="http://developer.android.com/guide/components/services.html">http://developer.android.com/guide/components/services.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -245,123 +412,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/01/05/about-android-activity-lifecycle-translate/">About Android Activity LifeCycle(译)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-01-05T23:22:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>11:22 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://developer.android.com/images/activity_lifecycle.png" alt="Jasmine" /></p>
-
-<p>Activity是应用的一个组件，它提供用户可以交互的屏幕，例如拨打电话，照相，发邮件，看地图。每一个Activity都会被赋予一个窗户用来绘画用户界面。这个窗口通常会占据整个屏幕，但是也可以比屏幕小和悬浮在其他窗口之上。</p>
-
-<p>一个应用程序通常由多个Activity组成，它们之间以一种较为松弛的关系联系在一起。例如，一个Activity作为主要的Activity，它会作为程序启动时第一个展现给用户的Activity。每一个Activity能够启动另外一个Activity，以便去执行其他的动作。每一次一个新的Activity启动，前一个Activity就会停止，但是系统会将它保存在一个栈中（“back stack”）。当一个新的Activity启动时，当前的Activity会被压入栈中，并拿走焦点。这个栈遵守“后进先出”原则，所以，当用户在当前Activity完成对应操作，按下返回按钮的时候，它会从栈顶弹出，并销毁，然后前一个Activity恢复。</p>
-
-<p>当一个Activity因为另一个新的Activity启动而停止时，系统会通过Activity生命周期中的回调函数通知它这个状态的变化。由于状态的改变，Activity会接受到多个回调函数，无论系统是在create，stop，resume还是destroy，并且每一次回调都提供你一个机会去执行适合这个状态变化的操作。例如，当stop时，你的Activity应该释放任何比较大的对象，例如网络和数据库连接。当Activity恢复时，你应该从新获取必要的资源和恢复之前被打断的操作。状态的转换是Activity生命周期的一部分。</p>
-
-<p>通过回调函数去管理Activity的生命周期是实现健壮和灵活应用的关键。Activity的生命周期直接受到其他Activity，Task以及back stack的影响。</p>
-
-<p>一个Activity可以存在于三个状态中：</p>
-
-<p><em>Resumed</em></p>
-
-<p>该状态下，Activity置于屏幕前景，并拥有聚焦，可以把这个状态理解为正在运行。</p>
-
-<p><em>Paused</em></p>
-
-<p>该状态下，另一个Activity正置于屏幕前景并拥有聚焦，但是当前Activity仍然可见。一个暂停的Activity是处于完全存活状态的（Activity对象仍然保有内存，它维持状态和成员信息，并保持与Window Manger的关系），但是如果内存不足时，系统有权利关闭该Activity。</p>
-
-<p><em>Stopped</em></p>
-
-<p>该状态下，该Activity完全被另一个Activity遮挡（该Activity就会进入到背景状态）。进入stopped状态的Activity也是仍然处于存活状态。然而，它对用户是不可见的，同样在系统需要内存的时候，它会被关闭。</p>
-
-<p>如果一个Activity进入paused或者stopped状态，系统可以通过调用finish方法或者终止进程的方式，将Activity从内存中清除。当该Activity从新打开，他必须要重新创建一次。</p>
-
-<p>Activity<strong>完整的生命周期</strong>发生于onCreate()方法和onDestroy()方法之间。Activity应该在onCreate()方法时，设置一些全局状态，例如布局，并且在onDestroy()方法释放所有保持的资源。例如，如果Activity拥有一个线程在后台运行并正在从网络上下载数据，该线程可能是在onCreate()方法中创建的，那么就应该在onDestroy()方法中停止该线程。</p>
-
-<p>Activity的<strong>可见生命周期</strong>发生于onStart()方法和onStop()方法之间。在这段时间，用户可以在屏幕上看见它，并进行交互。例如，onStop()方法被调用发生在当一个新的Activity启动，而当前Activity不在可见时。在这两个方法之间，你可以保有Activity所需要的资源。例如，你可以在onStart()方法调用时，注册一个BroadCartReceiver，让他监控你对UI的操作，并在用户不在看到这个Activity时，在onStop()方法中注销这个BroadCartReceiver。</p>
-
-<p>Activity<strong>前景生命周</strong>发生于onResume()方法和onPause()方法之间。在这段时间中，该Activity处于所有Activity的上方并且拥有用户输入焦点。Activity能够频繁的在前景中出镜和入镜。例如，当设备进入睡眠或者有一个对话框弹出时，在onPause()方法被调用时。因为，这个状态频繁的转变，在这两个方法中的代码要尽量的轻量级，以避免转换太慢，让用户等待。</p>
-
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th>Description</th>
-<th>Killable after?</th>
-<th>Next</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>onCreate()</td>
-<td>当Activity第一次被创建时调用。在这里，你应该做所有关于静态配置的事情-创建View，绑定数据到List等等。这个方法会传入一个Bundle对象，如果Activity中有捕获自身状态，那么它包含了Activity之前的状态。</td>
-<td>No</td>
-<td>onStart()</td>
-</tr>
-<tr>
-<td>onRestart()</td>
-<td> 在Activity停止之后被调用，指明Activity会被重新启动。</td>
-<td>No</td>
-<td>onStart()</td>
-</tr>
-<tr>
-<td>onStart()</td>
-<td>在Activity变成用户可见状态之前调用。如果Activity要变成前景状态，那么onResume()方法会被调用，如果Activity要被隐藏，则onStop()方法会被调用。</td>
-<td>No</td>
-<td>onResume() or onStop()</td>
-</tr>
-<tr>
-<td>onResume()</td>
-<td>在Activity开始与用户交互之前调用。这个时候，Activity会置于栈顶，并伴随着用户输入。</td>
-<td>No</td>
-<td>onPause()</td>
-</tr>
-<tr>
-<td>onPause()</td>
-<td>在系统开始要恢复另一个Activity时被调用。该方法通常被用于提交未保存数据到持久数据中，停止动画和其他会占用CPU资源的操作。并且应该非常迅速的做这些事情，因为下一个Activity只有在当前方法执行完成之后才会恢复。如果Activity回到前端，则onResume()方法跟在onPaused()方法后面，如果对用户不可见，则onStop()方法跟在后面。</td>
-<td>Yes</td>
-<td>onResume() or onStop()</td>
-</tr>
-<tr>
-<td>onStop()</td>
-<td>当Activity对用户不在可见时被调用。onStop()发生的原因是Activity被销毁，或者另一个Activity被恢复并正在覆盖当前Activity。如果紧跟随着的是onRestart()方法，则说明Activity正在恢复与用户的交互。如果跟着的是onDestory()方法，则说明这个Activity要被销毁了。</td>
-<td>Yes</td>
-<td>onRestart() or onDestroy()</td>
-</tr>
-<tr>
-<td>onDestroy()</td>
-<td>在Activity被销毁时调用。这是Activity最后一个会接收到的调用。被调用的原因要么是因为finish()方法在哪个位置调用，或者因为系统因为要保留资源而临时销毁它。可以通过isFinishing()方法来区分两种不同情况。</td>
-<td>Yes</td>
-<td>nothing</td>
-</tr>
-</tbody>
-</table>
-
-
-<p>文献参考自：<a href="http://developer.android.com/guide/components/activities.html">http://developer.android.com/guide/components/activities.html</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/34">&larr; Older</a>
@@ -387,6 +437,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/10/28/ractivejs/">了解RactiveJS</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/10/28/js-template-engine/">了解JavaScript模板引擎</a>
       </li>
     
@@ -400,10 +454,6 @@
     
       <li class="post">
         <a href="/blog/2015/10/26/spring-boot-hot-swap/">基于Gradle和Intellij的Spring Boot热交换</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/10/06/learning-js-well-2/">学好JavaScript（二）- 被我忽视的东西(2)对象</a>
       </li>
     
   </ul>
