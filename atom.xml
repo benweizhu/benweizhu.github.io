@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-10-29T13:35:13+08:00</updated>
+  <updated>2015-10-31T19:53:10+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,110 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[SEO实战密码：URL静态化]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/10/31/static-url-for-seo/"/>
+    <updated>2015-10-31T19:01:24+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/10/31/static-url-for-seo</id>
+    <content type="html"><![CDATA[<p>URL静态化一直以来都是最基本的SEO要求之一，但近年来搜索引擎技术进步，抓取动态url已经不是问题，SEO行业对是否一定要做静态化也有了一些观念上的改变。</p>
+
+<h2>为什么要做静态化？</h2>
+
+<p>现在的网站绝大多数都是数据库驱动，页面由程序实时生成，而不是真的在服务器上有一个静态HTML文件存在。当用户访问一个网址时，程序根据URL中的参数调用数据库，实时生成页面内容。因此动态页面相对应的URL原始状态也是动态的，包含问号，等号及参数。</p>
+
+<p>搜索引擎在发展初期，一般不愿意爬行和收录动态URL，主要原因是可能陷入无限循环或收录大量重复内容，造成资源极大的浪费。最典型的无线循环就是某些网站上出现的万年历。万年历会使得蜘蛛可以无限点击下去。</p>
+
+<p>真实用户一眼就能看出这是一个万年历，但是搜索引擎蜘蛛面对的只是一串代码，不一定能判断它。</p>
+
+<p>有时候就算不是无限循环，动态URL也可能造成大量重复页面。比如：想用的URL和参数（也就是相同的页面），但是参数的顺序不同（有多个参数）。</p>
+
+<p>更麻烦的是，有时候某些参数完全可以是任意值，服务器都能够正常的返回某个固定页面。</p>
+
+<p>这就是为什么搜索引擎对动态URL敬而远之的原因。</p>
+
+<h2>如何静态化URL呢？</h2>
+
+<p>最常见的方式是使用服务器URL重写模块，LAMP（Linux+Apache+MySQL+PHP）服务器上一般使用mod_rewrite模块，Windows服务器上也有类似的功能。</p>
+
+<p>举例：</p>
+
+<p><a href="http://www.domain.com/products.php?id=123">http://www.domain.com/products.php?id=123</a></p>
+
+<p>静态化为:</p>
+
+<p><a href="http://www.domain.com/products/123">http://www.domain.com/products/123</a></p>
+
+<p>需要请用服务器模块mod_rewrite，然后在.htaccess文件写入代码：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">RewriteRule</span> <span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="p">([</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="o">/</span><span class="n">products</span><span class="o">.</span><span class="n">php</span><span class="err">?</span><span class="nb">id</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>URL重写基于正则表达式，每个网站的动态URL结构都不同，所以写起来就很麻烦。</p>
+
+<p>严格的说，这里所说的URL静态化应该称为“伪静态化”，也就是说服务器上还是不存在相应的HTML文件，用户访问时还是动态生成页面，只不过通过URL重写技术使网站看起来像是静态的。当然，也有CMS系统可以实现真正静态化，系统会自动真实生成静态的HTML文件。但对于搜索引擎来说，真正的静态化和伪静态化没有区别。</p>
+
+<h2>到底是否需要URL静态化？</h2>
+
+<p>近年来搜索引擎对URL的抓取有了很大进步。一般来说，URL中有两三个参数，对于收录不会造成任何影响。权重高的域名，再多几个问号也不是问题。不过一般还是建议将URL静态化，即能提高用户体验，又能降低收录难度。</p>
+
+<p>2008年9月，Google站长博客发表了一篇关于动态网址还是静态网址的帖子，颠覆了SEO界的观念。</p>
+
+<p>Google的帖子有几个要点。</p>
+
+<p>一是Google完全有能力抓取动态网址，多少个问号也不是问题。这一点基本靠谱。</p>
+
+<p>第二，动态网址更有助于Google蜘蛛读懂URL含义，并进行鉴别，因为网址中的参数有提示性。比如Google举了这个例子：</p>
+
+<p>www.example.com/article/bin/answer.foo?language=en&amp;answer=3&amp;sid=98971298178906&amp;query=URL</p>
+
+<p>URL里的参数都有助于Google理解URL及网页内容。比如language后面跟的参数是提示语言，answer后面跟的是文章编号，sid后面的肯定是session ID。其他常用的包括color后面跟的参数指的是颜色，size后面跟的参数是尺寸等。有了这些参数的帮助，Google更容易理解网页。</p>
+
+<p>而将网址静态化后，这些参数的意义通常就变得不明显了。比如这个URL：</p>
+
+<p>www.example.com/shoes/red/7/12/men/index.html</p>
+
+<p>就可能使Google不知道哪个是产品序列号，哪个是尺寸等。</p>
+
+<p>第三，网址静态化很容易弄错，那就更得不偿失了。比如通常动态网址的参数调换顺序，所得到的页面其实是相同的，比如这两个网址很可能就是同一个页面：</p>
+
+<p>www.example.com/article/bin/answer.foo?language=en&amp;answer=3</p>
+
+<p>www.example.com/article/bin/answer.foo?answer=3&amp;language=en</p>
+
+<p>保留动态网址，Google还比较容易明白这是一样的网页。而经过静态化后，这样两个网址Google就不容易判断是不是同一个页面，从而可能引起复制内容：</p>
+
+<p>www.example.com/shoes/men/7/red/index.html</p>
+
+<p>www.example.com/shoes/red/7/men/index.html</p>
+
+<p>再一个容易搞错的是session ID，也可能被静态化进URL：</p>
+
+<p>www.example.com/article/bin/answer.foo/en/3/98971298178906/URL</p>
+
+<p>这样网站将产生大量URL不同，但其实内容相同的页面。</p>
+
+<p>所以，Google建议不要静态化URL。</p>
+
+<h2>虽然如此</h2>
+
+<p>但是《SEO实战密码》的作者建议还是做静态化。他认为Google的这个帖子解释的有些极端和牵强，也没有从其他搜索引擎的角度出发。</p>
+
+<p>参考资料： <br/>
+1.《SEO实战密码》</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Responsive Design]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/10/31/responsive-design/"/>
+    <updated>2015-10-31T09:23:44+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/10/31/responsive-design</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[了解RactiveJS]]></title>
@@ -36,6 +140,113 @@
 
 <p>但实际上，还远远不止如此。</p>
 
+<h2>模板引擎</h2>
+
+<p>就像它自己介绍的和你在《60 second setup》中看到了那样，Ractive和模板引擎有很强的关联性，它要求所使用的HTML模板片段是严格符合HTML标准的（不会像浏览器那样，允许一些未关闭的标签）。</p>
+
+<p><strong>引用</strong></p>
+
+<p>在这个模板引擎中有一个“引用”的概念，其实指的就是模板中的占位符变量，比如《60 second setup》中的name变量。</p>
+
+<p>因为在定义的Ractive实例中有一个data属性，包含了所有的“引用”变量，在这里又引入一个context上下文的概念。通过定义上下文（比如messages和user），你就可以不需要messages.total来指定占位符，而是这样：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>{ {#user} }
+</span><span class='line'>  <span class="nt">&lt;p&gt;</span>Welcome back, { {name} }!
+</span><span class='line'>    { {#messages} }
+</span><span class='line'>      You have { {unread} } unread of { {total} } total messages.
+</span><span class='line'>    { {/messages} }
+</span><span class='line'>  <span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>{ {/user} }
+</span><span class='line'>
+</span><span class='line'>data: {//data长这个样
+</span><span class='line'>    user: {
+</span><span class='line'>      name: &#39;Jim&#39;,
+</span><span class='line'>      messages: {
+</span><span class='line'>        total: 10,
+</span><span class='line'>        unread: 3
+</span><span class='line'>      },
+</span><span class='line'>      lastLogin: &#39;Wednesday&#39;
+</span><span class='line'>    }
+</span><span class='line'> }
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>表达式</strong>
+表达式允许你在模板中定义逻辑，比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&#39;bar-chart&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">&#39;width: %;&#39;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>Partial</em></p>
+
+<p>Partial是一个模板代码片段，它可以被插入到模板当中，或者其他的partial中。主要作用是通过抽象（或者抽取）来简化模板的内容。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="c">&lt;!-- the main template --&gt;</span>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&#39;gallery&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'>  { {#items} }
+</span><span class='line'>    { {&gt;thumbnail} }
+</span><span class='line'>  { {/items} }
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="c">&lt;!-- the partial --&gt;</span>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&#39;bogus-wrapper&#39;</span><span class="nt">&gt;&lt;notextile&gt;&lt;figure</span> <span class="na">class=</span><span class="s">&#39;thumbnail&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&#39;assets/thumbnails/.jpg&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;figcaption&gt;&lt;/figcaption&gt;</span>
+</span><span class='line'><span class="nt">&lt;/figure&gt;&lt;/notextile&gt;&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ractive</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Ractive</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">el</span><span class="o">:</span> <span class="nx">myContainer</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">template</span><span class="o">:</span> <span class="nx">myTemplate</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">partials</span><span class="o">:</span> <span class="p">{</span> <span class="nx">thumbnail</span><span class="o">:</span> <span class="nx">myThumbnailPartial</span> <span class="p">},</span>
+</span><span class='line'>  <span class="nx">data</span><span class="o">:</span> <span class="p">{</span> <span class="nx">items</span><span class="o">:</span> <span class="nx">myItems</span> <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
 <h2>双向绑定</h2>
 
 <p>数据双向绑定的概念在后端MVC中用的挺多的，比如，SpringMVC。而实现并标榜这一特性的前端框架也很多，例如Ember.js，AngularJS以及KnockoutJS。</p>
@@ -50,6 +261,15 @@
 </pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;input</span> <span class="na">value=</span><span class="s">&quot;{ {foo} }&quot;</span><span class="nt">&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="nt">&lt;input</span> <span class="na">value=</span><span class="s">&quot;{ {foo} }&quot;</span> <span class="na">twoway=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>双向绑定对contenteditable元素的支持</strong></p>
+
+<p>contenteditable是html5的属性，任何一个元素，比如div，加上contenteditable，该元素就可以被编辑了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">contenteditable=</span><span class="s">&quot;true&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -2090,323 +2310,6 @@ submit:Login</p>
 <p>上面这段代码，当用户以http协议访问/secure/**，就会先跳转到https上。</p>
 
 <p>参考资料：Spring Security Reference</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Spring Web Security 实战 (二) - 自定义登录页面]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/06/14/spring-web-security-2/"/>
-    <updated>2015-06-14T15:45:34+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/06/14/spring-web-security-2</id>
-    <content type="html"><![CDATA[<p>上一章节结尾，我们实现了Spring web security的最小实现，拦截所有url，采用表单登录，用户名和密码采用inMemory方式保存。</p>
-
-<p>你可能在想，这个登录页面从哪里来的，我们并没有直接去实现一个页面。事实上，正是因为我们没有设置登录页面，Spring Security就自动生成了一个，该页面是的Spring Security处理登录的标准页面。</p>
-
-<p>不过，我们肯定是不会想要使用Spring Security给我们提供的标准页面，除非项目刚启动，处于demo阶段，否则，肯定采用自定义页面，那么如何做到呢？</p>
-
-<p>在form-login标签提供了一个属性login-page，允许指定用户自定义的登录页面，于是，实现方式如下：</p>
-
-<p>首先定义一个登录页面JSP文件，里面的form表单和标准页面一样：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ taglib prefix=&quot;form&quot; uri=&quot;http://www.springframework.org/tags/form&quot; %&gt;
-</span><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Spring MVC Security<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;/spring-mvc-security/j_spring_security_check&quot;</span> <span class="na">method=</span><span class="s">&quot;POST&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;table&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;tbody&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;tr&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;td&gt;</span>User:<span class="nt">&lt;/td&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;td&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;j_username&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/tr&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;tr&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;td&gt;</span>Password:<span class="nt">&lt;/td&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;td&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="na">name=</span><span class="s">&quot;j_password&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/tr&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;tr&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;td</span> <span class="na">colspan=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;&lt;input</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Login&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/tr&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/tbody&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/table&gt;</span>
-</span><span class='line'><span class="nt">&lt;/form&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后定义一个对应的RequestMapping：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Controller</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">LoginController</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/login&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">login</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;login&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>最后一步，就是配置http标签的内容，有两点，第一，设置form-login的属性login-page为登录页面的url，第二，设置login页面的访问权限为IS_AUTHENTICATED_ANONYMOUSLY，必须允许匿名用户可以访问，否则怎么登录呢。代码如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;security:http&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;security:intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/login&quot;</span> <span class="na">access=</span><span class="s">&quot;IS_AUTHENTICATED_ANONYMOUSLY&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;security:intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;security:form-login</span> <span class="na">login-page=</span><span class="s">&quot;/login&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;security:logout/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/security:http&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当然，你也可以这么写，3.1之后，允许多个http标签的定义。不过这么做，相当于完全绕过Spring Security的filterChain，不在Spring Security相关管理之下。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/css/**&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/login&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span><span class="nt">/&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>匿名登录</h2>
-
-<p>你肯定会问，上面那样写和IS_AUTHENTICATED_ANONYMOUSLY有什么区别？这里参考：<a href="http://www.mossle.com/docs/auth/html/ch107-anonymous.html">http://www.mossle.com/docs/auth/html/ch107-anonymous.html</a></p>
-
-<p>”匿名登录，即用户尚未登录系统，系统会为所有未登录的用户分配一个匿名用户，这个用户也拥有自己的权限，不过他是不能访问任何被保护资源的。</p>
-
-<p>设置一个匿名用户的好处是，我们在进行权限判断时，可以保证SecurityContext中永远是存在着一个权限主体的，启用了匿名登录功能之后，我们所需要做的工作就是从SecurityContext中取出权限主体，然后对其拥有的权限进行校验，不需要每次去检验这个权限主体是否为空了。这样做的好处是我们永远认为请求的主体是拥有权限的，即便他没有登录，系统也会自动为他赋予未登录系统角色的权限，这样后面所有的安全组件都只需要在当前权限主体上进行处理，不用一次一次的判断当前权限主体是否存在。这就更容易保证系统中操作的一致性。“</p>
-
-<p>这种一致性，统一了业务层代码的实现，将匿名用户看做是用户的一种类型，只是访问权限不一样而已。关于它们的优缺点 <a href="http://www.mossle.com/docs/auth/html/ch107-anonymous.html">http://www.mossle.com/docs/auth/html/ch107-anonymous.html</a> 的最后一部分有介绍。</p>
-
-<p>设置登录后的跳转页面，form-login还提供了两个属性default-target-url和always-use-default-target。如果用户进入登录页面是因为要访问某个受限制的资源，当用户登录后，就会回到该访问资源，但是如果不是，default-target-url，就起到作用，指定了登录后的跳转页面，它的默认值是“/”。always-use-default-target的含义就很简单了，是否永远跳转，不管用户之前访问的资源。</p>
-
-<h2>处理登出</h2>
-
-<p>因为在xml配置中添加了security:logout，所以Spring Security也默认提供了一个登出URL：“/j_spring_security_logout”。</p>
-
-<h2>获得用户名</h2>
-
-<p>让Spring注入Principal即可</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Controller</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HomeController</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/home&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">home</span><span class="o">(</span><span class="n">Principal</span> <span class="n">principal</span><span class="o">,</span> <span class="n">Model</span> <span class="n">model</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">model</span><span class="o">.</span><span class="na">addAttribute</span><span class="o">(</span><span class="s">&quot;userName&quot;</span><span class="o">,</span> <span class="n">principal</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
-</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;home&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料： <br/>
-1.Spring security reference</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Spring Web Security 实战 (一) - 最少配置启动]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/06/12/spring-web-security-1/"/>
-    <updated>2015-06-12T21:12:38+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/06/12/spring-web-security-1</id>
-    <content type="html"><![CDATA[<p>你大概应该知道对于应用的安全性（无论是Web应用还是非Web应用），都包含两个方面“身份认证”（authentication）和“权限认证”（authorization，access-control）。身份认证是确立“访问者”所声称的“当事人”（principal）的一个过程（当事人可以是一个用户，设备，或者其他任何要在该应用操作的系统）。权限认证指的是确定该“当事人”是否可以在应用执行某一个操作的过程。</p>
-
-<p>Spring Security能提供的功能亦围绕着这两个核心概念展开。</p>
-
-<p>在“身份认证”方面，Spring Security能提供什么样的支持呢？如下：</p>
-
-<p>HTTP BASIC authentication headers(an IETF RFC-based standard)   <br/>
-HTTP Digest authentication headers(an IETF RFC-based standard)   <br/>
-HTTPX.509 client certificate exchange(an IETF RFC-based standard)   <br/>
-Form-based authentication(for simple user interface needs)   <br/>
-&hellip;
-更多类型，请参考Spring Security官文。</p>
-
-<p>好吧，概念性的东西就介绍到这，本篇文章以实战为主，下面我们还是来聊聊大家更关心的实现：</p>
-
-<p>在Spring Security 3.0中，相应的功能代码被分到了不同的Jar包中，以清晰的区分不同的功能和第三方依赖。下面介绍三个主要的Jar包：</p>
-
-<p>Core - spring-security-core.jar</p>
-
-<p>包含核心的“身份认证”和“访问控制”类和接口。任何Spring Security的应用都需要这个包，支持独立应用，远程客户端，方法级别（服务层）的安全，以及JDBC，主要包含下面几个顶级包：      <br/>
-org.springframework.security.core  <br/>
-org.springframework.security.access  <br/>
-org.springframework.security.authentication    <br/>
-org.springframework.security.provisioning</p>
-
-<p>Web - spring-security-web.jar</p>
-
-<p>包含对应的filter和web security相关的基础架构代码。任何与Servlet API相关的依赖。如果你需要Spring Security对web身份认证和URL级别的访问控制的支持，就需要它。里面主要包含的包是：org.springframework.security.web。</p>
-
-<p>Config - spring-security-config.jar</p>
-
-<p>包含security命名空间解析代码。如果你要使用XML方式的配置Security，那么你就会需要它。主要包含的包：org.springframework.security.config。</p>
-
-<p>以web应用和xml配置为例，要开始使用Spring Security，需要至少下面的两个依赖，web和config，web会自动依赖于core，所以不用显示的指定core。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework.security:spring-security-web:3.2.7.RELEASE&#39;</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework.security:spring-security-config:3.2.7.RELEASE&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>为了能够支持更多的Spring使用，我们以XML方法来配置Security框架。</p>
-
-<p>下面介绍下在Security命名空间下，都有哪些重要的元素节点。</p>
-
-<p>• Web/HTTP Security - 设置filter和相关的Service Bean，以应用框架的用户认证机制，安全化URL，渲染登录，错误页面等。</p>
-
-<p>• Business Object(Method) Security - 用来保证业务层的安全。</p>
-
-<p>• Authentication Manager - 处理身份认证请求</p>
-
-<p>• Access Decision Manager - 为web和method提供访问决策。框架提供了一个默认实现，你也可以自定义一个，语法和普通Bean定义一样。</p>
-
-<p>• AuthenticationProviders - 与Authentication Manager相对应的身份认真机制提供方，提供了多种标准选择，同样也支持自定义。</p>
-
-<p>• UserDetailsService - 与authentication providers联系紧密，也会被其他Bean使用。</p>
-
-<p>接下来，我们开始正式写代码。</p>
-
-<p>首先，你需要在web.xml中定义一个名字是springSecurityFilterChain的filter。它提供了一个“钩子“，来启动Spring Security Web的基础架构。DelegatingFilterProxy是Spring框架中一个类，它代理着一个以Spring Bean方式定义在Spring上下文中的filter。在本例中，bean的名字是springSecurityFilterChain，它是Spring提供的内部基础架构Bean，所以，我们定义的一些自定义的Bean的时候，就不可以使用这个名字springSecurityFilterChain。代码如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;filter&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;filter-name&gt;</span>springSecurityFilterChain<span class="nt">&lt;/filter-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;filter-class&gt;</span>org.springframework.web.filter.DelegatingFilterProxy<span class="nt">&lt;/filter-class&gt;</span>
-</span><span class='line'><span class="nt">&lt;/filter&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;filter-mapping&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;filter-name&gt;</span>springSecurityFilterChain<span class="nt">&lt;/filter-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;url-pattern&gt;</span>/*<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'><span class="nt">&lt;/filter-mapping&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>springSecurityFilterChain是由Spring框架定义。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">security</span><span class="o">.</span><span class="na">config</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">configuration</span><span class="o">;</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebSecurityConfiguration</span><span class="o">{</span>
-</span><span class='line'>  <span class="nd">@org.springframework.context.annotation.Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="o">{</span><span class="s">&quot;springSecurityFilterChain&quot;</span><span class="o">})</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">javax</span><span class="o">.</span><span class="na">servlet</span><span class="o">.</span><span class="na">Filter</span> <span class="nf">springSecurityFilterChain</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Exception</span> <span class="o">{</span> <span class="cm">/* compiled code */</span> <span class="o">}</span>   
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>做完上面的”钩子”配置，你就可以正式开始Spring上下文的定义。首先来配置Web/HTTP Security节点部分“http”：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;ROLE_USER&#39;)&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;form-login/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;logout/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/http&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面是使得Spring Security工作的最小http节点配置。安全拦截所有应用中的URL，要求访问者（“当事人”）含有ROLE_USER权限，要求使用带有用户名和密码的表单登录，并提供一个登出的URL。上面的pattern可以使用正则表达式来匹配对应路径，access中的hasRole必须配合use-expressions=&ldquo;true&#8221;才能使用（4.0以上有所不同）。如果提供多种权限，ROLE_USER后面可以以逗号分隔以允许多种权限（如果是4.0以上版本，Spring会自动给hasRole中的值加上ROLE_作为前缀，所以需要注意）。</p>
-
-<p>这里允许定义多个intercept-url以应对不同的url，比如，css，js的访问，自定义登陆页面的访问，等。由于该intercept-url会根据定义的先后顺序来解析输入的url，所以，越明确的url模式，越应该放在前面。</p>
-
-<p>note：如果你对filter比较熟悉，你应该能明白intercept-url其实是在配置FilterChainProxy所使用的filter。</p>
-
-<p>接下来，需要配置Authentication Manager：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;authentication-provider&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;user-service&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;ben&quot;</span> <span class="na">password=</span><span class="s">&quot;ben&quot;</span> <span class="na">authorities=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/user-service&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/authentication-provider&gt;</span>
-</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>authentication-provider和user-service分别创建了两个bean，DaoAuthenticationProvider和InMemoryDaoImpl。它们作为authentication-manager的子元素存在，而authentication-manager则创建了一个ProviderManager的Bean，并将authentication-provider注册到该ProviderManager。理解这段代码的含义很简单，一个用户ben，密码ben，拥有ROLE_USER这个权限。</p>
-
-<p>你还可以通过user-service上的properties属性来指定一个properties文件作为用户定义的输入。</p>
-
-<p>到此，你就完成了一个最简单的Spring Web Security的配置。拦截所有url，需要输入用户名和密码登录访问。</p>
-
-<p>参考资料：   <br/>
-1. Spring Security Reference。</p>
 ]]></content>
   </entry>
   
