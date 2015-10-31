@@ -14,7 +14,7 @@ categories:
 <div>user name: ${userName}</div>
 
 //Haml
-<div>= "user name: #{userName}"</div>
+%div = "user name: #{userName}"
 {% endcodeblock %}
 JavaScript模板引擎，顾名思义，它也是一种模板引擎，只不过由JavaScript实现，是一种前端或者说是客户端的模板引擎。
 
