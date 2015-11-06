@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-11-06T12:19:03+08:00</updated>
+  <updated>2015-11-06T14:17:17+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -243,6 +243,23 @@ Heroku Enterprise</p>
 <p>问题3：Heroku会先运行npm install，所以如果项目使用了BowerJS，那么在postInstall要进行bower install。</p>
 
 <p>问题4：确保package中，dependencies的配置是正确的，很多情况下，我们都把依赖放在了devDependencies中，但在产品环境下，应该在dependencies下。</p>
+
+<p>问题5：端口号配置</p>
+
+<p>一个Web dyno并需和传递给他的$PORT在60秒内绑定。</p>
+
+<p>所以应用程序的端口配置应该：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// set the port of our application</span>
+</span><span class='line'><span class="c1">// process.env.PORT lets the port be set by Heroku</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">8080</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Web Dynos: Web dynos are dynos of the “web” process type that is defined in your Procfile. Only web dynos receive HTTP traffic from Heroku’s routers.</p>
 
 <p>另外还有一些问题：可能出在Heroku的配置上，具体请参考<strong>Heroku官方的troubleshooting</strong>： <a href="https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate">https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate</a></p>
 
