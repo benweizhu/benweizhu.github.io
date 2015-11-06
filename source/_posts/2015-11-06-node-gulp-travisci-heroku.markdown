@@ -173,6 +173,19 @@ web: node node_modules/.bin/gulp serve:dist
 
 问题4：确保package中，dependencies的配置是正确的，很多情况下，我们都把依赖放在了devDependencies中，但在产品环境下，应该在dependencies下。
 
+问题5：端口号配置
+
+一个Web dyno并需和传递给他的$PORT在60秒内绑定。
+
+所以应用程序的端口配置应该：
+{% codeblock lang:javascript %}
+// set the port of our application
+// process.env.PORT lets the port be set by Heroku
+var port = process.env.PORT || 8080;
+{% endcodeblock %}
+
+Web Dynos: Web dynos are dynos of the “web” process type that is defined in your Procfile. Only web dynos receive HTTP traffic from Heroku’s routers.
+
 另外还有一些问题：可能出在Heroku的配置上，具体请参考**Heroku官方的troubleshooting**： https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate
 
 ##结束语
