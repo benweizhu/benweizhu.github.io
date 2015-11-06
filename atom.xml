@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-10-31T19:53:10+08:00</updated>
+  <updated>2015-11-06T12:19:03+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,253 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/11/06/node-gulp-travisci-heroku/"/>
+    <updated>2015-11-06T08:06:16+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/11/06/node-gulp-travisci-heroku</id>
+    <content type="html"><![CDATA[<p>这篇博客的起源比较有意思，客户给我们出了一道前端的开发题目，实现一个满足某种需求的web应用程序，算是某种程度的面试或者能力检测。</p>
+
+<p>开发的技术栈采用我比较熟悉的：</p>
+
+<p>环境：Node  <br/>
+脚手架，构建和依赖管理：Yoman，Gulp，Bower，NPM（Node包管理也算依赖管理吧）  <br/>
+开发框架：AngularJS，Bootstrap  <br/>
+测试框架和Runner：Karma，Protractor，Jasmine，Webdriver</p>
+
+<p>当然还有些七七八八的JavaScript类库，这里就不罗列了。</p>
+
+<p>开发时间大概用了不到一天，考虑到这些环境我都没安装，所以下载还是花了点时间的，基本的本地运行，单元测试，功能测试都完善了，本来想着已经差不多了，但作为一个在以构建，持续集成和持续交付自豪的公司（Build and CI is in our DNA）里工作的开发人员，好像还差点什么。</p>
+
+<p>没错，就是<strong>持续集成和部署到PreProduction环境或者Production环境</strong>，之前没怎么用过Heroku，所以彻底完成还是足足花费了一天的时间，也就是从开发到上线用了两天，不过这其中踩了无数的坑。</p>
+
+<p>关于开发以及构建的部分，我就不详细说明了，这与标题也不符合。</p>
+
+<h2>TravisCI</h2>
+
+<p><img src="https://travis-ci.com/img/travis-mascot-200px.png" alt="Alt text" /></p>
+
+<blockquote><p>Test and Deploy with Confidence
+Easily sync your GitHub projects with Travis CI and you’ll be testing your code in minutes!</p></blockquote>
+
+<p>TravisCI是一个免费的，可以和Github项目同步的持续集成服务器，对持续集成这个概念不懂的同学，请参考我司（我厂）高级咨询师腾云的翻译的Martin Fowler的文章《持续集成》 <a href="http://www.cnblogs.com/CloudTeng/archive/2012/02/25/2367565.html">http://www.cnblogs.com/CloudTeng/archive/2012/02/25/2367565.html</a> 。</p>
+
+<p>其实，要使用TravisCI是非常简单的，假设你是Java的项目，且采用了Maven或者Gradle做构建，那么只需要在项目中添加一个.travis.yml的文件，在里面写上language: java，提交，并在TravisCI上将项目Sync打开，就可以开始构建了。可以参考资料： <a href="http://docs.travis-ci.com/user/languages/java/">http://docs.travis-ci.com/user/languages/java/</a></p>
+
+<p>但是在本例子中，采用的是Node环境，所以相对的配置就需要有所改变。基本配置和Java环境类似：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">language</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">node_js</span>
+</span><span class='line'><span class="l-Scalar-Plain">node_js</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;4.1&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;4.0&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.12&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.11&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.10&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.8&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.6&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;iojs&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里要注意的是Node的版本，如果你使用4.0以上版本，很有可能在TravisCI上会遇到，导致npm install失败：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">../</span><span class="n">node_modules</span><span class="o">/</span><span class="n">nan</span><span class="o">/</span><span class="n">nan</span><span class="o">.</span><span class="n">h</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">3</span><span class="p">:</span> <span class="n">error</span><span class="p">:</span> <span class="c">#error This version of node/NAN/v8 requires a C++11 compiler</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>官方文档上并没有给出解决这个问题的办法，唯一的临时解决办法就是使用低于4的稳定版本，比如我使用是0.12。</p>
+
+<p>对于Node项目，TravisCI默认执行：npm test命令来运行你的测试（官方翻译：测试套件）。</p>
+
+<p>如果你查看了官方文档，项目采用Gulp做构建，它会告诉你还需要在.travis.yml文件中添加：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">before_script</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">npm install -g gulp</span>
+</span><span class='line'><span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">gulp</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果添加script: gulp，TravisCI会运行gulp，而不会运行npm test命令，所以这里取决于你的项目构建（测试）运行方式。我这里采用的npm test，因为需要同时运行单元测试和功能测试，在我的配置中，gulp任务只是最优化打包应用，所以在.travis.yml我并没有这些配置。</p>
+
+<p>官方参考文档： <a href="http://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Using-Gulp">http://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Using-Gulp</a></p>
+
+<p>我的配置全部在package.json的Script中，主要原因是为了方便Heroku部署，这里之所以需要在npm install之后运行bower install是为了功能测试能够正常运行。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;scripts&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;test&quot;</span><span class="o">:</span> <span class="s2">&quot;gulp test &amp; gulp protractor&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;start&quot;</span><span class="o">:</span> <span class="s2">&quot;./node_modules/.bin/gulp serve:dist&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;postinstall&quot;</span><span class="o">:</span> <span class="s2">&quot;./node_modules/.bin/bower install&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>到目前为止，TravisCI的配置就结束了，项目可以正常的在持续集成服务器（CI Server）上运行。</p>
+
+<h2>Heroku</h2>
+
+<p><img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/Heroku_logo.png/220px-Heroku_logo.png" alt="Alt text" /></p>
+
+<blockquote><p>Heroku (pronounced her-OH-koo) is a cloud application platform – a new way of building and deploying web apps.</p></blockquote>
+
+<p>Heroku是国外有名的云应用平台，旗下的产品有： <br/>
+Heroku Platform <br/>
+Heroku Postgres <br/>
+Heroku Redis <br/>
+Heroku Connect <br/>
+Heroku Enterprise</p>
+
+<h3>注册和安装Toolbelt</h3>
+
+<p>首先，你需要注册Heroku的账号，然后安装Heroku的Toolbelt工具。   <br/>
+可以参考： <a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up">https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up</a></p>
+
+<p>安装参考资料的提示，登录：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">heroku</span> <span class="n">login</span>
+</span><span class='line'><span class="n">Enter</span> <span class="n">your</span> <span class="n">Heroku</span> <span class="n">credentials</span><span class="o">.</span>
+</span><span class='line'><span class="n">Email</span><span class="p">:</span> <span class="n">zeke</span><span class="nd">@example.com</span>
+</span><span class='line'><span class="n">Password</span><span class="p">:</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>在Travis中配置Heroku</h3>
+
+<p>登录Heroku创建一个应用程序，名字你自己取（得小写字母）</p>
+
+<p>进入到应用，在Deploy的tab里面，你会看到一个Connect to Github，你可以选择将哪个repository和该应用关联来实现自动部署或手动部署，但TravisCI的自动部署跟它没有关系，所以你不用管它。</p>
+
+<p>你要做的是看这里： <a href="http://docs.travis-ci.com/user/deployment/heroku/">http://docs.travis-ci.com/user/deployment/heroku/</a></p>
+
+<p>在.travis.yml中配置：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">deploy</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">heroku</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">api_key</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">secure</span><span class="p-Indicator">:</span> <span class="s">&quot;YOUR</span><span class="nv"> </span><span class="s">ENCRYPTED</span><span class="nv"> </span><span class="s">API</span><span class="nv"> </span><span class="s">KEY&quot;</span>
+</span><span class='line'><span class="nn">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>虽然，你看得懂文档，但不建议手动配置，建议Travis和Heroku的客户端都安装，然后在项目目录下运行：travis setup heroku，来自动配置.travis.yml文件。</p>
+
+<p>可以参考的文档： <a href="http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/">http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/</a></p>
+
+<p>配置完成之后，.travis.yml文件大概和下面的相似：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">language</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">node_js</span>
+</span><span class='line'><span class="l-Scalar-Plain">node_js</span><span class="p-Indicator">:</span>
+</span><span class='line'><span class="p-Indicator">-</span> <span class="s">&#39;0.12&#39;</span>
+</span><span class='line'><span class="l-Scalar-Plain">deploy</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">heroku</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">api_key</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">secure</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">QFSD0pnNddlsdZ6Wm/...</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">app</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">yourapplicationname</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">on</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">repo</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">benweizhu/yourApplicationRepoName</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>提交代码之后，TravisCI就会开始在构建完成之后，开始执行部署到Heroku。</p>
+
+<p>这样就完了吗？错！！！前面已经踩过一些坑，但还不够坑。</p>
+
+<h2>现在正式开始采坑</h2>
+
+<p>执行完上面的步骤，你会发现构建是绿的，并且显示：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">-----&gt;</span> <span class="n">Compressing</span><span class="o">...</span> <span class="n">done</span><span class="p">,</span> <span class="mf">65.3</span><span class="n">MB</span>
+</span><span class='line'><span class="o">-----&gt;</span> <span class="n">Launching</span><span class="o">...</span> <span class="n">done</span><span class="p">,</span> <span class="n">v28</span>
+</span><span class='line'>       <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">yourapplicationname</span><span class="o">.</span><span class="n">herokuapp</span><span class="o">.</span><span class="n">com</span><span class="o">/</span> <span class="n">deployed</span> <span class="n">to</span> <span class="n">Heroku</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当你通过URL打开应用时，就会出现Application Error的页面。这个时候，就要开始troubleshooting了。</p>
+
+<p>首先，你需要在TravisCI上构建和部署的log，这个就不用我教了。</p>
+
+<p>如果TravisCI上没有问题，那么，你就需要查看Heroku服务器上的log，方法如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">heroku</span> <span class="n">logs</span> <span class="o">--</span><span class="n">tail</span> <span class="o">--</span><span class="n">app</span> <span class="n">appname</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>所有的出现问题/导致失败的原因都可以在log中看到。</p>
+
+<p><strong>常见问题</strong></p>
+
+<p>问题1：Heroku的Node环境启动时，运行npm start，所以，你需要配置好，package中的script命令来正确的启动服务器。你也可以配置Procfile文件，那么它就会执行文件中的命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">web</span><span class="p">:</span> <span class="n">node</span> <span class="n">node_modules</span><span class="o">/.</span><span class="n">bin</span><span class="o">/</span><span class="n">gulp</span> <span class="n">serve</span><span class="p">:</span><span class="n">dist</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>问题2：Heroku没有在全局（global）下安装gulp，所以项目的gulp需要安装在本地，在npm start的命令中也要有相应的配置，比如：gulp命令是执行本地的bin目录。</p>
+
+<p>问题3：Heroku会先运行npm install，所以如果项目使用了BowerJS，那么在postInstall要进行bower install。</p>
+
+<p>问题4：确保package中，dependencies的配置是正确的，很多情况下，我们都把依赖放在了devDependencies中，但在产品环境下，应该在dependencies下。</p>
+
+<p>另外还有一些问题：可能出在Heroku的配置上，具体请参考<strong>Heroku官方的troubleshooting</strong>： <a href="https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate">https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate</a></p>
+
+<h2>结束语</h2>
+
+<p>整个项目是一个完整的JavaScript全栈项目，从需求，到开发，最后部署，花费两天时间，虽然辛苦，但是学到不少东西。</p>
+
+<p>参考资料： <br/>
+1.<a href="http://docs.travis-ci.com/user/languages/javascript-with-nodejs/">http://docs.travis-ci.com/user/languages/javascript-with-nodejs/</a>  <br/>
+2.<a href="http://docs.travis-ci.com/user/deployment/heroku/">http://docs.travis-ci.com/user/deployment/heroku/</a>  <br/>
+3.<a href="http://www.sitepoint.com/deploying-heroku-using-gulp-node-git/">http://www.sitepoint.com/deploying-heroku-using-gulp-node-git/</a>
+4.<a href="http://www.hygkui.com/2015/03/13/%E4%BD%BF%E7%94%A8Gulp-Node-Git%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E5%88%B0Heroku%E4%B8%8A/">http://www.hygkui.com/2015/03/13/%E4%BD%BF%E7%94%A8Gulp-Node-Git%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E5%88%B0Heroku%E4%B8%8A/</a> 上面的中文版  <br/>
+5.<a href="http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/">http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/</a>  <br/>
+6.<a href="https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate">https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[SEO实战密码：URL静态化]]></title>
@@ -109,7 +356,7 @@
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Responsive Design]]></title>
+    <title type="html"><![CDATA[了解响应式设计]]></title>
     <link href="http://benweizhu.github.io/blog/2015/10/31/responsive-design/"/>
     <updated>2015-10-31T09:23:44+08:00</updated>
     <id>http://benweizhu.github.io/blog/2015/10/31/responsive-design</id>
@@ -2169,147 +2416,6 @@ AuthenticationManager返回一个完全的Authentication实例，在成功校验
 <p>事实上，Spring Security并不介意你如何将Authentication对象放到SecurityContextHolder里。唯一关键的一点是 在AbstractSecurityInterceptor需要验证一个用户操作之前，SecurityContextHolder必须包含了一个表示了主体的Authentication。</p>
 
 <p>待续。。。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Spring Web Security 实战 (三) - 改变用户认证方式和安全性]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/06/14/spring-web-security-3/"/>
-    <updated>2015-06-14T17:19:38+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/06/14/spring-web-security-3</id>
-    <content type="html"><![CDATA[<p>之前实现的表单提交方式来验证用户，实际上是不安全，http请求没有做任何的处理，表单内容以明文方式发送，在浏览器查看请求，得到结果就如下：</p>
-
-<p>j_username:ben<br/>
-j_password:ben <br/>
-submit:Login</p>
-
-<p>而且，用户名和密码保存在xml或者properties方式保存在服务器端，也是不合理的。</p>
-
-<h2>Http Basic</h2>
-
-<p>参考：<a href="http://blog.itpub.net/23071790/viewspace-709367/">http://blog.itpub.net/23071790/viewspace-709367/</a></p>
-
-<p>“在HTTP协议进行通信的过程中，HTTP协议定义了基本认证过程以允许HTTP服务器对WEB浏览器进行用户身份证的方法，当一个客户端向HTTP服务 器进行数据请求时，如果客户端未被认证，则HTTP服务器将通过基本认证过程对客户端的用户名及密码进行验证，以决定用户是否合法。客户端在接收到HTTP服务器的身份认证要求后，会提示用户输入用户名及密码，然后将用户名及密码以BASE64加密，加密后的密文将附加于请求信息中， 如当用户名为anjuta，密码为：123456时，客户端将用户名和密码用“：”合并，并将合并后的字符串用BASE64加密为密文，并于每次请求数据 时，将密文附加于请求头（Request Header）中。HTTP服务器在每次收到请求包后，根据协议取得客户端附加的用户信息（BASE64加密的用户名和密码），解开请求包，对用户名及密码进行验证，如果用 户名及密码正确，则根据客户端请求，返回客户端所需要的数据;否则，返回错误代码或重新要求客户端提供用户名及密码。”</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;security:http&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;security:intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;security:http-basic/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/security:http&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这种方式直接的表单要好点，但其实也不安全，用户名和密码可以通过BASE64反编码得到。</p>
-
-<h2>使用数据库</h2>
-
-<p>如果你想使用数据库作为身份认证的数据来源，非常简单，只需要配置一个DataSource即可。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;authentication-provider&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;jdbc-user-service</span> <span class="na">data-source-ref=</span><span class="s">&quot;securityDataSource&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/authentication-provider&gt;</span>
-</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里的securityDataSource是Spring上下文种一个DataSource Bean，它指向一个含有Spring Security“标准用户数据库表”的数据库。</p>
-
-<p>除了直接配置DataSource，你还可以配置一个Spring Security的JdbcDaoImpl的Bean，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;authentication-provider</span> <span class="na">user-service-ref=</span><span class="s">&#39;myUserDetailsService&#39;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;beans:bean</span> <span class="na">id=</span><span class="s">&quot;myUserDetailsService&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;beans:property</span> <span class="na">name=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">ref=</span><span class="s">&quot;dataSource&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/beans:bean&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>你肯定会问，这个“标准用户数据库表”的结构是什么样的。</p>
-
-<p>默认的结构是有两张表：&#8221;users&#8221;和&#8221;authorities&#8221;。Users表有三个字段username，password，enabled。Authorities表有两个字段username，authority</p>
-
-<p>如果你不满意标准的表结构，你还可以实现AuthenticationProvider接口自定义实现。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;authentication-provider</span> <span class="na">ref=</span><span class="s">&#39;myAuthenticationProvider&#39;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>添加Password编码器</h2>
-
-<p>将密码以明文的方式存放在代码中或者是数据库中，始终是不安全的，AuthenticationProvider允许设置密码的加密编码。并且应该使用为此目的而设计的标准的安全hash算法，而不是一般的SHA或者MD5哈希算法。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;bean</span> <span class="na">name=</span><span class="s">&quot;bcryptEncoder&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;authentication-provider&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;password-encoder</span> <span class="na">ref=</span><span class="s">&quot;bcryptEncoder&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;user-service&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;jimi&quot;</span> <span class="na">password=</span><span class="s">&quot;d7e6351eaa13189a5a3641bab846c8e8c69ba39f&quot;</span>
-</span><span class='line'>                  <span class="na">authorities=</span><span class="s">&quot;ROLE_USER, ROLE_ADMIN&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;bob&quot;</span> <span class="na">password=</span><span class="s">&quot;4e7421b1b8765d8f9406d87e7cc6aa784c4ab97f&quot;</span> <span class="na">authorities=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/user-service&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/authentication-provider&gt;</span>
-</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Bcrypt是Spring文档里推荐的hash算法，它是一个跨平台的文件加密工具。由它加密的文件可在所有支持的操作系统和处理器上进行转移。它的口令必须是8至56个字符，并将在内部被转化为448位的密钥。（来自-百度百科）</p>
-
-<h2>HTTPS</h2>
-
-<p>很多情况下我们依旧需要采用以表单的方式来实现身份认真，就必须要避免，表单数据，即用户名和密码在HTTP协议下以明文传输。</p>
-
-<p>Spring Security可以非常方面的支持要求某些URL必须是在https协议下才可以访问。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;http&gt;</span>
-</span><span class='line'><span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/secure/**&quot;</span> <span class="na">access=</span><span class="s">&quot;ROLE_USER&quot;</span> <span class="na">requires-channel=</span><span class="s">&quot;https&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;ROLE_USER&quot;</span> <span class="na">requires-channel=</span><span class="s">&quot;any&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>...
-</span><span class='line'><span class="nt">&lt;/http&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面这段代码，当用户以http协议访问/secure/**，就会先跳转到https上。</p>
-
-<p>参考资料：Spring Security Reference</p>
 ]]></content>
   </entry>
   
