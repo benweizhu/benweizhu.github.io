@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-11-07T18:19:37+08:00</updated>
+  <updated>2015-11-07T21:39:56+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -314,6 +314,12 @@ DaoCloud 对接 GitHub、Coding、GitCafe 等国内外代码托管库，采用�
 <p>script脚本，也就是你的构建执行命令了，比如：./gradlew clean build</p>
 
 <p>配置完成后，提交代码，就可以触发CI构建。</p>
+
+<h2>微信提醒功能</h2>
+
+<p>DaoCloud还可以和微信绑定，提供构建状态提醒，这样就不需要Build TV，直接手机微信提醒。</p>
+
+<h2>结束语</h2>
 
 <p>我的项目花费了大概半天的时间，就配置成功了，当然这包括项目本身的一些配置，与平台无关。</p>
 
