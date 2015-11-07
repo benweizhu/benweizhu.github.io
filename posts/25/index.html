@@ -9,11 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在AngularJS中，视图是模型在模板中的映射的结果（模型（Model）和视图模型的绑定（View Model））。这意味当模型发生变化时，视图上的绑定内容会对应更新。 模型 看第一个的例子，模型与模板： 1
-2
-3
-4
-&lt;body ng-app&gt; &lt;input type=& &hellip;">
+  <meta name="description" content="什么是作用域？它做了些什么事情？ 作用域是一个存储应用数据模型的对象 没错，它是概念也是一个对象 作用域为表达式提供了一个执行上下文 作用域为表达式提供执行环境，比如像表达式{ {name} }，必须在一个拥有该属性的作用域中才能执行 作用域的层级结构对应于DOM树结构 一个应用可以有多个作用域， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -68,6 +64,134 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/12/26/yes-angularjs-3/">开始！AngularJS!（三）- 深入作用域</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-12-26T22:58:34+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>10:58 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>什么是作用域？它做了些什么事情？</h3>
+
+<p><strong>作用域是一个存储应用数据模型的对象</strong> <br/>
+没错，它是概念也是一个对象</p>
+
+<p><strong>作用域为表达式提供了一个执行上下文</strong> <br/>
+作用域为表达式提供执行环境，比如像表达式{ {name} }，必须在一个拥有该属性的作用域中才能执行</p>
+
+<p><strong>作用域的层级结构对应于DOM树结构</strong> <br/>
+一个应用可以有多个作用域，当新作用域被创建的时候，他们会被当成子作用域添加到父作用域下，这使得作用域会变成一个和相应DOM结构一个的树状结构。</p>
+
+<p><strong>作用域可以监听表达式的变化并传播事件</strong>  <br/>
+作用域提供了($watch)方法监听数据模型的变化<br/>
+作用域提供了($apply)方法把不是由Angular触发的数据模型的改变引入Angular的控制范围内（如控制器，服务，及Angular事件处理器等）</p>
+
+<p><strong>作用域是Web应用的控制器和视图之间的粘结剂</strong><br/>
+控制器和指令都持有作用域的引用，于是我们可以这样理解它们之间的传递关系：<br/>
+控制器 &ndash;> 作用域 &ndash;> 视图（DOM）<br/>
+指令 &ndash;> 作用域 &ndash;> 视图（DOM）</p>
+
+<h3>何时会产生一个作用域？</h3>
+
+<p>于是，你肯定会想要知道，一个作用域的范围是什么？即何时会产生一个作用域？</p>
+
+<p>1.创建控制器时会产生作用域（这个很明显，控制器的构造函数会传入$scope对象） <br/>
+2.某些指令也会产生作用域</p>
+
+<h3>作用域层级</h3>
+
+<p>一般情况下，当新的作用域被创建时，它是以子级的形式被创建，嵌入在当前父级作用域，这样就形成了与其所关联的DOM树相对应的一个作用域的树结构。</p>
+
+<h3>继承</h3>
+
+<p>作用域中定义的属性对于所有子作用域都是可见的，只要子作用域没有定义同名属性。</p>
+
+<p>换句话说，当AngularJS执行表达式{ {name} }，它首先会在与当前节点相关的作用域中查找叫做name的属性。如果没找到，则继续向上层作用域搜索，直到根作用域$rootScope。在Javascript中，这被称为原型类型的继承，子作用域以原型的形式继承自父作用域。</p>
+
+<p>上面引入了一个新的概念和对象根作用域$rootScope，正如上面所介绍的，作用域的结构对应于DOM结构，那么最顶层，就和DOM树有根节点一样，每个Angular应用有且仅有一个 根作用域$rootScope。</p>
+
+<p>我们来看个一个具体的例子，贯穿一下上面所提到的概念：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;listApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;listController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        my name is <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;ul</span> <span class="na">ng-repeat=</span><span class="s">&quot;friend in friends&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;li&gt;</span>Hi { {friend} }, { {introduce()} }<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/ul&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s2">&quot;listApp&quot;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s2">&quot;listController&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">friends</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Lily&quot;</span><span class="p">,</span><span class="s2">&quot;Kate&quot;</span><span class="p">,</span><span class="s2">&quot;Mike&quot;</span><span class="p">];</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">introduce</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s2">&quot;this is &quot;</span> <span class="o">+</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/wLufL8p1/1/">http://jsfiddle.net/benweizhu/wLufL8p1/1/</a></p>
+
+<p>在这个例子中，你可能会看到和上一节定义控制器的方式不同。没错，上一节已经说过，以直接定义函数的方式定义控制器并不是常用的方式，只是为了让你知道控制器的本质是函数。</p>
+
+<p>这里你不用关心定义控制器的方式，之后的章节会讲解。你需要知道的是，这里定义了一个app叫做listApp，里面定义了一个控制器listController。在这个控制器中定义了两个模型(Model)对象name，数组friends和一个函数introduce()，在模板(HTML)上使用了ng-repeat指令来迭代数组friends里面的结果，通过表达式来解析遍历结果和调用函数。</p>
+
+<p>在控制器中初始化了friends，映射了这样的传递关系：控制器 &ndash;> 作用域 &ndash;> 视图（DOM）</p>
+
+<p>有一点要注意的，指令ng-repeat在执行时，会在每一次遍历都创建一个名字是friend的变量，但是你从结果中看到，页面上friend的值并没有重复。那是因为，AngularJS将每个friend都放在了不同的作用域中，这就是上面提到的，某些指令会产生作用域。</p>
+
+<p>于是乎，在这个app中，就不止一个作用域了，有四个作用域，其中三个作用域是同级的，它们都嵌入在父作用域listController。根据继承的关系，父作用域中的属性对子作用域是可见的，所以{ {introduce()} }表达式可以调用函数introduce。</p>
+
+<p>如果你希望更深入的了解作用域的层级和产生，可以运用Chrome的插件Batarang，它可以帮助你分析AngularJS层级结构。</p>
+
+<p>参考资料：</p>
+
+<p>1.《精通AngularJS》<br/>
+2.<a href="http://www.ngnice.com/docs/guide/scope">http://www.ngnice.com/docs/guide/scope</a> <br/>
+3.<a href="http://www.angularjs.cn/A00y">http://www.angularjs.cn/A00y</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -183,123 +307,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/12/19/yes-angularjs-1/">开始！AngularJS!（一）- 刚刚开始</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-12-19T21:54:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:54 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>看这样一个例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;textLengthLimitController&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;textarea</span> <span class="na">ng-model=</span><span class="s">&quot;text&quot;</span><span class="nt">&gt;&lt;/textarea&gt;</span> <span class="nt">&lt;span&gt;&lt;/span&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">ng-disabled=</span><span class="s">&quot;!hasValidLength()&quot;</span> <span class="na">value=</span><span class="s">&quot;send&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">MAX_LENGTH</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">function</span> <span class="nx">textLengthLimitController</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">remaining</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">MAX_LENGTH</span> <span class="o">-</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">hasValidLength</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">remaining</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>代码的功能是告诉用户还可输入多少字符，当字符超过限制，将发送按钮灰掉。在jsFiddle里运行该代码，<a href="http://jsfiddle.net/benweizhu/cbcn995m/">http://jsfiddle.net/benweizhu/cbcn995m/</a></p>
-
-<p>这里做了几件事情：<br/>
-1.定义页面（HTML页面）<br/>
-2.定义期待行为（remaining()和ng-disabled）<br/>
-3.定义行为发生的逻辑（MAX_LENGTH - $scope.text.length和$scope.remaining() >= 0）</p>
-
-<p>剩下最复杂的事情：对DOM元素的操作，交给了AngularJS来做。</p>
-
-<p><strong>引用AngularJS官方文档对AngularJS的介绍：</strong></p>
-
-<p>“AngularJS是一个开发动态Web应用的框架。它让你可以使用HTML作为模板语言并且可以通过扩展的HTML语法来使应用组件更加清晰和简洁。它的创新之处在于，通过数据绑定和依赖注入减少了大量代码，而这些都在浏览器端通过JavaScript实现，能够和任何服务器端技术完美结合。”</p>
-
-<p>就像文档介绍的那样，HTML本身是静态文档，是很好的声明式语言，但对于构建动态的web应用，却无能为力。</p>
-
-<p>针对这类问题，通常的解决办法是：通过JavaScript对HTML的DOM结构进行修改。比如，jQuery。</p>
-
-<p>而AngularJS另辟蹊径，通过扩展HTML的语法来拉近静态Web和动态Web之间的距离。</p>
-
-<p><strong>&ldquo;Angular是建立在这样的信念之上的：即声明式的代码用在构建用户界面和组装软件组件时更好，而命令式的代码更擅长展现业务逻辑。&rdquo;</strong></p>
-
-<p>AngularJS将应用逻辑与DOM操作解耦，让开发人员不用去担心去前端视图模型（View Model）改变，从而大大提高代码的可测试性。</p>
-
-<p>AngularJS试图去实现一个完整的前端解决方案：</p>
-
-<p>1.构建一个CRUD应用时可能用到的所有技术：数据绑定、基本模板指令、表单验证、路由、深度链接、组件重用、依赖注入<br/>
-2.可测试性：单元测试、端到端测试、模拟对象（mocks）、测试工具</p>
-
-<p>在一个以用户体验，多平台（Web和移动）为核心的现代应用时代，单页应用以前端+API成为了Web应用的开发的趋势：</p>
-
-<p>1.对于内容的改动不需要加载整个页面 <br/>
-2.对服务器压力很小，消耗更少的带宽，与面向服务的架构更好地结合<br/>
-3.多平台使用相同的API，减少后台逻辑的重复开发</p>
-
-<p>AngularJS给现代Web应用开发带来曙光，让我们一起认认真真学习AngularJS。</p>
-
-<p>参考资料：</p>
-
-<p>1.《精通AngularJS》<br/>
-2.<a href="http://www.ngnice.com/docs/guide/introduction">http://www.ngnice.com/docs/guide/introduction</a> <br/>
-3.<a href="http://www.csdn.net/article/2012-12-10/2812658-Single-Page-Applications">http://www.csdn.net/article/2012-12-10/2812658-Single-Page-Applications</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/26">&larr; Older</a>
@@ -325,6 +332,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
       </li>
     
@@ -338,10 +349,6 @@
     
       <li class="post">
         <a href="/blog/2015/10/31/responsive-design/">了解响应式设计</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/10/28/ractivejs/">了解RactiveJS</a>
       </li>
     
   </ul>

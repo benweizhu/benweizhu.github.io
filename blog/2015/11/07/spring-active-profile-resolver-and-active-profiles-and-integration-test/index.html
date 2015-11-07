@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>NO END FOR LEARNING</title>
+  <title>Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置 - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -62,15 +62,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a></h1>
+      <h1 class="entry-title">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</h1>
     
     
       <p class="meta">
@@ -86,7 +83,7 @@
   </header>
 
 
-  <div class="entry-content"><h2>场景</h2>
+<div class="entry-content"><h2>场景</h2>
 
 <p>在运行集成测试的时候，很可能会遇到这样一种情况：</p>
 
@@ -246,182 +243,65 @@
 <p>参考资料：  <br/>
 1.<a href="http://stackoverflow.com/questions/20551681/spring-integration-tests-with-profile">http://stackoverflow.com/questions/20551681/spring-integration-tests-with-profile</a> 作答人：Sam (author of the Spring TestContext Framework)</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-11-07T17:46:18+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>5:46 pm</span></time>
+      
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-11-07T13:14:19+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:14 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>昨天无意间搜索到一篇文章： <a href="http://blog.daocloud.io/daocloud_coding/">http://blog.daocloud.io/daocloud_coding/</a> DaoCloud完成与Coding对接</p>
-
-<p>这让我感到很兴奋，原因是我搜索的关键字是“coding.net 持续集成”。</p>
-
-<p>有一个项目放在coding平台的私有库中，一直没有做持续集成，如果是放在github的公有库，倒是可以用TravisCI做，但是这个项目不是开源的，一直希望找到一个国内的类似TravisCI的服务，直到昨天。</p>
-
-<h2>DaoCloud</h2>
-
-<p><img src="http://blog.daocloud.io/wp-content/uploads/2015/06/Logo_2.jpg" alt="Alt text" /></p>
-
-<p>DaoCloud 是业界领先的企业级容器云平台和解决方案提供商，致力于以 Docker 为代表的容器技术，为企业打造面向下一代互联网应用的交付和运维平台，帮助客户实现云端持续创新，&hellip;.，等等。就不帮别人打广告了。</p>
-
-<p>对我来说最重要的是：  <br/>
-DaoCloud 对接 GitHub、Coding、GitCafe 等国内外代码托管库，采用云端 SaaS 化服务，帮助开发者实现自动化持续集成测试和 Docker 容器镜像构建。DaoCloud 镜像构建服务基于全球分布式网路，构建速度极快，提供私有镜像存储空间，为容器化交付和跨团队合作奠定了基础。</p>
-
-<h3>如何使用</h3>
-
-<p>其实它提供的持续集成服务和TravisCI有点类似，至少从使用者的角度，是这么理解的。</p>
-
-<p>目前支持如下语言和服务：</p>
-
-<p>语言：Golang、Python、Ruby、Java、Javascript（NodeJS）、PHP、C（gcc） <br/>
-服务：MySQL、Redis、MongoDB</p>
-
-<p>服务指的意思是，比如：构建需要集成测试或者功能测试，那么它可以提供三种数据库供你使用。</p>
-
-<p>和TravisCI类似，需要你提供一个daocloud.yml，格式如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">image</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">daocloud/ci-golang:1.4</span>
-</span><span class='line'>
-</span><span class='line'><span class="l-Scalar-Plain">services</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">mongodb</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">mysql</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">redis</span>
-</span><span class='line'>
-</span><span class='line'><span class="l-Scalar-Plain">env</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">MYENV = &quot;hello&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="l-Scalar-Plain">install</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an install segment&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Here, we usually run scripts to setup a base environment&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;For customized base image, you need to install git here unless you have git installed in your base image&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;e.g., apt-get install -y git-core&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="l-Scalar-Plain">before_script</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an before_script segment&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Here, we usually run scripts to prepare our test&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an script segment&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Run test cases here&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Below shows how to use services, mongodb/mysql/redis are the hostnames of services&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 mongodb</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 mysql</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 redis</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>image是指定构建运行的环境镜像，除了上面的go语言，还有其他node，java，php，ruby等，在文章底部的参考资料中可以找到。</p>
-
-<h3>服务</h3>
-
-<p>service也就是你需要的数据库服务了，举个例子，假设，你指定了mysql。那么它提供的mysql的配置如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="err">Version：MySQL</span> <span class="err">5.5</span>
-</span><span class='line'><span class="na">Docker Link Alias</span><span class="o">:</span> <span class="s">mysql</span>
-</span><span class='line'><span class="na">Host</span><span class="o">:</span> <span class="s">mysql</span>
-</span><span class='line'><span class="na">Port</span><span class="o">:</span> <span class="s">3306</span>
-</span><span class='line'><span class="na">UserName</span><span class="o">:</span> <span class="s">root</span>
-</span><span class='line'><span class="na">Password</span><span class="o">:</span> <span class="s">不设密码</span>
-</span><span class='line'><span class="na">Default Instance</span><span class="o">:</span> <span class="s">test</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>所以，项目中的测试在连接数据库的时候，也需要对应配置，否则就连接不上。</p>
-
-<h3>执行顺序</h3>
-
-<p>设置环境变量。 <br/>
-执行 install 脚本。 <br/>
-克隆源代码，切换到对应的提交。 <br/>
-执行 before_script 脚本。 <br/>
-执行 script 脚本。</p>
-
-<p>script脚本，也就是你的构建执行命令了，比如：./gradlew clean build</p>
-
-<p>配置完成后，提交代码，就可以触发CI构建。</p>
-
-<p>我的项目花费了大概半天的时间，就配置成功了，当然这包括项目本身的一些配置，与平台无关。</p>
-
-<p>参考资料：  <br/>
-1.<a href="http://help.daocloud.io/features/continuous-integration/daocloud-yml.html">http://help.daocloud.io/features/continuous-integration/daocloud-yml.html</a></p>
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/11/07/coding-net-and-dao-cloud/" title="Previous Post: 通过DaoCloud配置Coding平台的持续集成服务">&laquo; 通过DaoCloud配置Coding平台的持续集成服务</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
 
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/posts/2">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -509,6 +389,7 @@ DaoCloud 对接 GitHub、Coding、GitCafe 等国内外代码托管库，采用�
 
   
 </aside>
+
 
     </div>
   </div>
