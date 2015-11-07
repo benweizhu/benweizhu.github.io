@@ -9,12 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="模板引擎这个概念，相信对大家并不陌生，如果做过Java EE的开发，或者Rails开发，那么Jsp，Erb，Haml都是一种模板引擎，也许你还听说过Apache的velocity，只不过它们是后端的模板引擎，模板的渲染由服务器端完成。 比如这样的代码： 1
-2
-3
-4
-5
-//Jsp With &hellip;">
+  <meta name="description" content="Ractive is a next-generation DOM manipulation library for creating reactive user interfaces, optimised for developer sanity. It was originally &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -69,6 +64,186 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/10/28/ractivejs/">了解RactiveJS</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-10-28T14:13:53+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:13 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><blockquote><p>Ractive is a next-generation DOM manipulation library for creating reactive user interfaces, optimised for developer sanity. It was originally developed to create interactive news applications at theguardian.com.</p>
+
+<p>Ractive.js is a template-driven UI library, but unlike other tools that generate inert HTML, it transforms your templates into blueprints for apps that are interactive by default.</p>
+
+<p>Two-way binding, animations, SVG support and more are provided out-of-the-box – but you can add whatever functionality you need by downloading and creating plugins.</p></blockquote>
+
+<p>看看Ractive的介绍，你能够看明白，RactiveJS是干嘛的吗？</p>
+
+<p>1.为用户界面交互提供的下一代DOM操作类库（这是要干掉jQuery的节奏吗？）  <br/>
+2.模板驱动的UI库（模板的概念可以看看我一篇关于《JavaScript模板引擎》的文章），但不同于其他工具产生可以插入的HTML代码，它将模板变成了用户交互的蓝图。 <br/>
+3.双向绑定，动画，和SVG支持等开箱即用的功能。</p>
+
+<p>花费60秒去看一下，官方的《60 second setup》， <a href="http://www.ractivejs.org/60-second-setup">http://www.ractivejs.org/60-second-setup</a></p>
+
+<p>你会发现，这不就是JavaScript模板引擎吗？只不过不需要你，手动将编译得到的HTML片段添加到指定的元素上。</p>
+
+<p>但实际上，还远远不止如此。</p>
+
+<h2>模板引擎</h2>
+
+<p>就像它自己介绍的和你在《60 second setup》中看到了那样，Ractive和模板引擎有很强的关联性，它要求所使用的HTML模板片段是严格符合HTML标准的（不会像浏览器那样，允许一些未关闭的标签）。</p>
+
+<p><strong>引用</strong></p>
+
+<p>在这个模板引擎中有一个“引用”的概念，其实指的就是模板中的占位符变量，比如《60 second setup》中的name变量。</p>
+
+<p>因为在定义的Ractive实例中有一个data属性，包含了所有的“引用”变量，在这里又引入一个context上下文的概念。通过定义上下文（比如messages和user），你就可以不需要messages.total来指定占位符，而是这样：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>{ {#user} }
+</span><span class='line'>  <span class="nt">&lt;p&gt;</span>Welcome back, { {name} }!
+</span><span class='line'>    { {#messages} }
+</span><span class='line'>      You have { {unread} } unread of { {total} } total messages.
+</span><span class='line'>    { {/messages} }
+</span><span class='line'>  <span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>{ {/user} }
+</span><span class='line'>
+</span><span class='line'>data: {//data长这个样
+</span><span class='line'>    user: {
+</span><span class='line'>      name: &#39;Jim&#39;,
+</span><span class='line'>      messages: {
+</span><span class='line'>        total: 10,
+</span><span class='line'>        unread: 3
+</span><span class='line'>      },
+</span><span class='line'>      lastLogin: &#39;Wednesday&#39;
+</span><span class='line'>    }
+</span><span class='line'> }
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>表达式</strong>
+表达式允许你在模板中定义逻辑，比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&#39;bar-chart&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">&#39;width: %;&#39;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>Partial</em></p>
+
+<p>Partial是一个模板代码片段，它可以被插入到模板当中，或者其他的partial中。主要作用是通过抽象（或者抽取）来简化模板的内容。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="c">&lt;!-- the main template --&gt;</span>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&#39;gallery&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'>  { {#items} }
+</span><span class='line'>    { {&gt;thumbnail} }
+</span><span class='line'>  { {/items} }
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="c">&lt;!-- the partial --&gt;</span>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&#39;bogus-wrapper&#39;</span><span class="nt">&gt;&lt;notextile&gt;&lt;figure</span> <span class="na">class=</span><span class="s">&#39;thumbnail&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&#39;assets/thumbnails/.jpg&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;figcaption&gt;&lt;/figcaption&gt;</span>
+</span><span class='line'><span class="nt">&lt;/figure&gt;&lt;/notextile&gt;&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ractive</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Ractive</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">el</span><span class="o">:</span> <span class="nx">myContainer</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">template</span><span class="o">:</span> <span class="nx">myTemplate</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">partials</span><span class="o">:</span> <span class="p">{</span> <span class="nx">thumbnail</span><span class="o">:</span> <span class="nx">myThumbnailPartial</span> <span class="p">},</span>
+</span><span class='line'>  <span class="nx">data</span><span class="o">:</span> <span class="p">{</span> <span class="nx">items</span><span class="o">:</span> <span class="nx">myItems</span> <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>双向绑定</h2>
+
+<p>数据双向绑定的概念在后端MVC中用的挺多的，比如，SpringMVC。而实现并标榜这一特性的前端框架也很多，例如Ember.js，AngularJS以及KnockoutJS。</p>
+
+<p>默认情况下，如果你有使用input，textarea或者select等元素，Ractive实例会基于用户的输入更新它的内部模型。</p>
+
+<p>如果你不想在某一个元素上使用双向绑定，你可以通过设置twoway: false属性，将该特性disable。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;input</span> <span class="na">value=</span><span class="s">&quot;{ {foo} }&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;input</span> <span class="na">value=</span><span class="s">&quot;{ {foo} }&quot;</span> <span class="na">twoway=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>双向绑定对contenteditable元素的支持</strong></p>
+
+<p>contenteditable是html5的属性，任何一个元素，比如div，加上contenteditable，该元素就可以被编辑了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">contenteditable=</span><span class="s">&quot;true&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -267,270 +442,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/10/27/sass-basic/">重温SASS基础</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-10-27T14:18:48+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:18 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>最早因为Bootstrap接触到了LESS，但LESS随着时间，使用的人越来越少，大家都开始转向SASS，至于为什么，原因很多，大家可以去网上搜索，有很多人都对比了LESS和SASS。今天主要是来回顾SASS的基础知识。</p>
-
-<p>CSS很好，但是随着stylesheets的内容增多，变得越来越复杂，也越来越难以维护。此时，CSS预处理器横空出世，SASS就是其中一种。</p>
-
-<p>SASS允许你做许多在CSS中做不了的事情，比如：变量，网状结构（接近DOM结构），mixin，继承等。</p>
-
-<h3>变量</h3>
-
-<p>Sass使用$符号定义变量，就和其他编程语言一定，它可以被赋值和重复使用。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">$</span><span class="nt">font-stack</span><span class="o">:</span>    <span class="nt">Helvetica</span><span class="o">,</span> <span class="nt">sans-serif</span><span class="o">;</span>
-</span><span class='line'><span class="o">$</span><span class="nt">primary-color</span><span class="o">:</span> <span class="nf">#333</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">body</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">font</span><span class="o">:</span> <span class="m">100%</span> <span class="err">$</span><span class="k">font</span><span class="o">-</span><span class="n">stack</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">color</span><span class="o">:</span> <span class="err">$</span><span class="n">primary</span><span class="o">-</span><span class="k">color</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>网状结构</h3>
-
-<p>Sass比CSS强大的一点是，可读性好，CSS有后代选择器和权重的知识，它们与DOM结构息息相关，但是CSS本身却没有很好的语法结构来反映这种结构，Sass做到了这一点。</p>
-
-<p>Sass让你的css选择器符合真实的HTML层次结构，当然Sass官方也提示如果过度的使用网状结构，也会导致CSS很难维护。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">nav</span> <span class="p">{</span>
-</span><span class='line'>  <span class="n">ul</span> <span class="err">{</span>
-</span><span class='line'>    <span class="k">margin</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">padding</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">list-style</span><span class="o">:</span> <span class="k">none</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nt">li</span> <span class="p">{</span> <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nt">a</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">display</span><span class="o">:</span> <span class="k">block</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">padding</span><span class="o">:</span> <span class="m">6px</span> <span class="m">12px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">text-decoration</span><span class="o">:</span> <span class="k">none</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="err">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面的例子中，ul和li是在nav结构之中的。</p>
-
-<h3>通过Partial和Import来做模块化</h3>
-
-<p>CSS本身也是有import功能的，但是缺点是，它会在页面中单独发送一个Http请求来获取这个import进来的css。</p>
-
-<p>Sass是一个CSS预处理器，它的import是建立在编译过程中，将两个或者多个文件合并，所以机制完全不同。</p>
-
-<p>比如，有_reset.scss和base.scss两个文件，注意，定义Partial的sass文件是以下划线开头的。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">//</span> <span class="nt">_reset</span><span class="nc">.scss</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">html</span><span class="o">,</span>
-</span><span class='line'><span class="nt">body</span><span class="o">,</span>
-</span><span class='line'><span class="nt">ul</span><span class="o">,</span>
-</span><span class='line'><span class="nt">ol</span> <span class="p">{</span>
-</span><span class='line'>   <span class="k">margin</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">padding</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">//</span> <span class="nt">base</span><span class="nc">.scss</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">@import</span> <span class="s1">&#39;reset&#39;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">body</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">font</span><span class="o">:</span> <span class="m">100%</span> <span class="n">Helvetica</span><span class="o">,</span> <span class="k">sans-serif</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="m">#efefef</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Mixins</h3>
-
-<p>Mixins是一个非常有用的功能，Mixins允许你将一组css定义在不同的位置重用，而且还可以像函数一样传递变量。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="k">@mixin</span> <span class="nt">border-radius</span><span class="o">($</span><span class="nt">radius</span><span class="o">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nt">-webkit-border-radius</span><span class="o">:</span> <span class="o">$</span><span class="nt">radius</span><span class="o">;</span>
-</span><span class='line'>     <span class="nt">-moz-border-radius</span><span class="o">:</span> <span class="o">$</span><span class="nt">radius</span><span class="o">;</span>
-</span><span class='line'>      <span class="nt">-ms-border-radius</span><span class="o">:</span> <span class="o">$</span><span class="nt">radius</span><span class="o">;</span>
-</span><span class='line'>          <span class="nt">border-radius</span><span class="o">:</span> <span class="o">$</span><span class="nt">radius</span><span class="o">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.box</span> <span class="p">{</span> <span class="o">@</span><span class="n">include</span> <span class="k">border</span><span class="o">-</span><span class="n">radius</span><span class="p">(</span><span class="m">10px</span><span class="p">);</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Extend/Inheritance继承</h3>
-
-<p>通过@extend关键字，你可以让一系列的在某个选择器中css属性，在另一个css选择器中继承，也是重用css定义的一种模式。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.message</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">border</span><span class="o">:</span> <span class="m">1px</span> <span class="k">solid</span> <span class="m">#ccc</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">padding</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">color</span><span class="o">:</span> <span class="m">#333</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.success</span> <span class="p">{</span>
-</span><span class='line'>  <span class="o">@</span><span class="n">extend</span> <span class="o">.</span><span class="n">message</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">border-color</span><span class="o">:</span> <span class="nb">green</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.error</span> <span class="p">{</span>
-</span><span class='line'>  <span class="o">@</span><span class="n">extend</span> <span class="o">.</span><span class="n">message</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">border-color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.warning</span> <span class="p">{</span>
-</span><span class='line'>  <span class="o">@</span><span class="n">extend</span> <span class="o">.</span><span class="n">message</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">border-color</span><span class="o">:</span> <span class="nb">yellow</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Operators操作符/运算符</h3>
-
-<p>Sass可以轻易的进行数学运算，+, -, *, /, %</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.container</span> <span class="p">{</span> <span class="k">width</span><span class="o">:</span> <span class="m">100%</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">article</span><span class="o">[</span><span class="nt">role</span><span class="o">=</span><span class="s2">&quot;main&quot;</span><span class="o">]</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">float</span><span class="o">:</span> <span class="k">left</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">600px</span> <span class="o">/</span> <span class="m">960px</span> <span class="o">*</span> <span class="m">100%</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">aside</span><span class="o">[</span><span class="nt">role</span><span class="o">=</span><span class="s2">&quot;complimentary&quot;</span><span class="o">]</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">float</span><span class="o">:</span> <span class="k">right</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">300px</span> <span class="o">/</span> <span class="m">960px</span> <span class="o">*</span> <span class="m">100%</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Data Types有用的数据类型</h3>
-
-<p>SassScript支持七种主要的数据类型</p>
-
-<p>numbers (e.g. 1.2, 13, 10px) <br/>
-strings of text, with and without quotes (e.g. &ldquo;foo&rdquo;, &lsquo;bar&rsquo;, baz) <br/>
-colors (e.g. blue, #04a3f9, rgba(255, 0, 0, 0.5)) <br/>
-booleans (e.g. true, false) <br/>
-nulls (e.g. null) <br/>
-lists of values, separated by spaces or commas (e.g. 1.5em 1em 0 2em, Helvetica, Arial, sans-serif) <br/>
-maps from one value to another (e.g. (key1: value1, key2: value2))</p>
-
-<p>比如：map</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">$</span><span class="nt">map</span><span class="o">:</span> <span class="o">(</span><span class="nt">key1</span><span class="o">:</span> <span class="nt">value1</span><span class="o">,</span> <span class="nt">key2</span><span class="o">:</span> <span class="nt">value2</span><span class="o">,</span> <span class="nt">key3</span><span class="o">:</span> <span class="nt">value3</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考文献： <br/>
-1.SASS官方文档</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/4">&larr; Older</a>
@@ -556,6 +467,10 @@ maps from one value to another (e.g. (key1: value1, key2: value2))</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
       </li>
     
@@ -569,10 +484,6 @@ maps from one value to another (e.g. (key1: value1, key2: value2))</p>
     
       <li class="post">
         <a href="/blog/2015/10/28/ractivejs/">了解RactiveJS</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/10/28/js-template-engine/">了解JavaScript模板引擎</a>
       </li>
     
   </ul>

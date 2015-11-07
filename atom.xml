@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-11-06T14:17:17+08:00</updated>
+  <updated>2015-11-07T13:46:15+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,148 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[通过DaoCloud配置Coding平台的持续集成服务]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/11/07/coding-net-and-dao-cloud/"/>
+    <updated>2015-11-07T13:14:19+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/11/07/coding-net-and-dao-cloud</id>
+    <content type="html"><![CDATA[<p>昨天无意间搜索到一篇文章： <a href="http://blog.daocloud.io/daocloud_coding/">http://blog.daocloud.io/daocloud_coding/</a> DaoCloud完成与Coding对接</p>
+
+<p>这让我感到很兴奋，原因是我搜索的关键字是“coding.net 持续集成”。</p>
+
+<p>有一个项目放在coding平台的私有库中，一直没有做持续集成，如果是放在github的公有库，倒是可以用TravisCI做，但是这个项目不是开源的，一直希望找到一个国内的类似TravisCI的服务，直到昨天。</p>
+
+<h2>DaoCloud</h2>
+
+<p><img src="http://blog.daocloud.io/wp-content/uploads/2015/06/Logo_2.jpg" alt="Alt text" /></p>
+
+<p>DaoCloud 是业界领先的企业级容器云平台和解决方案提供商，致力于以 Docker 为代表的容器技术，为企业打造面向下一代互联网应用的交付和运维平台，帮助客户实现云端持续创新，&hellip;.，等等。就不帮别人打广告了。</p>
+
+<p>对我来说最重要的是：  <br/>
+DaoCloud 对接 GitHub、Coding、GitCafe 等国内外代码托管库，采用云端 SaaS 化服务，帮助开发者实现自动化持续集成测试和 Docker 容器镜像构建。DaoCloud 镜像构建服务基于全球分布式网路，构建速度极快，提供私有镜像存储空间，为容器化交付和跨团队合作奠定了基础。</p>
+
+<h3>如何使用</h3>
+
+<p>其实它提供的持续集成服务和TravisCI有点类似，至少从使用者的角度，是这么理解的。</p>
+
+<p>目前支持如下语言和服务：</p>
+
+<p>语言：Golang、Python、Ruby、Java、Javascript（NodeJS）、PHP、C（gcc） <br/>
+服务：MySQL、Redis、MongoDB</p>
+
+<p>服务指的意思是，比如：构建需要集成测试或者功能测试，那么它可以提供三种数据库供你使用。</p>
+
+<p>和TravisCI类似，需要你提供一个daocloud.yml，格式如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">image</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">daocloud/ci-golang:1.4</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">services</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">mongodb</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">mysql</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">redis</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">env</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">MYENV = &quot;hello&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">install</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an install segment&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Here, we usually run scripts to setup a base environment&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;For customized base image, you need to install git here unless you have git installed in your base image&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;e.g., apt-get install -y git-core&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">before_script</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an before_script segment&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Here, we usually run scripts to prepare our test&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an script segment&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Run test cases here&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Below shows how to use services, mongodb/mysql/redis are the hostnames of services&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 mongodb</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 mysql</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 redis</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>image是指定构建运行的环境镜像，除了上面的go语言，还有其他node，java，php，ruby等，在文章底部的参考资料中可以找到。</p>
+
+<h3>服务</h3>
+
+<p>service也就是你需要的数据库服务了，举个例子，假设，你指定了mysql。那么它提供的mysql的配置如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="err">Version：MySQL</span> <span class="err">5.5</span>
+</span><span class='line'><span class="na">Docker Link Alias</span><span class="o">:</span> <span class="s">mysql</span>
+</span><span class='line'><span class="na">Host</span><span class="o">:</span> <span class="s">mysql</span>
+</span><span class='line'><span class="na">Port</span><span class="o">:</span> <span class="s">3306</span>
+</span><span class='line'><span class="na">UserName</span><span class="o">:</span> <span class="s">root</span>
+</span><span class='line'><span class="na">Password</span><span class="o">:</span> <span class="s">不设密码</span>
+</span><span class='line'><span class="na">Default Instance</span><span class="o">:</span> <span class="s">test</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>所以，项目中的测试在连接数据库的时候，也需要对应配置，否则就连接不上。</p>
+
+<h3>执行顺序</h3>
+
+<p>设置环境变量。 <br/>
+执行 install 脚本。 <br/>
+克隆源代码，切换到对应的提交。 <br/>
+执行 before_script 脚本。 <br/>
+执行 script 脚本。</p>
+
+<p>script脚本，也就是你的构建执行命令了，比如：./gradlew clean build</p>
+
+<p>配置完成后，提交代码，就可以触发CI构建。</p>
+
+<p>我的项目花费了大概半天的时间，就配置成功了，当然这包括项目本身的一些配置，与平台无关。</p>
+
+<p>参考资料：  <br/>
+1.<a href="http://help.daocloud.io/features/continuous-integration/daocloud-yml.html">http://help.daocloud.io/features/continuous-integration/daocloud-yml.html</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku]]></title>
@@ -2332,107 +2474,6 @@ element+element div+p   第一个子元素选择器：选择紧接在 div 元素
 
 <p>参考资料：  <br/>
 1.Linux就是这个范儿</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Spring Web Security 实战 (四) - 了解Security基础架构]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/06/17/spring-web-security-4/"/>
-    <updated>2015-06-17T21:41:24+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/06/17/spring-web-security-4</id>
-    <content type="html"><![CDATA[<p>在了解了Spring Security的基本使用之后，还是需要更深入的了解Spring Security的基础架构，核心组件等。</p>
-
-<p>Spring Security是以自包含的角度来实现安全设计，所以使用Spring Security没有任何侵入性。因为Spring Security的目标是自己容器内管理， 所以不需要为你的Java运行环境进行什么特别的配置。</p>
-
-<h2>核心组件</h2>
-
-<h3>SecurityContextHolder, SecurityContext和Authentication对象</h3>
-
-<p>SecurityContextHolder，就如该类的名字所描述的那样，它用来存放当前应用程序的当前安全上下文中的细节，当然也包括“当事人Principal”的细节。SecurityContextHolder将上下文信息存储在ThreadLocal当中，这意味着，安全环境在同一个线程执行的方法一直是有效的。这种情况下使用ThreadLocal是非常安全的，只要记得在处理完当前主体的请求以后，把这个线程清除就行了。当然，Spring Security自动帮你管理这一切了，你就不用担心什么了。</p>
-
-<p>下面这段代码很清晰的说明了上面的实现策略：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">final</span> <span class="kd">class</span> <span class="nc">ThreadLocalSecurityContextHolderStrategy</span> <span class="kd">implements</span> <span class="n">SecurityContextHolderStrategy</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">SecurityContext</span><span class="o">&gt;</span> <span class="n">contextHolder</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">SecurityContext</span><span class="o">&gt;();</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">SecurityContext</span> <span class="nf">getContext</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">SecurityContext</span> <span class="n">ctx</span> <span class="o">=</span> <span class="n">contextHolder</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">ctx</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">ctx</span> <span class="o">=</span> <span class="n">createEmptyContext</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">contextHolder</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">ctx</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">return</span> <span class="n">ctx</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当你从SecurityContextHolder中拿到SecurityContext后，你就可以通过下面的这段代码取到“当事人”或者说用户的信息：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Object</span> <span class="n">principal</span> <span class="o">=</span> <span class="n">SecurityContextHolder</span><span class="o">.</span><span class="na">getContext</span><span class="o">().</span><span class="na">getAuthentication</span><span class="o">().</span><span class="na">getPrincipal</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">principal</span> <span class="k">instanceof</span> <span class="n">UserDetails</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">String</span> <span class="n">username</span> <span class="o">=</span> <span class="o">((</span><span class="n">UserDetails</span><span class="o">)</span><span class="n">principal</span><span class="o">).</span><span class="na">getUsername</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">String</span> <span class="n">username</span> <span class="o">=</span> <span class="n">principal</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>看完上面的代码，就要引入第二个关键组件Authentication：</p>
-
-<p>Authentication是一个接口，代表着一种“认证”令牌，它里面存放着“当事人”的基本信息和是否认证的标志信息。框架在接受到认证请求时，会将新创建的Authentication对象会传递给AuthenticationManager.authenticate(Authentication)，由它来决定“认证”是否成功。</p>
-
-<p>而一旦“认证”请求通过，Authentication通常都会存储在SecurityContext中，由SecurityContextHolder来管理。</p>
-
-<p>除了主体，另一个Authentication提供的重要方法是getAuthorities()。 这个方法提供了GrantedAuthority对象数组。 毫无疑问，GrantedAuthority是赋予到主体的权限。这些权限通常使用角色表示，比如ROLE_ADMINISTRATOR或ROLE_HR_SUPERVISOR。</p>
-
-<p>SecurityContextHolder，提供访问SecurityContext的方式。 <br/>
-SecurityContext，保存Authentication信息，和请求对应的安全信息。  <br/>
-Authentication，作为认证的令牌。  <br/>
-GrantedAuthority，反应在应用程序范围内，赋予的权限。</p>
-
-<h2>Spring Security的认证(Authentication)过程</h2>
-
-<p>让我们考虑一种标准的验证场景，每个人都很熟悉的那种。 <br/>
-一个用户想使用一个账号和密码进行登陆。     <br/>
-系统（成功的）验证了密码对于这个用户名是正确的。 <br/>
-这个用户对应的信息获取（他们的角色列表以及等等）。 <br/>
-为用户建立一个安全环境。 <br/>
-用户会执行一些操作，这些都是潜在被权限控制机制所保护的，通过对操作的授权，使用当前的安全环境信息。</p>
-
-<p>前三个项目执行了验证过程，所以我们可以看一下Spring Security的作用。 <br/>
-用户名和密码被获得，并进行比对，在一个UsernamePasswordAuthenticationToken的实例中（它是Authentication接口的一个实例，我们在之前已经见过了）。 <br/>
-这个标志被发送给一个AuthenticationManager的实例进行校验。 <br/>
-AuthenticationManager返回一个完全的Authentication实例，在成功校验后。 <br/>
-安全环境被建立，通过调用SecurityContextHolder.getContext().setAuthentication(&hellip;)，传递到返回的验证对象中。</p>
-
-<p>事实上，Spring Security并不介意你如何将Authentication对象放到SecurityContextHolder里。唯一关键的一点是 在AbstractSecurityInterceptor需要验证一个用户操作之前，SecurityContextHolder必须包含了一个表示了主体的Authentication。</p>
-
-<p>待续。。。</p>
 ]]></content>
   </entry>
   
