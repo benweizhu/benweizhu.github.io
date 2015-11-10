@@ -46,9 +46,9 @@ sudo launchctl unload /Library/LaunchDaemons/org.jenkins-ci.plist
 
 安装完成后，再次新建item，可以看GitHub project字段，Source Code Management中多了Git，Build Triggers中多了Build when a change is pushed to GitHub(但简单配置这个，还不能实现自动trigger，后面讲)。
 
-添加在Build那一栏，选择添加Build Step，在本例中选择python。
+在Build那一栏，选择添加Build Step，在本例中选择python。
 
-我的项目是一个NodeJS项目，所以第一步是NPM install。
+我的项目是一个NodeJS项目，所以第一步是npm install。
 
 保存项目，回到项目栏，点击Schedule a build。
 
@@ -56,7 +56,7 @@ sudo launchctl unload /Library/LaunchDaemons/org.jenkins-ci.plist
 
 正如这个小标题，构建执行失败了，你会发现失败的原因是command npm not found。
 
-NPM这个命令不存在，原因是Jenkins在执行那个脚本的时候是以Jenkins这个用户身份去执行，所以命令的PATH配置是不正确的。
+NPM这个命令不存在，原因是Jenkins在执行该shell脚本的时候是以jenkins这个用户身份去执行，所以命令的PATH配置是不正确的。
 
 ## Prepare Env Before Run
 
@@ -65,19 +65,21 @@ NPM这个命令不存在，原因是Jenkins在执行那个脚本的时候是以J
 1.直接在Prepare an environment for the run中配置     
 2.安装Environment Inject插件，在Inject environment variables to the build process中配置
 
+我这里配置了下node的bin，npm中的bin。
+
 {% codeblock lang:python %}
 PATH=$PATH:/usr/local/bin:/usr/local/Cellar/node/0.12.5/libexec/npm/bin/
 {% endcodeblock %}
 
-##A Blue Ball Appear
+##A Blue Ball Appear，一个蓝色灯泡的故事
 
-配置完成之后，再次执行，构建成功。但是构建的提示是一个蓝颜色的球。关于为什么是蓝色球： http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls
+配置完成之后，再次执行，构建成功。但是构建的提示是一个蓝颜色的球。为什么是蓝色球呢？请看： http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls
 
-这个当然不太习惯，好在要换成绿色球也很简单，安装插件：Green Ball Plugin。
+当然我不太习惯，好在要换成绿色球也很简单，安装插件：Green Ball Plugin。
 
 ##Pipeline插件
 
-根据现代软件的开发方式，我们更习惯于构建CI以pipeline的方式呈现，pipeline中有不同的step，可以自动的trigger，也可以手动trigger，比如：部署到Test或者Production环境。
+根据现代软件的开发方式，我们更习惯于构建CI以pipeline的方式呈现，pipeline中有不同的step，有可以自动的trigger，也有可以手动trigger，比如：部署到Test或者Production环境，理论上应该是手动的触发。
 
 这个时候，你需要安装Jenkins的pipeline插件。安装完成之后，回到首页，点击tab上的加号，添加一个tab，你就可以看到pipeline选项。
 
@@ -87,7 +89,7 @@ PATH=$PATH:/usr/local/bin:/usr/local/Cellar/node/0.12.5/libexec/npm/bin/
 
 配置方式和新建一个item一样。
 
-配置完成之后，你可以在前一个项目的Post-build Actions中添加Build Other Projects，选择Trigger only if build is stable或者其他。
+配置完成之后，你可以在前一个项目的Post-build Actions中添加Build Other Projects，选择Trigger only if build is stable或者其他，填写被trigger的项目。
 
 这样就可以自动触发后续的step。
 
@@ -95,7 +97,7 @@ PATH=$PATH:/usr/local/bin:/usr/local/Cellar/node/0.12.5/libexec/npm/bin/
 
 你肯定会发现，既然新的step就是一个新的item，那么不是要重新check out一次代码，而且之前build的archive也不在了。
 
-没错，这个时候，你需要安装Clone Workspace SCM Plugin，安装完成之后，你需要做两件事情：
+没错，这是个问题，这个时候，你需要安装Clone Workspace SCM Plugin，安装完成之后，你需要做两件事情：
 
 1.在upstream的项目中的Post-Build Actions中添加Achieve for Clone Workspace SCM   
 2.在downstream的项目的Source Code Management中选择Clone Workspace
