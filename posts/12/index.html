@@ -9,8 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="之前实现的表单提交方式来验证用户，实际上是不安全，http请求没有做任何的处理，表单内容以明文方式发送，在浏览器查看请求，得到结果就如下： j_username:ben
-j_password:ben submit:Login 而且，用户名和密码保存在xml或者properties方式保存在服务器端 &hellip;">
+  <meta name="description" content="在了解了Spring Security的基本使用之后，还是需要更深入的了解Spring Security的基础架构，核心组件等。 Spring Security是以自包含的角度来实现安全设计，所以使用Spring Security没有任何侵入性。因为Spring &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +64,127 @@ j_password:ben submit:Login 而且，用户名和密码保存在xml或者propert
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/06/17/spring-web-security-4/">Spring Web Security 实战 (四) - 了解Security基础架构</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-06-17T21:41:24+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:41 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在了解了Spring Security的基本使用之后，还是需要更深入的了解Spring Security的基础架构，核心组件等。</p>
+
+<p>Spring Security是以自包含的角度来实现安全设计，所以使用Spring Security没有任何侵入性。因为Spring Security的目标是自己容器内管理， 所以不需要为你的Java运行环境进行什么特别的配置。</p>
+
+<h2>核心组件</h2>
+
+<h3>SecurityContextHolder, SecurityContext和Authentication对象</h3>
+
+<p>SecurityContextHolder，就如该类的名字所描述的那样，它用来存放当前应用程序的当前安全上下文中的细节，当然也包括“当事人Principal”的细节。SecurityContextHolder将上下文信息存储在ThreadLocal当中，这意味着，安全环境在同一个线程执行的方法一直是有效的。这种情况下使用ThreadLocal是非常安全的，只要记得在处理完当前主体的请求以后，把这个线程清除就行了。当然，Spring Security自动帮你管理这一切了，你就不用担心什么了。</p>
+
+<p>下面这段代码很清晰的说明了上面的实现策略：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">final</span> <span class="kd">class</span> <span class="nc">ThreadLocalSecurityContextHolderStrategy</span> <span class="kd">implements</span> <span class="n">SecurityContextHolderStrategy</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">SecurityContext</span><span class="o">&gt;</span> <span class="n">contextHolder</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">SecurityContext</span><span class="o">&gt;();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">SecurityContext</span> <span class="nf">getContext</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">SecurityContext</span> <span class="n">ctx</span> <span class="o">=</span> <span class="n">contextHolder</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">ctx</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">ctx</span> <span class="o">=</span> <span class="n">createEmptyContext</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">contextHolder</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">ctx</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">return</span> <span class="n">ctx</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当你从SecurityContextHolder中拿到SecurityContext后，你就可以通过下面的这段代码取到“当事人”或者说用户的信息：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Object</span> <span class="n">principal</span> <span class="o">=</span> <span class="n">SecurityContextHolder</span><span class="o">.</span><span class="na">getContext</span><span class="o">().</span><span class="na">getAuthentication</span><span class="o">().</span><span class="na">getPrincipal</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">principal</span> <span class="k">instanceof</span> <span class="n">UserDetails</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">String</span> <span class="n">username</span> <span class="o">=</span> <span class="o">((</span><span class="n">UserDetails</span><span class="o">)</span><span class="n">principal</span><span class="o">).</span><span class="na">getUsername</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">String</span> <span class="n">username</span> <span class="o">=</span> <span class="n">principal</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>看完上面的代码，就要引入第二个关键组件Authentication：</p>
+
+<p>Authentication是一个接口，代表着一种“认证”令牌，它里面存放着“当事人”的基本信息和是否认证的标志信息。框架在接受到认证请求时，会将新创建的Authentication对象会传递给AuthenticationManager.authenticate(Authentication)，由它来决定“认证”是否成功。</p>
+
+<p>而一旦“认证”请求通过，Authentication通常都会存储在SecurityContext中，由SecurityContextHolder来管理。</p>
+
+<p>除了主体，另一个Authentication提供的重要方法是getAuthorities()。 这个方法提供了GrantedAuthority对象数组。 毫无疑问，GrantedAuthority是赋予到主体的权限。这些权限通常使用角色表示，比如ROLE_ADMINISTRATOR或ROLE_HR_SUPERVISOR。</p>
+
+<p>SecurityContextHolder，提供访问SecurityContext的方式。 <br/>
+SecurityContext，保存Authentication信息，和请求对应的安全信息。  <br/>
+Authentication，作为认证的令牌。  <br/>
+GrantedAuthority，反应在应用程序范围内，赋予的权限。</p>
+
+<h2>Spring Security的认证(Authentication)过程</h2>
+
+<p>让我们考虑一种标准的验证场景，每个人都很熟悉的那种。 <br/>
+一个用户想使用一个账号和密码进行登陆。     <br/>
+系统（成功的）验证了密码对于这个用户名是正确的。 <br/>
+这个用户对应的信息获取（他们的角色列表以及等等）。 <br/>
+为用户建立一个安全环境。 <br/>
+用户会执行一些操作，这些都是潜在被权限控制机制所保护的，通过对操作的授权，使用当前的安全环境信息。</p>
+
+<p>前三个项目执行了验证过程，所以我们可以看一下Spring Security的作用。 <br/>
+用户名和密码被获得，并进行比对，在一个UsernamePasswordAuthenticationToken的实例中（它是Authentication接口的一个实例，我们在之前已经见过了）。 <br/>
+这个标志被发送给一个AuthenticationManager的实例进行校验。 <br/>
+AuthenticationManager返回一个完全的Authentication实例，在成功校验后。 <br/>
+安全环境被建立，通过调用SecurityContextHolder.getContext().setAuthentication(&hellip;)，传递到返回的验证对象中。</p>
+
+<p>事实上，Spring Security并不介意你如何将Authentication对象放到SecurityContextHolder里。唯一关键的一点是 在AbstractSecurityInterceptor需要验证一个用户操作之前，SecurityContextHolder必须包含了一个表示了主体的Authentication。</p>
+
+<p>待续。。。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -227,185 +347,6 @@ submit:Login</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/06/14/spring-web-security-2/">Spring Web Security 实战 (二) - 自定义登录页面</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-06-14T15:45:34+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:45 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>上一章节结尾，我们实现了Spring web security的最小实现，拦截所有url，采用表单登录，用户名和密码采用inMemory方式保存。</p>
-
-<p>你可能在想，这个登录页面从哪里来的，我们并没有直接去实现一个页面。事实上，正是因为我们没有设置登录页面，Spring Security就自动生成了一个，该页面是的Spring Security处理登录的标准页面。</p>
-
-<p>不过，我们肯定是不会想要使用Spring Security给我们提供的标准页面，除非项目刚启动，处于demo阶段，否则，肯定采用自定义页面，那么如何做到呢？</p>
-
-<p>在form-login标签提供了一个属性login-page，允许指定用户自定义的登录页面，于是，实现方式如下：</p>
-
-<p>首先定义一个登录页面JSP文件，里面的form表单和标准页面一样：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ taglib prefix=&quot;form&quot; uri=&quot;http://www.springframework.org/tags/form&quot; %&gt;
-</span><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Spring MVC Security<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;/spring-mvc-security/j_spring_security_check&quot;</span> <span class="na">method=</span><span class="s">&quot;POST&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;table&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;tbody&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;tr&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;td&gt;</span>User:<span class="nt">&lt;/td&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;td&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;j_username&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/tr&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;tr&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;td&gt;</span>Password:<span class="nt">&lt;/td&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;td&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="na">name=</span><span class="s">&quot;j_password&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/tr&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;tr&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;td</span> <span class="na">colspan=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;&lt;input</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Login&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/tr&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/tbody&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/table&gt;</span>
-</span><span class='line'><span class="nt">&lt;/form&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后定义一个对应的RequestMapping：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Controller</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">LoginController</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/login&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">login</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;login&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>最后一步，就是配置http标签的内容，有两点，第一，设置form-login的属性login-page为登录页面的url，第二，设置login页面的访问权限为IS_AUTHENTICATED_ANONYMOUSLY，必须允许匿名用户可以访问，否则怎么登录呢。代码如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;security:http&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;security:intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/login&quot;</span> <span class="na">access=</span><span class="s">&quot;IS_AUTHENTICATED_ANONYMOUSLY&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;security:intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;security:form-login</span> <span class="na">login-page=</span><span class="s">&quot;/login&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;security:logout/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/security:http&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当然，你也可以这么写，3.1之后，允许多个http标签的定义。不过这么做，相当于完全绕过Spring Security的filterChain，不在Spring Security相关管理之下。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/css/**&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/login&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span><span class="nt">/&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>匿名登录</h2>
-
-<p>你肯定会问，上面那样写和IS_AUTHENTICATED_ANONYMOUSLY有什么区别？这里参考：<a href="http://www.mossle.com/docs/auth/html/ch107-anonymous.html">http://www.mossle.com/docs/auth/html/ch107-anonymous.html</a></p>
-
-<p>”匿名登录，即用户尚未登录系统，系统会为所有未登录的用户分配一个匿名用户，这个用户也拥有自己的权限，不过他是不能访问任何被保护资源的。</p>
-
-<p>设置一个匿名用户的好处是，我们在进行权限判断时，可以保证SecurityContext中永远是存在着一个权限主体的，启用了匿名登录功能之后，我们所需要做的工作就是从SecurityContext中取出权限主体，然后对其拥有的权限进行校验，不需要每次去检验这个权限主体是否为空了。这样做的好处是我们永远认为请求的主体是拥有权限的，即便他没有登录，系统也会自动为他赋予未登录系统角色的权限，这样后面所有的安全组件都只需要在当前权限主体上进行处理，不用一次一次的判断当前权限主体是否存在。这就更容易保证系统中操作的一致性。“</p>
-
-<p>这种一致性，统一了业务层代码的实现，将匿名用户看做是用户的一种类型，只是访问权限不一样而已。关于它们的优缺点 <a href="http://www.mossle.com/docs/auth/html/ch107-anonymous.html">http://www.mossle.com/docs/auth/html/ch107-anonymous.html</a> 的最后一部分有介绍。</p>
-
-<p>设置登录后的跳转页面，form-login还提供了两个属性default-target-url和always-use-default-target。如果用户进入登录页面是因为要访问某个受限制的资源，当用户登录后，就会回到该访问资源，但是如果不是，default-target-url，就起到作用，指定了登录后的跳转页面，它的默认值是“/”。always-use-default-target的含义就很简单了，是否永远跳转，不管用户之前访问的资源。</p>
-
-<h2>处理登出</h2>
-
-<p>因为在xml配置中添加了security:logout，所以Spring Security也默认提供了一个登出URL：“/j_spring_security_logout”。</p>
-
-<h2>获得用户名</h2>
-
-<p>让Spring注入Principal即可</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Controller</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HomeController</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/home&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">home</span><span class="o">(</span><span class="n">Principal</span> <span class="n">principal</span><span class="o">,</span> <span class="n">Model</span> <span class="n">model</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">model</span><span class="o">.</span><span class="na">addAttribute</span><span class="o">(</span><span class="s">&quot;userName&quot;</span><span class="o">,</span> <span class="n">principal</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
-</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;home&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料： <br/>
-1.Spring security reference</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/13">&larr; Older</a>
@@ -431,6 +372,10 @@ submit:Login</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
       </li>
     
@@ -444,10 +389,6 @@ submit:Login</p>
     
       <li class="post">
         <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/10/31/responsive-design/">了解响应式设计</a>
       </li>
     
   </ul>
