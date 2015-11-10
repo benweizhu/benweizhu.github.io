@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-11-10T21:30:37+08:00</updated>
+  <updated>2015-11-10T21:37:40+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -71,7 +71,7 @@
 
 <p>在Build那一栏，选择添加Build Step，在本例中选择python。</p>
 
-<p>我的项目是一个NodeJS项目，所以第一步是NPM install。</p>
+<p>我的项目是一个NodeJS项目，所以第一步是npm install。</p>
 
 <p>保存项目，回到项目栏，点击Schedule a build。</p>
 
@@ -79,7 +79,7 @@
 
 <p>正如这个小标题，构建执行失败了，你会发现失败的原因是command npm not found。</p>
 
-<p>NPM这个命令不存在，原因是Jenkins在执行那个脚本的时候是以Jenkins这个用户身份去执行，所以命令的PATH配置是不正确的。</p>
+<p>NPM这个命令不存在，原因是Jenkins在执行该shell脚本的时候是以jenkins这个用户身份去执行，所以命令的PATH配置是不正确的。</p>
 
 <h2>Prepare Env Before Run</h2>
 
@@ -88,20 +88,22 @@
 <p>1.直接在Prepare an environment for the run中配置   <br/>
 2.安装Environment Inject插件，在Inject environment variables to the build process中配置</p>
 
+<p>我这里配置了下node的bin，npm中的bin。</p>
+
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">PATH</span><span class="o">=</span><span class="err">$</span><span class="n">PATH</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">node</span><span class="o">/</span><span class="mf">0.12</span><span class="o">.</span><span class="mi">5</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">npm</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h2>A Blue Ball Appear</h2>
+<h2>A Blue Ball Appear，一个蓝色灯泡的故事</h2>
 
-<p>配置完成之后，再次执行，构建成功。但是构建的提示是一个蓝颜色的球。关于为什么是蓝色球： <a href="http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls">http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls</a></p>
+<p>配置完成之后，再次执行，构建成功。但是构建的提示是一个蓝颜色的球。为什么是蓝色球呢？请看： <a href="http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls">http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls</a></p>
 
-<p>这个当然不太习惯，好在要换成绿色球也很简单，安装插件：Green Ball Plugin。</p>
+<p>当然我不太习惯，好在要换成绿色球也很简单，安装插件：Green Ball Plugin。</p>
 
 <h2>Pipeline插件</h2>
 
-<p>根据现代软件的开发方式，我们更习惯于构建CI以pipeline的方式呈现，pipeline中有不同的step，可以自动的trigger，也可以手动trigger，比如：部署到Test或者Production环境。</p>
+<p>根据现代软件的开发方式，我们更习惯于构建CI以pipeline的方式呈现，pipeline中有不同的step，有可以自动的trigger，也有可以手动trigger，比如：部署到Test或者Production环境，理论上应该是手动的触发。</p>
 
 <p>这个时候，你需要安装Jenkins的pipeline插件。安装完成之后，回到首页，点击tab上的加号，添加一个tab，你就可以看到pipeline选项。</p>
 
@@ -111,7 +113,7 @@
 
 <p>配置方式和新建一个item一样。</p>
 
-<p>配置完成之后，你可以在前一个项目的Post-build Actions中添加Build Other Projects，选择Trigger only if build is stable或者其他。</p>
+<p>配置完成之后，你可以在前一个项目的Post-build Actions中添加Build Other Projects，选择Trigger only if build is stable或者其他，填写被trigger的项目。</p>
 
 <p>这样就可以自动触发后续的step。</p>
 
@@ -119,7 +121,7 @@
 
 <p>你肯定会发现，既然新的step就是一个新的item，那么不是要重新check out一次代码，而且之前build的archive也不在了。</p>
 
-<p>没错，这个时候，你需要安装Clone Workspace SCM Plugin，安装完成之后，你需要做两件事情：</p>
+<p>没错，这是个问题，这个时候，你需要安装Clone Workspace SCM Plugin，安装完成之后，你需要做两件事情：</p>
 
 <p>1.在upstream的项目中的Post-Build Actions中添加Achieve for Clone Workspace SCM <br/>
 2.在downstream的项目的Source Code Management中选择Clone Workspace</p>
