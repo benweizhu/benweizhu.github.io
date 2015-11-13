@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-11-13T14:11:02+08:00</updated>
+  <updated>2015-11-13T14:18:37+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -1802,11 +1802,15 @@ maps from one value to another (e.g. (key1: value1, key2: value2))</p>
 
 <p>而运行测试的时候，本来Intellij会默认先跑make project，但是由于build/classes已经有文件了，所以就skip了，于是导致Intellij找不到resource文件，因为Intellij要求的resource路径和gradle构建时输出的路径不同。</p>
 
-<h2>配置Intellij的Junit</h2>
+<h3>手动点击Project Rebuild</h3>
+
+<p>可以手动点击Project Rebuild，它会清理Intellij的输出目录（也就是当前Gradle的classes目录），然后在make。</p>
+
+<h3>配置Intellij的Junit</h3>
 
 <p>又或者改变Intellij中Junit的配置，Junit会在运行测试之前，先跑make，可以然它在make之前先跑Gradle的clean任务。</p>
 
-<h2>通过Watch来解决</h2>
+<h3>通过Watch来解决</h3>
 
 <p>还可以将我在上篇文章中介绍的Watch引入，监测文件变化，自动运行compileJava和processResources等Gradle命令，而不要改变Intellij的输出目录，让Gradle和Intellij采用各自的输出目录，就可以的。</p>
 
