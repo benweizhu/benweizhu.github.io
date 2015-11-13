@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-11-11T21:58:05+08:00</updated>
+  <updated>2015-11-13T14:01:21+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -1792,7 +1792,15 @@ maps from one value to another (e.g. (key1: value1, key2: value2))</p>
 
 <p>此时，如果你在应用启动的时候修改了Java代码，只需要点击Intellij的编译按钮，重新编译代码即可。</p>
 
-<p>又或者，将我在上篇文章中介绍的Watch引入，监测文件变化，自动运行compileJava等Gradle命令，也是可以的。</p>
+<p>由于这样配置之后，导致Intellij上进行make project，输出到build/classes下。</p>
+
+<p>这样做会导致集成测试有一个问题，运行集成测试的时候，我们常常需要使用properties文件和xml文件。</p>
+
+<p>如果之前运行过gradle build，而build目录下没有被clean，则gradle默认会将properties文件和xml文件放在build/resources下，这与Intellij的行为不同。</p>
+
+<p>而运行测试的时候，本来Intellij会默认先跑make project，但是由于build/classes已经有文件了，所以就skip了，于是导致Intellij找不到resource文件，因为Intellij要求的resource路径和gradle构建时输出的路径不同。</p>
+
+<p>所以，最好的办法还是，将我在上篇文章中介绍的Watch引入，监测文件变化，自动运行compileJava和processResources等Gradle命令，就可以的。</p>
 
 <p>参考文献： <br/>
 1.<a href="http://docs.spring.io/spring-boot/docs/current/reference/html/howto-hotswapping.html">http://docs.spring.io/spring-boot/docs/current/reference/html/howto-hotswapping.html</a></p>
