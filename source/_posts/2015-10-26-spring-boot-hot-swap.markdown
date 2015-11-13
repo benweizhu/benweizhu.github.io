@@ -52,7 +52,15 @@ org.springsource.loaded.jvm.JVM : Problems copying method. Incompatible JVM? 报
 
 此时，如果你在应用启动的时候修改了Java代码，只需要点击Intellij的编译按钮，重新编译代码即可。
 
-又或者，将我在上篇文章中介绍的Watch引入，监测文件变化，自动运行compileJava等Gradle命令，也是可以的。
+由于这样配置之后，导致Intellij上进行make project，输出到build/classes下。
+
+这样做会导致集成测试有一个问题，运行集成测试的时候，我们常常需要使用properties文件和xml文件。
+
+如果之前运行过gradle build，而build目录下没有被clean，则gradle默认会将properties文件和xml文件放在build/resources下，这与Intellij的行为不同。
+
+而运行测试的时候，本来Intellij会默认先跑make project，但是由于build/classes已经有文件了，所以就skip了，于是导致Intellij找不到resource文件，因为Intellij要求的resource路径和gradle构建时输出的路径不同。
+
+所以，最好的办法还是，将我在上篇文章中介绍的Watch引入，监测文件变化，自动运行compileJava和processResources等Gradle命令，就可以的。
 
 参考文献：   
 1.http://docs.spring.io/spring-boot/docs/current/reference/html/howto-hotswapping.html
