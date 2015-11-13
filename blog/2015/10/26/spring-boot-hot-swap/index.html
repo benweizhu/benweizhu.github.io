@@ -157,6 +157,8 @@
 
 <p>而运行测试的时候，本来Intellij会默认先跑make project，但是由于build/classes已经有文件了，所以就skip了，于是导致Intellij找不到resource文件，因为Intellij要求的resource路径和gradle构建时输出的路径不同。</p>
 
+<h2>通过Watch来解决</h2>
+
 <p>所以，最好的办法还是，将我在上篇文章中介绍的Watch引入，监测文件变化，自动运行compileJava和processResources等Gradle命令，就可以的。</p>
 
 <p>参考文献： <br/>
