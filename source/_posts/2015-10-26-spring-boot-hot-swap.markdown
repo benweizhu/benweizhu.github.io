@@ -62,9 +62,14 @@ org.springsource.loaded.jvm.JVM : Problems copying method. Incompatible JVM? 报
 
 而运行测试的时候，本来Intellij会默认先跑make project，但是由于build/classes已经有文件了，所以就skip了，于是导致Intellij找不到resource文件，因为Intellij要求的resource路径和gradle构建时输出的路径不同。
 
+##配置Intellij的Junit
+
+又或者改变Intellij中Junit的配置，Junit会在运行测试之前，先跑make，可以然它在make之前先跑Gradle的clean任务。
+
 ##通过Watch来解决
 
-所以，最好的办法还是，将我在上篇文章中介绍的Watch引入，监测文件变化，自动运行compileJava和processResources等Gradle命令，而不要改变Intellij的输出目录，让Gradle和Intellij采用各自的输出目录，就可以的。
+还可以将我在上篇文章中介绍的Watch引入，监测文件变化，自动运行compileJava和processResources等Gradle命令，而不要改变Intellij的输出目录，让Gradle和Intellij采用各自的输出目录，就可以的。
+
 
 参考文献：   
 1.http://docs.spring.io/spring-boot/docs/current/reference/html/howto-hotswapping.html
