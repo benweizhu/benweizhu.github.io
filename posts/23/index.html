@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="使用Grunt做JavaScript的构建，npm为它解决了最大的问题，插件（提供各种各样的任务）。但是如果你是做前端的Web应用，那么就还需要很多东西，比如，MVX框架，JavaScript工具类库等，这些东西，我们在构建中称为依赖。而这时，我们就要借助另一个工具，Bower。 &hellip;">
+  <meta name="description" content="就像Grunt官方网站上说的“为何要用构建工具？” ”一句话：自动化。对于需要反复重复的任务，例如压缩（minification）、编译、单元测试、linting等，自动化工具可以减轻你的劳动，简化你的工作。当你正确配置好了任务，任务运行器就会自动帮你或你的小组完成大部分无聊的工作。” &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,313 +64,6 @@
     <div id="content">
       <div class="blog-index">
   
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/01/15/bower-to-install-dependencies/">用Bower做JavaScript类库依赖管理</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-01-15T19:29:54+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:29 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>使用Grunt做JavaScript的构建，npm为它解决了最大的问题，插件（提供各种各样的任务）。但是如果你是做前端的Web应用，那么就还需要很多东西，比如，MVX框架，JavaScript工具类库等，这些东西，我们在构建中称为依赖。而这时，我们就要借助另一个工具，<strong>Bower</strong>。</p>
-
-<p>Bower做的事情：</p>
-
-<p><em>“Bower works by fetching and installing packages from all over, taking care of hunting, finding, downloading, and saving the stuff you’re looking for.” &mdash; Bower</em></p>
-
-<p>而且，Bower针对前端应用做了优化。它拥有扁平的依赖关系树，对于每个包之请求一个版本，将页面加载的内容减到最低。</p>
-
-<h2>如何使用</h2>
-
-<h3>安装</h3>
-
-<p>Bower处在NodeJs的生态圈里，它是Node的一个模块（包）。所以安装方法和普通node包安装方法一样。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">npm</span> <span class="n">install</span> <span class="o">-</span><span class="n">g</span> <span class="n">bower</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>其实，我也在纠结是安装在全局还是本地，网上众说风云。</p>
-
-<h3>命令工具</h3>
-
-<p>bower下载下来之后，你会发现它和grunt cli很像，除了模块部分，还有命令文件，因为它还是一个命令行工具。</p>
-
-<p>使用bower install安装需要的依赖：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># registered package</span>
-</span><span class='line'><span class="err">$</span> <span class="n">bower</span> <span class="n">install</span> <span class="n">jquery</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># GitHub shorthand</span>
-</span><span class='line'><span class="err">$</span> <span class="n">bower</span> <span class="n">install</span> <span class="n">desandro</span><span class="o">/</span><span class="n">masonry</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Git endpoint</span>
-</span><span class='line'><span class="err">$</span> <span class="n">bower</span> <span class="n">install</span> <span class="n">git</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">user</span><span class="o">/</span><span class="n">package</span><span class="o">.</span><span class="n">git</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># URL</span>
-</span><span class='line'><span class="err">$</span> <span class="n">bower</span> <span class="n">install</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">script</span><span class="o">.</span><span class="n">js</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>bower.json</h3>
-
-<p>就和node一样，node有一个package.json来存储模块相关的信息，包括依赖。</p>
-
-<p>bower也有自己的一个json文件，bower.json，通过命令bower init，可以在bower的提示下，完成对bower.json的填写。当运行bower init命令后，bower会询问你下面这些问题，来帮助你完成bower.json文件的初始化：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="err">?</span> <span class="n">name</span><span class="p">:</span> <span class="p">(</span><span class="n">hello_grunt</span><span class="p">)</span>
-</span><span class='line'><span class="err">?</span> <span class="n">version</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="o">.</span><span class="mi">0</span><span class="p">)</span>
-</span><span class='line'><span class="err">?</span> <span class="n">description</span><span class="p">:</span> <span class="n">hello</span>
-</span><span class='line'><span class="err">?</span> <span class="n">main</span> <span class="nb">file</span><span class="p">:</span>
-</span><span class='line'><span class="err">?</span> <span class="n">what</span> <span class="n">types</span> <span class="n">of</span> <span class="n">modules</span> <span class="n">does</span> <span class="n">this</span> <span class="n">package</span> <span class="n">expose</span><span class="err">?</span><span class="p">:</span> <span class="p">(</span><span class="n">Press</span> <span class="o">&lt;</span><span class="n">space</span><span class="o">&gt;</span> <span class="n">to</span> <span class="n">select</span><span class="p">)</span>
-</span><span class='line'><span class="err">❯◯</span> <span class="n">amd</span>
-</span><span class='line'> <span class="err">◯</span> <span class="n">es6</span>
-</span><span class='line'> <span class="err">◯</span> <span class="nb">globals</span>
-</span><span class='line'> <span class="err">◯</span> <span class="n">node</span>
-</span><span class='line'> <span class="err">◯</span> <span class="n">yui</span>
-</span><span class='line'><span class="err">?</span> <span class="n">keywords</span><span class="p">:</span> <span class="n">hello</span>
-</span><span class='line'><span class="err">?</span> <span class="n">authors</span><span class="p">:</span> <span class="p">(</span><span class="n">benweizhu</span> <span class="o">&lt;</span><span class="n">xxxx</span><span class="nd">@gmail.com</span><span class="o">&gt;</span><span class="p">)</span>
-</span><span class='line'><span class="err">?</span> <span class="n">license</span><span class="p">:</span> <span class="p">(</span><span class="n">MIT</span><span class="p">)</span>
-</span><span class='line'><span class="err">?</span> <span class="n">homepage</span><span class="p">:</span>
-</span><span class='line'><span class="err">?</span> <span class="nb">set</span> <span class="n">currently</span> <span class="n">installed</span> <span class="n">components</span> <span class="k">as</span> <span class="n">dependencies</span><span class="err">?</span><span class="p">:</span> <span class="p">(</span><span class="n">Y</span><span class="o">/</span><span class="n">n</span><span class="p">)</span>
-</span><span class='line'><span class="err">?</span> <span class="n">add</span> <span class="n">commonly</span> <span class="n">ignored</span> <span class="n">files</span> <span class="n">to</span> <span class="n">ignore</span> <span class="nb">list</span><span class="err">?</span><span class="p">:</span>
-</span><span class='line'><span class="err">?</span> <span class="n">would</span> <span class="n">you</span> <span class="n">like</span> <span class="n">to</span> <span class="n">mark</span> <span class="n">this</span> <span class="n">package</span> <span class="k">as</span> <span class="n">private</span> <span class="n">which</span> <span class="n">prevents</span> <span class="n">it</span> <span class="kn">from</span> <span class="nn">being</span> <span class="nn">accidentally</span>
-</span><span class='line'><span class="n">published</span> <span class="n">to</span> <span class="n">the</span> <span class="n">registry</span><span class="err">?</span><span class="p">:</span> <span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="n">N</span><span class="p">)</span> <span class="n">Y</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="n">name</span><span class="p">:</span> <span class="s">&#39;hello_grunt&#39;</span><span class="p">,</span>
-</span><span class='line'>  <span class="n">version</span><span class="p">:</span> <span class="s">&#39;0.0.0&#39;</span><span class="p">,</span>
-</span><span class='line'>  <span class="n">authors</span><span class="p">:</span> <span class="p">[</span>
-</span><span class='line'>    <span class="s">&#39;benweizhu &lt;xxxx@gmail.com&gt;&#39;</span>
-</span><span class='line'>  <span class="p">],</span>
-</span><span class='line'>  <span class="n">description</span><span class="p">:</span> <span class="s">&#39;hello&#39;</span><span class="p">,</span>
-</span><span class='line'>  <span class="n">moduleType</span><span class="p">:</span> <span class="p">[</span>
-</span><span class='line'>    <span class="s">&#39;node&#39;</span>
-</span><span class='line'>  <span class="p">],</span>
-</span><span class='line'>  <span class="n">keywords</span><span class="p">:</span> <span class="p">[</span>
-</span><span class='line'>    <span class="s">&#39;hello&#39;</span>
-</span><span class='line'>  <span class="p">],</span>
-</span><span class='line'>  <span class="n">license</span><span class="p">:</span> <span class="s">&#39;MIT&#39;</span><span class="p">,</span>
-</span><span class='line'>  <span class="n">private</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
-</span><span class='line'>  <span class="n">ignore</span><span class="p">:</span> <span class="p">[</span>
-</span><span class='line'>    <span class="s">&#39;**/.*&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s">&#39;node_modules&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s">&#39;bower_components&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s">&#39;test&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s">&#39;tests&#39;</span>
-</span><span class='line'>  <span class="p">],</span>
-</span><span class='line'>  <span class="n">dependencies</span><span class="p">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">angularjs</span><span class="p">:</span> <span class="s">&#39;~1.3.8&#39;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="err">?</span> <span class="n">Looks</span> <span class="n">good</span><span class="err">?</span><span class="p">:</span> <span class="p">(</span><span class="n">Y</span><span class="o">/</span><span class="n">n</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>bower.json中要填写的信息包括：</p>
-
-<p>1.<strong>name (required):</strong> The name of your package; please see Register section for how to name your package.  <br/>
-2.<strong>version: </strong>A semantic version number (see semver).  <br/>
-3.<strong>main string or array: </strong>The primary acting files necessary to use your package. <br/>
-4.<strong>ignore array:</strong> An array of paths not needed in production that you want Bower to ignore when installing your package.  <br/>
-5.<strong>keywords array of string: </strong>(recommended) helps make your package easier to discover. <br/>
-6.<strong>dependencies hash:</strong> Packages your package depends upon in production. Note that you can specify ranges of versions for your dependencies. <br/>
-7.<strong>devDependencies hash:</strong> Development dependencies. <br/>
-8.<strong>private boolean: </strong>Set to true if you want to keep the package private and do not want to register the package in the future.</p>
-
-<h3>安装并存储到bower.json</h3>
-
-<p>就和Grunt一样，bower也允许你将依赖下载下来，并存储到bower.json文件中</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">bower</span> <span class="n">install</span> <span class="n">angularjs</span> <span class="o">--</span><span class="n">save</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>bower中的有用命令</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">bower</span> <span class="nb">list</span>        <span class="o">--</span><span class="err">列出本地的包和可能的更新</span>
-</span><span class='line'><span class="n">bower</span> <span class="n">cache</span> <span class="n">clean</span> <span class="o">--</span><span class="err">清除</span><span class="n">bower</span><span class="err">的依赖缓存</span>
-</span><span class='line'><span class="n">bower</span> <span class="n">cache</span> <span class="nb">list</span>  <span class="o">--</span><span class="err">列出</span><span class="n">bower</span><span class="err">的依赖缓存</span>
-</span><span class='line'><span class="n">bower</span> <span class="n">update</span>      <span class="o">--</span><span class="err">根据</span><span class="n">bower</span><span class="o">.</span><span class="n">json</span><span class="err">的内容将安装的包升级到最新版本</span>
-</span><span class='line'><span class="n">bower</span> <span class="n">install</span>     <span class="o">--</span><span class="err">安装</span><span class="n">bower</span><span class="o">.</span><span class="n">json</span><span class="err">中定义的依赖包</span>
-</span><span class='line'><span class="n">bower</span> <span class="n">uninstall</span>   <span class="o">--</span><span class="err">卸载已安装的依赖包</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>更多内容，请查看：<a href="http://bower.io/docs/api/">http://bower.io/docs/api/</a></p>
-
-<h3>将bower和grunt集成</h3>
-
-<p>目前，github上面有很多grunt的插件可以将bower集成到grunt中。你可以去 <a href="https://www.npmjs.com/">https://www.npmjs.com/</a> 上搜索bower和grunt的关键字。</p>
-
-<p>我这里使用的是：grunt-bower-task</p>
-
-<p>安装很简单：npm install grunt-bower-task &ndash;save-dev</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;relations-front-end&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nt">&quot;devDependencies&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nt">&quot;grunt&quot;</span><span class="p">:</span> <span class="s2">&quot;~0.4.5&quot;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nt">&quot;grunt-bower-task&quot;</span><span class="p">:</span> <span class="s2">&quot;^0.4.0&quot;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nt">&quot;grunt-contrib-jshint&quot;</span><span class="p">:</span> <span class="s2">&quot;~0.4.0&quot;</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nt">&quot;scripts&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nt">&quot;test&quot;</span><span class="p">:</span> <span class="s2">&quot;grunt&quot;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">grunt</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">initConfig</span><span class="p">({</span>
-</span><span class='line'>        <span class="nx">jshint</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">files</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;Gruntfile.js&#39;</span><span class="p">,</span> <span class="s1">&#39;src/**/*.js&#39;</span><span class="p">,</span> <span class="s1">&#39;test/**/*.js&#39;</span><span class="p">,</span> <span class="s1">&#39;!src/js/libs/**/*.js&#39;</span><span class="p">]</span>
-</span><span class='line'>        <span class="p">},</span>
-</span><span class='line'>        <span class="nx">bower</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">install</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nx">options</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>                    <span class="nx">targetDir</span><span class="o">:</span> <span class="s1">&#39;./src/js/libs&#39;</span>
-</span><span class='line'>                <span class="p">}</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">&#39;grunt-bower-task&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">&#39;grunt-contrib-jshint&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;bower:install&#39;</span><span class="p">,</span> <span class="s1">&#39;jshint&#39;</span><span class="p">]);</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>targetDir: &lsquo;./src/js/libs&#8217;的作用是告诉task将bower下载的目标文件拷贝一份到哪个路径下</p>
-
-<p>请参考：<a href="http://bower.io/docs/tools/">http://bower.io/docs/tools/</a></p>
-</div>
-  
-  
-
-
-    </article>
   
   
     <article>
@@ -775,6 +468,244 @@
 
 <p>1.<a href="http://www.gruntjs.net/docs/getting-started/">http://www.gruntjs.net/docs/getting-started/</a>   <br/>
 2.Book: Getting started with Grunt: The JavaScript Task Runner</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/01/04/yes-angularjs-6/">开始！AngularJS!（六）- 依赖注入</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-04T13:24:06+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:24 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>不说废话，开始学习AngularJS的依赖注入，如果你对什么是依赖注入还不明白的话，可以看看Martin Fowler的一篇关于依赖注入的文章
+<a href="http://martinfowler.com/articles/injection.html" title="Inversion of Control Containers and the Dependency Injection pattern">Inversion of Control Containers and the Dependency Injection pattern</a>，这里也有<a href="http://benweizhu.github.io/blog/2013/09/22/inversion-of-control-containers-and-the-dependency-injection-pattern-translate/" title="译文">译文</a>。</p>
+
+<p>依赖注入就是，在需要此依赖的地方等待被依赖对象注入（传入）进来，而不是通过new关键字去构造，或者去查找某个依赖。</p>
+
+<p>看一个AngularJS依赖注入的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;diApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;diController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;alertValue&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">ng-click=</span><span class="s">&quot;alertMe()&quot;</span> <span class="na">value=</span><span class="s">&quot;clickMe&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;diApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;diController&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$window</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">alertMe</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">$window</span><span class="p">.</span><span class="nx">alert</span><span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">alertValue</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在jsfiddle中查看，<a href="http://jsfiddle.net/n5sknpe9/">http://jsfiddle.net/n5sknpe9/</a></p>
+
+<p>在定义控制器diController时，在构造函数中传入一个对象$scope和一个服务$window。$scope将控制器作用域中的模型alertValue传递进来，而$window则提供alert()方法。</p>
+
+<h3>$inject</h3>
+
+<p>用起来看着确实很简单，那么AngularJS是怎么做到的呢？看下面一个例子。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;diApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;diController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        { {value} }
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;diApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;diService&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">getValue</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>            <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;diController&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">diService</span><span class="p">){</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">diService</span><span class="p">.</span><span class="nx">getValue</span><span class="p">();</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>每个Angular应用都有一个injector对象。这个injector是一个服务定位器，负责创建和查找依赖，当你的app的某处声明需要用到某个依赖时，Angular 会调用这个依赖注入器去查找或是创建你所需要的依赖，然后返回来给你用。</p>
+
+<p>为了看得更清楚，手动的去调injector来获取该依赖，就下面这样做：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;diApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;diService&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">getValue</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>            <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">injector</span><span class="p">([</span><span class="s1">&#39;diApp&#39;</span><span class="p">,</span> <span class="s1">&#39;ng&#39;</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">diService</span> <span class="o">=</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;diService&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">diService</span><span class="p">.</span><span class="nx">getValue</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>而当你在声明说需要的依赖时，AngularJS帮你做了上面这件事情。</p>
+
+<h3>依赖注解(Annotation)的方式</h3>
+
+<p>那么$inject服务，怎么知道应该将什么依赖注入给你呢？</p>
+
+<p>如果从$inject服务的内部来看，有下面三种方式：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// inferred (only works if code not minified/obfuscated)</span>
+</span><span class='line'><span class="nx">$injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">serviceA</span><span class="p">){});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// annotated</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">explicit</span><span class="p">(</span><span class="nx">serviceA</span><span class="p">)</span> <span class="p">{};</span>
+</span><span class='line'><span class="nx">explicit</span><span class="p">.</span><span class="nx">$inject</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;serviceA&#39;</span><span class="p">];</span>
+</span><span class='line'><span class="nx">$injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">explicit</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// inline</span>
+</span><span class='line'><span class="nx">$injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">([</span><span class="s1">&#39;serviceA&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">serviceA</span><span class="p">){}]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么，换成在注册控制器或者服务时，对应也是三种方式：</p>
+
+<p>直接指定，最简单的获取依赖的方法是让你的函数的参数名直接使用依赖名，也就是之前的那些例子一样。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">myController</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">myService</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>$inject服务的官方例子也说了，这种用法只适合于js不需要压缩和混乱的情况下。</p>
+
+<p>而为了让在压缩版的js代码能中重命名过的参数名能够正确地注入相关的依赖服务。函数需要通过$inject属性进行标注，这个属性是一个存放需要注入的服务的数组。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">myController</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">renamed$scope</span><span class="p">,</span> <span class="nx">renamedMyService</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">myController</span><span class="p">[</span><span class="s1">&#39;$inject&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span> <span class="s1">&#39;myService&#39;</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>但是，这种方式是不是看的很累赘。</p>
+
+<p>还有最后一种方法，<strong>内联（inline）</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;myApp&#39;</span><span class="p">,[]).</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;myController&#39;</span><span class="p">,[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span><span class="s1">&#39;myService&#39;</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">myService</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'><span class="p">}]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样是不是好多了，这是AngularJS官方推荐的方法，我之前写的例子，都不算是最佳实践，我们应该参考这种方式去实现自己控制器和服务。</p>
+
+<p>总算，将依赖注入的部分介绍完了，下一节，一起来了解AngularJS为View Model（视图模型）提供的强大的过滤器功能。</p>
+
+<p>参考资料： <br/>
+1.<a href="http://www.ngnice.com/docs/guide/di">http://www.ngnice.com/docs/guide/di</a>  <br/>
+2.<a href="http://www.ngnice.com/docs/api/auto/service/$injector">http://www.ngnice.com/docs/api/auto/service/$injector</a>  <br/>
+3.<a href="http://www.ngnice.com/docs/tutorial/step_05">http://www.ngnice.com/docs/tutorial/step_05</a></p>
 </div>
   
   
