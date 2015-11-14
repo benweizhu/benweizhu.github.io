@@ -1,0 +1,480 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>开始！AngularJS!（六）- 依赖注入 - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="不说废话，开始学习AngularJS的依赖注入，如果你对什么是依赖注入还不明白的话，可以看看Martin Fowler的一篇关于依赖注入的文章
+Inversion of Control Containers and the Dependency Injection pattern，这里也有译文。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/01/04/yes-angularjs-6">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">开始！AngularJS!（六）- 依赖注入</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-04T13:24:06+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:24 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>不说废话，开始学习AngularJS的依赖注入，如果你对什么是依赖注入还不明白的话，可以看看Martin Fowler的一篇关于依赖注入的文章
+<a href="http://martinfowler.com/articles/injection.html" title="Inversion of Control Containers and the Dependency Injection pattern">Inversion of Control Containers and the Dependency Injection pattern</a>，这里也有<a href="http://benweizhu.github.io/blog/2013/09/22/inversion-of-control-containers-and-the-dependency-injection-pattern-translate/" title="译文">译文</a>。</p>
+
+<p>依赖注入就是，在需要此依赖的地方等待被依赖对象注入（传入）进来，而不是通过new关键字去构造，或者去查找某个依赖。</p>
+
+<p>看一个AngularJS依赖注入的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;diApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;diController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;alertValue&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">ng-click=</span><span class="s">&quot;alertMe()&quot;</span> <span class="na">value=</span><span class="s">&quot;clickMe&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;diApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;diController&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$window</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">alertMe</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">$window</span><span class="p">.</span><span class="nx">alert</span><span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">alertValue</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在jsfiddle中查看，<a href="http://jsfiddle.net/n5sknpe9/">http://jsfiddle.net/n5sknpe9/</a></p>
+
+<p>在定义控制器diController时，在构造函数中传入一个对象$scope和一个服务$window。$scope将控制器作用域中的模型alertValue传递进来，而$window则提供alert()方法。</p>
+
+<h3>$inject</h3>
+
+<p>用起来看着确实很简单，那么AngularJS是怎么做到的呢？看下面一个例子。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;diApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;diController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        { {value} }
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;diApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;diService&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">getValue</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>            <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;diController&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">diService</span><span class="p">){</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">diService</span><span class="p">.</span><span class="nx">getValue</span><span class="p">();</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>每个Angular应用都有一个injector对象。这个injector是一个服务定位器，负责创建和查找依赖，当你的app的某处声明需要用到某个依赖时，Angular 会调用这个依赖注入器去查找或是创建你所需要的依赖，然后返回来给你用。</p>
+
+<p>为了看得更清楚，手动的去调injector来获取该依赖，就下面这样做：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;diApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;diService&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">getValue</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>            <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">injector</span><span class="p">([</span><span class="s1">&#39;diApp&#39;</span><span class="p">,</span> <span class="s1">&#39;ng&#39;</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">diService</span> <span class="o">=</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;diService&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">diService</span><span class="p">.</span><span class="nx">getValue</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>而当你在声明说需要的依赖时，AngularJS帮你做了上面这件事情。</p>
+
+<h3>依赖注解(Annotation)的方式</h3>
+
+<p>那么$inject服务，怎么知道应该将什么依赖注入给你呢？</p>
+
+<p>如果从$inject服务的内部来看，有下面三种方式：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// inferred (only works if code not minified/obfuscated)</span>
+</span><span class='line'><span class="nx">$injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">serviceA</span><span class="p">){});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// annotated</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">explicit</span><span class="p">(</span><span class="nx">serviceA</span><span class="p">)</span> <span class="p">{};</span>
+</span><span class='line'><span class="nx">explicit</span><span class="p">.</span><span class="nx">$inject</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;serviceA&#39;</span><span class="p">];</span>
+</span><span class='line'><span class="nx">$injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">explicit</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// inline</span>
+</span><span class='line'><span class="nx">$injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">([</span><span class="s1">&#39;serviceA&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">serviceA</span><span class="p">){}]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么，换成在注册控制器或者服务时，对应也是三种方式：</p>
+
+<p>直接指定，最简单的获取依赖的方法是让你的函数的参数名直接使用依赖名，也就是之前的那些例子一样。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">myController</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">myService</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>$inject服务的官方例子也说了，这种用法只适合于js不需要压缩和混乱的情况下。</p>
+
+<p>而为了让在压缩版的js代码能中重命名过的参数名能够正确地注入相关的依赖服务。函数需要通过$inject属性进行标注，这个属性是一个存放需要注入的服务的数组。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">myController</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">renamed$scope</span><span class="p">,</span> <span class="nx">renamedMyService</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">myController</span><span class="p">[</span><span class="s1">&#39;$inject&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span> <span class="s1">&#39;myService&#39;</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>但是，这种方式是不是看的很累赘。</p>
+
+<p>还有最后一种方法，<strong>内联（inline）</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;myApp&#39;</span><span class="p">,[]).</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;myController&#39;</span><span class="p">,[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span><span class="s1">&#39;myService&#39;</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">myService</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'><span class="p">}]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样是不是好多了，这是AngularJS官方推荐的方法，我之前写的例子，都不算是最佳实践，我们应该参考这种方式去实现自己控制器和服务。</p>
+
+<p>总算，将依赖注入的部分介绍完了，下一节，一起来了解AngularJS为View Model（视图模型）提供的强大的过滤器功能。</p>
+
+<p>参考资料： <br/>
+1.<a href="http://www.ngnice.com/docs/guide/di">http://www.ngnice.com/docs/guide/di</a>  <br/>
+2.<a href="http://www.ngnice.com/docs/api/auto/service/$injector">http://www.ngnice.com/docs/api/auto/service/$injector</a>  <br/>
+3.<a href="http://www.ngnice.com/docs/tutorial/step_05">http://www.ngnice.com/docs/tutorial/step_05</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-01-04T13:24:06+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:24 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/01/04/yes-angularjs-6/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/01/04/yes-angularjs-6/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/01/03/yes-angularjs-5/" title="Previous Post: 开始！AngularJS!（五）- 模块化">&laquo; 开始！AngularJS!（五）- 模块化</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/01/09/use-grunt-to-build-javascript/" title="Next Post: 用Grunt做JavaScript的构建">用Grunt做JavaScript的构建 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="开始！AngularJS!（六）- 依赖注入"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <p style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</p>
+  <div style="margin-left: 8px;">A Java/RoR Application Developer</div>
+  <div style="margin-left: 8px;">A Gradle Plugin Contributor</div>
+  <div style="margin-left: 8px;">A translator for Book 《Gradle in Action》</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle， Spring，前端开发</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

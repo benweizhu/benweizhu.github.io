@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>了解RactiveJS - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="Ractive is a next-generation DOM manipulation library for creating reactive user interfaces, optimised for developer sanity. It was originally &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/10/28/ractivejs">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">了解RactiveJS</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-10-28T14:13:53+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:13 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><blockquote><p>Ractive is a next-generation DOM manipulation library for creating reactive user interfaces, optimised for developer sanity. It was originally developed to create interactive news applications at theguardian.com.</p>
+
+<p>Ractive.js is a template-driven UI library, but unlike other tools that generate inert HTML, it transforms your templates into blueprints for apps that are interactive by default.</p>
+
+<p>Two-way binding, animations, SVG support and more are provided out-of-the-box – but you can add whatever functionality you need by downloading and creating plugins.</p></blockquote>
+
+<p>看看Ractive的介绍，你能够看明白，RactiveJS是干嘛的吗？</p>
+
+<p>1.为用户界面交互提供的下一代DOM操作类库（这是要干掉jQuery的节奏吗？）  <br/>
+2.模板驱动的UI库（模板的概念可以看看我一篇关于《JavaScript模板引擎》的文章），但不同于其他工具产生可以插入的HTML代码，它将模板变成了用户交互的蓝图。 <br/>
+3.双向绑定，动画，和SVG支持等开箱即用的功能。</p>
+
+<p>花费60秒去看一下，官方的《60 second setup》， <a href="http://www.ractivejs.org/60-second-setup">http://www.ractivejs.org/60-second-setup</a></p>
+
+<p>你会发现，这不就是JavaScript模板引擎吗？只不过不需要你，手动将编译得到的HTML片段添加到指定的元素上。</p>
+
+<p>但实际上，还远远不止如此。</p>
+
+<h2>模板引擎</h2>
+
+<p>就像它自己介绍的和你在《60 second setup》中看到了那样，Ractive和模板引擎有很强的关联性，它要求所使用的HTML模板片段是严格符合HTML标准的（不会像浏览器那样，允许一些未关闭的标签）。</p>
+
+<p><strong>引用</strong></p>
+
+<p>在这个模板引擎中有一个“引用”的概念，其实指的就是模板中的占位符变量，比如《60 second setup》中的name变量。</p>
+
+<p>因为在定义的Ractive实例中有一个data属性，包含了所有的“引用”变量，在这里又引入一个context上下文的概念。通过定义上下文（比如messages和user），你就可以不需要messages.total来指定占位符，而是这样：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>{ {#user} }
+</span><span class='line'>  <span class="nt">&lt;p&gt;</span>Welcome back, { {name} }!
+</span><span class='line'>    { {#messages} }
+</span><span class='line'>      You have { {unread} } unread of { {total} } total messages.
+</span><span class='line'>    { {/messages} }
+</span><span class='line'>  <span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>{ {/user} }
+</span><span class='line'>
+</span><span class='line'>data: {//data长这个样
+</span><span class='line'>    user: {
+</span><span class='line'>      name: &#39;Jim&#39;,
+</span><span class='line'>      messages: {
+</span><span class='line'>        total: 10,
+</span><span class='line'>        unread: 3
+</span><span class='line'>      },
+</span><span class='line'>      lastLogin: &#39;Wednesday&#39;
+</span><span class='line'>    }
+</span><span class='line'> }
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>表达式</strong>
+表达式允许你在模板中定义逻辑，比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&#39;bar-chart&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">&#39;width: %;&#39;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>Partial</em></p>
+
+<p>Partial是一个模板代码片段，它可以被插入到模板当中，或者其他的partial中。主要作用是通过抽象（或者抽取）来简化模板的内容。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="c">&lt;!-- the main template --&gt;</span>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&#39;gallery&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'>  { {#items} }
+</span><span class='line'>    { {&gt;thumbnail} }
+</span><span class='line'>  { {/items} }
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="c">&lt;!-- the partial --&gt;</span>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&#39;bogus-wrapper&#39;</span><span class="nt">&gt;&lt;notextile&gt;&lt;figure</span> <span class="na">class=</span><span class="s">&#39;thumbnail&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&#39;assets/thumbnails/.jpg&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;figcaption&gt;&lt;/figcaption&gt;</span>
+</span><span class='line'><span class="nt">&lt;/figure&gt;&lt;/notextile&gt;&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ractive</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Ractive</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">el</span><span class="o">:</span> <span class="nx">myContainer</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">template</span><span class="o">:</span> <span class="nx">myTemplate</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">partials</span><span class="o">:</span> <span class="p">{</span> <span class="nx">thumbnail</span><span class="o">:</span> <span class="nx">myThumbnailPartial</span> <span class="p">},</span>
+</span><span class='line'>  <span class="nx">data</span><span class="o">:</span> <span class="p">{</span> <span class="nx">items</span><span class="o">:</span> <span class="nx">myItems</span> <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>双向绑定</h2>
+
+<p>数据双向绑定的概念在后端MVC中用的挺多的，比如，SpringMVC。而实现并标榜这一特性的前端框架也很多，例如Ember.js，AngularJS以及KnockoutJS。</p>
+
+<p>默认情况下，如果你有使用input，textarea或者select等元素，Ractive实例会基于用户的输入更新它的内部模型。</p>
+
+<p>如果你不想在某一个元素上使用双向绑定，你可以通过设置twoway: false属性，将该特性disable。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;input</span> <span class="na">value=</span><span class="s">&quot;{ {foo} }&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;input</span> <span class="na">value=</span><span class="s">&quot;{ {foo} }&quot;</span> <span class="na">twoway=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>双向绑定对contenteditable元素的支持</strong></p>
+
+<p>contenteditable是html5的属性，任何一个元素，比如div，加上contenteditable，该元素就可以被编辑了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">contenteditable=</span><span class="s">&quot;true&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-10-28T14:13:53+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:13 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/10/28/ractivejs/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/10/28/ractivejs/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/10/28/js-template-engine/" title="Previous Post: 了解JavaScript模板引擎">&laquo; 了解JavaScript模板引擎</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/10/31/responsive-design/" title="Next Post: 了解响应式设计">了解响应式设计 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="了解RactiveJS"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <p style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</p>
+  <div style="margin-left: 8px;">A Java/RoR Application Developer</div>
+  <div style="margin-left: 8px;">A Gradle Plugin Contributor</div>
+  <div style="margin-left: 8px;">A translator for Book 《Gradle in Action》</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle， Spring，前端开发</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

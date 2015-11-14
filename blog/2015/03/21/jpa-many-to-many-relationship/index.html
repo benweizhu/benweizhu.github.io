@@ -1,0 +1,463 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>JPA中的多对多关系 - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="在关系型数据库中，表与表之间的关系是通过外键来实现，而其中最常见的关系有两种：一对多和多对多。 在面向对象的世界，对象与对象之间的关系是通过从源对象到目标对象的对象引用实现。关系是一个对象含有的其他对象或者对象的集合，而在关系型数据库中，关系要么通过定义另一张表的外键建立，要么通过中间表建立。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/03/21/jpa-many-to-many-relationship">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">JPA中的多对多关系</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-03-21T10:44:43+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>10:44 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>在关系型数据库中，表与表之间的关系是通过外键来实现，而其中最常见的关系有两种：一对多和多对多。</p>
+
+<p>在面向对象的世界，对象与对象之间的关系是通过从源对象到目标对象的对象引用实现。关系是一个对象含有的其他对象或者对象的集合，而在关系型数据库中，关系要么通过定义另一张表的外键建立，要么通过中间表建立。</p>
+
+<p>在Java或者JPA的世界里，所有的关系都是单向性的，一个源对象保有目标对象的索引，并不能保证目标对象和源对象一样包含源对象的索引。这个关系型数据库就不一样了，在关系型数据库中，表之间的关系通过外键来实现，查询语句通过这个外键，可以进行正向和反向的查询。</p>
+
+<p>ManyToMany多对多关系是关系型数据库中一种非常常见的表关系。</p>
+
+<p>在JPA中，如果要实现ManyToMany关系，常常是利用的一种方式是中间表。所有的ManyToMany关系都需要一个JoinTable，在这个JoinTable中，通过JoinColumns定义了两个外键，一个外键来指向源表的主键，另一个外键指向目标表的主键，通常JoinTable的主键是两个外键的组合。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Employee</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@Id</span>
+</span><span class='line'>  <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="nd">@ManyToMany</span>
+</span><span class='line'>  <span class="nd">@JoinTable</span><span class="o">(</span>
+</span><span class='line'>      <span class="n">name</span><span class="o">=</span><span class="s">&quot;EMP_PROJ&quot;</span><span class="o">,</span>
+</span><span class='line'>      <span class="n">joinColumns</span><span class="o">={</span><span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;EMP_ID&quot;</span><span class="o">,</span> <span class="n">referencedColumnName</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)},</span>
+</span><span class='line'>      <span class="n">inverseJoinColumns</span><span class="o">={</span><span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;PROJ_ID&quot;</span><span class="o">,</span> <span class="n">referencedColumnName</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)})</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="n">projects</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">.....</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>双向ManyToMany</p>
+
+<p>虽然在数据库中ManyToMany总是双向的，但是在对象模型中定义双向关系时，需要定义映射的发起方（管理方）和映射的接收方。发起方需要定义JoinTable，接收方则需要定义mappedBy。如果不使用mappedBy，则Jpa的实现者会认为，这种多对多关系是两个独立定义的关系，就会有重复的两行记录插入到JoinTable中。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Project</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@Id</span>
+</span><span class='line'>  <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="nd">@ManyToMany</span><span class="o">(</span><span class="n">mappedBy</span><span class="o">=</span><span class="s">&quot;projects&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Employee</span><span class="o">&gt;</span> <span class="n">employees</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>双向关系的共同毛病</p>
+
+<p>需要应用程序自己去维护它们（对象）之间的双向关系，否则就不同步（out of sync）。在写set方法或者，多对多关系中的add方法时，需要注意将自己的引用设置到包含的集合对象中。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Employee</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">List</span> <span class="n">phones</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addPhone</span><span class="o">(</span><span class="n">Phone</span> <span class="n">phone</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">phones</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">phone</span><span class="o">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">phone</span><span class="o">.</span><span class="na">getOwner</span><span class="o">()</span> <span class="o">!=</span> <span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">phone</span><span class="o">.</span><span class="na">setOwner</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Phone</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Employee</span> <span class="n">owner</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setOwner</span><span class="o">(</span><span class="n">Employee</span> <span class="n">employee</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">owner</span> <span class="o">=</span> <span class="n">employee</span><span class="o">;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(!</span><span class="n">employee</span><span class="o">.</span><span class="na">getPhones</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="k">this</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">employee</span><span class="o">.</span><span class="na">getPhones</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>多对多关系的管理方的选择</p>
+
+<p>多对多关系的管理方的定义取决于JoinTable的定义方，至于由哪一边作为管理方，取决于业务的关系，所以并不固定。但是必须要理解的时，它们之间建立关系的方式（即谁管理谁）。举个例子，User和Group，这是一个常见的多对多关系，当你将管理方定义在Group这边时，你要做的是将User添加到Group，然后保存Group。而不能将Group添加给User，然后保存User。</p>
+
+<p>应用级联</p>
+
+<p>由某一方来管理对象的操作，需要应用级联属性，来说明是否将级联操作传递到对应的实体类上。如果你在存储一个对象时，该对象关联到另一个对象，而它们之间的关系没有使用级联，则会抛出异常，告诉你，需要先存储关联对象。</p>
+
+<p>级联操作的类型有6种，分别是ALL，PERSIST，MERGE，REMOVE，REFRESH，DETACH。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">enum</span> <span class="n">CascadeType</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade all operations */</span>
+</span><span class='line'>    <span class="n">ALL</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade persist operation */</span>
+</span><span class='line'>    <span class="n">PERSIST</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade merge operation */</span>
+</span><span class='line'>    <span class="n">MERGE</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade remove operation */</span>
+</span><span class='line'>    <span class="n">REMOVE</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade refresh operation */</span>
+</span><span class='line'>    <span class="n">REFRESH</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Cascade detach operation</span>
+</span><span class='line'><span class="cm">     *</span>
+</span><span class='line'><span class="cm">     * @since Java Persistence 2.0</span>
+</span><span class='line'><span class="cm">     *</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="n">DETACH</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@ManyToMany</span><span class="o">(</span><span class="n">cascade</span> <span class="o">=</span> <span class="n">CascadeType</span><span class="o">.</span><span class="na">ALL</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料：  <br/>
+1.<a href="http://en.wikibooks.org/wiki/Java_Persistence/ManyToMany">http://en.wikibooks.org/wiki/Java_Persistence/ManyToMany</a>   <br/>
+2.<a href="http://stackoverflow.com/questions/4935095/jpa-hibernate-many-to-many-cascading">http://stackoverflow.com/questions/4935095/jpa-hibernate-many-to-many-cascading</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-03-21T10:44:43+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>10:44 am</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/03/21/jpa-many-to-many-relationship/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/03/21/jpa-many-to-many-relationship/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/03/15/deep-into-gradle-in-action-5/" title="Previous Post: Gradle深入与实战（五）自定义插件">&laquo; Gradle深入与实战（五）自定义插件</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/03/31/deep-into-gradle-in-action-6/" title="Next Post: Gradle深入与实战（六）Gradle的背后是什么？">Gradle深入与实战（六）Gradle的背后是什么？ &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="JPA中的多对多关系"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <p style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</p>
+  <div style="margin-left: 8px;">A Java/RoR Application Developer</div>
+  <div style="margin-left: 8px;">A Gradle Plugin Contributor</div>
+  <div style="margin-left: 8px;">A translator for Book 《Gradle in Action》</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle， Spring，前端开发</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,610 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="传统的Web应用，以Java栈为例，无论是纯Servlet还是MVC框架，比如，SpringMVC，Struts。在页面上的导航都比较简单，只需要在浏览器地址栏输入URL，一个URL用来指向服务器上一个单一的物理资源（页面文件）。当页面加载后，就可以点击链接跳转到其他资源， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/posts/22">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/01/23/yes-angularjs-8/">开始！AngularJS!（八）- 路由</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-23T22:18:10+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>10:18 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>传统的Web应用，以Java栈为例，无论是纯Servlet还是MVC框架，比如，SpringMVC，Struts。在页面上的导航都比较简单，只需要在浏览器地址栏输入URL，一个URL用来指向服务器上一个单一的物理资源（页面文件）。当页面加载后，就可以点击链接跳转到其他资源，或者使用前进后退按钮跳转到已访问的页面。</p>
+
+<p>通过修改DOM，动态生成页面的Web应用改变了这一现状，因为对页面内容的改变是直接对页面DOM元素的修改，而不是向服务器发出请求。于是，前进后退按钮在这种情况受到了影响。</p>
+
+<h2>URL</h2>
+
+<p>那么，对于单页应用，如何能够修改浏览器的URL，让浏览器可以前进后退，但是又不会向服务器发出请求？</p>
+
+<h3>HashBang URL</h3>
+
+<p>通过修改URL定制中#符号后面的部分，而不会触发当前页面重新加载。比如， <a href="http://localhost:3000/#/user/123">http://localhost:3000/#/user/123</a> ，浏览器会选取URL中#号后面的差异部分来提供前进后退。</p>
+
+<h3>另一种方式，HTML5的historyAPI</h3>
+
+<p>这里首先要说明浏览器的前进和后退都依赖于浏览器的history堆栈（window.history对象），保证浏览器history堆栈的记录正确，前进后退的按钮就可以正常工作。HTML5中的history正好提供了方法来将URL推送到浏览器的history堆栈。然后只要监听window.onpopstate事件就可以修改应用的状态。</p>
+
+<p>但是当直接在服务器上输入URL时，还是会向服务器发送请求，这个时候还需要在服务器端做些事情，让服务器始终返回应用首页。所以这种方式会相对麻烦一些。</p>
+
+<p>当看到#号，你可能会想到另一个东西，HTML中的锚点，定位页面的位置。在HashBang方式下，需要借助AngularJS的一个服务$anchorScroll以及两个#来实现锚点。比如 <a href="http://localhost:3000/#/user/123#name">http://localhost:3000/#/user/123#name</a></p>
+
+<h2>使用AngularJS的路由服务</h2>
+
+<p>AngularJS内置了$route服务来处理Web应用的路由，并通过ng-view指令来显示匹配路由的内容，看下面的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;routeApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;#/admin&quot;</span><span class="nt">&gt;</span>admin<span class="nt">&lt;/a&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-view</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>被插入的模板，动态渲染部分</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;adminController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>   I am admin.
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;routeApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngRoute&#39;</span><span class="p">])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$routeProvider</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/admin&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/admin/admin.html&#39;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;adminController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里引入了.config方法，需要穿插介绍一点知识：模块的生命周期。AngularJS将模块的生命周期分为两个阶段，配置阶段和运行阶段。其中模块的.config方法可以用来注册一些需要在模块加载时候执行的动作或者进行的配置，比如这里的路由配置。</p>
+
+<p>AngularJS的路由服务在angular-route.js中，所以首先需要引入它，然后引入子模块ngRoute，在config方法中注入$routeProvider服务，然后剩下的就很清楚了，和Java技术栈中道理一样，URL和资源文件的Mapping。</p>
+
+<p>ng-view指令可以通过当前匹配的路由找到要显示的内容。</p>
+
+<h3>URL查询参数</h3>
+
+<p><a href="http://localhost:3000/#/user?id=123">http://localhost:3000/#/user?id=123</a> 或者 <a href="http://localhost:3000/#/user/123">http://localhost:3000/#/user/123</a></p>
+
+<p>几乎所有Web应用，遇到这样的URL是太平常的事情了，那么这种动态的URL应该怎么匹配呢？在AngularJS中，URL中任何以冒号（:）开头的字符串都会作为通配符。无论是这里的$routeProvider.when(/user/id=:userid)还是之后会介绍的与后端restful api通信的$resource服务在定义URL的时候。</p>
+
+<p>那么如何在controller中获取该参数呢？$routeParams服务。我们可以在controller中注入该服务，看下面的例子。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;routeApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngRoute&#39;</span><span class="p">])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$routeProvider</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/user/:userid&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/user/user.html&#39;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;userController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope, &#39;</span><span class="nx">$routeParams</span><span class="err">&#39;</span><span class="p">,</span>
+</span><span class='line'>       <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$routeParams</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">$scope</span><span class="p">.</span><span class="nx">userid</span> <span class="o">=</span> <span class="nx">$routeParams</span><span class="p">.</span><span class="nx">userid</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>多个控制器重用模块</h3>
+
+<p>在上面的例子中，url对应的页面文件是这样的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;adminController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>   I am admin.
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>模板的作用域固定为adminController的，如果不同路由下的其他controller也想用该模块，那么就得重新建一个新的html文件。</p>
+
+<p>还有一种办法，就是将controller的声明放在路由的定义中。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div&gt;</span>
+</span><span class='line'>   I am admin.
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;routeApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngRoute&#39;</span><span class="p">])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$routeProvider</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/admin&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/admin/adminOrSuperUser.html&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;adminController&#39;</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/superUser&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/admin/adminOrSuperUser.html&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;superUserController&#39;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;adminController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;superUserController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样多个控制器就可以使用相同的模板。</p>
+
+<h3>指定默认路由</h3>
+
+<p>就和编程语言中的switch一样，在$routeProvider还提供了otherwise方法来设置默认路由，很明显它只能是一个，一般的做法是通过redirectTo属性，跳转到一个已有的路由上。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">$routeProvider</span><span class="p">.</span><span class="nx">otherwise</span><span class="p">({</span><span class="nx">redirectTo</span><span class="o">:</span> <span class="s1">&#39;/home&#39;</span><span class="p">});</span>
+</span><span class='line'><span class="p">}]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>下一节，学习通过$Resource与后端restful的API通信。</p>
+
+<p>参考资料：</p>
+
+<ol>
+<li>精通AngularJS</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/01/17/yes-angularjs-7/">开始！AngularJS!（七）- 过滤器</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-17T13:38:17+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:38 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>过滤器，按照一般的理解是，按照某个标准（或者阈值），将输入的内容中不满足要求的排除，得到最后的满足要求的输出。</p>
+
+<p>但过滤器还有一个更宽泛的理解，就是数据变换处理器。</p>
+
+<p>在AngularJS中，过滤器就是一个数据变换函数，将输入的数据进行处理，得到对应输出结果。</p>
+
+<h2>AngularJS内置过滤器</h2>
+
+<h4>格式化过滤器</h4>
+
+<p>currency：用两个小数位和一个货币符号来格式化数字 <br/>
+date：根据指定的数据格式来格式化日期，模型包含的日期可表达为Date对象或者字符串（这时字符串会在格式化前被解析为Date对象）  <br/>
+number：用参数指定的小数位数量格式化输入 <br/>
+lowercase和uppercase：转换大小写 <br/>
+json：主要用于调试，它能打印出漂亮的JavaScript对象</p>
+
+<h4>数组变换过滤器</h4>
+
+<p>limitTo：它将数组收缩到参数指定的长度，可以从集合的头或尾开始保留其中的元素（如果是尾部，则参数必须是负数）  <br/>
+Filter：提供通用的过滤功能，它非常灵活，支持很多可以精确从集合中选择元素的选项    <br/>
+orderBy：此排序过滤器根据给定的条件对数组中的元素进行排序</p>
+
+<h2>过滤器的使用</h2>
+
+<h3>在模板中使用</h3>
+
+<p>最简单的过滤使用方式: { { 表达式 | 过滤器名 } }</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;words&quot;</span><span class="nt">/&gt;</span>全部转换成大写
+</span><span class='line'>        { {words | uppercase} }
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>过滤器可以应用在另外一个过滤器的结果上，叫做“链式”调用: { { 表达式 | 过滤器1 | 过滤器2 | &hellip; } }</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;words&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>         { {words | uppercase | lowercase} }
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>过滤器可以拥有（多个）参数: { { 表达式 | 过滤器:参数1:参数2:&hellip; } }</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;num&quot;</span><span class="nt">/&gt;</span>最多显示到小数点后四位
+</span><span class='line'>        { {num | number:4} }
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>内置过滤器是全局的命名函数，在视图中通过管道(|)符号调用，接收用冒号(:)分割的参数。</p>
+
+<h3>控制器和服务中使用过滤器</h3>
+
+<p>过滤器又可以链式的使用又可以传递参数，那它的本质是什么？在前面其实已经讲过，是数据的变换函数，本质是函数。</p>
+
+<p>所以，你同样可以在控制器和服务中使用过滤器。注入过滤器有一种简单的方法，在控制器或者服务中添加以“&lt;过滤器名>Filter”为名的依赖。例如，使用&#8221;uppercaseFilter&#8221;为依赖时，会相应的注入uppercase过滤器。</p>
+
+<p>看下面的例子：在控制器中注入&#8221;uppercaseFilter&#8221;，然后将输入的小写转换成大写</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;filterApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;filterController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;value&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">value=</span><span class="s">&quot;To Upper Case&quot;</span> <span class="na">ng-click=</span><span class="s">&quot;changeToUpperCase()&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;filterApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;filterController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;uppercaseFilter&#39;</span><span class="p">,</span> <span class="s1">&#39;$scope&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">uppercaseFilter</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">changeToUpperCase</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">uppercaseFilter</span><span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">}]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>自定义过滤器</h2>
+
+<p>除了使用AngularJS内置的过滤器，我们还可以定义自己的过滤器</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;filterApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;value&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;filterApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="s1">&#39;subString&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">input</span><span class="p">,</span> <span class="nx">number</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">input</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>优点和缺点</h2>
+
+<p>过滤器的优点就是，它们不需要在作用域上注册函数，而且与规整的函数调用相比，通常具有更简洁的语法</p>
+
+<p>缺点是，过滤器的调用是频繁的，过滤器是函数，当模型发生变换时，使用了过滤器的表达式就是进行一次求值，所以被调用的次数非常的平凡。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/posts/23">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/posts/21">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <p style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</p>
+  <div style="margin-left: 8px;">A Java/RoR Application Developer</div>
+  <div style="margin-left: 8px;">A Gradle Plugin Contributor</div>
+  <div style="margin-left: 8px;">A translator for Book 《Gradle in Action》</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle， Spring，前端开发</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

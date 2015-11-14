@@ -1,0 +1,952 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="对于初学JavaScript的人很容易去关注如何快速使用它，而忘记学好一门语言，应该首先掌握的基本知识，我就是这样。但是基础知识才是真正掌握一门语言最关键的部分，特别是JavaScript这个看上去好像和C++、Java相同，但实际上完全不是一回事的语言。 作用域 在编程语言中， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/posts/33">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/22/something-you-need-to-know-about-javascript/">JavaScript中你需要了解的基本知识（一）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-22T14:16:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2014</span></span> <span class='time'>2:16 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>对于初学JavaScript的人很容易去关注如何快速使用它，而忘记学好一门语言，应该首先掌握的基本知识，我就是这样。但是基础知识才是真正掌握一门语言最关键的部分，特别是JavaScript这个看上去好像和C++、Java相同，但实际上完全不是一回事的语言。</p>
+
+<h2><strong>作用域</strong></h2>
+
+<p>在编程语言中，作用域控制着变量与参数的可见性及生命周期，是一个很基本的问题。</p>
+
+<p>但是和类C语言不同，JavaScript没有块级别作用域。</p>
+
+<p>所谓块级作用域，即在一个代码块中定义的所有变量在代码块的外部都是不可见的，定义在代码块中的变量在代码块执行结束后会被释放掉。</p>
+
+<p>Java中print方法中的a肯定是未定义的变量，编译器会标红，因为a是if块中的局部变量。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="o">(</span><span class="kc">true</span><span class="o">){</span>
+</span><span class='line'>      <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">a</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>但是在JavaScript中，a变量就可以被访问。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">if</span><span class="p">(</span><span class="kc">true</span><span class="p">){</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>JavaScript是由函数限定变量的作用域，意味着定义在函数中的参数和变量在函数外部是不可见的，而函数内可以访问函数外部的变量。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">carName</span> <span class="o">=</span> <span class="s1">&#39;byd&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">visitName</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">carName</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">visitName</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>JavaScript允许延迟声明变量，但是对于JavaScript缺少块级别作用域，所以这是个悲剧，推荐的做法是在函数的开头声明所有需要使用的变量。</p>
+
+<h2><strong>词法作用域和作用域链</strong></h2>
+
+<p>JavaScript是一种解释性语言。在解释过程中，JavaScript引擎是严格按照作用域来执行的。JavaScript语法采用的是词法作用域，也就是说JavaScript的变量和函数作用域是在定义时决定的，而不是执行时决定的，由于词法作用域决定于代码结构，所以JavaScript解释器只需要通过静态分析就能确定每个变量、函数的作用域，这种作用域也称为静态作用域。</p>
+
+<p>JavaScript解释器通过作用域链把多个嵌套的作用域串联在一起，并借助这个链条帮助JavaScript解释器检索变量的值。这个作用域链相当于一个索引表，通过编号来存储它们的嵌套关系。当JavaScript解释器检索变量的值，会按照这个索引编号进行快速查找，直到找到全局对象为止，如果没有找到值，则传递一个undefined。</p>
+
+<p>看下面这个比较经典的例子</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">carName</span> <span class="o">=</span> <span class="s1">&#39;byd&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">visitName</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">carName</span><span class="p">);</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">carName</span> <span class="o">=</span> <span class="s1">&#39;bmw&#39;</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">carName</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">visitName</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>第一个输出结果：undefined</p>
+
+<p>第二个输出结果：bmw</p>
+
+<p>原因就是它的作用域由静态分析决定，他在visitName中找到carName。所以当遇到第一个console.log(carName)，它并没有到外层的作用域去寻找。</p>
+
+<h2><strong>全局变量和全局对象</strong></h2>
+
+<p>JavaScript中，在所有函数之外声明的变量为全局变量，而在函数内部声明的变量（通过var关键字）为局部变量。</p>
+
+<p>全局变量在所有的作用域中都是可见的。这样一种特殊的变量，就算不是在JavaScript语言中，也是不受欢迎的。</p>
+
+<p>但是在JavaScript中实在太容易就创建一个全局变量，所以要格外小心。</p>
+
+<p>JavaScript中定义全局变量的方式有三种：</p>
+
+<p>1.在任何函数之外定义一个var语句变量。</p>
+
+<p>2.直接给全局对象添加一个属性，全局对象是全局变量和全局函数的容器。</p>
+
+<p>3.没有使用var关键字声明的变量，它在任何作用域中被使用的时候，都会被当做全局变量（与上面介绍的作用域链相关）。</p>
+
+<p>关于第3种情况：JavaScript有一种特性叫做隐式全局变量，不管一个变量有没有用过，JavaScript解释器反向遍历作用域链来查找该变量的var声明，如果没有找到，解释器则假定该变量是全局变量，如果该变量用于了赋值操作的话，之前如果不存在的话，解释器则会自动创建它。</p>
+
+<p>上面提到了一个全局对象的概念，在Web浏览器中，全局对象的名称是windows。全局对象是预定义的对象，作为JavaScript的全局函数和全局属性的占位符。通过使用全局对象，可以访问所有其他所有预定义的对象（例如，document（浏览器容器下））、函数（例如，parseInt()）和属性。</p>
+
+<p>看下面这个例子，通过三种方式创建全局变量。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">carName</span> <span class="o">=</span> <span class="s1">&#39;byd&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">defineGlobalVariable</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nb">window</span><span class="p">.</span><span class="nx">carPrice</span> <span class="o">=</span> <span class="mi">90000</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">carCount</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">defineGlobalVariable</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">print</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">carName</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">carPrice</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">carCount</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">print</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2><strong>对象</strong></h2>
+
+<p>在JavaScript中，只有对象，一切都是对象。</p>
+
+<p>首先要明确一点，JavaScript是面向对象的语言，但是它与C++、Java的面向对象不同。JavaScript不是基于类的面向对象，而是基于原型的面向对象，在JavaScript中没有类的概念。</p>
+
+<p>在基于类的面向对象中，要创建对象，首先要有类。类是对象的抽象描述。类为它们的实例定义了严格不变的结构（属性）和严格不变的行为（方法）。</p>
+
+<p>在基于原型的面向对象中，是动态可变的对象。他们可以很容易地改变（添加，删除，修改）自己的属性。在对对象的属性赋值的时候，如果某些属性不存在，则创建它并且将赋值与它进行初始化，如果它存在，就更新它。</p>
+
+<p>JavaScript里的对象是无类型的，它是属性的容器，是一系列属性的集合，而每一个属性包含名字和值（键值对）。（是不是有点像Map）</p>
+
+<p>属性的名字和属性的值没有限制，它可以是Number、String、Boolean或者另一个对象或者一个函数。</p>
+
+<p>为什么属性可以是一个函数。原因是在JavaScript中，函数也是对象。</p>
+
+<h2><strong>JavaScripty原生对象</strong></h2>
+
+<p>Object|Number|String|Boolean|Date|Array|RegExp</p>
+
+<p>Function</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">new</span> <span class="nb">Function</span> <span class="p">([</span><span class="nx">arg1</span><span class="p">[,</span> <span class="nx">arg2</span><span class="p">[,</span> <span class="p">...</span> <span class="nx">argN</span><span class="p">]],]</span> <span class="nx">functionBody</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在JavaScript中，一个函数实际上是一个Function对象。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">fn</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Function</span><span class="p">(</span><span class="s2">&quot;arg1&quot;</span><span class="p">,</span> <span class="s2">&quot;arg2&quot;</span><span class="p">,</span> <span class="s2">&quot;return arg1 * arg2;&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">alert</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">));</span><span class="c1">//6</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2><strong>对象字面量</strong></h2>
+
+<p>在JavaScript中创建对象有三种方式：</p>
+
+<p>1.通过Object创建</p>
+
+<p>2.通过自定义对象构造器创建</p>
+
+<p>3.对象字面量</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">audiCar</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Object</span><span class="p">();</span>
+</span><span class='line'><span class="nx">audiCar</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;audi&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">audiCar</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">bmwCar</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">myBmwCar</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">bmwCar</span><span class="p">(</span><span class="s1">&#39;bmw&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">myBmwCar</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//字面量模式</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">bydCar</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;byd&#39;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">bydCar</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>从上面的代码可以看出，字面量写法的一个明显优势是，它的代码更少。</p>
+
+<p>JavaScript中的字面量模式更加简洁、有表现力，而且在定义对象时不容易出错。</p>
+
+<p>如果调用Object()创建对象，解析器需要顺着作用域链从当前作用域开始查找，直到找到全局Object()构造函数为止，如果你在某个域中创建了一个Object()方法就会有问题。</p>
+
+<p>这里有一篇关于JavaScript创建对象的三种方式的介绍，是翻译自JavaScript Pattern。里面有更多关于为什么使用字面量定义对象更好。
+<a href="https://github.com/TooBug/javascript.patterns/blob/master/chapter3.markdown">https://github.com/TooBug/javascript.patterns/blob/master/chapter3.markdown</a></p>
+
+<h2><strong>函数</strong></h2>
+
+<p>因为函数是对象，所以它们可以像任何其他的值一样被使用。函数可以保存在变量、对象和数组（数组也是对象）中。函数可以被当做参数传递给其他函数，函数也可以在返回函数。而且，因为函数是对象，所以函数可以拥有方法。</p>
+
+<h2><strong>函数字面量（函数表达式）</strong></h2>
+
+<p>定义函数有两种常用方法：</p>
+
+<p>1.函数声明</p>
+
+<p>2.函数字面量（函数表达式）</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">getCarName</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">&quot;byd&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">getCarName</span><span class="p">());</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">getCarPrice</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">90000</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">getCarPrice</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这两种写法相差无几，实际项目中都是可行的，我们可能也没有发现什么错误。但是，他们是有区别的，JavaScript解析器对函数声明和函数表达式并不是一视同仁的。</p>
+
+<p>对于函数声明，JavaScript解析器会在预解析阶段优先读取函数声明的代码，以确保函数能够被引用到；而对于函数表达式，只有在执行到相应的语句时才进行解析。</p>
+
+<p>在实际中，具体表现在：当使用函数声明的形式来定义函数时，可将调用放在函数声明之前，而使用函数表达式，这样做的话会报错。如下例：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">runCar</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">runCar</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;run car&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">runTrain</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">runTrain</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;run train&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/13/spring-batch-job-by-example-2/">一起学学Spring Batch（二）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-13T14:31:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>2:31 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>所有的Batch处理都可以以一种最简单的方式描述，那就是<strong>读取大量的数据，然后进行某种方式的计算或者变形，最后输出写入到某个存储系统中</strong>。Spring Batch提供了三个简单的接口来帮助执行大量数据的读写，分别是<strong>ItemReader、ItmeWriter和ItermProcessor</strong>，你可以说它们是抽象出来的一种简单概念，它们同样也是针对不同类型数据的输入、输出和处理的方法。</p>
+
+<p>我们最常用到的数据类型有三种：<strong>数据库、XML和Flat文件</strong>。为了能够清晰的描述Batch处理的流程，我们采用Flat这种文件作为输入和输出数据源，排除数据库操作和XML文件解析的带来的理解上的复杂度。</p>
+
+<p>“Flat文件是一种包含没有相对关系结构的记录的文件。这个类型通常用来描述文字处理、其他结构字符或标记被移除了的文本。在任何事件中，许多用户把保存成“纯文本(text only)”类型的Microsoft Word文档叫做“Flat File(flat file)”。Flat File的另一种形式是包含了用ASCII码记录的，每个表单元由逗号分隔，用行表示记录组的文件。这种文件页叫做用逗号分隔数值(CSV)的文件.”</p>
+
+<p><strong>这里给出一个例子</strong>，从一个csv格式的flat文件中读取英语、数学、文学的分数，然后计算平均分，将结果写入另一个csv格式文件。</p>
+
+<p>首先是两个Model，分别是输入的数据模型ExamScore和输出的数据模型AverageScore。</p>
+
+<figure class='code'><figcaption><span>ExamScore.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">model</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ExamScore</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">id</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">english</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">math</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">literature</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setId</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getEnglish</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">english</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setEnglish</span><span class="o">(</span><span class="kt">int</span> <span class="n">english</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">english</span> <span class="o">=</span> <span class="n">english</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getMath</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">math</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setMath</span><span class="o">(</span><span class="kt">int</span> <span class="n">math</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">math</span> <span class="o">=</span> <span class="n">math</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getLiterature</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">literature</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setLiterature</span><span class="o">(</span><span class="kt">int</span> <span class="n">literature</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">literature</span> <span class="o">=</span> <span class="n">literature</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>AverageScore.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">model</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AverageScore</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">id</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">double</span> <span class="n">score</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setId</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">double</span> <span class="nf">getScore</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">score</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setScore</span><span class="o">(</span><span class="kt">double</span> <span class="n">score</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">score</span> <span class="o">=</span> <span class="n">score</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后是Processor，这里实现ItemProcessor接口。在process方法中传入输入数据模型，返回输出数据模型。</p>
+
+<figure class='code'><figcaption><span>ScoreProcessor.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">processor</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.batch.model.AverageScore</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.batch.model.ExamScore</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.item.ItemProcessor</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ScoreProcessor</span> <span class="kd">implements</span> <span class="n">ItemProcessor</span><span class="o">&lt;</span><span class="n">ExamScore</span><span class="o">,</span> <span class="n">AverageScore</span><span class="o">&gt;</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">double</span> <span class="n">COUNT</span> <span class="o">=</span> <span class="mf">3.0</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Override</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">AverageScore</span> <span class="nf">process</span><span class="o">(</span><span class="n">ExamScore</span> <span class="n">examScore</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">AverageScore</span> <span class="n">averageScore</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">AverageScore</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">averageScore</span><span class="o">.</span><span class="na">setId</span><span class="o">(</span><span class="n">examScore</span><span class="o">.</span><span class="na">getId</span><span class="o">());</span>
+</span><span class='line'>      <span class="n">averageScore</span><span class="o">.</span><span class="na">setScore</span><span class="o">(</span><span class="n">calculateAverageScore</span><span class="o">(</span><span class="n">examScore</span><span class="o">));</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">averageScore</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">double</span> <span class="nf">calculateAverageScore</span><span class="o">(</span><span class="n">ExamScore</span> <span class="n">examScore</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="o">(</span><span class="n">examScore</span><span class="o">.</span><span class="na">getEnglish</span><span class="o">()</span> <span class="o">+</span> <span class="n">examScore</span><span class="o">.</span><span class="na">getLiterature</span><span class="o">()</span> <span class="o">+</span> <span class="n">examScore</span><span class="o">.</span><span class="na">getMath</span><span class="o">())</span> <span class="o">/</span> <span class="n">COUNT</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>和上篇文章的一样，在spring-batch-beans.xml中定义了关于Sping Batch的一些基础Bean。</p>
+
+<figure class='code'><figcaption><span>spring-batch-beans.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;transactionManager&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.support.transaction.ResourcelessTransactionManager&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jobRepository&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;transactionManager&quot;</span> <span class="na">ref=</span><span class="s">&quot;transactionManager&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jobLauncher&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.core.launch.support.SimpleJobLauncher&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;jobRepository&quot;</span> <span class="na">ref=</span><span class="s">&quot;jobRepository&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>重点是下面一个xml文件spring-batch-jobs.xml，在这个里面定义所有关于Batch Job的具体内容。</p>
+
+<figure class='code'><figcaption><span>spring-batch-jobs.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:batch=</span><span class="s">&quot;http://www.springframework.org/schema/batch&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch</span>
+</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;import</span> <span class="na">resource=</span><span class="s">&quot;spring-batch-beans.xml&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;csvFileReader&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.FlatFileItemReader&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;resource&quot;</span> <span class="na">value=</span><span class="s">&quot;file:/Users/twer/Documents/gradle-project/spring-batch-example/src/main/resources/reader_file.csv&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;lineMapper&quot;</span> <span class="na">ref=</span><span class="s">&quot;lineMapper&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;lineMapper&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.mapping.DefaultLineMapper&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;lineTokenizer&quot;</span> <span class="na">ref=</span><span class="s">&quot;lineTokenizer&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;fieldSetMapper&quot;</span> <span class="na">ref=</span><span class="s">&quot;fieldSetMapper&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;lineTokenizer&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.transform.DelimitedLineTokenizer&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;delimiter&quot;</span> <span class="na">value=</span><span class="s">&quot;,&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;names&quot;</span> <span class="na">value=</span><span class="s">&quot;id,english,math,literature&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;fieldSetMapper&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;targetType&quot;</span> <span class="na">value=</span><span class="s">&quot;me.zeph.spring.batch.model.ExamScore&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;csvFileProcessor&quot;</span> <span class="na">class=</span><span class="s">&quot;me.zeph.spring.batch.processor.ScoreProcessor&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;csvFileWriter&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.FlatFileItemWriter&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;resource&quot;</span> <span class="na">value=</span><span class="s">&quot;file:/Users/twer/Documents/gradle-project/spring-batch-example/src/main/resources/writer_file.csv&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;lineAggregator&quot;</span> <span class="na">ref=</span><span class="s">&quot;lineAggregator&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;lineAggregator&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.transform.DelimitedLineAggregator&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;delimiter&quot;</span> <span class="na">value=</span><span class="s">&quot;,&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;fieldExtractor&quot;</span> <span class="na">ref=</span><span class="s">&quot;fieldExtractor&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;fieldExtractor&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;names&quot;</span> <span class="na">value=</span><span class="s">&quot;id,score&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;batch:job</span> <span class="na">id=</span><span class="s">&quot;fileTransfer&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;batch:step</span> <span class="na">id=</span><span class="s">&quot;step&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;batch:tasklet&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;batch:chunk</span> <span class="na">reader=</span><span class="s">&quot;csvFileReader&quot;</span> <span class="na">processor=</span><span class="s">&quot;csvFileProcessor&quot;</span> <span class="na">writer=</span><span class="s">&quot;csvFileWriter&quot;</span> <span class="na">commit-interval=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/batch:tasklet&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/batch:step&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/batch:job&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>让我们来一起分析一下上面这个xml配置。</p>
+
+<p><strong>FlatFileItemReader</strong>是Flat文件的读取类，可以按行读取输入文件。这里传入两个参数，LineMapper和Resource。</p>
+
+<p>Resource顾名思义，用来指定数据源。</p>
+
+<p>LineMapper用于将文件中的每行数据映射到对应的数据模型，这里使用DefaultLineMapper。LineMapper中传入两个参数，分别是行分词器LineTokenizer和域映射器FieldSetMapper。</p>
+
+<p>对应的LineTokenizer采用基于分隔符的分词器，而对应的FieldSetMapper需要传入待映射的数据模型类型。</p>
+
+<p>对于<strong>FlatFileItemWriter</strong>，同样要配置对应的输出源Resource和行聚合器lineAggregator。</p>
+
+<p>对于lineAggregator这里同样采用基于分隔符的聚合器DelimitedLineAggregator，需要给聚合器配置对应的分隔符（比如“,”）和域提取器BeanWrapperFieldExtractor。</p>
+
+<p>在域提取器BeanWrapperFieldExtractor中配置要被提取的值。</p>
+
+<p>最后就是定义具体的Batch Job。</p>
+
+<figure class='code'><figcaption><span>spring-batch-jobs.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;batch:job</span> <span class="na">id=</span><span class="s">&quot;fileTransfer&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;batch:step</span> <span class="na">id=</span><span class="s">&quot;step&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;batch:tasklet&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;batch:chunk</span> <span class="na">reader=</span><span class="s">&quot;csvFileReader&quot;</span> <span class="na">processor=</span><span class="s">&quot;csvFileProcessor&quot;</span> <span class="na">writer=</span><span class="s">&quot;csvFileWriter&quot;</span> <span class="na">commit-interval=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/batch:tasklet&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/batch:step&gt;</span>
+</span><span class='line'><span class="nt">&lt;/batch:job&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>运行结果：上面是输入，下面是输出</p>
+
+<pre><code>1,100,80,80
+2,100,70,80
+3,100,80,70
+
+1,86.66666666666667
+2,83.33333333333333
+3,83.33333333333333
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/posts/34">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/posts/32">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <p style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</p>
+  <div style="margin-left: 8px;">A Java/RoR Application Developer</div>
+  <div style="margin-left: 8px;">A Gradle Plugin Contributor</div>
+  <div style="margin-left: 8px;">A translator for Book 《Gradle in Action》</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle， Spring，前端开发</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

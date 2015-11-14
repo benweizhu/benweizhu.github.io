@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>SEO实战密码：URL静态化 - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="URL静态化一直以来都是最基本的SEO要求之一，但近年来搜索引擎技术进步，抓取动态url已经不是问题，SEO行业对是否一定要做静态化也有了一些观念上的改变。 为什么要做静态化？ 现在的网站绝大多数都是数据库驱动，页面由程序实时生成，而不是真的在服务器上有一个静态HTML文件存在。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/10/31/static-url-for-seo">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">SEO实战密码：URL静态化</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-10-31T19:01:24+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>7:01 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>URL静态化一直以来都是最基本的SEO要求之一，但近年来搜索引擎技术进步，抓取动态url已经不是问题，SEO行业对是否一定要做静态化也有了一些观念上的改变。</p>
+
+<h2>为什么要做静态化？</h2>
+
+<p>现在的网站绝大多数都是数据库驱动，页面由程序实时生成，而不是真的在服务器上有一个静态HTML文件存在。当用户访问一个网址时，程序根据URL中的参数调用数据库，实时生成页面内容。因此动态页面相对应的URL原始状态也是动态的，包含问号，等号及参数。</p>
+
+<p>搜索引擎在发展初期，一般不愿意爬行和收录动态URL，主要原因是可能陷入无限循环或收录大量重复内容，造成资源极大的浪费。最典型的无线循环就是某些网站上出现的万年历。万年历会使得蜘蛛可以无限点击下去。</p>
+
+<p>真实用户一眼就能看出这是一个万年历，但是搜索引擎蜘蛛面对的只是一串代码，不一定能判断它。</p>
+
+<p>有时候就算不是无限循环，动态URL也可能造成大量重复页面。比如：想用的URL和参数（也就是相同的页面），但是参数的顺序不同（有多个参数）。</p>
+
+<p>更麻烦的是，有时候某些参数完全可以是任意值，服务器都能够正常的返回某个固定页面。</p>
+
+<p>这就是为什么搜索引擎对动态URL敬而远之的原因。</p>
+
+<h2>如何静态化URL呢？</h2>
+
+<p>最常见的方式是使用服务器URL重写模块，LAMP（Linux+Apache+MySQL+PHP）服务器上一般使用mod_rewrite模块，Windows服务器上也有类似的功能。</p>
+
+<p>举例：</p>
+
+<p><a href="http://www.domain.com/products.php?id=123">http://www.domain.com/products.php?id=123</a></p>
+
+<p>静态化为:</p>
+
+<p><a href="http://www.domain.com/products/123">http://www.domain.com/products/123</a></p>
+
+<p>需要请用服务器模块mod_rewrite，然后在.htaccess文件写入代码：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">RewriteRule</span> <span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="p">([</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="o">/</span><span class="n">products</span><span class="o">.</span><span class="n">php</span><span class="err">?</span><span class="nb">id</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>URL重写基于正则表达式，每个网站的动态URL结构都不同，所以写起来就很麻烦。</p>
+
+<p>严格的说，这里所说的URL静态化应该称为“伪静态化”，也就是说服务器上还是不存在相应的HTML文件，用户访问时还是动态生成页面，只不过通过URL重写技术使网站看起来像是静态的。当然，也有CMS系统可以实现真正静态化，系统会自动真实生成静态的HTML文件。但对于搜索引擎来说，真正的静态化和伪静态化没有区别。</p>
+
+<h2>到底是否需要URL静态化？</h2>
+
+<p>近年来搜索引擎对URL的抓取有了很大进步。一般来说，URL中有两三个参数，对于收录不会造成任何影响。权重高的域名，再多几个问号也不是问题。不过一般还是建议将URL静态化，即能提高用户体验，又能降低收录难度。</p>
+
+<p>2008年9月，Google站长博客发表了一篇关于动态网址还是静态网址的帖子，颠覆了SEO界的观念。</p>
+
+<p>Google的帖子有几个要点。</p>
+
+<p>一是Google完全有能力抓取动态网址，多少个问号也不是问题。这一点基本靠谱。</p>
+
+<p>第二，动态网址更有助于Google蜘蛛读懂URL含义，并进行鉴别，因为网址中的参数有提示性。比如Google举了这个例子：</p>
+
+<p>www.example.com/article/bin/answer.foo?language=en&amp;answer=3&amp;sid=98971298178906&amp;query=URL</p>
+
+<p>URL里的参数都有助于Google理解URL及网页内容。比如language后面跟的参数是提示语言，answer后面跟的是文章编号，sid后面的肯定是session ID。其他常用的包括color后面跟的参数指的是颜色，size后面跟的参数是尺寸等。有了这些参数的帮助，Google更容易理解网页。</p>
+
+<p>而将网址静态化后，这些参数的意义通常就变得不明显了。比如这个URL：</p>
+
+<p>www.example.com/shoes/red/7/12/men/index.html</p>
+
+<p>就可能使Google不知道哪个是产品序列号，哪个是尺寸等。</p>
+
+<p>第三，网址静态化很容易弄错，那就更得不偿失了。比如通常动态网址的参数调换顺序，所得到的页面其实是相同的，比如这两个网址很可能就是同一个页面：</p>
+
+<p>www.example.com/article/bin/answer.foo?language=en&amp;answer=3</p>
+
+<p>www.example.com/article/bin/answer.foo?answer=3&amp;language=en</p>
+
+<p>保留动态网址，Google还比较容易明白这是一样的网页。而经过静态化后，这样两个网址Google就不容易判断是不是同一个页面，从而可能引起复制内容：</p>
+
+<p>www.example.com/shoes/men/7/red/index.html</p>
+
+<p>www.example.com/shoes/red/7/men/index.html</p>
+
+<p>再一个容易搞错的是session ID，也可能被静态化进URL：</p>
+
+<p>www.example.com/article/bin/answer.foo/en/3/98971298178906/URL</p>
+
+<p>这样网站将产生大量URL不同，但其实内容相同的页面。</p>
+
+<p>所以，Google建议不要静态化URL。</p>
+
+<h2>虽然如此</h2>
+
+<p>但是《SEO实战密码》的作者建议还是做静态化。他认为Google的这个帖子解释的有些极端和牵强，也没有从其他搜索引擎的角度出发。</p>
+
+<p>参考资料： <br/>
+1.《SEO实战密码》</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-10-31T19:01:24+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>7:01 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/10/31/static-url-for-seo/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/10/31/static-url-for-seo/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/10/31/responsive-design/" title="Previous Post: 了解响应式设计">&laquo; 了解响应式设计</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/11/06/node-gulp-travisci-heroku/" title="Next Post: 在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="SEO实战密码：URL静态化"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <p style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</p>
+  <div style="margin-left: 8px;">A Java/RoR Application Developer</div>
+  <div style="margin-left: 8px;">A Gradle Plugin Contributor</div>
+  <div style="margin-left: 8px;">A translator for Book 《Gradle in Action》</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle， Spring，前端开发</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

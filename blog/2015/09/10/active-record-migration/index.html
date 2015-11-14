@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>关于运行Active Record数据迁移 - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="Active Record数据库迁移是 Active Record提供的一个功能，按照时间顺序管理数据库模式。使用迁移，无需编写 SQL，使用简单的Ruby DSL就能修改数据表，对数据库的操作和所用的数据库种类无关。 你可以把每个迁移看做数据库的一个修订版本。数据库中一开始什么也没有， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/09/10/active-record-migration">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">关于运行Active Record数据迁移</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-09-10T08:51:45+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:51 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Active Record数据库迁移是 Active Record提供的一个功能，按照时间顺序管理数据库模式。使用迁移，无需编写 SQL，使用简单的Ruby DSL就能修改数据表，对数据库的操作和所用的数据库种类无关。</p>
+
+<p>你可以把每个迁移看做数据库的一个修订版本。数据库中一开始什么也没有，各个迁移会添加或删除数据表、字段或记录。Active Record知道如何按照时间线更新数据库，不管数据库现在的模式如何，都能更新到最新结构。同时，Active Record还会更新db/schema.rb文件，匹配最新的数据库结构。</p>
+
+<h2>db:migrate</h2>
+
+<p>Rails提供了很多Rake任务，用来执行指定的迁移。</p>
+
+<p>其中最常使用的是rake db:migrate，执行还没执行的迁移中的change或up方法。如果没有未运行的迁移，直接退出。rake db:migrate按照迁移文件名中时间戳顺序执行迁移。</p>
+
+<p>注意，执行db:migrate时还会执行db:schema:dump，更新db/schema.rb文件，匹配数据库的结构。</p>
+
+<h2>db:migrate VERSION</h2>
+
+<p>如果指定了版本，Active Record会运行该版本之前的所有迁移。版本就是迁移文件名前的数字部分。例如，要运行 20080906120000 这个迁移，可以执行下面的命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="n">migrate</span> <span class="no">VERSION</span><span class="o">=</span><span class="mi">20080906120000</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果20080906120000比当前的版本高，上面的命令就会执行所有20080906120000之前（包括 20080906120000）的迁移中的change或up方法，但不会运行20080906120000之后的迁移。如果回滚迁移，则会执行 20080906120000之前（不包括20080906120000）的迁移中的down方法。</p>
+
+<h2>db:rollback</h2>
+
+<p>还有一个常用的操作时回滚到之前的迁移。例如，迁移代码写错了，想纠正。我们无须查找迁移的版本号，直接执行下面的命令即可：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="n">rollback</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个命令会回滚上一次迁移，撤销 change 方法中的操作，或者执行 down 方法。如果想撤销多个迁移，可以使用 STEP 参数：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="n">rollback</span> <span class="no">STEP</span><span class="o">=</span><span class="mi">3</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个命令会撤销前三次迁移。</p>
+
+<h2>db:redo</h2>
+
+<p>db:migrate:redo 命令可以回滚上一次迁移，然后再次执行迁移。和 db:rollback 一样，如果想重做多次迁移，可以使用 STEP 参数。例如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="ss">migrate</span><span class="p">:</span><span class="k">redo</span> <span class="no">STEP</span><span class="o">=</span><span class="mi">3</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这些 Rake 任务的作用和 db:migrate 一样，只是用起来更方便，因为无需查找特定的迁移版本号。</p>
+
+<h2>db:migrate:up和db:migrate:down</h2>
+
+<p>如果想执行指定迁移，或者撤销指定迁移，可以使用db:migrate:up和db:migrate:down任务，指定相应的版本号，就会根据需求调用change、up或down方法。例如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="ss">migrate</span><span class="p">:</span><span class="n">up</span> <span class="no">VERSION</span><span class="o">=</span><span class="mi">20080906120000</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个命令会执行20080906120000迁移中的change方法或up方法。db:migrate:up 首先会检测指定的迁移是否已经运行，如果Active Record任务已经执行，就不会做任何操作。</p>
+
+<h2>修改现有的迁移</h2>
+
+<p>有时编写的迁移中可能有错误，如果已经运行了迁移，不能直接编辑迁移文件再运行迁移。Rails 认为这个迁移已经运行，所以执行 rake db:migrate 任务时什么也不会做。这种情况必须先回滚迁移（例如，执行 rake db:rollback 任务），编辑迁移文件后再执行 rake db:migrate 任务执行改正后的版本。</p>
+
+<p>一般来说，直接修改现有的迁移不是个好主意。这么做会为你以及你的同事带来额外的工作量，如果这个迁移已经在生产服务器上运行过，还可能带来不必要的麻烦。你应该编写一个新的迁移，做所需的改动。编辑新生成还未纳入版本控制的迁移（或者更宽泛地说，还没有出现在开发设备之外），相对来说是安全的。</p>
+
+<h2>在不同的环境中运行迁移</h2>
+
+<p>默认情况下，rake db:migrate 任务在 development 环境中执行。要在其他环境中运行迁移，执行命令时可以使用环境变量 RAILS_ENV 指定环境。例如，要在 test 环境中运行迁移，可以执行下面的命令：</p>
+
+<p>$ rake db:migrate RAILS_ENV=test</p>
+
+<p>参考资料：   <br/>
+1.<a href="http://guides.ruby-china.org/active_record_migrations.html">http://guides.ruby-china.org/active_record_migrations.html</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-09-10T08:51:45+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:51 am</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/09/10/active-record-migration/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/09/10/active-record-migration/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/09/06/deep-into-spring-aop-1/" title="Previous Post: Spring AOP 深入了解（一）还给业务逻辑代码一个干净的世界">&laquo; Spring AOP 深入了解（一）还给业务逻辑代码一个干净的世界</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/09/19/gradle-in-action-chinese-version/" title="Next Post: 《实战Gradle》译者序">《实战Gradle》译者序 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="关于运行Active Record数据迁移"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <p style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</p>
+  <div style="margin-left: 8px;">A Java/RoR Application Developer</div>
+  <div style="margin-left: 8px;">A Gradle Plugin Contributor</div>
+  <div style="margin-left: 8px;">A translator for Book 《Gradle in Action》</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle， Spring，前端开发</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

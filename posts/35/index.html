@@ -1,0 +1,741 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="自从3.0之后，Cordova默认是关闭所有关于设备原生特性功能的，所以我们要通过添加插件来启动原生特性。 这里以Accelerometer（加速度感应器）为例，来学习如何使用设备原生特性。 1.添加插件 首先，需要在工程目录下，通过CLI命令添加插件。 1
+cordova plugin add &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/posts/35">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/01/19/cordova-using-accelerometer/">Cordova探索之旅系列（三）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-01-19T15:39:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>3:39 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>自从3.0之后，Cordova默认是关闭所有关于设备原生特性功能的，所以我们要通过添加插件来启动原生特性。</p>
+
+<p>这里以Accelerometer（加速度感应器）为例，来学习如何使用设备原生特性。</p>
+
+<p><strong>1.添加插件</strong></p>
+
+<p>首先，需要在工程目录下，通过CLI命令添加插件。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin add org.apache.cordova.device-motion
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过ls命令，可以查看当前项目下，已经安装的插件。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin ls
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>2.在config.xml文件中配置该特性</strong></p>
+
+<p>路径：res/xml/config.xml</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;feature</span> <span class="na">name=</span><span class="s">&quot;Accelerometer&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;android-package&quot;</span> <span class="na">value=</span><span class="s">&quot;org.apache.cordova.devicemotion.AccelListener&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/feature&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>完整配置如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&#39;1.0&#39; encoding=&#39;utf-8&#39;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;widget</span> <span class="na">id=</span><span class="s">&quot;com.example.hello.HelloWorld&quot;</span> <span class="na">version=</span><span class="s">&quot;0.0.1&quot;</span>
+</span><span class='line'><span class="na">xmlns=</span><span class="s">&quot;http://www.w3.org/ns/widgets&quot;</span> <span class="na">xmlns:cdv=</span><span class="s">&quot;http://cordova.apache.org/ns/1.0&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;name&gt;</span>HelloCordova<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;description&gt;</span>
+</span><span class='line'>        A sample Apache Cordova application that responds to the deviceready event.
+</span><span class='line'>    <span class="nt">&lt;/description&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;author</span> <span class="na">email=</span><span class="s">&quot;dev@cordova.apache.org&quot;</span> <span class="na">href=</span><span class="s">&quot;http://cordova.io&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        Apache Cordova Team
+</span><span class='line'>    <span class="nt">&lt;/author&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;content</span> <span class="na">src=</span><span class="s">&quot;index.html&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;access</span> <span class="na">origin=</span><span class="s">&quot;*&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;feature</span> <span class="na">name=</span><span class="s">&quot;Accelerometer&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;android-package&quot;</span> <span class="na">value=</span><span class="s">&quot;org.apache.cordova.devicemotion.AccelListener&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/feature&gt;</span>
+</span><span class='line'><span class="nt">&lt;/widget&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>某些插件还需要在Android的AndroidManifest.xml中添加uses-permission</p>
+
+<p>例如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;uses-permission</span> <span class="na">android:name=</span><span class="s">&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;</span> <span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然，这里不需要！</p>
+
+<p><strong>3.API</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">navigator</span><span class="p">.</span><span class="nx">accelerometer</span><span class="p">.</span><span class="nx">getCurrentAcceleration</span><span class="p">(</span><span class="nx">onSuccess</span><span class="p">,</span> <span class="nx">onError</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>onSuccess和onError是对应的回调函数</p>
+
+<p><strong>4.完整例子</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Acceleration Example<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span> <span class="na">src=</span><span class="s">&quot;cordova.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;deviceready&quot;</span><span class="p">,</span> <span class="nx">onDeviceReady</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">onDeviceReady</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">getCurrrentAcceleration</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">navigator</span><span class="p">.</span><span class="nx">accelerometer</span><span class="p">.</span><span class="nx">getCurrentAcceleration</span><span class="p">(</span><span class="nx">onSuccess</span><span class="p">,</span> <span class="nx">onError</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">onSuccess</span><span class="p">(</span><span class="nx">acceleration</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Acceleration X: &#39;</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">x</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span>
+</span><span class='line'>              <span class="s1">&#39;Acceleration Y: &#39;</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">y</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span>
+</span><span class='line'>              <span class="s1">&#39;Acceleration Z: &#39;</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">z</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span>
+</span><span class='line'>              <span class="s1">&#39;Timestamp: &#39;</span>      <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">onError</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;onError!&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;button</span> <span class="na">onClick=</span><span class="s">&quot;getCurrrentAcceleration()&quot;</span><span class="nt">&gt;</span>click<span class="nt">&lt;/button&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果用Android的原生API，用Java代码来实现相同功能呢，如下：</p>
+
+<p>Activity</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">android.app.Activity</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.Sensor</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.SensorEvent</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.SensorEventListener</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.SensorManager</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.view.View</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.shakeshake.R</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.shakeshake.fragment.FireMissilesDialogFragment</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">android</span><span class="o">.</span><span class="na">hardware</span><span class="o">.</span><span class="na">Sensor</span><span class="o">.</span><span class="na">TYPE_ACCELEROMETER</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">android</span><span class="o">.</span><span class="na">hardware</span><span class="o">.</span><span class="na">SensorManager</span><span class="o">.</span><span class="na">SENSOR_DELAY_NORMAL</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">SensorManager</span> <span class="n">sensorManager</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Sensor</span> <span class="n">sensor</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">AccelerometerListener</span> <span class="n">listener</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">text</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">main</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">initSensor</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">initSensor</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">sensorManager</span> <span class="o">=</span> <span class="o">(</span><span class="n">SensorManager</span><span class="o">)</span> <span class="n">getSystemService</span><span class="o">(</span><span class="n">SENSOR_SERVICE</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">sensor</span> <span class="o">=</span> <span class="n">sensorManager</span><span class="o">.</span><span class="na">getDefaultSensor</span><span class="o">(</span><span class="n">TYPE_ACCELEROMETER</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">listener</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">AccelerometerListener</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">sensorManager</span><span class="o">.</span><span class="na">registerListener</span><span class="o">(</span><span class="n">listener</span><span class="o">,</span> <span class="n">sensor</span><span class="o">,</span> <span class="n">SENSOR_DELAY_NORMAL</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onStop</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">onStop</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">sensorManager</span><span class="o">.</span><span class="na">unregisterListener</span><span class="o">(</span><span class="n">listener</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">sendMessage</span><span class="o">(</span><span class="n">View</span> <span class="n">view</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">FireMissilesDialogFragment</span> <span class="n">fireMissilesDialogFragment</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">FireMissilesDialogFragment</span><span class="o">(</span><span class="n">text</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">fireMissilesDialogFragment</span><span class="o">.</span><span class="na">show</span><span class="o">(</span><span class="n">getFragmentManager</span><span class="o">(),</span> <span class="s">&quot;some tag&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">class</span> <span class="nc">AccelerometerListener</span> <span class="kd">implements</span> <span class="n">SensorEventListener</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nd">@Override</span>
+</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onSensorChanged</span><span class="o">(</span><span class="n">SensorEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">text</span> <span class="o">=</span> <span class="s">&quot;Acceleration X: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">values</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span> <span class="o">+</span>
+</span><span class='line'>                    <span class="s">&quot;Acceleration Y: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">values</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span> <span class="o">+</span>
+</span><span class='line'>                    <span class="s">&quot;Acceleration Z: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">values</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span> <span class="o">+</span>
+</span><span class='line'>                    <span class="s">&quot;Timestamp: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">timestamp</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nd">@Override</span>
+</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAccuracyChanged</span><span class="o">(</span><span class="n">Sensor</span> <span class="n">sensor</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Dialog</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">android.app.AlertDialog</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.app.Dialog</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.app.DialogFragment</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.content.DialogInterface</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.shakeshake.R</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FireMissilesDialogFragment</span> <span class="kd">extends</span> <span class="n">DialogFragment</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">text</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">FireMissilesDialogFragment</span><span class="o">(</span><span class="n">String</span> <span class="n">text</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">Dialog</span> <span class="nf">onCreateDialog</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">AlertDialog</span><span class="o">.</span><span class="na">Builder</span> <span class="n">builder</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AlertDialog</span><span class="o">.</span><span class="na">Builder</span><span class="o">(</span><span class="n">getActivity</span><span class="o">());</span>
+</span><span class='line'>        <span class="n">builder</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">setTitle</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">dialog_accelerometer</span><span class="o">)</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">setMessage</span><span class="o">(</span><span class="n">text</span><span class="o">)</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">setNeutralButton</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">ok</span><span class="o">,</span> <span class="k">new</span> <span class="n">DialogInterface</span><span class="o">.</span><span class="na">OnClickListener</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>                    <span class="nd">@Override</span>
+</span><span class='line'>                    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onClick</span><span class="o">(</span><span class="n">DialogInterface</span> <span class="n">dialogInterface</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>                    <span class="o">}</span>
+</span><span class='line'>                <span class="o">});</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">builder</span><span class="o">.</span><span class="na">create</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>main.xml</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;LinearLayout</span> <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span>
+</span><span class='line'>              <span class="na">android:orientation=</span><span class="s">&quot;vertical&quot;</span>
+</span><span class='line'>              <span class="na">android:layout_width=</span><span class="s">&quot;fill_parent&quot;</span>
+</span><span class='line'>              <span class="na">android:layout_height=</span><span class="s">&quot;fill_parent&quot;</span>
+</span><span class='line'>        <span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;Button</span> <span class="na">android:layout_width=</span><span class="s">&quot;fill_parent&quot;</span>
+</span><span class='line'>            <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
+</span><span class='line'>            <span class="na">android:text=</span><span class="s">&quot;@string/click&quot;</span>
+</span><span class='line'>            <span class="na">android:onClick=</span><span class="s">&quot;sendMessage&quot;</span>
+</span><span class='line'>            <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/LinearLayout&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/01/18/cordova-plugin/">Cordova探索之旅系列（二）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-01-18T15:28:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>3:28 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在Cordova中有一个很重要的概念：<strong>插件</strong>。</p>
+
+<p>插件会提供访问Cordova核心API的接口。</p>
+
+<p>插件是一些附加的代码，它能够提供访问原生组件的接口。一般情况下，你都需要添加一些插件以启动Cordova设备级别的特性。</p>
+
+<p>插件由官方和社区提供，可以在plugins.cordova.io上找到，当然还可以在命令行中去搜索插件。</p>
+
+<p>从3.0之后，Cordova将所有设备的API都作为插件，并默认设置为是不启动的。</p>
+
+<p>那么，如何添加插件呢？两种方式。</p>
+
+<p><strong>第一种是使用CLI命令行。</strong></p>
+
+<p><strong>第二种是使用更低级别的命令行Plugman。</strong></p>
+
+<p>两个的区别在于，Plugman只能一次添加一个平台的插件，而<strong>CLI命令行会添加所有平台的插件</strong>。所以如果你只在单个平台上工作，使用Plugman就显得更合理。</p>
+
+<h3>使用CLI命令行添加插件：</h3>
+
+<p><strong>1.添加插件</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin add org.apache.cordova.camera
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>2.删除插件</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin rm org.apache.cordova.camera
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>3.查看当前已有插件</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin ls
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>4.根据关键字搜索插件</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin search bar code
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>5.社区中会提供很多插件，但是如果它没有注册到registry.cordova.io，你可以通过仓库地址添加</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin add https://github.com/apache/cordova-plugin-console.git
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>使用plugman添加插件：</h3>
+
+<p>首先你需要安装plugman</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>npm install -g plugman
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>1.添加一个插件</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>plugman --platform &lt;ios<span class="p">|</span>amazon-fireos<span class="p">|</span>android<span class="p">|</span>blackberry10<span class="p">|</span>wp7<span class="p">|</span>wp8&gt; --project &lt;directory&gt; --plugin &lt;name<span class="p">|</span>url<span class="p">|</span>path&gt; <span class="o">[</span>--plugins_dir &lt;directory&gt;<span class="o">]</span> <span class="o">[</span>--www &lt;directory&gt;<span class="o">]</span> <span class="o">[</span>--variable &lt;name&gt;<span class="o">=</span>&lt;value&gt; <span class="o">[</span>--variable &lt;name&gt;<span class="o">=</span>&lt;value&gt; ...<span class="o">]]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过plugman命令行将一个插件加到一个Cordova工程中。你至少要指定平台信息、Cordova项目位置。</p>
+
+<p><strong>name</strong>：插件的目录名称。它必须是存在于plugins_dirpath路径下或者在Cordova中有注册。</p>
+
+<p><strong>url</strong>：以&#8221;<a href="http://">http://</a>&ldquo;或者&#8221;git://&#8221;开头的url，指向一个合法的git可克隆仓库，仓库中应该包含一个plugin.xml的文件，仓库中的内容可以被拷贝到plugins_dir路径下。</p>
+
+<p><strong>path</strong>：一个指向包含合法插件（包含plugin.xml文件）目录的路径。该路径下的内容可以被拷贝到plugins_dir。
+其他参数：</p>
+
+<p><strong>plugin_dir</strong>：默认是指向<project>/cordova/plugins，当然也可以是任何包含每一个已获取插件的子目录。</p>
+
+<p><strong>www</strong>：默认指向项目的www目录，但是也可以指向Cordova项目的应用web asserts目录。</p>
+
+<p><strong>variable</strong>：允许在安装时指定某些变量，对于某些插件需要API key或者其他用户定义参数是有必要的。</p>
+
+<p>下面是添加电池状态插件的安装命令行</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>plugman -d --platform android --project myProject –plugin org.apache.cordova.battery-status
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>-d或者—debug参数，会帮助你打印出内部调试信息，帮助你跟踪具体信息。</p>
+
+<p><strong>2.删除一个插件</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>plugman --uninstall --platform &lt;ios<span class="p">|</span>amazon-fireos<span class="p">|</span>android<span class="p">|</span>blackberry10<span class="p">|</span>wp7<span class="p">|</span>wp8&gt; --project &lt;directory&gt; --plugin &lt;id&gt; <span class="o">[</span>--www &lt;directory&gt;<span class="o">]</span> <span class="o">[</span>--plugins_dir &lt;directory&gt;<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/posts/36">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/posts/34">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <p style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</p>
+  <div style="margin-left: 8px;">A Java/RoR Application Developer</div>
+  <div style="margin-left: 8px;">A Gradle Plugin Contributor</div>
+  <div style="margin-left: 8px;">A translator for Book 《Gradle in Action》</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle， Spring，前端开发</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

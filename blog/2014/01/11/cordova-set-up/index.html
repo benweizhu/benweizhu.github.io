@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Cordova探索之旅系列（一） - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="最早接触PhoneGap平台是在1年多之前，能够使用HTML、CSS和JavaScript跨平台来编写Android或者IOS设备程序，并且应用的核心代码不需要多少修改就可以移植，确实让我感觉的到它应该是未来移动设备开发的趋势。Web程序员，特别是前端程序员， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2014/01/11/cordova-set-up">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Cordova探索之旅系列（一）</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-01-11T16:47:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>4:47 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>最早接触PhoneGap平台是在1年多之前，能够使用HTML、CSS和JavaScript跨平台来编写Android或者IOS设备程序，并且应用的核心代码不需要多少修改就可以移植，确实让我感觉的到它应该是未来移动设备开发的趋势。Web程序员，特别是前端程序员，能够轻松的通过Web技术来编写移动设备软件。</p>
+
+<p><strong>但是当时给我带来的感觉是应用的响应速度太慢，提供的API不全，能够实现的功能不多。PhoneGap经过1年多的沉淀，如今过头再来看PhoneGap，它又是什么样的呢？有哪些进步呢？</strong></p>
+
+<h2>Cordova是什么？</h2>
+
+<p>Apache Cordova是PhoneGap贡献给Apache后的开源项目，是从PhoneGap中抽出的核心代码，是驱动PhoneGap的核心引擎。</p>
+
+<p>Cordova是一个设备API的集合，它允许手机开发者通过JavaScript去访问设备原生功能，例如相机，重力感应等。结合UI框架，例如jQuery Mobile，Dojo Mobile或者Sencha Touch，可以让开发者通过HTML，CSS和JavaScript开发手机应用。</p>
+
+<p>当使用Cordova的API时，应用可以在没有任何原生代码（Java，Object-C等）的情况下构建。并且，虽然使用着Web开发技术，但是该应用却是在本机运行，而不是远程的Web应用）。</p>
+
+<p>并且因为提供的JavaScript的API在多个设备平台都保持一致性并且基于web标准，所以，应用可以在几乎没有任何修改的情况下应用到各个不同的设备平台。</p>
+
+<p>使用Cordova开发的应用仍然是使用平台的SDK打包，可以放置到每个设备平台的应用商店中。</p>
+
+<p>Cordova提供了一套统一的JavaScript库，其背后使用平台对应的代码来驱动设备。Cordova支持的平台有：IOS，Android，Blackberry，Windows Phone，Palm WebOS，Bada和Symbian。</p>
+
+<h2>如何开始Cordova编程?</h2>
+
+<p><strong>1.下载并安装node.js（如果你已经安装过，就不用了）</strong></p>
+
+<p><a href="http://nodejs.org/">http://nodejs.org/</a></p>
+
+<p><strong>2.安装Cordova</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo npm install -g cordova
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>3.创建应用程序</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova create hello com.example.hello HelloWorld
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>4.添加应用平台</strong></p>
+
+<p>这里添加的是Android应用程序</p>
+
+<p>你可能会得到如下信息：</p>
+
+<p>Error: ERROR : executing command ‘ant’, make sure you have ant installed and added to your path.</p>
+
+<p>说明你需要安装ant，方法如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>brew update
+</span><span class='line'>brew install ant
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后添加应用平台</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd </span>hello
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>首先进入到hello目录下</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova platform add android
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里也可以删除一个应用平台</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova platform rm android
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过ls命令</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova platforms ls
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可以查看你安装关于平台的信息，例如，我的是:</p>
+
+<p>Installed platforms: android 3.3.0</p>
+
+<p>Available platforms: blackberry10, firefoxos, ios</p>
+
+<p><strong>5.构建应用程序</strong></p>
+
+<p>在进行构建之前，先确保你的Android SDK配置好了。</p>
+
+<p>需要下载Android的SDK，并设置Path到系统路径下。</p>
+
+<p>安装Android SDK（Mac平台，下载解压缩就行）</p>
+
+<p>配置SDK的Path到系统路径</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>touch ~/.bash_profile<span class="p">;</span> open ~/.bash_profile
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在profile文件中加一句话：</p>
+
+<p>export PATH=${PATH}:/Users/twer/Downloads/adt-bundle-mac-x86_64-20131030/sdk/platform-tools:/Users/twer/Downloads/adt-bundle-mac-x86_64-20131030/sdk/tools</p>
+
+<p>记得要指定你自己的路径。</p>
+
+<p>最后还要执行profile将它更新到你的系统path下。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">source</span> ~/.bash_profile
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后你就可以开始构建了:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova build
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然你也可以正对某一个平台构建：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova build android
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>6.在模拟器上运行</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova emulate android
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>此时，模拟器会启动，并自动安装应用，效果应该如下：</p>
+
+<p><img src="http://cordova.apache.org/docs/zh/3.1.0/img/guide/cli/android_emulate_install.png" alt="Jasmine" /></p>
+
+<p><strong>7.实体机上运行</strong></p>
+
+<p>将你的设备插到电脑上，然后运行命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova run android
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>会将应用安装到你的手机上。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2014-01-11T16:47:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>4:47 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2014/01/11/cordova-set-up/" data-via="" data-counturl="http://benweizhu.github.io/blog/2014/01/11/cordova-set-up/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/01/05/about-android-activity-lifecycle-translate/" title="Previous Post: About Android Activity LifeCycle(译)">&laquo; About Android Activity LifeCycle(译)</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/01/11/android-service-translation/" title="Next Post: Android Service(译)">Android Service(译) &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="Cordova探索之旅系列（一）"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <p style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</p>
+  <div style="margin-left: 8px;">A Java/RoR Application Developer</div>
+  <div style="margin-left: 8px;">A Gradle Plugin Contributor</div>
+  <div style="margin-left: 8px;">A translator for Book 《Gradle in Action》</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle， Spring，前端开发</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

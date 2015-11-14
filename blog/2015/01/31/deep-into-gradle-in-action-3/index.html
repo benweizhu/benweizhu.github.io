@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Gradle深入与实战（三）依赖管理工具 - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="大部分的项目都不是自包含的，也就是说，需要使用到其他项目的构建结果，比如一些Jar文件。它们作为输入文件，必须存在于项目的ClassPath下，程序才能编译和运行。这些输入文件有一个很表意的名字，叫做依赖。 Gradle允许你告诉它项目的依赖是什么，然后它就会负责找到这些依赖。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-3">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Gradle深入与实战（三）依赖管理工具</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-31T18:41:46+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>6:41 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>大部分的项目都不是自包含的，也就是说，需要使用到其他项目的构建结果，比如一些Jar文件。它们作为输入文件，必须存在于项目的ClassPath下，程序才能编译和运行。这些输入文件有一个很表意的名字，叫做依赖。</p>
+
+<p>Gradle允许你告诉它项目的依赖是什么，然后它就会负责找到这些依赖。这些依赖会从Maven或者Ivy的远程仓库下载下来（大部分情况），并缓存在本地的某个路径，这个过程叫做依赖解析。</p>
+
+<p>Maven和Gradle一样也提供了类似的功能，而Ant没有，你只能告诉Ant依赖文件的相对或者绝对路径，让它去加载。</p>
+
+<p>常常一个依赖自己也存在依赖，我们称为传递依赖，依赖管理工具又具有解析传递依赖的能力。</p>
+
+<h3>Gradle的依赖管理</h3>
+
+<p>那么如何在Gradle中定义依赖呢？看个最简单的例子。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;junit:junit:4.11&#39;</span><span class="c1">// testCompile group: &#39;junit&#39;, name: &#39;junit&#39;, version: &#39;4.11&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>项目使用了Java的插件，在repositories块中告诉Gradle使用maven的远程仓库作为依赖下载地址，在dependencies块定义了一个junit的依赖，并说明了分组(Maven中的Scope)，后面注释中有一个表意更完整的依赖定义，说明了依赖声明使用的三个坐标group，name，version。</p>
+
+<p>整个看起来是那么的表意，使用过Maven更会觉得是无缝转换，甚至更简洁。</p>
+
+<h3>Dependency configurations 依赖分组</h3>
+
+<p>在Gradle中，依赖都被会分配到某一个具体的configuration中（这里我不倾向于翻译成配置，我觉得布局，或者分组更适合）。Configuration代表着一个或多个构件及构件所需依赖的一个分组。</p>
+
+<p>Java插件已经预定义了一些configuration，比如，compile，runtime，testCompile，testRuntime等。</p>
+
+<p><strong>compile</strong> 放在这个configuration下的依赖是在编译产品代码时所使用的，但它作为一个分组，包含产品代码和编译所需的依赖。  <br/>
+<strong>runtime</strong> 产品代码在运行时需要的依赖，默认，也会包含compile中的依赖。  <br/>
+<strong>testCompile</strong> 编译测试代码时所需要的依赖，默认，被编译的产品代码和产品代码需要的编译依赖也属于该分组。  <br/>
+<strong>testRuntime</strong> 运行测试时需要的依赖。默认，包含compile，runtime和testCompile的分组的构建和依赖。</p>
+
+<p>使用过Maven的都应该知道分组的含义，这里讲解给不明白的同学，依赖之所以要分组，是因为，每个阶段对依赖的需要不一样，最明显的是产品代码和测试代码，比如junit在产品代码中就不需要。</p>
+
+<p>那么，为什么产品代码的编译阶段和运行阶段也分组，一般编译阶段需要的依赖，在运行阶段也需要，但是反过来就不一定了。比如，你通过反射去load一个class，这时该class就不一定需要在编译阶段存在。</p>
+
+<p>一个更常见的例子，做web开发时需要servlet的依赖，但是只是编译阶段，运行时servlet依赖由servlet容器来提供。所以Gradle的War插件也提供了两个configuration，分别是providedCompile和providedRuntime，它们对依赖的使用范围定义和compile以及runtime一致，只不过依赖的Jar包不会被加到War包里面。</p>
+
+<h3>定义SourceSet时，添加的Configuration</h3>
+
+<p>上一节，在介绍Java插件的时候，提到了SourceSet概念。针对每一个新添加的SourceSet，Java插件都会动态的给它添加两个Configuration，分别是sourceSetCompile和sourceSetRuntime。</p>
+
+<p>比如：新添加一个SourceSet，叫做int，那么对应的Configuration是intCompile和intRuntime。</p>
+
+<p>这一特性也正好印证，Java插件是如何识别自定义SourceSet来进行编译和运行。</p>
+
+<h3>依赖的多种定义方式</h3>
+
+<p>除了通过远程仓库和依赖坐标来定义依赖，Gradle还提供了另外两种常用的依赖定义方式，对本地文件的依赖，对某个项目的依赖。</p>
+
+<h4>对文件的依赖</h4>
+
+<p>这种情况看起来是不是很奇葩，都有依赖管理了和Maven仓库了还要什么文件依赖。其实不然，使用这种定义方式，最常见场景是项目构建工具的迁移，从Ant到Gradle。无论任何项目，迁移过程都是小步前进，Gradle提供文件依赖的配置，就是为了解决这些特殊性。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">runtime</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;libs/a.jar&#39;</span><span class="o">,</span> <span class="s1">&#39;libs/b.jar&#39;</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">runtime</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="s1">&#39;libs&#39;</span><span class="o">,</span> <span class="nl">include:</span> <span class="s1">&#39;*.jar&#39;</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>对另一个工程的依赖</h4>
+
+<p>项目中划分子模块是很平常的事情，前端Controller和数据层Dao分离管理就是一个例子，那么在进行前端Controller模块构建时，就需要将数据层模块作为依赖。定义方式如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="nf">project</span><span class="o">(</span><span class="s1">&#39;:shared&#39;</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>依赖版本冲突</h3>
+
+<p>依赖冲突是所以依赖管理中最头痛的问题，这常常出现在传递依赖中。Gradle对解决传递依赖提供了两种策略，使用最新版本或者直接导致构建失败。默认的策略是使用最新版本。虽然这样的策略能够解决一些问题，但是还是不够。常见的一种情况是，NoSuchMethond或者ClassNotFound。这时候，你可能需要一些特殊手段，比如排除不想要的传递依赖。</p>
+
+<h4>排除传递依赖</h4>
+
+<p>排除传递依赖有多种原因，远程仓库中不存在，运行时不需要，或者版本冲突。排除传递依赖的方式有两种：1.直接在configuration中排除 2.在具体的某个dependency中排除</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">configurations</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">.</span><span class="na">exclude</span> <span class="nl">module:</span> <span class="s1">&#39;commons&#39;</span>
+</span><span class='line'>    <span class="n">all</span><span class="o">*.</span><span class="na">exclude</span> <span class="nl">group:</span> <span class="s1">&#39;org.gradle.test.excludes&#39;</span><span class="o">,</span> <span class="nl">module:</span> <span class="s1">&#39;reports&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.gradle.test.excludes:api:1.0&quot;</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">exclude</span> <span class="nl">module:</span> <span class="s1">&#39;shared&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>通过命令行查看依赖关系</h4>
+
+<p>当出现依赖冲突时，最主要的还是要分析依赖冲突的原因，Gradle提供了两个任务来帮助你分析依赖关系</p>
+
+<p>dependencies - Displays all dependencies declared in root project &lsquo;projectReports&rsquo;. <br/>
+dependencyInsight - Displays the insight into a specific dependency in root project &lsquo;projectReports&rsquo;.</p>
+
+<h5><strong>Tips：输出依赖关系图到文件</strong></h5>
+
+<p>在命令行中直接使用gradle dependencies可以打印出依赖图，但是在命令行中查看始终不太方便，我们可以将结果输出到一个文件中，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">gradle</span> <span class="n">dependencies</span> <span class="o">&gt;</span> <span class="n">dependencies</span><span class="o">.</span><span class="n">txt</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>dependencies.txt保存在项目的根目录</p>
+
+<p>Gradle的官方文档中关于Gradle的依赖管理的内容还有很多，比如，如何访问需要用户名密码授权的Maven仓库等等。等多内容，可以参考官方文档：<a href="http://gradle.org/docs/current/userguide/dependency_management.html">http://gradle.org/docs/current/userguide/dependency_management.html</a></p>
+
+<p>下一节，利用前三节学到的知识，编写集成测试任务，并单独划分SourceSet。</p>
+
+<p>参考资料： <br/>
+1.Gradle官方文档</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-01-31T18:41:46+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>6:41 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/gradleshen-ru-yu-shi-zhan/'>gradle深入与实战</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-3/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-3/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/01/31/deep-into-gradle-in-action-2/" title="Previous Post: Gradle深入与实战（二）Java插件">&laquo; Gradle深入与实战（二）Java插件</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/01/31/deep-into-gradle-in-action-4/" title="Next Post: Gradle深入与实战（四）自定义集成测试任务">Gradle深入与实战（四）自定义集成测试任务 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="Gradle深入与实战（三）依赖管理工具"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <p style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</p>
+  <div style="margin-left: 8px;">A Java/RoR Application Developer</div>
+  <div style="margin-left: 8px;">A Gradle Plugin Contributor</div>
+  <div style="margin-left: 8px;">A translator for Book 《Gradle in Action》</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle， Spring，前端开发</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
