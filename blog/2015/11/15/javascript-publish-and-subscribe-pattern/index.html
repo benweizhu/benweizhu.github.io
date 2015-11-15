@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>NO END FOR LEARNING</title>
+  <title>JavaScript发布订阅模式 - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/11/15/javascript-publish-and-subscribe-pattern">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -62,15 +62,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/11/15/javascript-publish-and-subscribe-pattern/">JavaScript发布订阅模式</a></h1>
+      <h1 class="entry-title">JavaScript发布订阅模式</h1>
     
     
       <p class="meta">
@@ -86,7 +83,7 @@
   </header>
 
 
-  <div class="entry-content"><p>发布者和订阅者的目的就是为了对象之间的解耦，或者更大一点是JavaScript组件之间的解耦。</p>
+<div class="entry-content"><p>发布者和订阅者的目的就是为了对象之间的解耦，或者更大一点是JavaScript组件之间的解耦。</p>
 
 <blockquote><p>Subscribe/Publish模式使用了一个主题/事件通道，这个通道介于订阅者和发布者之间。该事件系统允许代码定义应用程序的特定事件，该事件可以传递自定义参数，自定义参数包含订阅者所需要的值。其目的是避免订阅者和发布者产生依赖关系。 - 《Javascript设计模式》</p></blockquote>
 
@@ -236,160 +233,65 @@
 <p>参考资料：  <br/>
 1.<a href="http://dev.housetrip.com/2014/09/15/decoupling-javascript-apps-using-pub-sub-pattern/">http://dev.housetrip.com/2014/09/15/decoupling-javascript-apps-using-pub-sub-pattern/</a></p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-11-15T11:21:36+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:21 am</span></time>
+      
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-11-10T13:38:27+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:38 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>用了这么久的CI服务应用，Jenkins， Go pipeline，还没有自己尝试搭建一个。今天花点时间在本地搭建了Jenkins。</p>
-
-<h2>安装</h2>
-
-<p>以Mac版本为例：</p>
-
-<p>打开： <a href="https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins">https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins</a> ，下载Mac版本。</p>
-
-<p>安装完成之后，会直接启动 <a href="http://localhost:8080">http://localhost:8080</a> ，也就是说，Jenkins会默认启动8080端口作为服务端口。</p>
-
-<p>在mac下，如果你想要切换端口，你需要这么做：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">unload</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpPort</span> <span class="mi">8443</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">load</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果切换成https，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpPort</span> <span class="mi">8443</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpsKeyStore</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">keystore</span><span class="o">/</span><span class="nb">file</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpsKeyStorePassword</span> <span class="o">&lt;</span><span class="n">keystore</span> <span class="n">password</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>你会发现，它们都有下面的两个命令，它们用来在mac中启动和关闭Jenkins服务：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">load</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">unload</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>安装Github插件和配置项目第一个项目</h2>
-
-<p>安装完成之后，你可以点击new item来新建一个构建项目，选择Freestyle project。</p>
-
-<p>在Source Code Management中，你会发现，它CVS和Subversion的支持。没错，Jenkins默认并不支持Git配置。你需要安装Github Plugin。</p>
-
-<p>回到Jenkins服务器的首页，打开Manage Jenkins，里面有Manage Plugins。在Available Plugin中搜索GitHub plugin，安装并重启Jenkins（页面上又重启的checkbox，点击一下即可）。</p>
-
-<p>安装完成后，再次新建item，可以看GitHub project字段，Source Code Management中多了Git，Build Triggers中多了Build when a change is pushed to GitHub(但简单配置这个，还不能实现自动trigger，后面讲)。</p>
-
-<p>在Build那一栏，选择添加Build Step，在本例中选择python。</p>
-
-<p>我的项目是一个NodeJS项目，所以第一步是npm install。</p>
-
-<p>保存项目，回到项目栏，点击Schedule a build。</p>
-
-<h2>构建执行失败和Jenkins用户</h2>
-
-<p>正如这个小标题，构建执行失败了，你会发现失败的原因是command npm not found。</p>
-
-<p>NPM这个命令不存在，原因是Jenkins在执行该shell脚本的时候是以jenkins这个用户身份去执行，所以命令的PATH配置是不正确的。</p>
-
-<h2>Prepare Env Before Run</h2>
-
-<p>在运行前配置Jenkins运行命令的环境，有两种方式：</p>
-
-<p>1.直接在Prepare an environment for the run中配置   <br/>
-2.安装Environment Inject插件，在Inject environment variables to the build process中配置</p>
-
-<p>我这里配置了下node的bin，npm中的bin。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">PATH</span><span class="o">=</span><span class="err">$</span><span class="n">PATH</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">node</span><span class="o">/</span><span class="mf">0.12</span><span class="o">.</span><span class="mi">5</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">npm</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>A Blue Ball Appear，一个蓝色灯泡的故事</h2>
-
-<p>配置完成之后，再次执行，构建成功。但是构建的提示是一个蓝颜色的球。为什么是蓝色球呢？请看： <a href="http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls">http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls</a></p>
-
-<p>当然我不太习惯，好在要换成绿色球也很简单，安装插件：Green Ball Plugin。</p>
-
-<h2>Pipeline插件</h2>
-
-<p>根据现代软件的开发方式，我们更习惯于构建CI以pipeline的方式呈现，pipeline中有不同的step，有可以自动的trigger，也有可以手动trigger，比如：部署到Test或者Production环境，理论上应该是手动的触发。</p>
-
-<p>这个时候，你需要安装Jenkins的pipeline插件。安装完成之后，回到首页，点击tab上的加号，添加一个tab，你就可以看到pipeline选项。</p>
-
-<p>新建一个pipeline的tab，需要你填写一些信息，比如：在pipeline页面一次显示多少个构建的pipeline，配置完成之后，你就可以看到pipeline页面了。</p>
-
-<p>在pipeline页面，你可以添加一个step，其实也就是新建一个item，选项可以是free style的，也可以从别现有项目copy生成。</p>
-
-<p>配置方式和新建一个item一样。</p>
-
-<p>配置完成之后，你可以在前一个项目的Post-build Actions中添加Build Other Projects，选择Trigger only if build is stable或者其他，填写被trigger的项目。</p>
-
-<p>这样就可以自动触发后续的step。</p>
-
-<h2>Clone Workspace</h2>
-
-<p>你肯定会发现，既然新的step就是一个新的item，那么不是要重新check out一次代码，而且之前build的archive也不在了。</p>
-
-<p>没错，这是个问题，这个时候，你需要安装Clone Workspace SCM Plugin，安装完成之后，你需要做两件事情：</p>
-
-<p>1.在upstream的项目中的Post-Build Actions中添加Achieve for Clone Workspace SCM <br/>
-2.在downstream的项目的Source Code Management中选择Clone Workspace</p>
-
-<h2>关于Build when a change is pushed to GitHub</h2>
-
-<p>简单的添加这个选项还不行，需要你在github的webhook中进行配置，方法在下面的链接中，但是前提是，需要配置的jenkins有url，如果是像我这样在本地配置的，可能就会有问题。
-<a href="http://thepracticalsysadmin.com/setting-up-a-github-webhook-in-jenkins/">http://thepracticalsysadmin.com/setting-up-a-github-webhook-in-jenkins/</a></p>
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/11/15/javascript-publish-and-subscribe-pattern/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/11/15/javascript-publish-and-subscribe-pattern/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/11/10/make-jenkins-run-github-code/" title="Previous Post: 配置Jenkins运行Github的仓库代码构建">&laquo; 配置Jenkins运行Github的仓库代码构建</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
 
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/posts/2">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="JavaScript发布订阅模式"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -478,6 +380,7 @@
 
   
 </aside>
+
 
     </div>
   </div>

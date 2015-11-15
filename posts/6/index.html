@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="JavaScript普通对象 JavaScript中除了数字、字符串、布尔值、null和undefined之外的就是对象了。对象是属性的集合，每个属性都由“名/值对”构成，值可以是原始值，比如数字、字符串，也可以是对象。普通的JavaScript对象就是“命名值”的无序集合。（ &hellip;">
+  <meta name="description" content="原型 每个JavaScript对象（null除外）都和另一个对象相关联。“另一个”对象就是我们熟知的原型，每一个对象都从原型继承属性。 所有通过对象直接量创建的对象都具有同一个原型对象，并可以通过JavaScript代码Object.prototype获得对原型对象的引用。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,55 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/10/06/learning-js-well-2/">学好JavaScript（二）- 被我忽视的东西(2)对象</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-10-06T10:02:04+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:02 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>原型</p>
+
+<p>每个JavaScript对象（null除外）都和另一个对象相关联。“另一个”对象就是我们熟知的原型，每一个对象都从原型继承属性。</p>
+
+<p>所有通过对象直接量创建的对象都具有同一个原型对象，并可以通过JavaScript代码Object.prototype获得对原型对象的引用。通过关键字new和构造函数调用创建的对象的原型就是构造函数的prototype属性的值。因此，同使用{}创建对象一样，通过new Object()创建的对象也继承自Object.prototype。同样，通过new Array()创建的对象的原型就是Array.prototype，通过new Date()创建的对象的原型就是Date.prototype。</p>
+
+<p>没有原型的对象为数不多，Object.prototype就是其中之一。他不继承任何属性。其他原型对象都是普通对象，普通对象也有原型。所有的内置的构造函数都具有一个继承自Object.prototype的原型。例如，Date.prototype的属性继承自Object.prototype，因此由new Date()创建的Date对象的属性同时继承自Date.prototype和Object.prototype。这就是所谓的“原型链”。</p>
+
+<p>关联数组</p>
+
+<p>object.property
+object[&ldquo;property&rdquo;]</p>
+
+<p>第二种语法使用方括号和一个字符串，看起来更像数组，只是这个数组是通过字符串索引而不是数字索引，这种数组就是所说的关联数组。</p>
+
+<p>在C++、Java等强类型语言中，对象只能拥有固定数目的属性，并且这些属性名称必须提前定义好。由于JavaScript是弱类型语言，因此不必遵循这个条规定，在任何对象中程序都可以创建任意数量的属性。但当通过点运算符访问对象的属性时，属性名用一个标识符来表示。标示符必须直接出现在JavaScript程序中，它们不是数据类型，因此程序无法修改它们。</p>
+
+<p>反过来讲，当通过[]来访问对象的属性时，属性名通过字符串来表示。字符串是JavaScript的数据类型，在程序运行时可以修改和创建它们。</p>
+
+<p>for(i = 0; i &lt; 4; i++)
+    addr += customer[&ldquo;address&rdquo; + i];</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -207,178 +256,6 @@ NaN <br/>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/09/27/whenever-plus-capistrano-plus-rbenv/">当whenever遇到capistrano和rbenv - Linux下的cron Job</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-09-27T11:01:41+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:01 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>当你遇到这样一个需求：用户订阅了很多信息，服务器需要每周，或者每月给用户发送邮件，告知用户订阅信息的更新内容。你需要怎么做？</p>
-
-<p>在RoR的环境下，发送邮件使用Rails Action Mailer。参考资料：<a href="http://guides.ruby-china.org/action_mailer_basics.html">http://guides.ruby-china.org/action_mailer_basics.html</a> 。</p>
-
-<p>那么如何定时呢？答案是Cron Job。</p>
-
-<p>如果大家谷歌rails cron job，就可以得到答案，一个是关于Cron Job的答案， <a href="http://www.gotealeaf.com/blog/cron-jobs-and-rails">http://www.gotealeaf.com/blog/cron-jobs-and-rails</a> ，一个是whener gem， <a href="https://github.com/javan/whenever">https://github.com/javan/whenever</a> 。</p>
-
-<p>Cron是*nux系统中一个基于时间的任务安排软件。通过crontab 命令，我们可以在固定的间隔时间执行指定的系统指令或 shell script脚本。时间间隔的单位可以是分钟、小时、日、月、周及以上的任意组合。</p>
-
-<p>更多关于crontab定时任务，可以查看： <a href="http://linuxtools-rst.readthedocs.org/zh_CN/latest/tool/crontab.html">http://linuxtools-rst.readthedocs.org/zh_CN/latest/tool/crontab.html</a></p>
-
-<p>关于时间的定义：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># +---------------- minute (0 - 59)</span>
-</span><span class='line'><span class="c1"># |  +------------- hour (0 - 23)</span>
-</span><span class='line'><span class="c1"># |  |  +---------- day of month (1 - 31)</span>
-</span><span class='line'><span class="c1"># |  |  |  +------- month (1 - 12)</span>
-</span><span class='line'><span class="c1"># |  |  |  |  +---- day of week (0 - 6) (Sunday=0)</span>
-</span><span class='line'><span class="c1"># |  |  |  |  |</span>
-</span><span class='line'>  <span class="o">*</span>  <span class="o">*</span>  <span class="o">*</span>  <span class="o">*</span>  <span class="o">*</span>  <span class="n">command</span> <span class="n">to</span> <span class="n">be</span> <span class="n">executed</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里，我就不细谈crontab定时任务，大家可以去看上面那个链接。</p>
-
-<p>whenever是一个Ruby的gem，它可以提供一个清晰的语法来编写定时任务。</p>
-
-<p>如果你刚才有停下来看crontab的内容，你会发现crontab任务的语法非常的复杂。</p>
-
-<p>whenever的目的就是为了让你以ruby的语法来编写要执行的任务，再由它来生成真正的crontab任务。</p>
-
-<p>如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">set</span> <span class="ss">:environment</span><span class="p">,</span> <span class="s2">&quot;staging&quot;</span>
-</span><span class='line'><span class="n">set</span> <span class="ss">:output</span><span class="p">,</span> <span class="p">{</span><span class="ss">:error</span> <span class="o">=&gt;</span> <span class="s2">&quot;log/cron_error_log.log&quot;</span><span class="p">,</span> <span class="ss">:standard</span> <span class="o">=&gt;</span> <span class="s2">&quot;log/cron_log.log&quot;</span><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">weekly_of_day</span> <span class="o">=</span> <span class="ss">:sunday</span> <span class="c1"># every sunday</span>
-</span><span class='line'><span class="n">weekly_of_time</span> <span class="o">=</span> <span class="p">{</span><span class="ss">:at</span> <span class="o">=&gt;</span> <span class="s1">&#39;0:00 am&#39;</span><span class="p">}</span> <span class="c1"># every sunday 0:00am</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">monthly</span> <span class="o">=</span> <span class="s1">&#39;0 0 1 * *&#39;</span> <span class="c1"># monthly 0 0 1 * * (every first day of month at 0:00am)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">quarterly</span> <span class="o">=</span> <span class="s1">&#39;0 0 1 1,4,7,10 *&#39;</span> <span class="c1"># quarterly 0 0 1 1,4,7,10 * (every 3 months at 0:00am start from the first day in january)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">job_type</span> <span class="ss">:rbenv_rake</span><span class="p">,</span> <span class="sx">%Q{export PATH=~/.rbenv/shims:~/.rbenv/bin:/usr/bin:$PATH; eval &quot;$(rbenv init -)&quot;; cd :path &amp;&amp; RAILS_ENV=staging bundle exec rake :task --silent &gt;&gt; log/cron_log.log 2&gt;&gt; log/cron_error_log.log}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">every</span> <span class="n">weekly_of_day</span><span class="p">,</span> <span class="n">weekly_of_time</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">rbenv_rake</span> <span class="s2">&quot;email_notification:send_email_notification_weekly&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">every</span> <span class="n">monthly</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">rbenv_rake</span> <span class="s2">&quot;email_notification:send_email_notification_monthly&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>更多关于如何使用whenever的内容，请查看： <a href="https://github.com/javan/whenever">https://github.com/javan/whenever</a></p>
-
-<p>whenever提供提供了四种job类型，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">job_type</span> <span class="ss">:command</span><span class="p">,</span> <span class="s2">&quot;:task :output&quot;</span>
-</span><span class='line'><span class="n">job_type</span> <span class="ss">:rake</span><span class="p">,</span>    <span class="s2">&quot;cd :path &amp;&amp; :environment_variable=:environment bundle exec rake :task --silent :output&quot;</span>
-</span><span class='line'><span class="n">job_type</span> <span class="ss">:runner</span><span class="p">,</span>  <span class="s2">&quot;cd :path &amp;&amp; bin/rails runner -e :environment &#39;:task&#39; :output&quot;</span>
-</span><span class='line'><span class="n">job_type</span> <span class="ss">:script</span><span class="p">,</span>  <span class="s2">&quot;cd :path &amp;&amp; :environment_variable=:environment bundle exec script/:task :output&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>但是，你在我给的例子中可以看到，我并没有使用其中的任何一个，而是自定义了一个rbenv_rake，这便是接下来的重点。</p>
-
-<p>如果你产品环境的Ruby环境是通过rbenv配置，那么在你使用crontab任务的可能会遇到这个问题。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">/</span><span class="n">spec_set</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">92</span><span class="ss">:in</span> <span class="sb">`block in materialize&#39;: Could not find rake-10.4.2 in any of the sources (Bundler::GemNotFound)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>关于原因，可以查看这个： <a href="http://benscheirman.com/2013/12/using-rbenv-in-cron-jobs/">http://benscheirman.com/2013/12/using-rbenv-in-cron-jobs/</a></p>
-
-<p>Crontab运行在一个受限的环境下，所以.bash_profile的配置方式，并不起作用。需要在每次运行该任务前，重新初始化一次rbenv。</p>
-
-<p>最后一点：</p>
-
-<p>关于whenever和capistrano的集成，其实官方网站上也给出了，但是测试过不起作用，至少我这没起作用，所以我在部署的ruby文件中添加了一个task。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">namespace</span> <span class="ss">:deploy</span> <span class="k">do</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">desc</span> <span class="s2">&quot;Update crontab with whenever&quot;</span>
-</span><span class='line'>  <span class="n">task</span> <span class="ss">:update_cron</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">on</span> <span class="n">roles</span><span class="p">(</span><span class="ss">:app</span><span class="p">)</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">within</span> <span class="n">current_path</span> <span class="k">do</span>
-</span><span class='line'>        <span class="n">execute</span> <span class="ss">:bundle</span><span class="p">,</span> <span class="ss">:exec</span><span class="p">,</span> <span class="s2">&quot;whenever --update-crontab </span><span class="si">#{</span><span class="n">fetch</span><span class="p">(</span><span class="ss">:application</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">after</span> <span class="ss">:finishing</span><span class="p">,</span> <span class="s1">&#39;deploy:update_cron&#39;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/7">&larr; Older</a>
@@ -405,6 +282,10 @@ NaN <br/>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/11/15/javascript-publish-and-subscribe-pattern/">JavaScript发布订阅模式</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
       </li>
     
@@ -418,10 +299,6 @@ NaN <br/>
     
       <li class="post">
         <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
       </li>
     
   </ul>

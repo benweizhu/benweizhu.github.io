@@ -9,7 +9,8 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="上一章节结尾，我们实现了Spring web security的最小实现，拦截所有url，采用表单登录，用户名和密码采用inMemory方式保存。 你可能在想，这个登录页面从哪里来的，我们并没有直接去实现一个页面。事实上，正是因为我们没有设置登录页面，Spring Security就自动生成了一个 &hellip;">
+  <meta name="description" content="之前实现的表单提交方式来验证用户，实际上是不安全，http请求没有做任何的处理，表单内容以明文方式发送，在浏览器查看请求，得到结果就如下： j_username:ben
+j_password:ben submit:Login 而且，用户名和密码保存在xml或者properties方式保存在服务器端 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +65,167 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/06/14/spring-web-security-3/">Spring Web Security 实战 (三) - 改变用户认证方式和安全性</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-06-14T17:19:38+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>5:19 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>之前实现的表单提交方式来验证用户，实际上是不安全，http请求没有做任何的处理，表单内容以明文方式发送，在浏览器查看请求，得到结果就如下：</p>
+
+<p>j_username:ben<br/>
+j_password:ben <br/>
+submit:Login</p>
+
+<p>而且，用户名和密码保存在xml或者properties方式保存在服务器端，也是不合理的。</p>
+
+<h2>Http Basic</h2>
+
+<p>参考：<a href="http://blog.itpub.net/23071790/viewspace-709367/">http://blog.itpub.net/23071790/viewspace-709367/</a></p>
+
+<p>“在HTTP协议进行通信的过程中，HTTP协议定义了基本认证过程以允许HTTP服务器对WEB浏览器进行用户身份证的方法，当一个客户端向HTTP服务 器进行数据请求时，如果客户端未被认证，则HTTP服务器将通过基本认证过程对客户端的用户名及密码进行验证，以决定用户是否合法。客户端在接收到HTTP服务器的身份认证要求后，会提示用户输入用户名及密码，然后将用户名及密码以BASE64加密，加密后的密文将附加于请求信息中， 如当用户名为anjuta，密码为：123456时，客户端将用户名和密码用“：”合并，并将合并后的字符串用BASE64加密为密文，并于每次请求数据 时，将密文附加于请求头（Request Header）中。HTTP服务器在每次收到请求包后，根据协议取得客户端附加的用户信息（BASE64加密的用户名和密码），解开请求包，对用户名及密码进行验证，如果用 户名及密码正确，则根据客户端请求，返回客户端所需要的数据;否则，返回错误代码或重新要求客户端提供用户名及密码。”</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;security:http&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;security:intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;security:http-basic/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/security:http&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这种方式直接的表单要好点，但其实也不安全，用户名和密码可以通过BASE64反编码得到。</p>
+
+<h2>使用数据库</h2>
+
+<p>如果你想使用数据库作为身份认证的数据来源，非常简单，只需要配置一个DataSource即可。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;authentication-provider&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;jdbc-user-service</span> <span class="na">data-source-ref=</span><span class="s">&quot;securityDataSource&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/authentication-provider&gt;</span>
+</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里的securityDataSource是Spring上下文种一个DataSource Bean，它指向一个含有Spring Security“标准用户数据库表”的数据库。</p>
+
+<p>除了直接配置DataSource，你还可以配置一个Spring Security的JdbcDaoImpl的Bean，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;authentication-provider</span> <span class="na">user-service-ref=</span><span class="s">&#39;myUserDetailsService&#39;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;beans:bean</span> <span class="na">id=</span><span class="s">&quot;myUserDetailsService&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;beans:property</span> <span class="na">name=</span><span class="s">&quot;dataSource&quot;</span> <span class="na">ref=</span><span class="s">&quot;dataSource&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/beans:bean&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>你肯定会问，这个“标准用户数据库表”的结构是什么样的。</p>
+
+<p>默认的结构是有两张表：&#8221;users&#8221;和&#8221;authorities&#8221;。Users表有三个字段username，password，enabled。Authorities表有两个字段username，authority</p>
+
+<p>如果你不满意标准的表结构，你还可以实现AuthenticationProvider接口自定义实现。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;authentication-provider</span> <span class="na">ref=</span><span class="s">&#39;myAuthenticationProvider&#39;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>添加Password编码器</h2>
+
+<p>将密码以明文的方式存放在代码中或者是数据库中，始终是不安全的，AuthenticationProvider允许设置密码的加密编码。并且应该使用为此目的而设计的标准的安全hash算法，而不是一般的SHA或者MD5哈希算法。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;bean</span> <span class="na">name=</span><span class="s">&quot;bcryptEncoder&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;authentication-provider&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;password-encoder</span> <span class="na">ref=</span><span class="s">&quot;bcryptEncoder&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;user-service&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;jimi&quot;</span> <span class="na">password=</span><span class="s">&quot;d7e6351eaa13189a5a3641bab846c8e8c69ba39f&quot;</span>
+</span><span class='line'>                  <span class="na">authorities=</span><span class="s">&quot;ROLE_USER, ROLE_ADMIN&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;bob&quot;</span> <span class="na">password=</span><span class="s">&quot;4e7421b1b8765d8f9406d87e7cc6aa784c4ab97f&quot;</span> <span class="na">authorities=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/user-service&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/authentication-provider&gt;</span>
+</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Bcrypt是Spring文档里推荐的hash算法，它是一个跨平台的文件加密工具。由它加密的文件可在所有支持的操作系统和处理器上进行转移。它的口令必须是8至56个字符，并将在内部被转化为448位的密钥。（来自-百度百科）</p>
+
+<h2>HTTPS</h2>
+
+<p>很多情况下我们依旧需要采用以表单的方式来实现身份认真，就必须要避免，表单数据，即用户名和密码在HTTP协议下以明文传输。</p>
+
+<p>Spring Security可以非常方面的支持要求某些URL必须是在https协议下才可以访问。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;http&gt;</span>
+</span><span class='line'><span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/secure/**&quot;</span> <span class="na">access=</span><span class="s">&quot;ROLE_USER&quot;</span> <span class="na">requires-channel=</span><span class="s">&quot;https&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;ROLE_USER&quot;</span> <span class="na">requires-channel=</span><span class="s">&quot;any&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>...
+</span><span class='line'><span class="nt">&lt;/http&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面这段代码，当用户以http协议访问/secure/**，就会先跳转到https上。</p>
+
+<p>参考资料：Spring Security Reference</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -244,184 +406,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/06/12/spring-web-security-1/">Spring Web Security 实战 (一) - 最少配置启动</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-06-12T21:12:38+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:12 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>你大概应该知道对于应用的安全性（无论是Web应用还是非Web应用），都包含两个方面“身份认证”（authentication）和“权限认证”（authorization，access-control）。身份认证是确立“访问者”所声称的“当事人”（principal）的一个过程（当事人可以是一个用户，设备，或者其他任何要在该应用操作的系统）。权限认证指的是确定该“当事人”是否可以在应用执行某一个操作的过程。</p>
-
-<p>Spring Security能提供的功能亦围绕着这两个核心概念展开。</p>
-
-<p>在“身份认证”方面，Spring Security能提供什么样的支持呢？如下：</p>
-
-<p>HTTP BASIC authentication headers(an IETF RFC-based standard)   <br/>
-HTTP Digest authentication headers(an IETF RFC-based standard)   <br/>
-HTTPX.509 client certificate exchange(an IETF RFC-based standard)   <br/>
-Form-based authentication(for simple user interface needs)   <br/>
-&hellip;
-更多类型，请参考Spring Security官文。</p>
-
-<p>好吧，概念性的东西就介绍到这，本篇文章以实战为主，下面我们还是来聊聊大家更关心的实现：</p>
-
-<p>在Spring Security 3.0中，相应的功能代码被分到了不同的Jar包中，以清晰的区分不同的功能和第三方依赖。下面介绍三个主要的Jar包：</p>
-
-<p>Core - spring-security-core.jar</p>
-
-<p>包含核心的“身份认证”和“访问控制”类和接口。任何Spring Security的应用都需要这个包，支持独立应用，远程客户端，方法级别（服务层）的安全，以及JDBC，主要包含下面几个顶级包：      <br/>
-org.springframework.security.core  <br/>
-org.springframework.security.access  <br/>
-org.springframework.security.authentication    <br/>
-org.springframework.security.provisioning</p>
-
-<p>Web - spring-security-web.jar</p>
-
-<p>包含对应的filter和web security相关的基础架构代码。任何与Servlet API相关的依赖。如果你需要Spring Security对web身份认证和URL级别的访问控制的支持，就需要它。里面主要包含的包是：org.springframework.security.web。</p>
-
-<p>Config - spring-security-config.jar</p>
-
-<p>包含security命名空间解析代码。如果你要使用XML方式的配置Security，那么你就会需要它。主要包含的包：org.springframework.security.config。</p>
-
-<p>以web应用和xml配置为例，要开始使用Spring Security，需要至少下面的两个依赖，web和config，web会自动依赖于core，所以不用显示的指定core。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework.security:spring-security-web:3.2.7.RELEASE&#39;</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework.security:spring-security-config:3.2.7.RELEASE&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>为了能够支持更多的Spring使用，我们以XML方法来配置Security框架。</p>
-
-<p>下面介绍下在Security命名空间下，都有哪些重要的元素节点。</p>
-
-<p>• Web/HTTP Security - 设置filter和相关的Service Bean，以应用框架的用户认证机制，安全化URL，渲染登录，错误页面等。</p>
-
-<p>• Business Object(Method) Security - 用来保证业务层的安全。</p>
-
-<p>• Authentication Manager - 处理身份认证请求</p>
-
-<p>• Access Decision Manager - 为web和method提供访问决策。框架提供了一个默认实现，你也可以自定义一个，语法和普通Bean定义一样。</p>
-
-<p>• AuthenticationProviders - 与Authentication Manager相对应的身份认真机制提供方，提供了多种标准选择，同样也支持自定义。</p>
-
-<p>• UserDetailsService - 与authentication providers联系紧密，也会被其他Bean使用。</p>
-
-<p>接下来，我们开始正式写代码。</p>
-
-<p>首先，你需要在web.xml中定义一个名字是springSecurityFilterChain的filter。它提供了一个“钩子“，来启动Spring Security Web的基础架构。DelegatingFilterProxy是Spring框架中一个类，它代理着一个以Spring Bean方式定义在Spring上下文中的filter。在本例中，bean的名字是springSecurityFilterChain，它是Spring提供的内部基础架构Bean，所以，我们定义的一些自定义的Bean的时候，就不可以使用这个名字springSecurityFilterChain。代码如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;filter&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;filter-name&gt;</span>springSecurityFilterChain<span class="nt">&lt;/filter-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;filter-class&gt;</span>org.springframework.web.filter.DelegatingFilterProxy<span class="nt">&lt;/filter-class&gt;</span>
-</span><span class='line'><span class="nt">&lt;/filter&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;filter-mapping&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;filter-name&gt;</span>springSecurityFilterChain<span class="nt">&lt;/filter-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;url-pattern&gt;</span>/*<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'><span class="nt">&lt;/filter-mapping&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>springSecurityFilterChain是由Spring框架定义。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">security</span><span class="o">.</span><span class="na">config</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">configuration</span><span class="o">;</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebSecurityConfiguration</span><span class="o">{</span>
-</span><span class='line'>  <span class="nd">@org.springframework.context.annotation.Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="o">{</span><span class="s">&quot;springSecurityFilterChain&quot;</span><span class="o">})</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">javax</span><span class="o">.</span><span class="na">servlet</span><span class="o">.</span><span class="na">Filter</span> <span class="nf">springSecurityFilterChain</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Exception</span> <span class="o">{</span> <span class="cm">/* compiled code */</span> <span class="o">}</span>   
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>做完上面的”钩子”配置，你就可以正式开始Spring上下文的定义。首先来配置Web/HTTP Security节点部分“http”：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;ROLE_USER&#39;)&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;form-login/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;logout/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/http&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面是使得Spring Security工作的最小http节点配置。安全拦截所有应用中的URL，要求访问者（“当事人”）含有ROLE_USER权限，要求使用带有用户名和密码的表单登录，并提供一个登出的URL。上面的pattern可以使用正则表达式来匹配对应路径，access中的hasRole必须配合use-expressions=&ldquo;true&#8221;才能使用（4.0以上有所不同）。如果提供多种权限，ROLE_USER后面可以以逗号分隔以允许多种权限（如果是4.0以上版本，Spring会自动给hasRole中的值加上ROLE_作为前缀，所以需要注意）。</p>
-
-<p>这里允许定义多个intercept-url以应对不同的url，比如，css，js的访问，自定义登陆页面的访问，等。由于该intercept-url会根据定义的先后顺序来解析输入的url，所以，越明确的url模式，越应该放在前面。</p>
-
-<p>note：如果你对filter比较熟悉，你应该能明白intercept-url其实是在配置FilterChainProxy所使用的filter。</p>
-
-<p>接下来，需要配置Authentication Manager：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;authentication-provider&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;user-service&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;ben&quot;</span> <span class="na">password=</span><span class="s">&quot;ben&quot;</span> <span class="na">authorities=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/user-service&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/authentication-provider&gt;</span>
-</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>authentication-provider和user-service分别创建了两个bean，DaoAuthenticationProvider和InMemoryDaoImpl。它们作为authentication-manager的子元素存在，而authentication-manager则创建了一个ProviderManager的Bean，并将authentication-provider注册到该ProviderManager。理解这段代码的含义很简单，一个用户ben，密码ben，拥有ROLE_USER这个权限。</p>
-
-<p>你还可以通过user-service上的properties属性来指定一个properties文件作为用户定义的输入。</p>
-
-<p>到此，你就完成了一个最简单的Spring Web Security的配置。拦截所有url，需要输入用户名和密码登录访问。</p>
-
-<p>参考资料：   <br/>
-1. Spring Security Reference。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/13">&larr; Older</a>
@@ -448,6 +432,10 @@ org.springframework.security.provisioning</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/11/15/javascript-publish-and-subscribe-pattern/">JavaScript发布订阅模式</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
       </li>
     
@@ -461,10 +449,6 @@ org.springframework.security.provisioning</p>
     
       <li class="post">
         <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a>
       </li>
     
   </ul>
