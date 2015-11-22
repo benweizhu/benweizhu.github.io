@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-11-15T12:14:54+08:00</updated>
+  <updated>2015-11-22T21:28:16+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,380 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[继续前行！React（一）- 用JavaScript构建Web UI]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/11/22/ok-react-1/"/>
+    <updated>2015-11-22T15:12:52+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/11/22/ok-react-1</id>
+    <content type="html"><![CDATA[<h2>什么是React？</h2>
+
+<p>官方网站上是这么写的：</p>
+
+<blockquote><p>A JAVASCRIPT LIBRARY FOR BUILDING USER INTERFACES</p></blockquote>
+
+<p>React只关心UI，至于怎么路由（route），怎么获取数据（ajax），你可以通过结合其他技术来做。</p>
+
+<p>什么UI，在web中UI指的是HTML和CSS，React通过JavaScript的方式来写HTML和CSS，这就是它所说的“构建用户界面的JavaScript类库”。</p>
+
+<h3>用JavaScript绘制UI</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">HelloMessage</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">displayName</span><span class="o">:</span> <span class="s2">&quot;HelloMessage&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;Hello &quot;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">React</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="nx">HelloMessage</span><span class="p">,</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;John&quot;</span> <span class="p">}),</span> <span class="nx">mountNode</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>mountNode是一个在页面上的元素，通过document.getElementByXXX得到。</p>
+
+<p>该代码执行得到的结果如下：</p>
+
+<div data-reactid=".1">
+    <span data-reactid=".1.0">Hello </span><span data-reactid=".1.1">John</span>
+</div>
+
+
+<p>简单地说，就是它找到页面上的mountNode节点，将Hello John插入，其中John来自于动态传入的JSON数据。</p>
+
+<p>根据上面的解释，是否让你联想到了JavaScript模板引擎，对JavaScript模板引擎不了解的，可以看这篇文章： <a href="http://benweizhu.github.io/blog/2015/10/28/js-template-engine/">http://benweizhu.github.io/blog/2015/10/28/js-template-engine/</a> 。</p>
+
+<p>和JavaScript模板引擎相比，上面这种方式通过JavaScript来编写UI代码，可读性相差甚远，于是React提出了JSX的概念 - JavaScript XML，上面的代码就变成如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">HelloMessage</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Hello</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">HelloMessage</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;John&quot;</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nx">mountNode</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>不管你现在了不了解JSX，但是你应该可以看出来，React所指的用JavaScript构建UI的概念。</p>
+
+<p>HelloMessage就像是一个自定义的新标签，在React的概念中，叫做一个组件。</p>
+
+<h3>组件</h3>
+
+<p>React的核心概念是组件，广义的理解组件，组件（Component）是对数据和方法的简单封装，能够独立的实现某一种功能。</p>
+
+<p>组件是一种封装，它应该是自包含的，不需要外界的帮助，即可完成自身相应的功能(多个组件相互合作，也是组件本身可以完成相应功能的前提下实现的)，比如上面代码中的HelloMessage。</p>
+
+<p>有状态的组件（Props和State）：</p>
+
+<p>React不需要你去操作DOM，你只要告诉它，你想要绘制的DOM长什么样？如何去绘制，由它自己来操作。</p>
+
+<p>你只需要根据事件相应来改变组件的状态，当组件状态改变，它会自动重新绘制DOM。</p>
+
+<p>看下面的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">Timer</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span><span class="nx">secondsElapsed</span><span class="o">:</span> <span class="mi">0</span><span class="p">};</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">tick</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">secondsElapsed</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">secondsElapsed</span> <span class="o">+</span> <span class="mi">1</span><span class="p">});</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">interval</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">tick</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">componentWillUnmount</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">clearInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">interval</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Seconds</span> <span class="nx">Elapsed</span><span class="o">:</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">secondsElapsed</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'>    <span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Timer</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nx">mountNode</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>你改变的是组件的状态this.state.secondsElapsed，DOM的绘制由React自己完成，你只是告诉他画成这样。</p>
+
+<p>参考资料： <br/>
+1. <a href="https://facebook.github.io/react/index.html">https://facebook.github.io/react/index.html</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[译 Merging vs Rebasing（未完成）]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/11/17/merging-vs-rebasing-translation/"/>
+    <updated>2015-11-17T21:58:52+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/11/17/merging-vs-rebasing-translation</id>
+    <content type="html"><![CDATA[<p>原文地址：<a href="https://www.atlassian.com/git/tutorials/merging-vs-rebasing">https://www.atlassian.com/git/tutorials/merging-vs-rebasing</a></p>
+
+<p>git rebase命令对于初学git的人就是像是一种巫术，应该远离之，但是实际上如果使用适当，会让你的git生活变得更轻松。在本文中，我将会比较git rebase和相关的git merge命令，鉴别出在git工作流所有使用git rebase的可能性。</p>
+
+<h3>基本概念</h3>
+
+<p>理解git rebase的第一件事情就是它和git merge是解决相同的问题。两个命令都是设计出来将一个分支上的代码变化和另一个分支上的代码变化进行集成-只是他们的做法不同。</p>
+
+<p>考虑这样的场景，当你开始在专注于在某一个分支上进行一个新的feature（特性）开发时，另外一个团队在master分支上进行了新的提交。这导致一个forked的历史，这对于任何属性Git作为团队合作工作的人都是比较清楚的。</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/01.svg" alt="Alt text" /></p>
+
+<p>现在，假设在master分支上新提交的代码和你正在开发的特性相关。为了将这些新提交的代码吸收/包含（incorporate，在这里就翻译成合并，避免混淆），你有两个选择：merging（合并）和rebasing（复位基底/复基）。</p>
+
+<h3>Merge选项</h3>
+
+<p>最简单的选择是将master分支合并（merge）到正在开发的特性分支上，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
+</span><span class='line'>git merge master
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>或者，你可以将他们压缩成一行：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git merge master feature
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样就是在特性分支上创建了一个新的“merge commit”，他讲两个分支上的历史绑在了一起，就像下面你看到的分支结构：
+<img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/02.svg" alt="Alt text" /></p>
+
+<p>合并（merge）是很好的，因为他是一个非破坏性的操作。当前存在的分支是无论如何都不会改变的。这样就避免了所有因为rebase导致的坑（pitfall）。</p>
+
+<p>另外一方面，这样意味着，在每次你吸收/包含（incorprate）特性分支会有外部（extraneous）来的合并提交。如果master分支比较活跃，这样机会污染你的特性分支的历史记录。当然也有减轻该问题影响的的高级git log选项，但是他就让其他开发人员很难理解项目的历史。</p>
+
+<h3>Rebase选项</h3>
+
+<p>作为merge的另一种选择，又可以将特性分支rebase到master分支，通过下面的命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
+</span><span class='line'>git rebase master
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>他将整个特性分支移动到了master分支的末梢（tip），有效的吸收/包含（incorprate）所有的提交到master分支。但是，和merge不同，rebase通过给原始分支上每一次提交创建全新的提交，从而重写了项目的历史。</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/03.svg" alt="Alt text" /></p>
+
+<p>Rebase的主要好处是你会得到一个更为清晰的项目历史。首先，它消除了所有git merge所需要的不必要的merge提交（merge commit）。其次，正如你在上面那张图中看到的，rebase也产生一个完美的线性项目历史-你可以从特性的末端一路查看到项目的开始而没有任何的fork。这样，使得你更容易使用像git log， git bisect和gitk来浏览项目（原文字面含义：在项目中导航（navigate））。</p>
+
+<p>但是，为了这样淳朴的提交历史，有两点权衡/交易（trade-off，翻译为妥协更合适）：安全性和可追溯性（traceability）。如果你不遵循rebase的黄金准则，重写项目历史可能会给你的合作工作流带来潜在的悲惨结局。还有一点，虽然没有那么重要，rebase会丢失merge commit所提供的上下文-你无法看到上游的代码变化是合适包含（incorprate）到特性分支上的。</p>
+
+<h3>Interactive Rebasing</h3>
+
+<p>Interactive rebasing gives you the opportunity to alter commits as they are moved to the new branch. This is even more powerful than an automated rebase, since it offers complete control over the branch’s commit history. Typically, this is used to clean up a messy history before merging a feature branch into master.</p>
+
+<p>To begin an interactive rebasing session, pass the i option to the git rebase command:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
+</span><span class='line'>git rebase -i master
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will open a text editor listing all of the commits that are about to be moved:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pick 33d5b7a Message <span class="k">for</span> commit <span class="c">#1</span>
+</span><span class='line'>pick 9480b3d Message <span class="k">for</span> commit <span class="c">#2</span>
+</span><span class='line'>pick 5c67e61 Message <span class="k">for</span> commit <span class="c">#3</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This listing defines exactly what the branch will look like after the rebase is performed. By changing the pick command and/or re-ordering the entries, you can make the branch’s history look like whatever you want. For example, if the 2nd commit fixes a small problem in the 1st commit, you can condense them into a single commit with the fixup command:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pick 33d5b7a Message <span class="k">for</span> commit <span class="c">#1</span>
+</span><span class='line'>fixup 9480b3d Message <span class="k">for</span> commit <span class="c">#2</span>
+</span><span class='line'>pick 5c67e61 Message <span class="k">for</span> commit <span class="c">#3</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When you save and close the file, Git will perform the rebase according to your instructions, resulting in project history that looks like the following:</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/04.svg" alt="Alt text" /></p>
+
+<p>Eliminating insignificant commits like this makes your feature’s history much easier to understand. This is something that git merge simply cannot do.</p>
+
+<p>Rebase的黄金准则</p>
+
+<p>一旦你理解了什么是rebase，最重要的就是学会合适不要用它。git rebase的黄金准则就是不要在公共的分支上使用。</p>
+
+<p>比如，想象一下如果你将master分支rebase到特性分支：</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/05.svg" alt="Alt text" /></p>
+
+<p>这个rebase会将所有在master上的提交移动到feature分支的末端。问题是这还只是在你自己的仓库中发生了。所有其他的开发人员仍然工作在原来的master分支上。因为rebase导致了新的提交，Git会认为你的master分支的历史和其他人的偏离。</p>
+
+<p>唯一同步两个master分支的办法就是将他们合并（merge）回去，导致一个额外的合并提交（merge commit），和两个一系列的提交的，这两个一系列提交的代码改变是相同的（一个是原始master分支上的，一个是你rebased的分支上的）。不用说，这是非常让人困惑的情况。</p>
+
+<p>所以，在你开始做rebase的时候，永远问你自己一下，“是否有人也在用这个分支”，如果回答是，那么把你手移开键盘，开始思考一种非破坏性的方式来做改变(e.g., the git revert command，这个位置没搞懂)。</p>
+
+<p>否则，你就可以安全的重写历史。</p>
+
+<p>Force-Pushing</p>
+
+<p>如果你想要rebased过的master分支push到远程服务器，Git就会阻止你这么做，因为他和远程的master分支是冲突的。但是，你可以强制push，通过 &ndash;force标志，比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Be very careful with this command!</span>
+</span><span class='line'>git push --force
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样会重写远程master的分支来匹配在你仓库rebased过得master分支，这会让团队中的其他成员非常困惑。所以，只有当你非常清楚你要做什么的时候，你才可以非常小心的使用。</p>
+
+<p>一种情况下，你应该使用force-pushing，就是在你push一个私有特性分支到远程仓库后，你执行一个本地清理。这就是像是在说“哎呀，我不是真的想要push特性分支的原始版本。就用当前这一个吧”，而且，很重要的是，没有其他人在原来的特性分支上工作。</p>
+
+<h2>工作流指导</h2>
+
+<p>Rebase可以根据你的团队或多或少的包含到现有的Git工作流中。在本节，我们将看看rebase在一个特性开发的不同阶段所提供的好处。</p>
+
+<p>在任何工作流中启用git rebase的第一步就是为每一个特性创建单独的分支。这将提供你必备的分支结构来安全的使用rebase：</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/06.svg" alt="Alt text" /></p>
+
+<h2>清理本地</h2>
+
+<p>将rebase包含到工作流中最好的办法之一就是清理本地，同步特性。通过周期性的执行一个interactive（交互性的）rebase，你可以保证在你的特性开发中的每次提交都是专注和有意义的（focused and meaningful）。这就让你在写你的代码的时候，不用担心变成被独立的提交 - 你可以在这样的事情发生之后，修好它。</p>
+
+<p>当调用git rebase，对于新的base，你有两个选项：特性的父分支（比如：父分支），或者是特性分支的更早提交。我们在之前的Interactive Rebasing部分看到了第一种选项的例子。当你仅仅需要修复上几次提交的时候，第二个选项也是不错的选择。比如，下面的命令进行了一个只有最后三次提交提交的interactive rebase。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
+</span><span class='line'>git rebase -i HEAD~3
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过指定HEAD~3新的base，你并没有真的移动你的分支，交互性的重写了跟在它后面三次提交。注意这并不会将上游的改变包含到特性分支。</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/07.svg" alt="Alt text" /></p>
+
+<p>如果你想要用这种方法重写整个特性，git merge-base命令可以用来找到特性分支原来的base。下面的命令将返回原来base的提交ID，你可以将它传递给git rebase：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git merge-base feature master
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>interactive rebasing是向你的工作流中引入git rebase的最好方法。其他开发人员能够看到的，只有你的完成的产品，这样可以有非常干净，容易理解的特性分支历史。</p>
+
+<p>但是，还是要说，这仅仅能够用在私有的特性分支上。如果你和其他开发人员工作在同一个特性分支上，那么这个分支就是共有的，那么你就不允许重写它的历史。</p>
+
+<p>没有任何git合并方式来清除带有interactive rebase的本地提交。</p>
+
+<h3>Incorporating Upstream Changes Into a Feature</h3>
+
+<p>In the Conceptual Overview section, we saw how a feature branch can incorporate upstream changes from master using either git merge or git rebase. Merging is a safe option that preserves the entire history of your repository, while rebasing creates a linear history by moving your feature branch onto the tip of master.</p>
+
+<p>This use of git rebase is similar to a local cleanup (and can be performed simultaneously), but in the process it incorporates those upstream commits from master.</p>
+
+<p>Keep in mind that it’s perfectly legal to rebase onto a remote branch instead of master. This can happen when collaborating on the same feature with another developer and you need to incorporate their changes into your repository.</p>
+
+<p>For example, if you and another developer named John added commits to the feature branch, your repository might look like the following after fetching the remote feature branch from John’s repository:</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/08.svg" alt="Alt text" /></p>
+
+<p>You can resolve this fork the exact same way as you integrate upstream changes from master: either merge your local feature with john/feature, or rebase your local feature onto the tip of john/feature.</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/09.svg" alt="Alt text" /></p>
+
+<p>Note that this rebase doesn’t violate the Golden Rule of Rebasing because only your local feature commits are being moved—everything before that is untouched. This is like saying, “add my changes to what John has already done.” In most circumstances, this is more intuitive than synchronizing with the remote branch via a merge commit.</p>
+
+<p>By default, the git pull command performs a merge, but you can force it to integrate the remote branch with a rebase by passing it the &ndash;rebase option.</p>
+
+<h3>Reviewing a Feature With a Pull Request</h3>
+
+<p>If you use pull requests as part of your code review process, you need to avoid using git rebase after creating the pull request. As soon as you make the pull request, other developers will be looking at your commits, which means that it’s a public branch. Re-writing its history will make it impossible for Git and your teammates to track any follow-up commits added to the feature.</p>
+
+<p>Any changes from other developers need to be incorporated with git merge instead of git rebase.</p>
+
+<p>For this reason, it’s usually a good idea to clean up your code with an interactive rebase before submitting your pull request.</p>
+
+<h3>Integrating an Approved Feature</h3>
+
+<p>After a feature has been approved by your team, you have the option of rebasing the feature onto the tip of the master branch before using git merge to integrate the feature into the main code base.</p>
+
+<p>This is a similar situation to incorporating upstream changes into a feature branch, but since you’re not allowed to re-write commits in the master branch, you have to eventually use git merge to integrate the feature. However, by performing a rebase before the merge, you’re assured that the merge will be fast-forwarded, resulting in a perfectly linear history. This also gives you the chance to squash any follow-up commits added during a pull request.</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/10.svg" alt="Alt text" /></p>
+
+<p>If you’re not entirely comfortable with git rebase, you can always perform the rebase in a temporary branch. That way, if you accidentally mess up your feature’s history, you can check out the original branch and try again. For example:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
+</span><span class='line'>git checkout -b temporary-branch
+</span><span class='line'>git rebase -i master
+</span><span class='line'><span class="c"># [Clean up the history]</span>
+</span><span class='line'>git checkout master
+</span><span class='line'>git merge temporary-branch
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Summary</h3>
+
+<p>And that’s all you really need to know to start rebasing your branches. If you would prefer a clean, linear history free of unnecessary merge commits, you should reach for git rebase instead of git merge when integrating changes from another branch.</p>
+
+<p>On the other hand, if you want to preserve the complete history of your project and avoid the risk of re-writing public commits, you can stick with git merge. Either option is perfectly valid, but at least now you have the option of leveraging the benefits of git rebase.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[JavaScript发布订阅模式]]></title>
@@ -2537,180 +2911,6 @@ NaN <br/>
 <p>独立列的方式比表达式索引方式好的其中一点是当使用索引查询时，不用在查询语句中指定文本查询的配置。正如上面的例子中，查询语句依赖于default_text_search_config。另外一个优点是，查询更快速，因为它不需要重新执行to_tsvector来验证索引的匹配（特别是使用GiST的时候）。唯一的不同时，这种方式需要占据存储空间。</p>
 
 <p>参考自：<a href="http://www.postgresql.org/docs/9.2/static/textsearch-intro.html">http://www.postgresql.org/docs/9.2/static/textsearch-intro.html</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[CSS后代选择器以及选择器特殊性]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/08/01/css-selector-basic/"/>
-    <updated>2015-08-01T17:46:56+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/08/01/css-selector-basic</id>
-    <content type="html"><![CDATA[<h3>常用的重要选择器规则：</h3>
-
-<p>element,element div,p   选择所有 div 元素和所有 p 元素。  <br/>
-element element div p   后代选择器：选择 div 元素内部的所有 p 元素。 <br/>
-element>element div>p   子选择器：选择父元素为 div 元素的所有 p 元素。  <br/>
-element+element div+p   第一个子元素选择器：选择紧接在 div 元素之后的所有 p 元素。</p>
-
-<h3>后代选择器</h3>
-
-<p>后代选择器（descendant selector）又称为包含选择器。后代选择器可以选择作为某元素后代的元素。</p>
-
-<p>我们可以定义后代选择器来创建一些规则，使这些规则在某些文档结构中起作用，而在另外一些结构中不起作用。
-举例来说，如果你希望只对 h1 元素中的 em 元素应用样式，可以这样写：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">h1</span> <span class="nt">em</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span><span class="nb">red</span><span class="p">;}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面这个规则会把作为 h1 元素后代的 em 元素的文本变为 红色。其他 em 文本（如段落或块引用中的 em）则不会被这个规则选中：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;h1&gt;</span>This is a <span class="nt">&lt;em&gt;</span>important<span class="nt">&lt;/em&gt;</span> heading<span class="nt">&lt;/h1&gt;</span>
-</span><span class='line'><span class="nt">&lt;p&gt;</span>This is a <span class="nt">&lt;em&gt;</span>important<span class="nt">&lt;/em&gt;</span> paragraph.<span class="nt">&lt;/p&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在后代选择器中，规则左边的选择器一端包括两个或多个用空格分隔的选择器。选择器之间的空格是一种结合符（combinator）。每个空格结合符可以解释为“&hellip; 在 &hellip; 找到”、“&hellip; 作为 &hellip; 的一部分”、“&hellip; 作为 &hellip; 的后代”，但是要求必须从右向左读选择器。
-因此，h1 em 选择器可以解释为 “作为 h1 元素后代的任何 em 元素”。如果要从左向右读选择器，可以换成以下说法：“包含 em 的所有 h1 会把以下样式应用到该 em”。</p>
-
-<p>关于后代选择器有一个常被忽略的方面，即两个元素之间的层次间隔可以是无限的。例如，如果写作ul em，这个语法就会选择从u1元素继承的所有em元素，而无论em的嵌套层次有多深。</p>
-
-<h3>子选择器</h3>
-
-<p>某些情况下，可能并不想选择一个任意的后代元素，而是希望缩小范围，只选择另一个元素的子元素（不是所有后代元素）。可以使用子结合符，即大于号(>)</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">h1</span> <span class="o">&gt;</span> <span class="nt">strong</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>特殊性</h3>
-
-<p>如果有多个选择器都满足同一个元素，即冲突了，怎么知道哪一个规则更强？</p>
-
-<p>答案在于每个选择器的特殊性。对于每个规则，用户代理会计算选择器的特殊性，并将这个特殊性附加在规则中的各个声明。如果一个元素有两个或者多个冲突的属性声明，那么有最高特殊性的声明就会胜出。</p>
-
-<p>选择器的特殊性由选择器本身的组件确定。特殊性表述为4个部分，0,0,0,0</p>
-
-<p>1.对于选择器中给定的各个ID属性，加 0,1,0,0
-2.对于选择器中给定的各个类元素，属性选择器或伪类，加 0,0,1,0
-3.对于选择器中给定的各个元素和伪元素，加0,0,0,1
-4.结合符和通配选择器对特殊性没有任何贡献</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">h1</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">1</span>
-</span><span class='line'><span class="nt">p</span> <span class="nt">em</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">purple</span><span class="p">;}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">2</span>
-</span><span class='line'><span class="nc">.grape</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">purple</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">0</span>
-</span><span class='line'><span class="o">*</span><span class="nc">.bright</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">yellow</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">0</span>
-</span><span class='line'><span class="nt">p</span><span class="nc">.bright</span> <span class="nt">em</span><span class="nc">.dark</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">maroon</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">2</span><span class="o">,</span><span class="nt">2</span>
-</span><span class='line'><span class="nt">div</span><span class="nf">#sidebar</span> <span class="o">*[</span><span class="nt">href</span><span class="o">]</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">silver</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">1</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>第五条规则强于第二条</p>
-
-<p>0011 > 0001
-0101 > 0017</p>
-
-<p>内联样式的特殊性
-我们已经见过以0开头的特殊性，所以你可能会奇怪为什么会有这些特殊性。一般地，第一个0是为内联样式声明保留的，它比所有其他声明的特殊性都高，内联样式的特殊性是1,0,0,0</p>
-
-<h3>!important 重要性规则</h3>
-
-<p>有时某个声明可能非常重要，超过了所有其他声明。CSS2.1称之为重要声明，并允许在这些声明的结束分号之前插入!important来标识。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">p</span><span class="nc">.dark</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="m">#333</span> <span class="cp">!important</span><span class="p">;</span> <span class="k">background</span><span class="o">:</span> <span class="nb">white</span><span class="p">;}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>必须正确地放置!important，否则声明将无效，它应该总是放在声明的最后，即分号之前。如果一个属性的值包含多个关键字，则必须放在最后一个关键词的后面，比如font：sss,sss !important;</p>
-
-<p>标志位!important的声明并没有特殊的特殊性值，不过要与非重要声明分开考虑。实际上，所有!important声明会分组在一起，重要声明的特殊性冲突会在重要声明内部解决，而不会与非重要声明相混肴。类似的，非重要声明也归为一组，使用特殊性来解决冲突。如果一个重要声明和一个非重要声明冲突，胜出的总是重要声明。</p>
-
-<p>1.《css权威指南》</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[理解设计RESTful API - 资源、表述和HTTP协议语义]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/07/25/restful-web-api-part-1/"/>
-    <updated>2015-07-25T20:39:45+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/07/25/restful-web-api-part-1</id>
-    <content type="html"><![CDATA[<h3>什么是资源？什么是表述？</h3>
-
-<p>就本质而言，任何足够重要并被引用的事物都可以是资源。如果你的用户“想要建立指向它的超文本链接，指出或者反对关于它的断言，获取或者缓存它的表述，共另外的表述引用它的全部或者部分，给它增加注释信息，或者对它执行某些操作”，（源自《万维网的架构》），你都应该将它定义为资源。</p>
-
-<p>每个资源必须拥有URL，在web上，我们使用URL来为每个资源提供一个全球唯一的地址，将一个事物赋以URL，它就会成为一个资源。</p>
-
-<p>石榴可以是一个资源，但是你不可能通过互联网传输它，数据库中的一条记录可以是一个资源，并且可以通过互联网传输。</p>
-
-<p>当客户端对一个资源发起一个Get请求的时候，服务器会以一种有效的方式提供一个采集了资源信息的文档作为回应。这种资源信息的文档就是一种表述，一种以机器可读的方式对资源当前的状态进行说明。</p>
-
-<h3>资源有多重表述</h3>
-
-<p>一个资源可以有多种表述。比如，有的资源可以有整体概括性的表述，也可以有面面俱到的详细表述，又或者可能以JSON格式或者XML格式来表述同一个资源。</p>
-
-<h3>约束 - HTTP协议语义</h3>
-
-<p>尽管任何事物都可以成为一个资源，但是客户端并不能随心所欲地对资源进行任意的操作。所能进行的操作是有规定的。在一个RESTful系统里，客户端和服务器端只能通过相互发送遵循预定义协议的消息来进行交互。在Web API的世界里，该协议就是HTTP。</p>
-
-<p>在设计Web API时，严格遵守HTTP协议语义是设计好的API的重要基础。</p>
-
-<h4>GET请求</h4>
-
-<p>客户端通过发送Get请求来获取某个URL所标示的资源的表述。Get被定义为安全的HTTP方法。它仅仅是对信息的一次请求。向服务器发送一条Get请求对资源的影响应该和没有发送一样。</p>
-
-<h4>DELETE请求</h4>
-
-<p>发送DELETE请求，客户端希望服务器将资源销毁，并且以后再也不会跳到它。当Get请求再次访问一个已经销毁的资源，服务器应该返回错误响应码，比如404（Not Found）。Delete不是一个安全的方法，它会改变资源的状态，但是DELETE方法有另外一个很重要的属性，就是幂等性。当你发送一个DELETE请求后，资源就永久性的消失了，即便之后，再次发送相同的DELETE请求，也许你会收到404的错误码，但是第二次发送后和第一次发送后，资源的状态是一致的，仍然不存在。</p>
-
-<p>幂等性是一个很重要的特性，因为互联网的不稳定性，假设发送的一个Delete请求，因为连接超时，你并没有收到响应，所以你无法知道发送的Delete请求是否顺利完成，这时你也许会发送第二次Delete请求。幂等性保证了执行两次Delete请求并不会比执行一次Delete请求给资源带来更多的影响。</p>
-
-<h4>POST-to-Append请求</h4>
-
-<p>为什么是Post-to-Append而不是Post呢？因为Post方法可以做两件事情，第一件事情就是Post-to-Append，第二件事情叫做overloaded post。我们先看POST-to-Append，向某个资源发送一条Post请求用以在该资源的下一级中创建新的资源，当客户端发送一个POST-to-Append请求时，它会在请求的实体消息体中添加所希望创建的资源的表述信息并发给服务器。Post方法既不安全也不幂等，如果发送多次Post请求，就会创建多个资源。</p>
-
-<h4>PUT请求</h4>
-
-<p>Put请求用于修改资源的状态。客户端一般会通过Get请求获取表述，然后对其进行修改，最后再将修改后的资源表述作为PUT请求的负载数据发送回去。PUT请求也是幂等的，无论发送多少次PUT请求，结果都和第一次发送PUT请求一样。</p>
-
-<hr />
-
-<p>以上4种请求，我们最常见也是使用最频繁的请求。接下来要介绍的请求，虽然见的不多，但是当你了解后，你会觉得它非常有用。</p>
-
-<h4>PATCH请求</h4>
-
-<p>表述的信息量可能非常大。虽然，我们可以使用PUT请求来修改资源，但是如果只想修改资源状态的部分，或者说很少一部分，才PUT就会造成极大的资源浪费，这对于移动应用所使用的Web API设计是非常重要的。和将完整信息发送过去的PUT方法不同，PATCH方法将一个“diff”的表述放在请求的负载数据中发送给服务器。</p>
-
-<h4>HEAD请求</h4>
-
-<p>Head方法是和Get方法一样的安全方法。服务器应该和处理Get方法一样除了Head方法，但是Head方法不需要发送实体消息，只需要发送HTTP状态码和报头。</p>
-
-<h4>OPTIONS请求</h4>
-
-<p>OPTIONS是HTTP的原生探索机制。一个OPTIONS请求的返回结果包含一个HTTP Allow报头，这个报头展示了这个资源所支持的所有HTTP方法。</p>
-
-<h4>肮脏的Overloaded POST请求</h4>
-
-<p>POST不仅仅被用于创建新的资源，在用浏览器上网的时候，POST也被用于传输任何形式的变化，它将PUT、DELETE、PATCH、LINK和UNLINK所有的方法混合成一个方法。</p>
-
-<p>比如，在页面有一个表单对用户的基本信息进行修改，它是一个POST请求，但是从语义上，它更像是一个PUT，但这完全是合法的，任何数据作为POST请求的一部分发出去，不论是出于什么目的，这都是合法的。这导致POST请求没有任何语义。由于重载后的POST请求可以用来完成任何事情，所以这种POST方法既不安全也不幂等。</p>
-
-<hr />
-
-<p><strong>好的API不应该依靠文档来维护它的使用方式，就好像是优秀的代码，不需要注释来考诉你它是干什么，合理的协议语义的使用会帮助API实现基本的自我描述，虽然这还远远不够，但它最起码是互联网上大家都遵守的约束。</strong></p>
-
-<p>参考资料： <br/>
-1. RESTful Web AIPs</p>
 ]]></content>
   </entry>
   

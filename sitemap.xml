@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://benweizhu.github.io/blog/2015/11/22/ok-react-1/</loc>
+    <lastmod>2015-11-22T15:12:52+08:00</lastmod>
+  </url>
+  <url>
+    <loc>http://benweizhu.github.io/blog/2015/11/17/merging-vs-rebasing-translation/</loc>
+    <lastmod>2015-11-17T21:58:52+08:00</lastmod>
+  </url>
+  <url>
     <loc>http://benweizhu.github.io/blog/2015/11/15/javascript-publish-and-subscribe-pattern/</loc>
     <lastmod>2015-11-15T11:21:36+08:00</lastmod>
   </url>
@@ -326,119 +334,5 @@
   </url>
   <url>
     <loc>http://benweizhu.github.io/blog/categories/gradleshen-ru-yu-shi-zhan/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/2/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/3/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/4/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/5/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/6/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/7/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/8/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/9/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/10/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/11/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/12/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/13/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/14/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/15/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/16/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/17/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/18/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/19/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/20/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/21/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/22/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/23/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/24/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/25/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/26/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/27/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/28/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/29/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/30/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/31/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/32/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/33/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/34/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/35/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/36/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/37/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/38/</loc>
-  </url>
-  <url>
-    <loc>http://benweizhu.github.io/posts/39/</loc>
   </url>
 </urlset>

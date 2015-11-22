@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="发布者和订阅者的目的就是为了对象之间的解耦，或者更大一点是JavaScript组件之间的解耦。 Subscribe/Publish模式使用了一个主题/事件通道，这个通道介于订阅者和发布者之间。该事件系统允许代码定义应用程序的特定事件，该事件可以传递自定义参数，自定义参数包含订阅者所需要的值。 &hellip;">
+  <meta name="description" content="什么是React？ 官方网站上是这么写的： A JAVASCRIPT LIBRARY FOR BUILDING USER INTERFACES React只关心UI，至于怎么路由（route），怎么获取数据（ajax），你可以通过结合其他技术来做。 什么UI，在web中UI指的是HTML和CSS， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/11/15/javascript-publish-and-subscribe-pattern/">JavaScript发布订阅模式</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/11/22/ok-react-1/">继续前行！React（一）- 用JavaScript构建Web UI</a></h1>
     
     
       <p class="meta">
@@ -79,18 +79,95 @@
 
 
 
-<time class='entry-date' datetime='2015-11-15T11:21:36+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:21 am</span></time>
+<time class='entry-date' datetime='2015-11-22T15:12:52+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2015</span></span> <span class='time'>3:12 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>发布者和订阅者的目的就是为了对象之间的解耦，或者更大一点是JavaScript组件之间的解耦。</p>
+  <div class="entry-content"><h2>什么是React？</h2>
 
-<blockquote><p>Subscribe/Publish模式使用了一个主题/事件通道，这个通道介于订阅者和发布者之间。该事件系统允许代码定义应用程序的特定事件，该事件可以传递自定义参数，自定义参数包含订阅者所需要的值。其目的是避免订阅者和发布者产生依赖关系。 - 《Javascript设计模式》</p></blockquote>
+<p>官方网站上是这么写的：</p>
 
-<p>下面是它的一种实现方式：</p>
+<blockquote><p>A JAVASCRIPT LIBRARY FOR BUILDING USER INTERFACES</p></blockquote>
+
+<p>React只关心UI，至于怎么路由（route），怎么获取数据（ajax），你可以通过结合其他技术来做。</p>
+
+<p>什么UI，在web中UI指的是HTML和CSS，React通过JavaScript的方式来写HTML和CSS，这就是它所说的“构建用户界面的JavaScript类库”。</p>
+
+<h3>用JavaScript绘制UI</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">HelloMessage</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">displayName</span><span class="o">:</span> <span class="s2">&quot;HelloMessage&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;Hello &quot;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">React</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="nx">HelloMessage</span><span class="p">,</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;John&quot;</span> <span class="p">}),</span> <span class="nx">mountNode</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>mountNode是一个在页面上的元素，通过document.getElementByXXX得到。</p>
+
+<p>该代码执行得到的结果如下：</p>
+
+<div data-reactid=".1">
+    <span data-reactid=".1.0">Hello </span><span data-reactid=".1.1">John</span>
+</div>
+
+
+<p>简单地说，就是它找到页面上的mountNode节点，将Hello John插入，其中John来自于动态传入的JSON数据。</p>
+
+<p>根据上面的解释，是否让你联想到了JavaScript模板引擎，对JavaScript模板引擎不了解的，可以看这篇文章： <a href="http://benweizhu.github.io/blog/2015/10/28/js-template-engine/">http://benweizhu.github.io/blog/2015/10/28/js-template-engine/</a> 。</p>
+
+<p>和JavaScript模板引擎相比，上面这种方式通过JavaScript来编写UI代码，可读性相差甚远，于是React提出了JSX的概念 - JavaScript XML，上面的代码就变成如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">HelloMessage</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Hello</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">HelloMessage</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;John&quot;</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nx">mountNode</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>不管你现在了不了解JSX，但是你应该可以看出来，React所指的用JavaScript构建UI的概念。</p>
+
+<p>HelloMessage就像是一个自定义的新标签，在React的概念中，叫做一个组件。</p>
+
+<h3>组件</h3>
+
+<p>React的核心概念是组件，广义的理解组件，组件（Component）是对数据和方法的简单封装，能够独立的实现某一种功能。</p>
+
+<p>组件是一种封装，它应该是自包含的，不需要外界的帮助，即可完成自身相应的功能(多个组件相互合作，也是组件本身可以完成相应功能的前提下实现的)，比如上面代码中的HelloMessage。</p>
+
+<p>有状态的组件（Props和State）：</p>
+
+<p>React不需要你去操作DOM，你只要告诉它，你想要绘制的DOM长什么样？如何去绘制，由它自己来操作。</p>
+
+<p>你只需要根据事件相应来改变组件的状态，当组件状态改变，它会自动重新绘制DOM。</p>
+
+<p>看下面的例子：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -113,128 +190,34 @@
 <span class='line-number'>19</span>
 <span class='line-number'>20</span>
 <span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">EventBus</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">topics</span><span class="o">:</span> <span class="p">{},</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">Timer</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span><span class="nx">secondsElapsed</span><span class="o">:</span> <span class="mi">0</span><span class="p">};</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">tick</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">secondsElapsed</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">secondsElapsed</span> <span class="o">+</span> <span class="mi">1</span><span class="p">});</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">interval</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">tick</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">componentWillUnmount</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">clearInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">interval</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Seconds</span> <span class="nx">Elapsed</span><span class="o">:</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">secondsElapsed</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'>    <span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="nx">subscribe</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">listener</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// create the topic if not yet created</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">])</span> <span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">]</span> <span class="o">=</span> <span class="p">[];</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c1">// add the listener</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="nx">listener</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">publish</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// return if the topic doesn&#39;t exist, or there are no listeners</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">]</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c1">// send the event to all listeners</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">listener</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">listener</span><span class="p">(</span><span class="nx">data</span> <span class="o">||</span> <span class="p">{});</span>
-</span><span class='line'>        <span class="p">});</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">EventBus</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="nx">alert</span><span class="p">);</span>
-</span><span class='line'><span class="nx">EventBus</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;Hello World!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Timer</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nx">mountNode</span><span class="p">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>订阅者，在EventBus中注册事件/主题，并传递对应事件/主题的回调函数。 <br/>
-发布者，发布对应的事件/主题，并传递需要的回调函数所需要的数据对象。</p>
+<p>你改变的是组件的状态this.state.secondsElapsed，DOM的绘制由React自己完成，你只是告诉他画成这样。</p>
 
-<p>下面的这个写法，从函数命名上看更倾向于以注册事件和触发事件的方式理解，并且对事件的命名和回调函数的约束更加明确，也就是更鲁邦。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">eventService</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">EventService</span> <span class="o">=</span> <span class="p">{};</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">_listeners</span> <span class="o">=</span> <span class="p">{};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">eventService</span><span class="p">.</span><span class="nx">add</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">func</span> <span class="k">instanceof</span> <span class="nb">Function</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="nx">topic</span> <span class="o">+</span> <span class="s2">&quot; must add a function.&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">])</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">]</span> <span class="o">=</span> <span class="p">[];</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="nx">func</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">eventService</span><span class="p">.</span><span class="nx">remove</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">])</span> <span class="p">{</span>
-</span><span class='line'>            <span class="kd">var</span> <span class="nx">index</span> <span class="o">=</span> <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">func</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nx">index</span> <span class="o">!==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">splice</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">eventService</span><span class="p">.</span><span class="nx">fire</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">listeners</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">topic</span> <span class="o">!==</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="s1">&#39;EventDispatcher&#39;</span><span class="p">,</span> <span class="s1">&#39;First params must be an event type (String)&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">]</span> <span class="o">==</span> <span class="kc">undefined</span><span class="p">)</span>
-</span><span class='line'>            <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="s1">&#39;EventDispatcher&#39;</span><span class="p">,</span> <span class="s1">&#39;No Event Register&#39;</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nx">func</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">});</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">eventService</span><span class="p">;</span>
-</span><span class='line'><span class="p">}.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料：  <br/>
-1.<a href="http://dev.housetrip.com/2014/09/15/decoupling-javascript-apps-using-pub-sub-pattern/">http://dev.housetrip.com/2014/09/15/decoupling-javascript-apps-using-pub-sub-pattern/</a></p>
+<p>参考资料： <br/>
+1. <a href="https://facebook.github.io/react/index.html">https://facebook.github.io/react/index.html</a></p>
 </div>
   
   
@@ -247,7 +230,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/11/17/merging-vs-rebasing-translation/">译 Merging vs Rebasing（未完成）</a></h1>
     
     
       <p class="meta">
@@ -256,125 +239,239 @@
 
 
 
-<time class='entry-date' datetime='2015-11-10T13:38:27+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:38 pm</span></time>
+<time class='entry-date' datetime='2015-11-17T21:58:52+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:58 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>用了这么久的CI服务应用，Jenkins， Go pipeline，还没有自己尝试搭建一个。今天花点时间在本地搭建了Jenkins。</p>
+  <div class="entry-content"><p>原文地址：<a href="https://www.atlassian.com/git/tutorials/merging-vs-rebasing">https://www.atlassian.com/git/tutorials/merging-vs-rebasing</a></p>
 
-<h2>安装</h2>
+<p>git rebase命令对于初学git的人就是像是一种巫术，应该远离之，但是实际上如果使用适当，会让你的git生活变得更轻松。在本文中，我将会比较git rebase和相关的git merge命令，鉴别出在git工作流所有使用git rebase的可能性。</p>
 
-<p>以Mac版本为例：</p>
+<h3>基本概念</h3>
 
-<p>打开： <a href="https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins">https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins</a> ，下载Mac版本。</p>
+<p>理解git rebase的第一件事情就是它和git merge是解决相同的问题。两个命令都是设计出来将一个分支上的代码变化和另一个分支上的代码变化进行集成-只是他们的做法不同。</p>
 
-<p>安装完成之后，会直接启动 <a href="http://localhost:8080">http://localhost:8080</a> ，也就是说，Jenkins会默认启动8080端口作为服务端口。</p>
+<p>考虑这样的场景，当你开始在专注于在某一个分支上进行一个新的feature（特性）开发时，另外一个团队在master分支上进行了新的提交。这导致一个forked的历史，这对于任何属性Git作为团队合作工作的人都是比较清楚的。</p>
 
-<p>在mac下，如果你想要切换端口，你需要这么做：</p>
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/01.svg" alt="Alt text" /></p>
+
+<p>现在，假设在master分支上新提交的代码和你正在开发的特性相关。为了将这些新提交的代码吸收/包含（incorporate，在这里就翻译成合并，避免混淆），你有两个选择：merging（合并）和rebasing（复位基底/复基）。</p>
+
+<h3>Merge选项</h3>
+
+<p>最简单的选择是将master分支合并（merge）到正在开发的特性分支上，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
+</span><span class='line'>git merge master
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>或者，你可以将他们压缩成一行：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git merge master feature
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样就是在特性分支上创建了一个新的“merge commit”，他讲两个分支上的历史绑在了一起，就像下面你看到的分支结构：
+<img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/02.svg" alt="Alt text" /></p>
+
+<p>合并（merge）是很好的，因为他是一个非破坏性的操作。当前存在的分支是无论如何都不会改变的。这样就避免了所有因为rebase导致的坑（pitfall）。</p>
+
+<p>另外一方面，这样意味着，在每次你吸收/包含（incorprate）特性分支会有外部（extraneous）来的合并提交。如果master分支比较活跃，这样机会污染你的特性分支的历史记录。当然也有减轻该问题影响的的高级git log选项，但是他就让其他开发人员很难理解项目的历史。</p>
+
+<h3>Rebase选项</h3>
+
+<p>作为merge的另一种选择，又可以将特性分支rebase到master分支，通过下面的命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
+</span><span class='line'>git rebase master
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>他将整个特性分支移动到了master分支的末梢（tip），有效的吸收/包含（incorprate）所有的提交到master分支。但是，和merge不同，rebase通过给原始分支上每一次提交创建全新的提交，从而重写了项目的历史。</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/03.svg" alt="Alt text" /></p>
+
+<p>Rebase的主要好处是你会得到一个更为清晰的项目历史。首先，它消除了所有git merge所需要的不必要的merge提交（merge commit）。其次，正如你在上面那张图中看到的，rebase也产生一个完美的线性项目历史-你可以从特性的末端一路查看到项目的开始而没有任何的fork。这样，使得你更容易使用像git log， git bisect和gitk来浏览项目（原文字面含义：在项目中导航（navigate））。</p>
+
+<p>但是，为了这样淳朴的提交历史，有两点权衡/交易（trade-off，翻译为妥协更合适）：安全性和可追溯性（traceability）。如果你不遵循rebase的黄金准则，重写项目历史可能会给你的合作工作流带来潜在的悲惨结局。还有一点，虽然没有那么重要，rebase会丢失merge commit所提供的上下文-你无法看到上游的代码变化是合适包含（incorprate）到特性分支上的。</p>
+
+<h3>Interactive Rebasing</h3>
+
+<p>Interactive rebasing gives you the opportunity to alter commits as they are moved to the new branch. This is even more powerful than an automated rebase, since it offers complete control over the branch’s commit history. Typically, this is used to clean up a messy history before merging a feature branch into master.</p>
+
+<p>To begin an interactive rebasing session, pass the i option to the git rebase command:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
+</span><span class='line'>git rebase -i master
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will open a text editor listing all of the commits that are about to be moved:</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">unload</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpPort</span> <span class="mi">8443</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">load</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pick 33d5b7a Message <span class="k">for</span> commit <span class="c">#1</span>
+</span><span class='line'>pick 9480b3d Message <span class="k">for</span> commit <span class="c">#2</span>
+</span><span class='line'>pick 5c67e61 Message <span class="k">for</span> commit <span class="c">#3</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>如果切换成https，如下：</p>
+<p>This listing defines exactly what the branch will look like after the rebase is performed. By changing the pick command and/or re-ordering the entries, you can make the branch’s history look like whatever you want. For example, if the 2nd commit fixes a small problem in the 1st commit, you can condense them into a single commit with the fixup command:</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpPort</span> <span class="mi">8443</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpsKeyStore</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">keystore</span><span class="o">/</span><span class="nb">file</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpsKeyStorePassword</span> <span class="o">&lt;</span><span class="n">keystore</span> <span class="n">password</span><span class="o">&gt;</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pick 33d5b7a Message <span class="k">for</span> commit <span class="c">#1</span>
+</span><span class='line'>fixup 9480b3d Message <span class="k">for</span> commit <span class="c">#2</span>
+</span><span class='line'>pick 5c67e61 Message <span class="k">for</span> commit <span class="c">#3</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>你会发现，它们都有下面的两个命令，它们用来在mac中启动和关闭Jenkins服务：</p>
+<p>When you save and close the file, Git will perform the rebase according to your instructions, resulting in project history that looks like the following:</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/04.svg" alt="Alt text" /></p>
+
+<p>Eliminating insignificant commits like this makes your feature’s history much easier to understand. This is something that git merge simply cannot do.</p>
+
+<p>Rebase的黄金准则</p>
+
+<p>一旦你理解了什么是rebase，最重要的就是学会合适不要用它。git rebase的黄金准则就是不要在公共的分支上使用。</p>
+
+<p>比如，想象一下如果你将master分支rebase到特性分支：</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/05.svg" alt="Alt text" /></p>
+
+<p>这个rebase会将所有在master上的提交移动到feature分支的末端。问题是这还只是在你自己的仓库中发生了。所有其他的开发人员仍然工作在原来的master分支上。因为rebase导致了新的提交，Git会认为你的master分支的历史和其他人的偏离。</p>
+
+<p>唯一同步两个master分支的办法就是将他们合并（merge）回去，导致一个额外的合并提交（merge commit），和两个一系列的提交的，这两个一系列提交的代码改变是相同的（一个是原始master分支上的，一个是你rebased的分支上的）。不用说，这是非常让人困惑的情况。</p>
+
+<p>所以，在你开始做rebase的时候，永远问你自己一下，“是否有人也在用这个分支”，如果回答是，那么把你手移开键盘，开始思考一种非破坏性的方式来做改变(e.g., the git revert command，这个位置没搞懂)。</p>
+
+<p>否则，你就可以安全的重写历史。</p>
+
+<p>Force-Pushing</p>
+
+<p>如果你想要rebased过的master分支push到远程服务器，Git就会阻止你这么做，因为他和远程的master分支是冲突的。但是，你可以强制push，通过 &ndash;force标志，比如：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">load</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">unload</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Be very careful with this command!</span>
+</span><span class='line'>git push --force
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h2>安装Github插件和配置项目第一个项目</h2>
+<p>这样会重写远程master的分支来匹配在你仓库rebased过得master分支，这会让团队中的其他成员非常困惑。所以，只有当你非常清楚你要做什么的时候，你才可以非常小心的使用。</p>
 
-<p>安装完成之后，你可以点击new item来新建一个构建项目，选择Freestyle project。</p>
+<p>一种情况下，你应该使用force-pushing，就是在你push一个私有特性分支到远程仓库后，你执行一个本地清理。这就是像是在说“哎呀，我不是真的想要push特性分支的原始版本。就用当前这一个吧”，而且，很重要的是，没有其他人在原来的特性分支上工作。</p>
 
-<p>在Source Code Management中，你会发现，它CVS和Subversion的支持。没错，Jenkins默认并不支持Git配置。你需要安装Github Plugin。</p>
+<h2>工作流指导</h2>
 
-<p>回到Jenkins服务器的首页，打开Manage Jenkins，里面有Manage Plugins。在Available Plugin中搜索GitHub plugin，安装并重启Jenkins（页面上又重启的checkbox，点击一下即可）。</p>
+<p>Rebase可以根据你的团队或多或少的包含到现有的Git工作流中。在本节，我们将看看rebase在一个特性开发的不同阶段所提供的好处。</p>
 
-<p>安装完成后，再次新建item，可以看GitHub project字段，Source Code Management中多了Git，Build Triggers中多了Build when a change is pushed to GitHub(但简单配置这个，还不能实现自动trigger，后面讲)。</p>
+<p>在任何工作流中启用git rebase的第一步就是为每一个特性创建单独的分支。这将提供你必备的分支结构来安全的使用rebase：</p>
 
-<p>在Build那一栏，选择添加Build Step，在本例中选择python。</p>
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/06.svg" alt="Alt text" /></p>
 
-<p>我的项目是一个NodeJS项目，所以第一步是npm install。</p>
+<h2>清理本地</h2>
 
-<p>保存项目，回到项目栏，点击Schedule a build。</p>
+<p>将rebase包含到工作流中最好的办法之一就是清理本地，同步特性。通过周期性的执行一个interactive（交互性的）rebase，你可以保证在你的特性开发中的每次提交都是专注和有意义的（focused and meaningful）。这就让你在写你的代码的时候，不用担心变成被独立的提交 - 你可以在这样的事情发生之后，修好它。</p>
 
-<h2>构建执行失败和Jenkins用户</h2>
-
-<p>正如这个小标题，构建执行失败了，你会发现失败的原因是command npm not found。</p>
-
-<p>NPM这个命令不存在，原因是Jenkins在执行该shell脚本的时候是以jenkins这个用户身份去执行，所以命令的PATH配置是不正确的。</p>
-
-<h2>Prepare Env Before Run</h2>
-
-<p>在运行前配置Jenkins运行命令的环境，有两种方式：</p>
-
-<p>1.直接在Prepare an environment for the run中配置   <br/>
-2.安装Environment Inject插件，在Inject environment variables to the build process中配置</p>
-
-<p>我这里配置了下node的bin，npm中的bin。</p>
+<p>当调用git rebase，对于新的base，你有两个选项：特性的父分支（比如：父分支），或者是特性分支的更早提交。我们在之前的Interactive Rebasing部分看到了第一种选项的例子。当你仅仅需要修复上几次提交的时候，第二个选项也是不错的选择。比如，下面的命令进行了一个只有最后三次提交提交的interactive rebase。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">PATH</span><span class="o">=</span><span class="err">$</span><span class="n">PATH</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">node</span><span class="o">/</span><span class="mf">0.12</span><span class="o">.</span><span class="mi">5</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">npm</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
+</span><span class='line'>git rebase -i HEAD~3
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h2>A Blue Ball Appear，一个蓝色灯泡的故事</h2>
+<p>通过指定HEAD~3新的base，你并没有真的移动你的分支，交互性的重写了跟在它后面三次提交。注意这并不会将上游的改变包含到特性分支。</p>
 
-<p>配置完成之后，再次执行，构建成功。但是构建的提示是一个蓝颜色的球。为什么是蓝色球呢？请看： <a href="http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls">http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls</a></p>
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/07.svg" alt="Alt text" /></p>
 
-<p>当然我不太习惯，好在要换成绿色球也很简单，安装插件：Green Ball Plugin。</p>
+<p>如果你想要用这种方法重写整个特性，git merge-base命令可以用来找到特性分支原来的base。下面的命令将返回原来base的提交ID，你可以将它传递给git rebase：</p>
 
-<h2>Pipeline插件</h2>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git merge-base feature master
+</span></code></pre></td></tr></table></div></figure>
 
-<p>根据现代软件的开发方式，我们更习惯于构建CI以pipeline的方式呈现，pipeline中有不同的step，有可以自动的trigger，也有可以手动trigger，比如：部署到Test或者Production环境，理论上应该是手动的触发。</p>
 
-<p>这个时候，你需要安装Jenkins的pipeline插件。安装完成之后，回到首页，点击tab上的加号，添加一个tab，你就可以看到pipeline选项。</p>
+<p>interactive rebasing是向你的工作流中引入git rebase的最好方法。其他开发人员能够看到的，只有你的完成的产品，这样可以有非常干净，容易理解的特性分支历史。</p>
 
-<p>新建一个pipeline的tab，需要你填写一些信息，比如：在pipeline页面一次显示多少个构建的pipeline，配置完成之后，你就可以看到pipeline页面了。</p>
+<p>但是，还是要说，这仅仅能够用在私有的特性分支上。如果你和其他开发人员工作在同一个特性分支上，那么这个分支就是共有的，那么你就不允许重写它的历史。</p>
 
-<p>在pipeline页面，你可以添加一个step，其实也就是新建一个item，选项可以是free style的，也可以从别现有项目copy生成。</p>
+<p>没有任何git合并方式来清除带有interactive rebase的本地提交。</p>
 
-<p>配置方式和新建一个item一样。</p>
+<h3>Incorporating Upstream Changes Into a Feature</h3>
 
-<p>配置完成之后，你可以在前一个项目的Post-build Actions中添加Build Other Projects，选择Trigger only if build is stable或者其他，填写被trigger的项目。</p>
+<p>In the Conceptual Overview section, we saw how a feature branch can incorporate upstream changes from master using either git merge or git rebase. Merging is a safe option that preserves the entire history of your repository, while rebasing creates a linear history by moving your feature branch onto the tip of master.</p>
 
-<p>这样就可以自动触发后续的step。</p>
+<p>This use of git rebase is similar to a local cleanup (and can be performed simultaneously), but in the process it incorporates those upstream commits from master.</p>
 
-<h2>Clone Workspace</h2>
+<p>Keep in mind that it’s perfectly legal to rebase onto a remote branch instead of master. This can happen when collaborating on the same feature with another developer and you need to incorporate their changes into your repository.</p>
 
-<p>你肯定会发现，既然新的step就是一个新的item，那么不是要重新check out一次代码，而且之前build的archive也不在了。</p>
+<p>For example, if you and another developer named John added commits to the feature branch, your repository might look like the following after fetching the remote feature branch from John’s repository:</p>
 
-<p>没错，这是个问题，这个时候，你需要安装Clone Workspace SCM Plugin，安装完成之后，你需要做两件事情：</p>
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/08.svg" alt="Alt text" /></p>
 
-<p>1.在upstream的项目中的Post-Build Actions中添加Achieve for Clone Workspace SCM <br/>
-2.在downstream的项目的Source Code Management中选择Clone Workspace</p>
+<p>You can resolve this fork the exact same way as you integrate upstream changes from master: either merge your local feature with john/feature, or rebase your local feature onto the tip of john/feature.</p>
 
-<h2>关于Build when a change is pushed to GitHub</h2>
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/09.svg" alt="Alt text" /></p>
 
-<p>简单的添加这个选项还不行，需要你在github的webhook中进行配置，方法在下面的链接中，但是前提是，需要配置的jenkins有url，如果是像我这样在本地配置的，可能就会有问题。
-<a href="http://thepracticalsysadmin.com/setting-up-a-github-webhook-in-jenkins/">http://thepracticalsysadmin.com/setting-up-a-github-webhook-in-jenkins/</a></p>
+<p>Note that this rebase doesn’t violate the Golden Rule of Rebasing because only your local feature commits are being moved—everything before that is untouched. This is like saying, “add my changes to what John has already done.” In most circumstances, this is more intuitive than synchronizing with the remote branch via a merge commit.</p>
+
+<p>By default, the git pull command performs a merge, but you can force it to integrate the remote branch with a rebase by passing it the &ndash;rebase option.</p>
+
+<h3>Reviewing a Feature With a Pull Request</h3>
+
+<p>If you use pull requests as part of your code review process, you need to avoid using git rebase after creating the pull request. As soon as you make the pull request, other developers will be looking at your commits, which means that it’s a public branch. Re-writing its history will make it impossible for Git and your teammates to track any follow-up commits added to the feature.</p>
+
+<p>Any changes from other developers need to be incorporated with git merge instead of git rebase.</p>
+
+<p>For this reason, it’s usually a good idea to clean up your code with an interactive rebase before submitting your pull request.</p>
+
+<h3>Integrating an Approved Feature</h3>
+
+<p>After a feature has been approved by your team, you have the option of rebasing the feature onto the tip of the master branch before using git merge to integrate the feature into the main code base.</p>
+
+<p>This is a similar situation to incorporating upstream changes into a feature branch, but since you’re not allowed to re-write commits in the master branch, you have to eventually use git merge to integrate the feature. However, by performing a rebase before the merge, you’re assured that the merge will be fast-forwarded, resulting in a perfectly linear history. This also gives you the chance to squash any follow-up commits added during a pull request.</p>
+
+<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/10.svg" alt="Alt text" /></p>
+
+<p>If you’re not entirely comfortable with git rebase, you can always perform the rebase in a temporary branch. That way, if you accidentally mess up your feature’s history, you can check out the original branch and try again. For example:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
+</span><span class='line'>git checkout -b temporary-branch
+</span><span class='line'>git rebase -i master
+</span><span class='line'><span class="c"># [Clean up the history]</span>
+</span><span class='line'>git checkout master
+</span><span class='line'>git merge temporary-branch
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Summary</h3>
+
+<p>And that’s all you really need to know to start rebasing your branches. If you would prefer a clean, linear history free of unnecessary merge commits, you should reach for git rebase instead of git merge when integrating changes from another branch.</p>
+
+<p>On the other hand, if you want to preserve the complete history of your project and avoid the risk of re-writing public commits, you can stick with git merge. Either option is perfectly valid, but at least now you have the option of leveraging the benefits of git rebase.</p>
 </div>
   
   
@@ -406,6 +503,14 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/11/22/ok-react-1/">继续前行！React（一）- 用JavaScript构建Web UI</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/17/merging-vs-rebasing-translation/">译 Merging vs Rebasing（未完成）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/11/15/javascript-publish-and-subscribe-pattern/">JavaScript发布订阅模式</a>
       </li>
     
@@ -415,14 +520,6 @@
     
       <li class="post">
         <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a>
       </li>
     
   </ul>
