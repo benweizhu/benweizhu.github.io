@@ -1,0 +1,103 @@
+---
+layout: post
+title: "继续前行！React（一）- 用JavaScript构建Web UI"
+date: 2015-11-22 15:12:52 +0800
+comments: true
+categories: 
+---
+
+##什么是React？
+
+官方网站上是这么写的：
+
+> A JAVASCRIPT LIBRARY FOR BUILDING USER INTERFACES
+
+React只关心UI，至于怎么路由（route），怎么获取数据（ajax），你可以通过结合其他技术来做。
+
+什么UI，在web中UI指的是HTML和CSS，React通过JavaScript的方式来写HTML和CSS，这就是它所说的“构建用户界面的JavaScript类库”。
+
+###用JavaScript绘制UI
+
+{% codeblock lang:javascript %}
+var HelloMessage = React.createClass({
+  displayName: "HelloMessage",
+
+  render: function render() {
+    return React.createElement("div", null, "Hello ", this.props.name);
+  }
+});
+
+ReactDOM.render(React.createElement(HelloMessage, { name: "John" }), mountNode);
+{% endcodeblock %}
+mountNode是一个在页面上的元素，通过document.getElementByXXX得到。
+
+该代码执行得到的结果如下：
+
+<div data-reactid=".1">
+	<span data-reactid=".1.0">Hello </span><span data-reactid=".1.1">John</span>
+</div>
+
+
+简单地说，就是它找到页面上的mountNode节点，将Hello John插入，其中John来自于动态传入的JSON数据。
+
+根据上面的解释，是否让你联想到了JavaScript模板引擎，对JavaScript模板引擎不了解的，可以看这篇文章： http://benweizhu.github.io/blog/2015/10/28/js-template-engine/ 。
+
+和JavaScript模板引擎相比，上面这种方式通过JavaScript来编写UI代码，可读性相差甚远，于是React提出了JSX的概念 - JavaScript XML，上面的代码就变成如下：
+
+{% codeblock lang:javascript %}
+var HelloMessage = React.createClass({
+  render: function() {
+    return <div>Hello {this.props.name}</div>;
+  }
+});
+
+ReactDOM.render(<HelloMessage name="John" />, mountNode);
+{% endcodeblock %}
+
+不管你现在了不了解JSX，但是你应该可以看出来，React所指的用JavaScript构建UI的概念。
+
+HelloMessage就像是一个自定义的新标签，在React的概念中，叫做一个组件。
+
+###组件
+
+React的核心概念是组件，广义的理解组件，组件（Component）是对数据和方法的简单封装，能够独立的实现某一种功能。
+
+组件是一种封装，它应该是自包含的，不需要外界的帮助，即可完成自身相应的功能(多个组件相互合作，也是组件本身可以完成相应功能的前提下实现的)，比如上面代码中的HelloMessage。
+
+有状态的组件（Props和State）：
+
+React不需要你去操作DOM，你只要告诉它，你想要绘制的DOM长什么样？如何去绘制，由它自己来操作。
+
+你只需要根据事件相应来改变组件的状态，当组件状态改变，它会自动重新绘制DOM。
+
+看下面的例子：
+
+{% codeblock lang:javascript %}
+var Timer = React.createClass({
+  getInitialState: function() {
+    return {secondsElapsed: 0};
+  },
+  tick: function() {
+    this.setState({secondsElapsed: this.state.secondsElapsed + 1});
+  },
+  componentDidMount: function() {
+    this.interval = setInterval(this.tick, 1000);
+  },
+  componentWillUnmount: function() {
+    clearInterval(this.interval);
+  },
+  render: function() {
+    return (
+      <div>Seconds Elapsed: {this.state.secondsElapsed}</div>
+    );
+  }
+});
+
+ReactDOM.render(<Timer />, mountNode);
+{% endcodeblock %}
+
+你改变的是组件的状态this.state.secondsElapsed，DOM的绘制由React自己完成，你只是告诉他画成这样。
+
+参考资料：   
+1. https://facebook.github.io/react/index.html
+
