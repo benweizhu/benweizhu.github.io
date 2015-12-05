@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-12-05T15:41:35+08:00</updated>
+  <updated>2015-12-05T15:43:02+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[鱼和熊掌的故事 - CSS Module还是BEM]]></title>
+    <title type="html"><![CDATA[鱼和熊掌的故事 - CSS Modules还是BEM]]></title>
     <link href="http://benweizhu.github.io/blog/2015/12/05/css-modules-or-bem/"/>
     <updated>2015-12-05T11:39:48+08:00</updated>
     <id>http://benweizhu.github.io/blog/2015/12/05/css-modules-or-bem</id>
