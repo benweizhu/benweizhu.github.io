@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="理解DSL（领域特定语言） DSLs come in two main forms: external and internal. An external DSL is a language that&rsquo;s parsed independently of the host general &hellip;">
+  <meta name="description" content="JavaScript是一种单线程的语言。这意味着运行一个有较长处理时间的代码A，会阻塞所有其他代码的执行，直到该代码A执行完。UI元素无响应，动画暂停，其他代码都不能运行。 解决这个问题的办法就是尽量避免同步执行。一种解决办法就是让这种需要较长处理时间的代码后执行。在JavaScript中， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,179 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/04/18/angularjs-resolve-and-promise-q/">Promise/Q和AngularJS中的resolve</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-04-18T10:02:50+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:02 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>JavaScript是一种单线程的语言。这意味着运行一个有较长处理时间的代码A，会阻塞所有其他代码的执行，直到该代码A执行完。UI元素无响应，动画暂停，其他代码都不能运行。</p>
+
+<p>解决这个问题的办法就是尽量避免同步执行。一种解决办法就是让这种需要较长处理时间的代码后执行。在JavaScript中，所有类似这样的操作都是通过回调函数实现。比如，JavaScript的事件处理器，当事件触发时，才被调用。</p>
+
+<p>异步编程会让代码变得复杂难懂，许多JavaScript的API严重依赖于回调函数，这样就导致了回调的嵌套。比如，下面的ajax调用：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">url</span><span class="o">:</span> <span class="nx">url1</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>            <span class="nx">url</span><span class="o">:</span> <span class="nx">url2</span><span class="p">,</span>
+</span><span class='line'>            <span class="nx">data</span><span class="o">:</span> <span class="nx">data</span><span class="p">,</span>
+</span><span class='line'>            <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果上面的代码，再进行一次回调就更难以阅读了。</p>
+
+<p>为了解决这个问题，许多JavaScript库（jQuery，AngularJS）提供了一个Promise对象来让异步编程模式同步化。看下面的一个例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">myWebService</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;http://www.example.com&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">myDb</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;data successfully saved&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;an error occurred while saving:&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">dir</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>myWebService.get(&ldquo;<a href="http://www.example.com">http://www.example.com</a>&rdquo;)返回一个promise对象。该promise对象提供一个重要的方法then，并接受一个或者两个回调函数（success callback，failure callback）。</p>
+
+<p>重点是，then方法调用之后，会再次返回一个promise对象，该promise对象是什么，取决于回调函数返回什么，还是什么都不返回。这样，你就可以将多层回调通过链接方式连接起来。这样就可以用同步化的方式来进行异步化编程。</p>
+
+<p>在AngularJS中，通常使用$resource服务来进行restful的Ajax请求，所以对应需要success callback和failure callback。看下面的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/user/:userId&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">userId</span><span class="o">:</span><span class="s1">&#39;@id&#39;</span><span class="p">});</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span><span class="nx">userId</span><span class="o">:</span><span class="mi">123</span><span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">user</span><span class="p">.</span><span class="nx">abc</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Calling these methods invoke an $http with the specified http method, destination and parameters. When the data is returned from the server then the object is an instance of the resource class.</p>
+
+<p>调用resource上的get方法，会触发一个$http请求，当请求数据从服务器端回来时，它是resource类的是一个实例。该实例有一个很重要的属性$promise，该属性返回给你对应的promise对象。于是上面那段通过回调方式编写的代码，就可以用同步的方式编写，如下。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/user/:userId&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">userId</span><span class="o">:</span><span class="s1">&#39;@id&#39;</span><span class="p">});</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">userPromise</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span><span class="nx">userId</span><span class="o">:</span><span class="mi">123</span><span class="p">}).</span><span class="nx">$promise</span><span class="p">;</span>
+</span><span class='line'><span class="nx">userPromise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">user</span><span class="p">.</span><span class="nx">abc</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>理解这部分后，我们进行下一个话题：Angular的resolve。</p>
+
+<p>在AngularJS路由进入一个页面时，对应的Controller可能会进行一些异步调用，比如，去服务器端获取一些需要在页面现实的数据。这种异步调用可能会花费较长的时间，这样就很可能导致页面抖动，页面在渲染完成后，现实数据还没有返回，甚至页面显示不正确。</p>
+
+<p>为了解决这个问题，angular的路由提供了一个重要的属性resolve，允许在进入页面之前，进行一些必要的数据准备，然后将准备好的数据注入到Controller中，如下。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;views/main.html&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;mainCtrl&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">user</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="p">{</span><span class="nx">name</span><span class="o">:</span><span class="s1">&#39;benweizhu&#39;</span><span class="p">};</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>resolve提供了一个重要的特性，如果返回的是一个promise对象，那么路由会等到这个promise对象resolve（成功或者失败的）后，再初始化Controller。这样，我们就可以在Controller初始化前，进行一些异步调用，比如resource的Ajax请求，这样就可以防止页面都会，或者渲染错误。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;views/main.html&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;mainCtrl&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">user</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span><span class="nx">userId</span><span class="o">:</span><span class="mi">123</span><span class="p">}).</span><span class="nx">$promise</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料：  <br/>
+1.AngularJS官方网站 <br/>
+2.<a href="http://andyshora.com/promises-angularjs-explained-as-cartoon.html">http://andyshora.com/promises-angularjs-explained-as-cartoon.html</a>   <br/>
+3.<a href="https://thinkster.io/a-better-way-to-learn-angularjs/promises">https://thinkster.io/a-better-way-to-learn-angularjs/promises</a>   <br/>
+4.<a href="https://msdn.microsoft.com/en-us/library/windows/apps/hh700330.aspx">https://msdn.microsoft.com/en-us/library/windows/apps/hh700330.aspx</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -271,228 +444,6 @@ Any property you access in your build script, which is not defined in the build 
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/03/21/jpa-many-to-many-relationship/">JPA中的多对多关系</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-03-21T10:44:43+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>10:44 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在关系型数据库中，表与表之间的关系是通过外键来实现，而其中最常见的关系有两种：一对多和多对多。</p>
-
-<p>在面向对象的世界，对象与对象之间的关系是通过从源对象到目标对象的对象引用实现。关系是一个对象含有的其他对象或者对象的集合，而在关系型数据库中，关系要么通过定义另一张表的外键建立，要么通过中间表建立。</p>
-
-<p>在Java或者JPA的世界里，所有的关系都是单向性的，一个源对象保有目标对象的索引，并不能保证目标对象和源对象一样包含源对象的索引。这个关系型数据库就不一样了，在关系型数据库中，表之间的关系通过外键来实现，查询语句通过这个外键，可以进行正向和反向的查询。</p>
-
-<p>ManyToMany多对多关系是关系型数据库中一种非常常见的表关系。</p>
-
-<p>在JPA中，如果要实现ManyToMany关系，常常是利用的一种方式是中间表。所有的ManyToMany关系都需要一个JoinTable，在这个JoinTable中，通过JoinColumns定义了两个外键，一个外键来指向源表的主键，另一个外键指向目标表的主键，通常JoinTable的主键是两个外键的组合。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Employee</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@Id</span>
-</span><span class='line'>  <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">...</span>
-</span><span class='line'>  <span class="nd">@ManyToMany</span>
-</span><span class='line'>  <span class="nd">@JoinTable</span><span class="o">(</span>
-</span><span class='line'>      <span class="n">name</span><span class="o">=</span><span class="s">&quot;EMP_PROJ&quot;</span><span class="o">,</span>
-</span><span class='line'>      <span class="n">joinColumns</span><span class="o">={</span><span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;EMP_ID&quot;</span><span class="o">,</span> <span class="n">referencedColumnName</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)},</span>
-</span><span class='line'>      <span class="n">inverseJoinColumns</span><span class="o">={</span><span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;PROJ_ID&quot;</span><span class="o">,</span> <span class="n">referencedColumnName</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)})</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="n">projects</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">.....</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>双向ManyToMany</p>
-
-<p>虽然在数据库中ManyToMany总是双向的，但是在对象模型中定义双向关系时，需要定义映射的发起方（管理方）和映射的接收方。发起方需要定义JoinTable，接收方则需要定义mappedBy。如果不使用mappedBy，则Jpa的实现者会认为，这种多对多关系是两个独立定义的关系，就会有重复的两行记录插入到JoinTable中。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Project</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@Id</span>
-</span><span class='line'>  <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">...</span>
-</span><span class='line'>  <span class="nd">@ManyToMany</span><span class="o">(</span><span class="n">mappedBy</span><span class="o">=</span><span class="s">&quot;projects&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Employee</span><span class="o">&gt;</span> <span class="n">employees</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">...</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>双向关系的共同毛病</p>
-
-<p>需要应用程序自己去维护它们（对象）之间的双向关系，否则就不同步（out of sync）。在写set方法或者，多对多关系中的add方法时，需要注意将自己的引用设置到包含的集合对象中。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Employee</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">List</span> <span class="n">phones</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addPhone</span><span class="o">(</span><span class="n">Phone</span> <span class="n">phone</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">phones</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">phone</span><span class="o">);</span>
-</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">phone</span><span class="o">.</span><span class="na">getOwner</span><span class="o">()</span> <span class="o">!=</span> <span class="k">this</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">phone</span><span class="o">.</span><span class="na">setOwner</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Phone</span> <span class="o">{</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">Employee</span> <span class="n">owner</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setOwner</span><span class="o">(</span><span class="n">Employee</span> <span class="n">employee</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">owner</span> <span class="o">=</span> <span class="n">employee</span><span class="o">;</span>
-</span><span class='line'>        <span class="k">if</span> <span class="o">(!</span><span class="n">employee</span><span class="o">.</span><span class="na">getPhones</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="k">this</span><span class="o">))</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">employee</span><span class="o">.</span><span class="na">getPhones</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>多对多关系的管理方的选择</p>
-
-<p>多对多关系的管理方的定义取决于JoinTable的定义方，至于由哪一边作为管理方，取决于业务的关系，所以并不固定。但是必须要理解的时，它们之间建立关系的方式（即谁管理谁）。举个例子，User和Group，这是一个常见的多对多关系，当你将管理方定义在Group这边时，你要做的是将User添加到Group，然后保存Group。而不能将Group添加给User，然后保存User。</p>
-
-<p>应用级联</p>
-
-<p>由某一方来管理对象的操作，需要应用级联属性，来说明是否将级联操作传递到对应的实体类上。如果你在存储一个对象时，该对象关联到另一个对象，而它们之间的关系没有使用级联，则会抛出异常，告诉你，需要先存储关联对象。</p>
-
-<p>级联操作的类型有6种，分别是ALL，PERSIST，MERGE，REMOVE，REFRESH，DETACH。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">enum</span> <span class="n">CascadeType</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** Cascade all operations */</span>
-</span><span class='line'>    <span class="n">ALL</span><span class="o">,</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** Cascade persist operation */</span>
-</span><span class='line'>    <span class="n">PERSIST</span><span class="o">,</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** Cascade merge operation */</span>
-</span><span class='line'>    <span class="n">MERGE</span><span class="o">,</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** Cascade remove operation */</span>
-</span><span class='line'>    <span class="n">REMOVE</span><span class="o">,</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** Cascade refresh operation */</span>
-</span><span class='line'>    <span class="n">REFRESH</span><span class="o">,</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/**</span>
-</span><span class='line'><span class="cm">     * Cascade detach operation</span>
-</span><span class='line'><span class="cm">     *</span>
-</span><span class='line'><span class="cm">     * @since Java Persistence 2.0</span>
-</span><span class='line'><span class="cm">     *</span>
-</span><span class='line'><span class="cm">     */</span>
-</span><span class='line'>    <span class="n">DETACH</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@ManyToMany</span><span class="o">(</span><span class="n">cascade</span> <span class="o">=</span> <span class="n">CascadeType</span><span class="o">.</span><span class="na">ALL</span><span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料：  <br/>
-1.<a href="http://en.wikibooks.org/wiki/Java_Persistence/ManyToMany">http://en.wikibooks.org/wiki/Java_Persistence/ManyToMany</a>   <br/>
-2.<a href="http://stackoverflow.com/questions/4935095/jpa-hibernate-many-to-many-cascading">http://stackoverflow.com/questions/4935095/jpa-hibernate-many-to-many-cascading</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/18">&larr; Older</a>
@@ -519,6 +470,10 @@ Any property you access in your build script, which is not defined in the build 
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/12/05/css-modules-or-bem/">鱼和熊掌的故事 - CSS Module还是BEM</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/11/22/ok-react-1/">继续前行！React（一）- 用JavaScript构建Web UI</a>
       </li>
     
@@ -532,10 +487,6 @@ Any property you access in your build script, which is not defined in the build 
     
       <li class="post">
         <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a>
       </li>
     
   </ul>

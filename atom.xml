@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2015-11-22T21:28:16+08:00</updated>
+  <updated>2015-12-05T15:41:35+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,391 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[鱼和熊掌的故事 - CSS Module还是BEM]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/12/05/css-modules-or-bem/"/>
+    <updated>2015-12-05T11:39:48+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/12/05/css-modules-or-bem</id>
+    <content type="html"><![CDATA[<p>首先还是最基础的两个问题：什么是BEM？什么是CSS Modules？</p>
+
+<h2>BEM(Block Element Modifer)</h2>
+
+<p><a href="https://en.bem.info/">https://en.bem.info/</a></p>
+
+<p><img src="http://segmentfault.com/img/bVbN4T" alt="Alt text" /></p>
+
+<p>BEM的意思就是块（block）、元素（element）、修饰符（modifier），是由Yandex团队提出的一种<strong>前端命名方法论</strong>。这种巧妙的命名方法让你的CSS类对其他开发者来说更加透明而且更有意义。BEM命名约定更加严格，而且包含更多的信息，它们用于一个团队开发一个耗时的大项目。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.block</span><span class="p">{}</span>
+</span><span class='line'><span class="nc">.block__element</span><span class="p">{}</span>
+</span><span class='line'><span class="nc">.block--modifier</span><span class="p">{}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>.block 代表了更高级别的抽象或组件。 <br/>
+.block__element 代表.block的后代，用于形成一个完整的.block的整体。 <br/>
+.block&ndash;modifier代表.block的不同状态或不同版本。  <br/>
+.block__element&ndash;modifier代表.element的不同状态或不同版本。</p>
+
+<p>我们用一个搜索栏为例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;form</span> <span class="na">class=</span><span class="s">&quot;site-search full&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">class=</span><span class="s">&quot;field&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;Submit&quot;</span> <span class="na">value =</span><span class="s">&quot;Search&quot;</span> <span class="na">class=</span><span class="s">&quot;button&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="nt">&lt;/form&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的这个CSS类名真是太不精确了，比如field，并不能告诉我们足够的信息。尽管我们可以用它们来完成工作，但它们确实非常含糊不清。用BEM记号法就会是下面这个样子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;form</span> <span class="na">class=</span><span class="s">&quot;site-search site-search--full&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">class=</span><span class="s">&quot;site-search__field&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;Submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Search&quot;</span> <span class="na">class=</span><span class="s">&quot;site-search__button&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="nt">&lt;/form&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们能清晰地看到有个叫.site-search的块，它的内部是一个叫.site-search__field的元素。并且.site-search还有另外一种形态叫.site-search&ndash;full。如果搜索栏还有验证，那么它还有一个error状态，可以用site-search__field&ndash;error。</p>
+
+<p>虽然上面是个简单地例子，但相信你已经可以看到BEM带来的好处是命名独立，有意义，且可以清晰的表示模块结构。</p>
+
+<p>BEM（或BEM的变体）是一个非常有用，强大，简单的命名约定，以至于让你的前端代码更容易阅读和理解，更容易协作，更容易控制，更加健壮和明确而且更加严密。</p>
+
+<h2>CSS Modules</h2>
+
+<p>在React中，我们以Web Component的方式实现应用。组件（Component）的概念中有一个很重要特性：完整和自包含，而对于一个完整的Web Component，包含HTML，JAVASCRIPT和CSS。</p>
+
+<p>React通过JSX实现了在JavaScript中写HTML，但是还缺少一个重要的元素：CSS。</p>
+
+<p>在2014年11月的NationJS上Christopher Chedeau谈到了“CSS in JS”的话题。给许多人带了思想上的一个冲击，也让React实现完整Web Component带来的曙光。</p>
+
+<p>现在，已经有了三种最新的，最明智和最可行的实现React样式的方式。</p>
+
+<p>React Style： <a href="https://github.com/js-next/react-style">https://github.com/js-next/react-style</a>   <br/>
+JSX Style： <a href="https://github.com/petehunt/jsxstyle">https://github.com/petehunt/jsxstyle</a>   <br/>
+Radium： <a href="https://github.com/FormidableLabs/radium">https://github.com/FormidableLabs/radium</a></p>
+
+<h4>一般情况下，如果项目中有大量的CSS，会出现什么问题？如图</h4>
+
+<p><img src="http://glenmaddern.com/assets/images/7_problems_css.jpg" alt="Alt text" /></p>
+
+<p>Christopher指出，如果你将样式都挪到JavaScript中，这些问题都有很好地解决方案，这点说的没错，但是会引入复杂度，以及不太习惯的CSS使用方式。CSS Modules团队觉得可以让CSS还是保持以前的样子，但是构建时，以style-in-JS的方式实现。</p>
+
+<p>CSS Modules的项目地址： <a href="https://github.com/css-modules/css-modules">https://github.com/css-modules/css-modules</a></p>
+
+<h3>默认就是局部命名空间</h3>
+
+<p>在CSS Modules中每个文件都是独立编译，你可以使用更为简单地类命名方式，而不用担心它会污染全局。</p>
+
+<p>我们以不同状态的Button为例，在没有CSS Modules的情况下，你可能会以Suit/BEM的方式来写CSS。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="c">/* components/submit-button.css \*/</span>
+</span><span class='line'><span class="nc">.Button</span> <span class="p">{</span> <span class="c">/* all styles for Normal \*/</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.Button--disabled</span> <span class="p">{</span> <span class="c">/* overrides for Disabled \*/</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.Button--error</span> <span class="p">{</span> <span class="c">/* overrides for Error \*/</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.Button--in-progress</span> <span class="p">{</span> <span class="c">/* overrides for In Progress \*/</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;Button Button--in-progress&quot;</span><span class="nt">&gt;</span>Processing...<span class="nt">&lt;/button&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>使用CSS Modules的方式，你就可以用下面这种方式来写：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="c">/* components/submit-button.css \*/</span>
+</span><span class='line'><span class="nc">.normal</span> <span class="p">{</span> <span class="c">/* all styles for Normal \*/</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.disabled</span> <span class="p">{</span> <span class="c">/* all styles for Disabled \*/</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.error</span> <span class="p">{</span> <span class="c">/* all styles for Error \*/</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.inProgress</span> <span class="p">{</span> <span class="c">/* all styles for In Progress \*/</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>你应该发现，class的前缀button没有了，为什么？因为这个css文件的名字已经叫做submit-button.css，CSS Modules已经知道它的前缀，不需要再次定义了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/* components/submit-button.js \*/</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./submit-button.css&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nx">buttonElem</span><span class="p">.</span><span class="nx">outerHTML</span> <span class="o">=</span> <span class="err">`</span><span class="o">&lt;</span><span class="nx">button</span> <span class="kr">class</span><span class="o">=</span><span class="nx">$</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">normal</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Submit</span><span class="o">&lt;</span><span class="err">/button&gt;`</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以JavaScript的方式使用CSS。</p>
+
+<p>然后，你再看看生成的最终页面的样子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;components_submit_button__normal__abc5436&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  Processing...
+</span><span class='line'><span class="nt">&lt;/button&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>最终生成的class的名字是Component Name + Class Name + Base64，保证了层次结构和唯一性。</p>
+
+<h2>鱼和熊掌的问题</h2>
+
+<p>对比一下BEM和CSS Modules，它们最终的目的都是给你带来独立，唯一和有意义的类命名。CSS Modules允许你以变量的方式将class获取并使用到元素上，并且省略了类名中Component Name前缀（也就是BEM中的B）。</p>
+
+<p>在React中，Component一般会由多个元素组成（除了像Button这样比较简单地组件），就以上面的搜索框为例，在React中以CSS Modules的方式写，就有可能如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./site-search.css&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="c1">//省略React代码</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">full</span><span class="p">}</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">field</span><span class="p">}</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">value</span> <span class="o">=</span><span class="s2">&quot;Search&quot;</span> <span class="kr">class</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">button</span><span class="p">}</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/form&gt;  </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>对比一下BEM方式</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">from</span> <span class="s1">&#39;./site-search-bem.css&#39;</span><span class="p">;</span><span class="c1">//以BEM方式写的样式表</span>
+</span><span class='line'><span class="c1">//省略React代码</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;site-search site-search--full&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;site-search__field&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Search&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;site-search__button&quot;</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/form&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>CSS Modules好像挺完美的，变量的方式传递class，在JavaScript的语境下似乎更有道理，但从本质上来说，与BEM相比，也就只是省略了Block这一个前缀，在这个看似好像很不错的方案下，有没有存在的问题？</p>
+
+<h2>问题</h2>
+
+<h4>测试</h4>
+
+<p>在React的环境下，会使用Jest框架对组件进行测试，import styles from &lsquo;./site-search.css&rsquo;;这一个语句，并不是JavaScript的标准，只是CSS Modules的实现者，帮助你进行了编译，但Jest并不会编译。</p>
+
+<p>所以这个时候，我们会在Jest的PreProcessor中处理这句话，这样才不会有语法解析错误。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">babel</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./babel-jest&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">process</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="nx">filename</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="sr">/\.(css|scss)$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">filename</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">babel</span><span class="p">.</span><span class="nx">process</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="nx">filename</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>但与此同时，styles会变成空对象，由于我们使用了变量的方式，在测试中，并不能测试className的改变（因为state改变，去改变className）。相反，BEM因为是纯粹的字符串，所以它使可测试的。</p>
+
+<h2>在React中引入classnames模块</h2>
+
+<p>我们知道，在React中，通过state的改变来决定组件的样式变化，在没有外部力量帮助的情况下，你的代码就会如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/* components/submit-button.jsx \*/</span>
+</span><span class='line'><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./submit-button.css&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">SubmitButton</span> <span class="kr">extends</span> <span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">let</span> <span class="nx">className</span><span class="p">,</span> <span class="nx">text</span> <span class="o">=</span> <span class="s2">&quot;Submit&quot;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">submissionInProgress</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">inProgress</span>
+</span><span class='line'>      <span class="nx">text</span> <span class="o">=</span> <span class="s2">&quot;Processing...&quot;</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">errorOccurred</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">error</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">form</span><span class="p">.</span><span class="nx">valid</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">disabled</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">normal</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">className</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">text</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个时候，可以引入classnames模块，例子来自classnames样例：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;classnames&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Button</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="c1">// ...</span>
+</span><span class='line'>  <span class="nx">render</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">btnClass</span> <span class="o">=</span> <span class="nx">classNames</span><span class="p">({</span>
+</span><span class='line'>      <span class="s1">&#39;btn&#39;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;btn-pressed&#39;</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;btn-over&#39;</span><span class="o">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isHovered</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">btnClass</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">label</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/button&gt;;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>问题是，classNames中传入的JavaScript对象，不可以用styles.normal作为key，如果要在CSS Modules的环境下，使用classnames，你需要像下面这样写：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./site-search.css&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;classnames&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Button</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="c1">// ...</span>
+</span><span class='line'>  <span class="nx">render</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">btnClass</span> <span class="o">=</span> <span class="nx">classNames</span><span class="p">({</span>
+</span><span class='line'>      <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;btn&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>      <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;btn-pressed&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span><span class="p">,</span>
+</span><span class='line'>      <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;btn-over&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isHovered</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">btnClass</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">label</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/button&gt;;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果你不使用classnames，在使用CSS Modules也是可以用styles[&lsquo;normal&rsquo;]来代替styles.normal。</p>
+
+<h2>无意中的发现，结合CSS Modules和BEM方式</h2>
+
+<p>通过用styles[&lsquo;normal&rsquo;]来代替styles.normal，在定义CSS的类名时，你依旧可以使用你习惯的CSS类命名方式，比如：BEM。上面的搜索框的例子，就可以写成：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./site-search.css&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">classNames</span> <span class="nx">from</span> <span class="s1">&#39;classnames&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="c1">//省略React代码</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">fieldClass</span> <span class="o">=</span> <span class="nx">classNames</span><span class="p">({</span>
+</span><span class='line'>  <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;field&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isError</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;field__error&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isError</span><span class="p">,</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">[</span><span class="nx">full</span><span class="p">]}</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">fieldClass</span><span class="p">}</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Search&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;submit&#39;</span><span class="p">]}</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/form&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这种方式，既保证了CSS Modules的使用，也保留了BEM通过三种基本元素来描述组件样式的方式。</p>
+
+<h2>总结</h2>
+
+<p>对比两种实现方式，从本质上来讲，并没有区别，否则它们也不可能结合在一起，但是CSS Modules带来的致命伤害是作为一个变量，并不能直接测试（想要测试，可以让Jest的路径指向已经编译过的JavaScript路径）。而纯粹的BEM因为是字符串可以很好地和classnames结合使用，也可以进行测试，所以在选择上占据了很大的优势。</p>
+
+<p>参考资料：  <br/>
+1.<a href="http://glenmaddern.com/articles/css-modules">http://glenmaddern.com/articles/css-modules</a>  <br/>
+2.<a href="http://segmentfault.com/a/1190000000391762">http://segmentfault.com/a/1190000000391762</a>  <br/>
+3.<a href="https://github.com/css-modules/css-modules">https://github.com/css-modules/css-modules</a>  <br/>
+4.<a href="https://www.npmjs.com/package/classnames">https://www.npmjs.com/package/classnames</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[继续前行！React（一）- 用JavaScript构建Web UI]]></title>
@@ -2719,198 +3104,6 @@ NaN <br/>
 <p>参考资料：  <br/>
 1.Spring 3.0就是这么简单  <br/>
 2.<a href="http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/aop.html">http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/aop.html</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[如何使用Postgres全文搜索特性（一）]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/08/09/postgres-full-text-search-1/"/>
-    <updated>2015-08-09T08:24:23+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/08/09/postgres-full-text-search-1</id>
-    <content type="html"><![CDATA[<h2>基本概念</h2>
-
-<p>全文搜索提供了一种能力来鉴别的自然语言文档是否满足某个查询语句，并根据与查询语句的相关性来对查询结果排序。最常见的查询就是找到所有包含查询术语（term）的文档，并根据他们的相似性进行排序。</p>
-
-<p>文字查询已经在数据库中存在多年。PostgreSQL有~，~*，LIKE和ILIKE这样的对应文字数据类型的操作符，但它们缺少现代信息系统需要的必要属性：</p>
-
-<p>1.没有语言特性的支持，比如，英语中的单数和复数，用正则表达式是做不到识别复数单词的。<br/>
-2.没有查询结果的相似性的排序。 <br/>
-3.因为没有索引支持，所以会比较慢</p>
-
-<p>全文搜索允许对文档进行预处理，比允许建立索引来提供搜索速度。预处理一般包括：</p>
-
-<p>1.将文档解析为符号。这对于解析不同类型的符号非常有用。比如，数字，单词，复杂单词，email，这样它们就可以用不同的方式被处理。原则上，符号类型取决于文档，但是大部分情况，可以使用预定义的类型就足够了。Postgres提供了一个标准的解析器，但也可以建立自定义的解析器。</p>
-
-<p>2.将符号转化为分词。一个分词（词位，单词单位）是一个字符串，跟符号相似，但是它被正常化，这样就可以匹配同一个单词的不同形式，比如，正常化允许将大写字母转换为小写，更常见的是英语单词的前缀和后缀（复数单词），这就允许搜索同一个单词的不同形式，而不需要输入该单词的全部可能变形式。（话句话说，符号是文档文本的直接片段，而分词是可以用来索引和搜索的有用单词）。而Postgres实现这种方式的办法就是利用词典，可以提供不同标准的词典，或者自定义的词典来满足不同的需要。</p>
-
-<p>3.Storing preprocessed documents optimized for searching. For example, each document can be represented as a sorted array of normalized lexemes. Along with the lexemes it is often desirable to store positional information to use for proximity ranking, so that a document that contains a more &ldquo;dense&rdquo; region of query words is assigned a higher rank than one with scattered query words.(这段没看明白)</p>
-
-<h2>文档</h2>
-
-<p>上面提到一个很重要的概念，叫做文档（Document）。那么，它的含义是什么？</p>
-
-<p>在PostgresSQL的搜索中，文档可以是数据库表中某一行的某一个文字字段（textual field），或者是多个这样的字段的组合，也许他们存储在不同表中，又或者是动态获取到的结果。话句话说，文档是由不同的部分组成，可能并不会作为一个整体存在某一个位置。比如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">title</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span>  <span class="n">author</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span>  <span class="n">abstract</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">body</span> <span class="k">AS</span> <span class="n">document</span>
-</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span>
-</span><span class='line'><span class="k">WHERE</span> <span class="n">mid</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">SELECT</span> <span class="n">m</span><span class="p">.</span><span class="n">title</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">m</span><span class="p">.</span><span class="n">author</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">m</span><span class="p">.</span><span class="n">abstract</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">d</span><span class="p">.</span><span class="n">body</span> <span class="k">AS</span> <span class="n">document</span>
-</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span> <span class="n">m</span><span class="p">,</span> <span class="n">docs</span> <span class="n">d</span>
-</span><span class='line'><span class="k">WHERE</span> <span class="n">mid</span> <span class="o">=</span> <span class="n">did</span> <span class="k">AND</span> <span class="n">mid</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span> 
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>title，author，abstract作为了文档，它们是message的不同字段。</p>
-
-<p>还有一种可能，文档以简单文本的方式存储在文件系统中，这样的情况下，数据库中可以存放全文的索引来执行搜索，并使用一些独立的标识符来从文件系统中获取文档。</p>
-
-<h2>TSVECTOR（分词向量）</h2>
-
-<p>以文本搜索为目的，每个文档必须缩减为预处理的tsvector（某种向量）形式，搜索和排名都是在这个可以代表文档的tsvector上执行，文档只是在需要用户需要使用时才去获取，因此，我们常常将tsvector作为一种文档，当然它只是全文文档的一种压缩形式。</p>
-
-<p>PostgreSQL全文搜索是基于匹配操作符@@实现，当一个tsvector（document）匹配一个tsquery（query）时，返回true。至于哪个写在前面，哪个写在后面不重要：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="s1">&#39;a fat cat sat on a mat and ate a fat rat&#39;</span><span class="p">::</span><span class="n">tsvector</span> <span class="o">@@</span> <span class="s1">&#39;cat &amp; rat&#39;</span><span class="p">::</span><span class="n">tsquery</span><span class="p">;</span>
-</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
-</span><span class='line'><span class="c1">----------</span>
-</span><span class='line'> <span class="n">t</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">SELECT</span> <span class="s1">&#39;fat &amp; cow&#39;</span><span class="p">::</span><span class="n">tsquery</span> <span class="o">@@</span> <span class="s1">&#39;a fat cat sat on a mat and ate a fat rat&#39;</span><span class="p">::</span><span class="n">tsvector</span><span class="p">;</span>
-</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
-</span><span class='line'><span class="c1">----------</span>
-</span><span class='line'> <span class="n">f</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如上面的例子中，一个tsquery不是单纯的文本，tsvector也是一样。一个tsquery包含搜索术语（term），它们是已经做过正常化的分词，并且可能通过AND，OR和NOT操作将多个术语结合。函数to_tsquery和plainto_tsquery可以帮助将用户写的文本转化为适当的tsquery。简单来说，to_tsvector是用来解析和正常化一个文档字符串的。所以，在实际应用中，一个文本搜索匹配应该长如下这样：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;fat cats ate fat rats&#39;</span><span class="p">)</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;fat &amp; rat&#39;</span><span class="p">);</span>
-</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
-</span><span class='line'><span class="c1">----------</span>
-</span><span class='line'> <span class="n">t</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>注意，如果写成如下方式将不会成功：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="s1">&#39;fat cats ate fat rats&#39;</span><span class="p">::</span><span class="n">tsvector</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;fat &amp; rat&#39;</span><span class="p">);</span>
-</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
-</span><span class='line'><span class="c1">----------</span>
-</span><span class='line'> <span class="n">f</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>@@操作符也支持文本输入，简单情况下，允许跳过具体的tsvector或者tsquery的转换。使用如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="n">tsvector</span> <span class="o">@@</span> <span class="n">tsquery</span>
-</span><span class='line'><span class="n">tsquery</span>  <span class="o">@@</span> <span class="n">tsvector</span>
-</span><span class='line'><span class="nb">text</span> <span class="o">@@</span> <span class="n">tsquery</span>
-</span><span class='line'><span class="nb">text</span> <span class="o">@@</span> <span class="nb">text</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>如何在数据库表中进行搜索，并使用索引呢？</h2>
-
-<p>我们是可以再没有索引的情况下做全文搜索的，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">title</span>
-</span><span class='line'><span class="k">FROM</span> <span class="n">pgweb</span>
-</span><span class='line'><span class="k">WHERE</span> <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="s1">&#39;friend&#39;</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>创建索引</h3>
-
-<p>我们可以创建GIN索引来提供文本搜索的速度：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">pgweb_idx</span> <span class="k">ON</span> <span class="n">pgweb</span> <span class="k">USING</span> <span class="n">gin</span><span class="p">(</span><span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">body</span><span class="p">));</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>注意这里使用两个参数的to_tsvector方法。只有文本搜索指定了一个配置名字才能使用在表达式索引中。这是因为索引内容必须不被default_text_search_config所影响。如果它们被影响了，索引内容有可能不一致，因为不同的条目（entries）可以包含有不同配置生成的tsvector，所以没有办法猜测谁是谁。所以也就没办法正确的删除和还原这样是索引。</p>
-
-<p>因为上面使用了两个参数版本的to_tsvector，只有也使用了两参数版本to_tsvector并且配置相同的查询语句才能使用。也就说，WHERE to_tsvector(&lsquo;english&rsquo;, body) @@ &lsquo;a &amp; b&#8217;可以使用索引，WHERE to_tsvector(body) @@ &#8216;a &amp; b&#8217;就不行。</p>
-
-<p>索引可以建立在联合的字段中：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">pgweb_idx</span> <span class="k">ON</span> <span class="n">pgweb</span> <span class="k">USING</span> <span class="n">gin</span><span class="p">(</span><span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">title</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">body</span><span class="p">));</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>在单独的字段创建向量</h3>
-
-<p>另外一种办法就是创建一个单独的tsvector字段来保存to_tsvector的输出，本例中，coalesce用来保证即便有一个字段是null，仍然会生成索引：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">pgweb</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">textsearchable_index_col</span> <span class="n">tsvector</span><span class="p">;</span>
-</span><span class='line'><span class="k">UPDATE</span> <span class="n">pgweb</span> <span class="k">SET</span> <span class="n">textsearchable_index_col</span> <span class="o">=</span>
-</span><span class='line'>     <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">coalesce</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">));</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>我们创建一个GIN索引来加快搜索：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">textsearch_idx</span> <span class="k">ON</span> <span class="n">pgweb</span> <span class="k">USING</span> <span class="n">gin</span><span class="p">(</span><span class="n">textsearchable_index_col</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>现在可以来执行一个快速的全文搜索：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">title</span>
-</span><span class='line'><span class="k">FROM</span> <span class="n">pgweb</span>
-</span><span class='line'><span class="k">WHERE</span> <span class="n">textsearchable_index_col</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;create &amp; table&#39;</span><span class="p">)</span>
-</span><span class='line'><span class="k">ORDER</span> <span class="k">BY</span> <span class="n">last_mod_date</span> <span class="k">DESC</span>
-</span><span class='line'><span class="k">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当使用独立字段来存储tsvector的结果时，非常有必要创建一个触发器（trigger）来保证tsvector的状态，当title或者body发生改变。</p>
-
-<p>独立列的方式比表达式索引方式好的其中一点是当使用索引查询时，不用在查询语句中指定文本查询的配置。正如上面的例子中，查询语句依赖于default_text_search_config。另外一个优点是，查询更快速，因为它不需要重新执行to_tsvector来验证索引的匹配（特别是使用GiST的时候）。唯一的不同时，这种方式需要占据存储空间。</p>
-
-<p>参考自：<a href="http://www.postgresql.org/docs/9.2/static/textsearch-intro.html">http://www.postgresql.org/docs/9.2/static/textsearch-intro.html</a></p>
 ]]></content>
   </entry>
   
