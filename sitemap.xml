@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://benweizhu.github.io/blog/2015/12/13/react-on-es6-plus-translation/</loc>
+    <lastmod>2015-12-13T10:32:12+08:00</lastmod>
+  </url>
+  <url>
     <loc>http://benweizhu.github.io/blog/2015/12/05/css-modules-or-bem/</loc>
     <lastmod>2015-12-05T11:39:48+08:00</lastmod>
   </url>

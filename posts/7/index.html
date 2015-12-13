@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在去年的一篇《Gradle Jetty和Gradle Watch插件实现热部署》中，谈到Java热部署带来的好处，文章地址在： http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/ 。 &hellip;">
+  <meta name="description" content="Node.js是基于Chrome V8引擎的JavaScript运行时。 https://nodejs.org/en/ Express是Node.js上最小的，灵活的web应用框架，给web和移动应用提供了一系列有用的特性。 http://expressjs.com/ 如何安装 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,352 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/10/27/how-to-use-express/">在Node中使用Express</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-10-27T09:43:04+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:43 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Node.js是基于Chrome V8引擎的JavaScript运行时。</p>
+
+<p><a href="https://nodejs.org/en/">https://nodejs.org/en/</a></p>
+
+<p>Express是Node.js上最小的，灵活的web应用框架，给web和移动应用提供了一系列有用的特性。</p>
+
+<p><a href="http://expressjs.com/">http://expressjs.com/</a></p>
+
+<h2>如何安装</h2>
+
+<p>首先确保你已经安装好Node.js，下面是mac环境下，安装node的一些简单步骤（安装路径，根据不同的系统有所不同，注意安装结束时的说明）：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">Go</span> <span class="n">to</span> <span class="nl">https:</span><span class="c1">//nodejs.org/en/, and download the latest version of node.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">install</span> <span class="n">it</span> <span class="n">and</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Node</span><span class="o">.</span><span class="na">js</span> <span class="n">was</span> <span class="n">installed</span> <span class="n">at</span>
+</span><span class='line'>   <span class="s">/usr/</span><span class="n">local</span><span class="s">/bin/</span><span class="n">node</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">npm</span> <span class="n">was</span> <span class="n">installed</span> <span class="n">at</span>
+</span><span class='line'>   <span class="s">/usr/</span><span class="n">local</span><span class="s">/bin/</span><span class="n">npm</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Make</span> <span class="n">sure</span> <span class="n">that</span> <span class="s">/usr/</span><span class="n">local</span><span class="o">/</span><span class="n">bin</span> <span class="n">is</span> <span class="k">in</span> <span class="n">your</span> <span class="n">$PATH</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Then</span><span class="o">,</span> <span class="k">try</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">node</span> <span class="o">-</span><span class="n">v</span>
+</span><span class='line'><span class="n">npm</span> <span class="o">-</span><span class="n">v</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">to</span> <span class="n">verify</span> <span class="n">the</span> <span class="n">node</span> <span class="n">has</span> <span class="n">been</span> <span class="n">successfully</span> <span class="n">installed</span> <span class="n">on</span> <span class="n">your</span> <span class="n">PC</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>新建一个myapp文件夹，从命令行进入目录，运行 npm init 。</p>
+
+<p>npm init命令会创建一个package.json的文件，关于这个文件里面具体每个字段的含义，请参考： <a href="https://docs.npmjs.com/files/package.json">https://docs.npmjs.com/files/package.json</a> 。</p>
+
+<p>npm init命令会提示你输入一段内容，不必管它，一路回车（enter）。只是要注意一点，entry point: (index.js)会提示你输入【入口点文件】，默认是index.js，你也可以改为app.js（我这里改为了app.js，之后都采用app.js作为入口文件）。</p>
+
+<p>现在来安装express，输入：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">npm</span> <span class="n">install</span> <span class="n">express</span> <span class="o">--</span><span class="n">save</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果你有node相关的知识，或者看过我的这篇文章《用Grunt做JavaScript的构建》（ <a href="http://benweizhu.github.io/blog/2015/01/09/use-grunt-to-build-javascript/">http://benweizhu.github.io/blog/2015/01/09/use-grunt-to-build-javascript/</a> ）中，对node和npm部分进行讲解。</p>
+
+<p>应该知道，express的模块会安装到当前目录的node_modules文件夹中， express会保存到package.json的dependencies中。</p>
+
+<p>express的安装部分现在就完成了。</p>
+
+<h2>Hello World 向世界说你好</h2>
+
+<p>简单的让express跑起来，验证上面的步骤都是正确的，新建一个app.js文件，用编辑器打开它，然后拷贝下面这段代码：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;express&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">3000</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">host</span> <span class="o">=</span> <span class="nx">server</span><span class="p">.</span><span class="nx">address</span><span class="p">().</span><span class="nx">address</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">server</span><span class="p">.</span><span class="nx">address</span><span class="p">().</span><span class="nx">port</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Example app listening at http://%s:%s&#39;</span><span class="p">,</span> <span class="nx">host</span><span class="p">,</span> <span class="nx">port</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>不用我解释，看到这段代码，你应该猜测的出来，它要干什么，这段代码会启动一个server，监听3000端口，接受一个“/”的uri作为请求路径，返回‘Hello World!’的字符串。</p>
+
+<p>运行方式应用的方式：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">node</span> <span class="nx">app</span><span class="p">.</span><span class="nx">js</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个里面有用到一个require函数来或者express对象（函数对象），关于require，在《用Grunt做JavaScript的构建》也有简单介绍Node的模块系统。</p>
+
+<h2>Express的应用生成器（generator）</h2>
+
+<p>无论是前端，后端还是构建工具，任何成熟的应用框架都不会让你从头写应用，都会提供一套基本的脚手架（scaffold），比如maven的archetype，前端的yeoman等等。</p>
+
+<p>Express也有自己的generator来做一些初始化的工作。</p>
+
+<p>安装generator：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">npm</span> <span class="n">install</span> <span class="n">express</span><span class="o">-</span><span class="n">generator</span> <span class="o">-</span><span class="n">g</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>-g 参数表示express-generator模块会安装到npm的全局环境，而不是当前目录，这样，所有的node应用都可以重用，而不需要重新下载。运行express -h可以查看帮助。</p>
+
+<p>和之前helloworld中不同，使用generator就不需要手动运行npm init命令和建立app.js文件，直接运行express myapp，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">express</span> <span class="n">myapp</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">package</span><span class="o">.</span><span class="n">json</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">app</span><span class="o">.</span><span class="n">js</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">public</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">javascripts</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">images</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">routes</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">routes</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">js</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">routes</span><span class="o">/</span><span class="n">users</span><span class="o">.</span><span class="n">js</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">stylesheets</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">stylesheets</span><span class="o">/</span><span class="n">style</span><span class="o">.</span><span class="n">css</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">views</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">views</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">jade</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">views</span><span class="o">/</span><span class="n">layout</span><span class="o">.</span><span class="n">jade</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="n">views</span><span class="o">/</span><span class="n">error</span><span class="o">.</span><span class="n">jade</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="nb">bin</span>
+</span><span class='line'>   <span class="n">create</span> <span class="p">:</span> <span class="n">myapp</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">www</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>也许你会发现安装了express-generator，运行express时，还是会提示命令找不到，如果是mac环境，你需要查看$PATH中，npm的bin目录是否包含在里面，方法如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">echo</span> <span class="err">$</span><span class="n">PATH</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">touch</span> <span class="o">~/.</span><span class="n">bash_profile</span><span class="p">;</span> <span class="o">//</span><span class="err">如果以前没有创建过</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">open</span> <span class="o">~/.</span><span class="n">bash_profile</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">//</span><span class="err">将</span><span class="n">npm</span><span class="err">的</span><span class="nb">bin</span><span class="err">目录放在原始的$</span><span class="p">{</span><span class="n">PATH</span><span class="p">}</span><span class="err">后面</span>
+</span><span class='line'><span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="err">$</span><span class="p">{</span><span class="n">PATH</span><span class="p">}:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">node</span><span class="o">/</span><span class="mf">0.12</span><span class="o">.</span><span class="mi">5</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">npm</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">source</span> <span class="o">~/.</span><span class="n">bash_profile</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可以参考： <a href="http://hathaway.cc/post/69201163472/how-to-edit-your-path-environment-variables-on-mac">http://hathaway.cc/post/69201163472/how-to-edit-your-path-environment-variables-on-mac</a></p>
+
+<p>安装成功之后，进入myapp目录，运行npm install，安装对应的依赖，运行DEBUG=myapp npm start命令，运行package.json中配置的start脚本命令来启动应用，进入 <a href="http://localhost:3000/">http://localhost:3000/</a> 就可以。</p>
+
+<h2>关于路由</h2>
+
+<p>路由这个概念就很容易理解了，无论是前端的AngularJS还后端的SpringMVC或者Ruby on Rails，它们都有自己的一套请求和对应handler（Controller）的映射方式。</p>
+
+<p>Express也不例外，用来指定应用程序如何响应客户端的特定请求，包含URI，请求的HTTP方法（GET，POST）。</p>
+
+<p>Express中路由定义是通过app.METHOD(PATH, HANDLER)结构实现，app是express的一个实例对象，METHOD是HTTP请求方法，PATH就是请求的相对URI，HANDLER是一个回调函数来处理请求内容，具体例子看下面：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">/ respond with &quot;Hello World!&quot; on the homepage</span>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// accept POST request on the homepage</span>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;Got a POST request&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// accept PUT request at /user</span>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="s1">&#39;/user&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;Got a PUT request at /user&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// accept DELETE request at /user</span>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="k">delete</span><span class="p">(</span><span class="s1">&#39;/user&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;Got a DELETE request at /user&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>静态文件处理</h2>
+
+<p>静态文件也就是，常说的“非服务器程序代码”，比如：图片，CSS，字体，JavaScript文件等。</p>
+
+<p>Express有一套自己的内置中间件来处理它们，express.static，使用方式如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="s1">&#39;public&#39;</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>将目录的名字传递过去，如果它是作为static assets的目录，express.static就会把它们host起来。比如，你将图片，CSS和JavaScript放在名字是publish的目录。</p>
+
+<p>这样，你就可以直接通过浏览器访问它们了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">kitten</span><span class="o">.</span><span class="n">jpg</span>
+</span><span class='line'><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span><span class="o">/</span><span class="n">css</span><span class="o">/</span><span class="n">style</span><span class="o">.</span><span class="n">css</span>
+</span><span class='line'><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">app</span><span class="o">.</span><span class="n">js</span>
+</span><span class='line'><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">bg</span><span class="o">.</span><span class="n">png</span>
+</span><span class='line'><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span><span class="o">/</span><span class="n">hello</span><span class="o">.</span><span class="n">html</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然，如果你想使用多个目录，也是可以的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="s1">&#39;public&#39;</span><span class="p">));</span>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="s1">&#39;files&#39;</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果你想使用自定义的路径，而不是默认的真是文件路径作为url的路径（我想你看了代码应该明白我的意思），可以像下面这样做：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="s1">&#39;/static&#39;</span><span class="p">,</span> <span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="s1">&#39;public&#39;</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么，你通过浏览器访问它们，就成这样了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span><span class="o">/</span><span class="n">static</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">kitten</span><span class="o">.</span><span class="n">jpg</span>
+</span><span class='line'><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span><span class="o">/</span><span class="n">static</span><span class="o">/</span><span class="n">css</span><span class="o">/</span><span class="n">style</span><span class="o">.</span><span class="n">css</span>
+</span><span class='line'><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span><span class="o">/</span><span class="n">static</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">app</span><span class="o">.</span><span class="n">js</span>
+</span><span class='line'><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span><span class="o">/</span><span class="n">static</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">bg</span><span class="o">.</span><span class="n">png</span>
+</span><span class='line'><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span><span class="o">/</span><span class="n">static</span><span class="o">/</span><span class="n">hello</span><span class="o">.</span><span class="n">html</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>路径问题一直都是所有Web框架最头痛的问题，所以express.static的路径定义，也取决于你在哪个位置启动Node进程。如果，你在另一个位置启动node，最好还是给对应的你想要载入的文件目录（比如，publish目录），加一个绝对路径。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="s1">&#39;/static&#39;</span><span class="p">,</span> <span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/public&#39;</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料：  <br/>
+1.<a href="http://expressjs.com/starter/installing.html">http://expressjs.com/starter/installing.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -181,55 +527,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/10/06/learning-js-well-2/">学好JavaScript（二）- 被我忽视的东西(2)对象</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-10-06T10:02:04+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:02 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>原型</p>
-
-<p>每个JavaScript对象（null除外）都和另一个对象相关联。“另一个”对象就是我们熟知的原型，每一个对象都从原型继承属性。</p>
-
-<p>所有通过对象直接量创建的对象都具有同一个原型对象，并可以通过JavaScript代码Object.prototype获得对原型对象的引用。通过关键字new和构造函数调用创建的对象的原型就是构造函数的prototype属性的值。因此，同使用{}创建对象一样，通过new Object()创建的对象也继承自Object.prototype。同样，通过new Array()创建的对象的原型就是Array.prototype，通过new Date()创建的对象的原型就是Date.prototype。</p>
-
-<p>没有原型的对象为数不多，Object.prototype就是其中之一。他不继承任何属性。其他原型对象都是普通对象，普通对象也有原型。所有的内置的构造函数都具有一个继承自Object.prototype的原型。例如，Date.prototype的属性继承自Object.prototype，因此由new Date()创建的Date对象的属性同时继承自Date.prototype和Object.prototype。这就是所谓的“原型链”。</p>
-
-<p>关联数组</p>
-
-<p>object.property
-object[&ldquo;property&rdquo;]</p>
-
-<p>第二种语法使用方括号和一个字符串，看起来更像数组，只是这个数组是通过字符串索引而不是数字索引，这种数组就是所说的关联数组。</p>
-
-<p>在C++、Java等强类型语言中，对象只能拥有固定数目的属性，并且这些属性名称必须提前定义好。由于JavaScript是弱类型语言，因此不必遵循这个条规定，在任何对象中程序都可以创建任意数量的属性。但当通过点运算符访问对象的属性时，属性名用一个标识符来表示。标示符必须直接出现在JavaScript程序中，它们不是数据类型，因此程序无法修改它们。</p>
-
-<p>反过来讲，当通过[]来访问对象的属性时，属性名通过字符串来表示。字符串是JavaScript的数据类型，在程序运行时可以修改和创建它们。</p>
-
-<p>for(i = 0; i &lt; 4; i++)
-    addr += customer[&ldquo;address&rdquo; + i];</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/8">&larr; Older</a>
@@ -256,6 +553,10 @@ object[&ldquo;property&rdquo;]</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/12/13/react-on-es6-plus-translation/">翻译 React on ES6+</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/12/05/css-modules-or-bem/">鱼和熊掌的故事 - CSS Modules还是BEM</a>
       </li>
     
@@ -269,10 +570,6 @@ object[&ldquo;property&rdquo;]</p>
     
       <li class="post">
         <a href="/blog/2015/11/15/javascript-publish-and-subscribe-pattern/">JavaScript发布订阅模式</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a>
       </li>
     
   </ul>
