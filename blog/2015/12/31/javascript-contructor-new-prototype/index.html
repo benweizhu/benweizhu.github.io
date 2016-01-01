@@ -278,9 +278,9 @@
 
 <p>当我看到上面的回答时，加上我对prototype英文含义的理解，我会认为每个对象都有一个prototype. 但当我写({}).prototype的时候，或者&#8221;&ldquo;.prototype，我却得到了undefined，是不是疯了？</p>
 
-<p>忘记你所理解的关于prototype属性的理解（它其实只是函数对象的一个属性，比如Object.prototype，Function.prototype，Array.prototype，在浏览器控制台查看这些值，它们都是函数） - 这个名字很可能是迷惑的根源。</p>
+<p>忘记你所理解的关于prototype属性的理解（它其实只是函数对象的一个属性，比如Object.prototype，Function.prototype，Array.prototype，在浏览器控制台查看Object，Function，Array这些值，它们都是函数） - 这个名字很可能是迷惑的根源。</p>
 
-<p>一个对象真正的prototype是内部[[Prototype]]属性. ECMA5介绍了标准的访问方法，Object.getPrototypeOf(object)。这个最新的实现已被Firefox, Safari, Chrome and IE9所支持。另外，除了IE，所有的浏览器都支持非标准的访问方法__proto__。</p>
+<p>一个对象真正的prototype是内部[[Prototype]]属性. ECMA5介绍了标准的访问方法，Object.getPrototypeOf(object)。这个最新的实现已被Firefox, Safari, Chrome and IE9所支持。另外，除了IE，所有的浏览器都支持非标准的访问方法__proto__，它指向当对象被实例化的时候，用作原型的对象。</p>
 
 <p>那么我想知道prototype属性到底是干什么的?特别是上面的阮一峰介绍的Prototype模式。</p>
 
@@ -353,7 +353,7 @@
 
 <h3>原型链又是什么？</h3>
 
-<p>因为每个对象和每个原型(本身)都有一个原型，我们可以想象，一个接一个的对象连接在一起形成一个原型链。原型链的终端总是默认对象（object）的原型。</p>
+<p>因为每个对象和每个原型(本身)都有一个原型，我们可以想象，一个接一个的对象连接在一起形成一个原型链。原型链的终端总是默认对象（object）的原型，即Object.prototype。你可以在自定义的对象上调用__proto__方法就来自于Object.prototype.__proto__上。</p>
 
 <p>原型继承机制是内在且隐式实现的。当对象a要访问属性foo时，Javascript会遍历a的原型链（首先从a自身开始），检查原型链的每一个环节中存在的foo属性。如果找到了foo属性就会将其返回，否则返回undefined值。</p>
 
@@ -403,7 +403,7 @@
 
 <p>看完这篇文章，你需要记住一下几点：</p>
 
-<p>构造函数和普通函数没有区别，只有在结合new关键字时，有特定的作用。每个对象都有原型，不要误解Prototype属性，它只是Function的属性，真正的原型通过Object.getPrototypeOf(object)和__proto__获取。因为构造函数隐式的执行this.__proto__ = Circle.prototype，所以Prototype模式可以实现对象方法是定义（对象中的属性只是引用，指向的是构造函数Prototype属性上定义的一个方法）。</p>
+<p>构造函数和普通函数没有区别，只有在结合new关键字时，有特定的作用，可以创建一个对象实例，而该对象实例有一个constructor属性指向创建它的函数，即构造函数。每个对象都有原型，不要误解Prototype属性，它是函数对象的属性（比如Object，Array，Function），真正的原型通过Object.getPrototypeOf(object)和__proto__获取。因为构造函数隐式的执行this.__proto__ = Circle.prototype，所以Prototype模式可以实现对象方法是定义（对象中的属性只是引用，指向的是构造函数Prototype属性上定义的一个方法）。</p>
 
 <p>参考文献：   <br/>
 1.<a href="http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html">http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html</a>  <br/>
