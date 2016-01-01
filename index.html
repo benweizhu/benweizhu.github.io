@@ -285,9 +285,11 @@
 
 <p>一个对象真正的prototype是内部[[Prototype]]属性. ECMA5介绍了标准的访问方法，Object.getPrototypeOf(object)。这个最新的实现已被Firefox, Safari, Chrome and IE9所支持。另外，除了IE，所有的浏览器都支持非标准的访问方法__proto__，它指向当对象被实例化的时候，用作原型的对象。</p>
 
-<p>那么我想知道prototype属性到底是干什么的?特别是上面的阮一峰介绍的Prototype模式。</p>
+<p>那么我想知道prototype属性到底是干什么的?比如Object.prototype，Function.prototype，Array.prototype等。特别是上面的阮一峰介绍的Prototype模式。</p>
 
-<p>好吧，首先，在前面介绍构造函数时已经知道，JavaScript不区分构造函数和其它普通函数，所以每个函数都有prototype属性。反而任何不是方法的，都没有这样的属性。</p>
+<p>Object.prototype属性表示对象Object的原型对象，它是所有对象原型链的根节点。</p>
+
+<p>那其他的呢？好吧，首先，在前面介绍构造函数时已经知道，JavaScript不区分构造函数和其它普通函数，所以每个函数都有prototype属性。反而任何不是方法的，都没有这样的属性。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -349,6 +351,53 @@
 </span><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Circle</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Circle</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
 </span><span class='line'><span class="nx">a</span><span class="p">.</span><span class="nx">area</span><span class="p">().</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="c1">//28.27</span>
 </span><span class='line'><span class="nx">b</span><span class="p">.</span><span class="nx">area</span><span class="p">().</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="c1">//50.27</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么，根据上面的定义，下面的内容非常有趣：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span>
+</span><span class='line'><span class="nx">$</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">func</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Function</span><span class="p">()</span>
+</span><span class='line'><span class="nx">func</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">functionA</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(){}</span>
+</span><span class='line'><span class="nx">functionA</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">myFunction</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Function</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="s1">&#39;salary&#39;</span><span class="p">,</span> <span class="s1">&#39;return users * salary&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">myFunction</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span>
+</span><span class='line'><span class="nx">$</span> <span class="p">[]</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Array</span><span class="p">()</span>
+</span><span class='line'><span class="nx">arr</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="p">[]</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">array</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class='line'><span class="nx">array</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="p">[]</span>
+</span><span class='line'><span class="nx">Cat</span><span class="p">.</span><span class="nx">prototype</span>
+</span><span class='line'><span class="nx">$</span> <span class="nx">Cat</span> <span class="p">{}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
