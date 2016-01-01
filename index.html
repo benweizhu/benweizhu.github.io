@@ -407,6 +407,29 @@
 
 <p>因为每个对象和每个原型(本身)都有一个原型，我们可以想象，一个接一个的对象连接在一起形成一个原型链。原型链的终端总是默认对象（object）的原型，即Object.prototype。你可以在自定义的对象上调用__proto__方法就来自于Object.prototype.__proto__上。</p>
 
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Cat</span><span class="p">(){}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">cat</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Cat</span><span class="p">()</span>
+</span><span class='line'><span class="nx">cat</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="nx">Cat</span> <span class="p">{}</span>
+</span><span class='line'><span class="nx">cat</span><span class="p">.</span><span class="nx">__proto__</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="nb">Object</span> <span class="p">{}</span>
+</span><span class='line'><span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span>
+</span><span class='line'><span class="nx">$</span> <span class="nb">Object</span> <span class="p">{}</span>
+</span><span class='line'><span class="nx">cat</span><span class="p">.</span><span class="nx">__proto__</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">===</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span>
+</span><span class='line'><span class="nx">$</span> <span class="kc">true</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
 <p>原型继承机制是内在且隐式实现的。当对象a要访问属性foo时，Javascript会遍历a的原型链（首先从a自身开始），检查原型链的每一个环节中存在的foo属性。如果找到了foo属性就会将其返回，否则返回undefined值。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
