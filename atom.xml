@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-01-01T18:11:49+08:00</updated>
+  <updated>2016-01-01T20:59:53+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,245 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript This指针]]></title>
+    <link href="http://benweizhu.github.io/blog/2016/01/01/javascript-this/"/>
+    <updated>2016-01-01T19:04:16+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2016/01/01/javascript-this</id>
+    <content type="html"><![CDATA[<p>在JavaScript中，随着函数使用场合的不同，this的值会发生变化。但是有一个总的原则，那就是this指的是，调用该函数的那个对象。this关键字在Javascript中和执行环境，而非声明环境有关。</p>
+
+<p>举个例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">someone</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">showName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">other</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Tom&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">showName</span><span class="o">:</span> <span class="nx">someone</span><span class="p">.</span><span class="nx">showName</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">other</span><span class="p">.</span><span class="nx">showName</span><span class="p">();</span><span class="err">　　</span><span class="c1">//Tom</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里其实应该好理解，other的showName属性指向了someone的showName所声明的函数，他等价于：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">other</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Tom&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">showName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">other</span><span class="p">.</span><span class="nx">showName</span><span class="p">();</span><span class="err">　　</span><span class="c1">//Tom</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>所以this指针理所当然的指向other自己。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;Tom&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Bob</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">show</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">show</span> <span class="o">=</span> <span class="nx">Bob</span><span class="p">.</span><span class="nx">show</span><span class="p">;</span>
+</span><span class='line'><span class="nx">show</span><span class="p">();</span><span class="err">　　</span><span class="c1">//Tom</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面这个show为什么显示Tom，它的执行对象是什么？Window对象。</p>
+
+<p>Window对象是所有客户端JavaScript特性和API的主要接入点。它表示Web浏览器的一个窗口，并且可以用标示符window（小写）来引用。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">window</span>
+</span><span class='line'><span class="nx">$</span> <span class="nx">Window</span> <span class="p">{</span><span class="nx">external</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nx">chrome</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nb">document</span><span class="o">:</span> <span class="nb">document</span><span class="p">,</span> <span class="err">\</span><span class="nx">_ASYNC_START</span><span class="o">:</span> <span class="mi">1451649155228</span><span class="p">,</span> <span class="err">\</span><span class="nx">_chrome_37_fix</span><span class="o">:</span> <span class="kc">undefined</span><span class="err">…</span><span class="p">}</span>
+</span><span class='line'><span class="nx">Window</span>
+</span><span class='line'><span class="nx">$</span> <span class="kd">function</span> <span class="nx">Window</span><span class="p">()</span> <span class="p">{</span> <span class="p">[</span><span class="kr">native</span> <span class="nx">code</span><span class="p">]</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Window对象定义了一些属性，比如，指代Location对象(location)的location属性。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">location</span> <span class="o">===</span> <span class="nx">location</span>
+</span><span class='line'><span class="nx">$</span> <span class="kc">true</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Window对象还定义了一些方法，比如alert()和setTimeout()，使用时，我们都没有显示的使用window属性。Window对象是全局对象，处于作用域链的顶部，它的属性和方法实际上全是全局变量和全局函数。
+通过window变量可以引用到Window对象本身，但是如果要使用全局窗口对象的属性，并不需要使用window。</p>
+
+<p>我们常说，JavaScript很容易就创建一个全局变量或者全局函数。比如，直接var a_global_variable = &lsquo;a global variable&#8217;。它不仅使全局变量，它还是window的一个属性。如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">a_global_variable</span> <span class="o">=</span> <span class="s1">&#39;a global variable&#39;</span>
+</span><span class='line'><span class="nx">a_global_variable</span>
+</span><span class='line'><span class="nx">$</span> <span class="s2">&quot;a global variable&quot;</span>
+</span><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">goodtest</span>
+</span><span class='line'><span class="nx">$</span> <span class="s2">&quot;a global variable&quot;</span>
+</span><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">a_global_variable</span> <span class="o">===</span> <span class="nx">a_global_variable</span>
+</span><span class='line'><span class="nx">$</span> <span class="kc">true</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>理解了setTimeout是Window的属性之后，理解下面这段代码应该比较容易了：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;Bob&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">nameObj</span> <span class="o">=</span><span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span> <span class="o">:</span> <span class="s2">&quot;Tom&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">showName</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span><span class="c1">//此时this指向的是window  </span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">waitShowName</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">setTimeout</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">showName</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span><span class="c1">//这里的this指向的是nameObj.showName</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="nx">nameObj</span><span class="p">.</span><span class="nx">waitShowName</span><span class="p">();</span><span class="c1">// Bob</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>和下面这段代码相似</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;Bob&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>    <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'><span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>new关键字</h2>
+
+<p>new关键字指向创建的对象，在上一篇文章中已经介绍的很清楚了。 <a href="http://benweizhu.github.io/blog/2015/12/31/javascript-contructor-new-prototype/">http://benweizhu.github.io/blog/2015/12/31/javascript-contructor-new-prototype/</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Person</span><span class="p">(</span><span class="nx">name</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span> <span class="c1">//这个this指向用该构造函数构造的新对象，这个例子是Bob对象</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">show</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>    <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Bob</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">Bob</span><span class="p">.</span><span class="nx">show</span><span class="p">();</span>        <span class="c1">//Bob</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>apply和call改变this指向的对象</h2>
+
+<p>apply和call能够强制改变函数执行时的当前对象，让this指向其他对象。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;window&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">someone</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">showName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">other</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Tom&quot;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">someone</span><span class="p">.</span><span class="nx">showName</span><span class="p">();</span>   <span class="c1">//Bob</span>
+</span><span class='line'><span class="nx">someone</span><span class="p">.</span><span class="nx">showName</span><span class="p">.</span><span class="nx">apply</span><span class="p">();</span>    <span class="c1">//window</span>
+</span><span class='line'><span class="nx">someone</span><span class="p">.</span><span class="nx">showName</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">other</span><span class="p">);</span>    <span class="c1">//Tom</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料：  <br/>
+1.<a href="http://www.cnblogs.com/justany/archive/2012/11/01/the_keyword_this_in_javascript.html">http://www.cnblogs.com/justany/archive/2012/11/01/the_keyword_this_in_javascript.html</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[JavaScript的构造函数、new、原型]]></title>
@@ -3645,50 +3884,6 @@ NaN <br/>
 </pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">rails</span> <span class="n">server</span> <span class="o">-</span><span class="n">e</span> <span class="n">production</span> <span class="o">-</span><span class="n">p</span> <span class="mi">4000</span>
 </span></code></pre></td></tr></table></div></figure>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[《实战Gradle》译者序]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/09/19/gradle-in-action-chinese-version/"/>
-    <updated>2015-09-19T10:02:36+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/09/19/gradle-in-action-chinese-version</id>
-    <content type="html"><![CDATA[<p><img src="http://benweizhu.github.io/images/gradle_in_action_preview.jpg" width="500" title="《实战Gradle》" alt="Alt text" /></p>
-
-<p><a href="http://search.jd.com/Search?keyword=%E5%AE%9E%E6%88%98gradle&enc=utf-8&wq=%E5%AE%9E%E6%88%98gradle&pvid=31qzkqei.dn8ieh" target="_blank">在京东搜索《实战Gradle》</a></p>
-
-<p><a href="https://s.taobao.com/search?initiative_id=tbindexz_20150919&spm=a21bo.7724922.8452-taobao-item.2&sourceId=tb.index&search_type=item&ssid=s5-e&commend=all&imgfile=&q=%E5%AE%9E%E6%88%98gradle&suggest=0_1&_input_charset=utf-8&wq=gradle&suggest_query=gradle&source=suggest" target="_blank">在淘宝搜索《实战Gradle》</a></p>
-
-<p><a href="http://www.amazon.cn/s/ref=nb_sb_noss?__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&url=search-alias%3Daps&field-keywords=%E5%AE%9E%E6%88%98+gradle " target="_blank">在亚马逊搜索《实战Gradle》</a></p>
-
-<p><a href="http://www.amazon.cn/s/ref=nb_sb_noss?__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&url=search-alias%3Daps&field-keywords=%E5%AE%9E%E6%88%98+gradle" target="_blank">在当当网搜索《实战Gradle》</a></p>
-
-<h1>内容简介</h1>
-
-<p>Gradle是Java软件开发中的自动化构建工具，类似的传统工具如Ant和Maven。Gradle吸收或沿用了Maven中比较成功的一些实践，但相对于Maven或Ant又有极强的扩展。</p>
-
-<p>《Gradle in Action》一书全方位的讲解了Gradle这一工具相关的知识，包括Gradle的基本知识，自动化构建的基本概念和最佳实践，以实际案例的方式解释如何使用Gradle进行软件项目构建。</p>
-
-<p>除了基础知识外，由于软件开发绝对不仅仅是实现业务逻辑代码，书中还介绍了一些解决软件开发中常见问题的实践，如多语言，多项目构建，Gradle在持续集成和持续交付中的应用，Gradle构建JVM其他语言，以及Gradle集成Javascript构建等。
-云计算和DevOps的兴起，给软件行业带来了翻天覆地的变化，书中对于云计算平台，开源社区中的一些工具与Gradle的结合使用也做了相关的介绍。</p>
-
-<p>因为Groovy用于编写Gradle构建配置的DSL，所以为了帮助读者更好的理解Gradle，本书还讲解了Groovy的基本知识，虽然不足以全方位的讲解Groovy，但是理解Gradle足矣。</p>
-
-<h1>译者序</h1>
-
-<p>提到自动化构建，你能想到的是什么？是经典的make脚本语言？是曾经统治了Java构建世界的Ant?或者是颠覆了Ant统治地位的Maven? 抑或是即将也正在颠覆Maven的Gradle?不管你想到的哪一个，如果你还在使用Java语言开发软件，那Gradle将是你工具箱中必不可少的一样利器。而《Gradle in Action》将可能是你不可或缺的教材，或者参考书。</p>
-
-<p>第一次接触到Gradle是加入ThoughtWorks的第一个项目，从此以后，我几乎认为Gradle应该是一个Java软件项目的标配，是每一个Java程序员都应该了如指掌的东西。本书结合简单实用的案例，由浅入深地讲解Gradle，正是我在学习Gradle时所希望拥有的一本教材，所以我便欣然接受并参与此书的翻译工作。希望本书能帮助所有将软件质量和开发效率视为软件项目中不可或缺的一环的程序员，把软件开发带到另一个高度。</p>
-
-<p>虽然本书是Gradle的一本实用指南，但本书不仅仅局限于此。软件构建在现代软件开发过程中并不是独立工作的，开发人员通常面临的问题还包括持续集成，持续交付，以及云平台下的基础设施搭建，多语言项目构建等。本书还对如何结合Gradle解决此类问题以及一些常用的工具有一定的说明，如用于持续集成和交付的Jenkins，虚拟化技术工具vagrant等。Groovy语言用于实现Gradle DSL，因此理解基础的Groovy语言对理解Gradle也有极大的帮助，因此本书对Gradle语言的基本功能也做了讲解。</p>
-
-<p>与另外两位同事合作翻译此书的过程，并非一帆风顺，由于物理位置的不同，使得沟通变得困难，我们不得不采用通读对方译文的形式使各自的行文风格尽量保持一致。但这同时也是一个充实有趣的过程，想要把一个单词或一句话翻译的精准到位从而反复推敲，有些技术语言如果直译又会生硬难懂，我们得寻求适合中文的准确表达方式。这些过程无疑是翻译中最大的趣味所在。在这里我想感谢朱本威和杨柳的智慧结晶，感谢出版社同事的辛勤劳作，感谢滕云的严格审校，更感谢Benjamin为Gradle社区带来如此优秀的读物。</p>
-
-<p>博主评论：</p>
-
-<p>朱本威，Java/Ruby软件开发工程师，Gradle系列博客<a href="http://benweizhu.github.io/blog/categories/gradleshen-ru-yu-shi-zhan/" target="_blank">Gradle深入与实战</a>，《实战Gradle》译者之一</p>
-
-<blockquote><p>《实战Gradle》是一本既适合初学者，也适合有经验人员的经典参考书。它以故事的方式，简单而生动的解释了软件开发对构建的刚需，对比了Gradle的前辈Ant、Maven的优缺点，详细的介绍了Gradle优秀的特性集，并通过范例的方式生动的介绍了如何使用Gradle，是一本不可多得的优秀的Gradle书籍。 - 朱本威</p></blockquote>
 ]]></content>
   </entry>
   

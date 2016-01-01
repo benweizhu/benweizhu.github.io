@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="IoC容器和Dependency Injection模式(作者：Martin Fowler) 原文链接：http://martinfowler.com/articles/injection.html 翻译：透明（熊节） 摘要：Java社群近来掀起了一阵轻量级容器的热潮， &hellip;">
+  <meta name="description" content="写这一篇关于Jasmine文章，是因为在正式加入ThoughtWorks之前，做过的一个偏前端的web项目。 项目的内容是对用户提供的数据进行计算，并得到一个报表，提供打印。 当时希望能够用github page作为空间，但我们都知道，github page是只支持前端， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,165 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/10/14/using-jasmine-to-write-test-for-javascript/">使用jasmine为javascript写单元测试</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-10-14T14:38:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>2:38 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>写这一篇关于Jasmine文章，是因为在正式加入ThoughtWorks之前，做过的一个偏前端的web项目。</p>
+
+<p>项目的内容是对用户提供的数据进行计算，并得到一个报表，提供打印。</p>
+
+<p>当时希望能够用github page作为空间，但我们都知道，github page是只支持前端，即页面和javascript。</p>
+
+<p>所以在项目中，我使用js进行计算，使用xml作为数据库，使用cookie来确保用户意外退出浏览器时，不会丢失尚未完成计算的输入数据。</p>
+
+<p>项目中最难的部分是对计算公式的选择，需要根据计算参数的不同条件选择出不同的计算公式。这里我给出一部分较为简单的公式选择逻辑作为说明。C和AF是条件也就是参数，PI是对应的选择公式。</p>
+
+<pre><code>#   C       AF      PI
+1.  q       q       1/q
+2.  pq      q       1/2q
+3.  q       qr      1/2q
+4.  pq      pq      (p+q)/4pq
+5.  pq      qr      1/4q
+</code></pre>
+
+<p>如果这个是一个Java或者C的项目，Ok，即使没有测试，我们也可以非常方便的通过控制台查看计算结果（如果内容多了，还是要写测试，因为要重构）。</p>
+
+<p>但对于是js项目，如果没有测试帮助判断逻辑的正确性，将是非常痛苦的事情。</p>
+
+<p><img src="http://pivotal.github.io/jasmine/images/jasmine_logo.png" alt="Jasmine" /></p>
+
+<p>Jasmine是一种基于行为驱动的Javascript测试框架。它不依赖于其他的Javascript框架。</p>
+
+<p>下面是一个简单的且常用的单元测试模式。</p>
+
+<figure class='code'><figcaption><span>a junit test for js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s2">&quot;Test method&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">it</span><span class="p">(</span><span class="s2">&quot;should return true when condition is pp qq&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">expect</span><span class="p">(</span><span class="nx">someMethod</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;q&#39;</span><span class="p">,</span><span class="s1">&#39;q&#39;</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>describe是对一系列单元测试的大描述。</p>
+
+<p>it中的描述是这一个单元测试的描述。例如，我们可以在describe中写多个单元测试，例如：</p>
+
+<figure class='code'><figcaption><span>a junit test for js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s2">&quot;Test method&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">it</span><span class="p">(</span><span class="s2">&quot;should return true when condition is pp qq&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">expect</span><span class="p">(</span><span class="nx">someMethod</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;q&#39;</span><span class="p">,</span><span class="s1">&#39;q&#39;</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>  <span class="nx">it</span><span class="p">(</span><span class="s2">&quot;should return false when condition is pp pp&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">expect</span><span class="p">(</span><span class="nx">someMethod</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<blockquote><p>下面进入正题，如何在项目中引入Jasmine。
+jasmine库中一共包含4个重要文件。</p></blockquote>
+
+<p>jasmine.css   jasmine.js   jasmine-html.js   SpecRunner.html</p>
+
+<p>剩下的是你自己的Javascript文件和测试文件。例如，假设js文件是</p>
+
+<figure class='code'><figcaption><span>justdoit.js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么你对应的测试文件是</p>
+
+<figure class='code'><figcaption><span>justdoitSpec.js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s2">&quot;just do it&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s2">&quot;should return 10 when 5 plus 5&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">expect</span><span class="p">(</span><span class="nx">add</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在写完测试代码之后，需要将对应的js文件引入在SpecRunner.html文件中。</p>
+
+<figure class='code'><figcaption><span>justdoitSpec.js </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c">&lt;!--</span> <span class="nx">include</span> <span class="nx">source</span> <span class="nx">files</span> <span class="nx">here</span><span class="p">...</span> <span class="o">--&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text/javascript&quot;</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;src/justdoit.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">&lt;!--</span> <span class="nx">include</span> <span class="nx">spec</span> <span class="nx">files</span> <span class="nx">here</span><span class="p">...</span> <span class="o">--&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text/javascript&quot;</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;spec/whatervername.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>运行测试的方式是在浏览器中打开这个SpecRunner.html页面。</p>
+
+<p>大致给出的内容就是：</p>
+
+<pre><code>Passing 1 spec
+
+just do it
+
+    should return 10 when 5 plus 5
+</code></pre>
+
+<p>在我的这个项目中，起初没有使用jasmine，由于逻辑复杂，手动在页面测试非常麻烦，且不易于代码重构。</p>
+
+<p>后期引入jasmine之后，覆盖了所有的测试情况，这样可以在重构代码时，能够非常迅速的知道重构代码是否正确。</p>
+
+<p>Jasmine还有很多更高级的用法，就目前项目中暂时还没有用到，如果用到，在以后的时间继续更新。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -537,472 +696,6 @@ File /Users/bwzhu/Documents/benweizhu.github.io/source/downloads/code/IfaceTeste
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/09/22/what-is-spring-ioc/">什么是Spring IoC？</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-09-22T15:33:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2013</span></span> <span class='time'>3:33 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在直接进入主题之前，先引入一些基本概念。</p>
-
-<blockquote><p>概念1：什么是容器？</p></blockquote>
-
-<p>日常生活领域内的容器，用来包装或装载物品的贮存器(如箱、罐、罈)或者成形或柔软不成形的包覆材料。&ndash;维基百科。<br/>
-简而言之，容器是存放东西的东西。</p>
-
-<p>Java中，Java的类库有一系列的基本类来保存对象（正确的说是保存对象的引用），包括List，Set，Queue和Map，它们被称作集合类。<br/>
-Bruce Eckel（《Thinking in Java》的作者）使用了一个范围更广的术语来称呼它们：“容器”，容器提供了完善的方法来保存和管理对象。</p>
-
-<p>当然，这里只是为了简单介绍“容器”这个宽泛术语本身的含义。我们常说的容器并不是指Java的内部容器类。</p>
-
-<p>那么我们常说的容器是指的什么呢？举个例子，<em>Servlet容器</em>。<br/>
-什么是Servlet？这里又扯远了，引用孙鑫老师的说法（《Servlet/JSP深入详解：基于Tomcat的Web开发》的作者），Java Servlet（Java服务器小程序）是一个基于Java技术的Web组件，运行在服务器端。Servlet是平台独立的Java类，编写一个Servlet，实际上就是按照Servlet规范编写一个Java类。</p>
-
-<p>Servlet容器又称为Servlet引擎，它是Java Web服务器（例如：Apache Tomcat）的一部分，用来提供动态网页的服务。<br/>
-我们知道，Servlet没有main方法，它是不能独立运行的。它必须被部署到Servlet容器中，由容器来实例化和调用Servlet中的方法。因此，Servlet容器的作用是在Servlet的生命周期内包容和管理Servlet。</p>
-
-<p>用户通过单击某个链接或者直接在浏览器的地址栏中输入URL来访问Servlet，Java Web服务器接收到该请求后，并不是将请求直接交给Servlet，而是交给Servlet容器。Servlet容器实例化Servlet，调用Servlet的一个特定方法对请求进行处理，并产生一个响应。这个响应由Servlet容器返回给Web服务器，Web服务器包装这个响应，以HTTP响应的形式发送给Web浏览器。</p>
-
-<p>Ok，容器的概念就讲到这里，下一个依赖注入。</p>
-
-<blockquote><p>概念2：依赖注入</p></blockquote>
-
-<p>谈到依赖注入，必须提Martin Fowler的经典文章<a href="http://martinfowler.com/articles/injection.html">IoC容器和Dependency Injection模式</a>。这篇文章有对应的中文版翻译（<a href="http://gigix.thoughtworkers.org/">熊节</a>译），原文上有链接，但是由于时间太久了，链接已经不可用了。我把它转载到我的博客上做了记录，可以在这里访问。我相信如果有看完这篇文章的，应该不用听我在这里啰嗦了。
-依赖注入的直接好处就是解耦，消除组件之间的直接依赖。这种优势能够非常好的体现在对组件的测试。</p>
-
-<blockquote><p>进入正题</p></blockquote>
-
-<p>在Martin的那篇文章中已经提到，依赖注入有三种方式，分别是接口注入，构造器注入和设值注入。其中比较常用的是构造器注入和设值方法注入。在Spring中，配置依赖的方式有两种，一种是比较常用的xml方式配置，另一种是通过注解的方式配置（Spring2.5之后）。</p>
-
-<blockquote><p>首先介绍基于xml的配置方式：</p></blockquote>
-
-<p>现在来看一下，如何通过xml来配置一个bean</p>
-
-<figure class='code'><figcaption><span>bean-config.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;context:annotation-config/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;foo.bar&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;beans&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;dataBaseService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.DatabaseService&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;0&quot;</span> <span class="na">value=</span><span class="s">&quot;username&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;1&quot;</span> <span class="na">value=</span><span class="s">&quot;password&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;2&quot;</span> <span class="na">value=</span><span class="s">&quot;database_url&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;justService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.JustService&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;constructor-arg</span> <span class="na">value=</span><span class="s">&quot;word&quot;</span> <span class="na">type=</span><span class="s">&quot;java.lang.String&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;constructor-arg</span> <span class="na">value=</span><span class="s">&quot;10&quot;</span> <span class="na">type=</span><span class="s">&quot;int&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;justReferenceService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.JustReferenceService&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;justService&quot;</span> <span class="na">ref=</span><span class="s">&quot;justService&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;calculatorService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.CalculatorService&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;a&quot;</span> <span class="na">value=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;b&quot;</span> <span class="na">value=</span><span class="s">&quot;1&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;useCalculatorService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.UseCalculatorService&quot;</span> <span class="na">autowire=</span><span class="s">&quot;byName&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/beans&gt;</span>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>每一个Bean都有对应的id用来唯一表示它，可以理解为Spring容器中，该Bean的名字。</p>
-
-<p>在这个Bean的配置文件中，介绍了几种配置Bean的方法。</p>
-
-<p>dataBaseService采用构造器方式注入，由于构造器参数都是String类型，所以这里采用index来指定对应的参数。<br/>
-justService同样采用构造器方式注入，但构造器参数类型不同，所以这里可以根据类型指定参数。<br/>
-justReferenceService采用的是设值方式注入，并且注入的参数为一个引用类型，name为类中对应的变量名，ref是xml中的某一个Bean。<br/>
-calculatorService同样采用设值方式注入。<br/>
-useCalculatorService同样采用设值方法注入，并声明autowire自动装配是byName，它会根据类中成员变量的名字，在这些Bean中找到对应id等于成员变量名字的Bean。</p>
-
-<p>在xml中配置好这些Bean之后，就可以通过ApplicationContext去得到这些Bean。</p>
-
-<figure class='code'><figcaption><span>helloworld.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">foo</span><span class="o">.</span><span class="na">bar</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.ApplicationContext</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.support.ClassPathXmlApplicationContext</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">ApplicationContext</span> <span class="n">context</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ClassPathXmlApplicationContext</span><span class="o">(</span><span class="s">&quot;spring-config.xml&quot;</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">DatabaseService</span> <span class="n">databaseService</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">DatabaseService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">databaseService</span><span class="o">.</span><span class="na">connect</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">JustService</span> <span class="n">justService</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">JustService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">justService</span><span class="o">.</span><span class="na">justPrint</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">JustReferenceService</span> <span class="n">justReferenceService</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">JustReferenceService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">justReferenceService</span><span class="o">.</span><span class="na">justPrint</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">UseCalculatorService</span> <span class="n">useCalculatorService</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">UseCalculatorService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">useCalculatorService</span><span class="o">.</span><span class="na">calculate</span><span class="o">());</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<blockquote><p>另一种配置Bean的方式是直接在类文件中加入注解</p></blockquote>
-
-<figure class='code'><figcaption><span>bean-config.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;context:annotation-config</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;foo.bar&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面是一个没有任何Bean的xml配置文件，里面有两个标签，分别是&lt;context:annotation-config />和&lt;context:component-scan />。现在来解释一下这两个标签的作用：</p>
-
-<p>&lt;context:annotation-config />:隐式地向Spring容器注册
-AutowiredAnnotationBeanPostProcessor、CommonAnnotationBeanPostProcessor、
-PersistenceAnnotationBeanPostProcessor 以及 RequiredAnnotationBeanPostProcessor 这 4 个BeanPostProcessor。这样我们就可以使用@Required、@Autowired以及JSR 250的@PostConstruct、@PreDestroy和@Resource (if available）等等这些注解。如果不使用这个标签，那么如果要使用这些注解，就必须在xml文件中配置这些processor的Bean。</p>
-
-<p>&lt;context:component-scan base-package=&ldquo;foo.bar&rdquo;/>:它会扫描classpath下被注解过的类，并注册为Spring容器中的bean。Spring默认提供的注解有@Component、@Repository、@Service和@Controller。</p>
-
-<p>有了这两个标签，我们就可以简单的在类中添加注解实现Bean向Spring容器的注册，如下，是对JustReferenceService的配置：</p>
-
-<figure class='code'><figcaption><span>JustReferenceService.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">foo</span><span class="o">.</span><span class="na">bar</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Component</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">JustReferenceService</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Autowired</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">JustService</span> <span class="n">justService</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">JustService</span> <span class="nf">getJustService</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">justService</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setJustService</span><span class="o">(</span><span class="n">JustService</span> <span class="n">justService</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">justService</span> <span class="o">=</span> <span class="n">justService</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">justPrint</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">justService</span><span class="o">.</span><span class="na">justPrint</span><span class="o">();</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>使用@Autowired注解进行装配，只能是根据类型进行匹配。@Autowired注解可以用于Setter方法、构造函数、字段，甚至普通方法，前提是方法必须有至少一个参数。</p>
-
-<p>当容器中存在多个Bean的类型与需要注入的相同时，注入将不能执行，我们可以给@Autowired增加一个候选值，做法是在@Autowired后面增加一个@Qualifier标注，提供一个String类型的值作为候选的Bean的名字，见下例。</p>
-
-<p>在xml配置中，有两个同类型的Bean，它们拥有不同的id，因此，需要在类中添加注解告诉它需要装配哪一个。</p>
-
-<figure class='code'><figcaption><span>UseCalculatorService.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">foo</span><span class="o">.</span><span class="na">bar</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Qualifier</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Component</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UseCalculatorService</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Autowired</span>
-</span><span class='line'>  <span class="nd">@Qualifier</span><span class="o">(</span><span class="s">&quot;anotherCalculatorService&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">CalculatorService</span> <span class="n">calculatorService</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">CalculatorService</span> <span class="nf">getCalculatorService</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">calculatorService</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setCalculatorService</span><span class="o">(</span><span class="n">CalculatorService</span> <span class="n">calculatorService</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">calculatorService</span> <span class="o">=</span> <span class="n">calculatorService</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">calculate</span><span class="o">(){</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">calculatorService</span><span class="o">.</span><span class="na">calculate</span><span class="o">();</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><em>如果希望根据name执行自动装配</em></p>
-
-<p>那么应该使用JSR-250提供的@Resource注解，而不应该使用@Autowired与@Qualifier 的组合。@Resource使用byName的方式执行自动封装。@Resource标注可以作用于带一个参数的Setter方法、字段，以及带一个参数的普通方法上。@Resource注解有一个name属性，用于指定Bean在配置文件中对应的名字。如果没有指定name属性，那么默认值就是字段或者属性的名字。@Resource和@Qualifier的配合虽然仍然成立，但是@Qualifier对于@Resource而言，几乎与name属性等效。如果@Resource没有指定name属性，那么使用byName匹配失败后，会退而使用byType继续匹配，如果再失败，则抛出异常。</p>
-
-<figure class='code'><figcaption><span>UseCalculatorService.java 使用@Resource </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">foo</span><span class="o">.</span><span class="na">bar</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.annotation.Resource</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Component</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UseCalculatorService</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Resource</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;anotherCalculatorService&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">CalculatorService</span> <span class="n">calculatorService</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">CalculatorService</span> <span class="nf">getCalculatorService</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">calculatorService</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setCalculatorService</span><span class="o">(</span><span class="n">CalculatorService</span> <span class="n">calculatorService</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">calculatorService</span> <span class="o">=</span> <span class="n">calculatorService</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">calculate</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">calculatorService</span><span class="o">.</span><span class="na">calculate</span><span class="o">();</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><em>使用 @Required 进行 Bean 的依赖检查</em></p>
-
-<p>依赖检查的作用是，判断给定Bean的相应Setter方法是否都在Bean被实例化的时候被调用了，而不是判断字段是否已经存在值了。Spring进行依赖检查时，只会判断属性是否使用了Setter注入。如果某个属性没有使用Setter注入，即使是通过构造函数已经为该属性注入了值，Spring仍然认为它没有执行注入，从而抛出异常。另外，Spring只管是否通过Setter执行了注入，而对注入的值却没有任何要求，即使注入的null，Spring也认为是执行了依赖注入。</p>
-
-<p>@Required 注解只能标注在Setter方法之上。因为依赖注入的本质是检查Setter方法是否被调用了，而不是真的去检查属性是否赋值了以及赋了什么样的值。如果将该注解标注在非setXxxx()类型的方法则被忽略。</p>
-
-<p><em>使用 @Configuration 和 @Bean 进行 Bean 的声明</em></p>
-
-<p>Spring3.0新增了另外两个实现类：AnnotationConfigApplicationContext和AnnotationConfigWebApplicationContext，它们是为注解而生，直接依赖于注解，作为容器配置信息来源的IoC容器初始化类。AnnotationConfigApplicationContext搭配上@Configuration和@Bean注解，自此，XML配置方式不再是 Spring IoC容器的唯一配置方式。Spring对标注Configuration的类有如下要求：</p>
-
-<p>(1)配置类不能是 final 的；(2)配置类不能是本地化的，亦即不能将配置类定义在其他类的方法内部；(3)配置类必须有一个无参构造函数。</p>
-
-<figure class='code'><figcaption><span>BeanConfiguration.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">foo</span><span class="o">.</span><span class="na">bar</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Bean</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Configuration</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Configuration</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BeanConfiguration</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Bean</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">DatabaseService</span> <span class="nf">dataBaseService</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="k">new</span> <span class="nf">DatabaseService</span><span class="o">(</span><span class="s">&quot;username&quot;</span><span class="o">,</span> <span class="s">&quot;password&quot;</span><span class="o">,</span> <span class="s">&quot;database_url&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Bean</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">JustService</span> <span class="nf">justService</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="k">new</span> <span class="nf">JustService</span><span class="o">(</span><span class="s">&quot;justService&quot;</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面这种配置bean的方式与下面的xml配置方式一样。</p>
-
-<figure class='code'><figcaption><span>spring-config.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;dataBaseService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.DatabaseService&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;0&quot;</span> <span class="na">value=</span><span class="s">&quot;username&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;1&quot;</span> <span class="na">value=</span><span class="s">&quot;password&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;constructor-arg</span> <span class="na">index=</span><span class="s">&quot;2&quot;</span> <span class="na">value=</span><span class="s">&quot;database_url&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'><span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;justService&quot;</span> <span class="na">class=</span><span class="s">&quot;foo.bar.JustService&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;constructor-arg</span> <span class="na">value=</span><span class="s">&quot;word&quot;</span> <span class="na">type=</span><span class="s">&quot;java.lang.String&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;constructor-arg</span> <span class="na">value=</span><span class="s">&quot;10&quot;</span> <span class="na">type=</span><span class="s">&quot;int&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/bean&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Spring IoC是将Bean的管理交给Spring容器，开发人员只需要配置，当要使用时，告诉Spring，让它注入给你。这样，在写程序时，可以大大降低耦合。</p>
-
-<p>参考资料：</p>
-
-<p><a href="http://www.ibm.com/developerworks/cn/opensource/os-cn-spring-iocannt/">http://www.ibm.com/developerworks/cn/opensource/os-cn-spring-iocannt/</a></p>
-
-<p><a href="http://www.springbyexample.org">http://www.springbyexample.org</a></p>
-
-<p>孙鑫《Servlet/JSP深入详解：基于Tomcat的Web开发》</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/42">&larr; Older</a>
@@ -1029,6 +722,10 @@ PersistenceAnnotationBeanPostProcessor 以及 RequiredAnnotationBeanPostProcesso
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/01/01/javascript-this/">JavaScript This指针</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/12/31/javascript-contructor-new-prototype/">JavaScript的构造函数、new、原型</a>
       </li>
     
@@ -1042,10 +739,6 @@ PersistenceAnnotationBeanPostProcessor 以及 RequiredAnnotationBeanPostProcesso
     
       <li class="post">
         <a href="/blog/2015/11/22/ok-react-1/">继续前行！React（一）- 用JavaScript构建Web UI</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/11/17/merging-vs-rebasing-translation/">译 Merging vs Rebasing（未完成）</a>
       </li>
     
   </ul>
