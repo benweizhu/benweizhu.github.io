@@ -281,7 +281,7 @@
 
 <p>当我看到上面的回答时，加上我对prototype英文含义的理解，我会认为每个对象都有一个prototype. 但当我写({}).prototype的时候，或者&#8221;&ldquo;.prototype，我却得到了undefined，是不是疯了？</p>
 
-<p>忘记你所理解的关于prototype属性的理解（它其实只是Function对象的一个属性） - 这个名字很可能是迷惑的根源。</p>
+<p>忘记你所理解的关于prototype属性的理解（它其实只是函数对象的一个属性，比如Object.prototype，Function.prototype，Array.prototype，在浏览器控制台查看这些值，它们都是函数） - 这个名字很可能是迷惑的根源。</p>
 
 <p>一个对象真正的prototype是内部[[Prototype]]属性. ECMA5介绍了标准的访问方法，Object.getPrototypeOf(object)。这个最新的实现已被Firefox, Safari, Chrome and IE9所支持。另外，除了IE，所有的浏览器都支持非标准的访问方法__proto__。</p>
 
