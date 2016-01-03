@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-01-01T20:59:53+08:00</updated>
+  <updated>2016-01-03T13:57:58+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -644,6 +644,8 @@
 </span><span class='line'><span class="nx">a</span> <span class="k">instanceof</span> <span class="nx">A</span><span class="p">;</span> <span class="c1">//false</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+<p>使用instanceof操作符需要注意的一件事情是，任何时间判断对象是否是Object的实例，它都会返回true，因为所有对象都继承自Object.prototype。</p>
 
 <h2>总结</h2>
 
