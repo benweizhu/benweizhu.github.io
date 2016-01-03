@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-01-03T16:05:39+08:00</updated>
+  <updated>2016-01-03T16:06:34+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[JavaScript This指针]]></title>
+    <title type="html"><![CDATA[JavaScript渐入佳境 - This指针]]></title>
     <link href="http://benweizhu.github.io/blog/2016/01/01/javascript-this/"/>
     <updated>2016-01-01T19:04:16+08:00</updated>
     <id>http://benweizhu.github.io/blog/2016/01/01/javascript-this</id>
@@ -267,7 +267,7 @@
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[JavaScript的构造函数、new、原型]]></title>
+    <title type="html"><![CDATA[JavaScript渐入佳境 - 构造函数、new、原型]]></title>
     <link href="http://benweizhu.github.io/blog/2015/12/31/javascript-contructor-new-prototype/"/>
     <updated>2015-12-31T21:38:21+08:00</updated>
     <id>http://benweizhu.github.io/blog/2015/12/31/javascript-contructor-new-prototype</id>
