@@ -256,6 +256,10 @@ a.__proto__ = Function.prototype;
 a instanceof A; //false
 {% endcodeblock %}
 
+使用instanceof操作符需要注意的一件事情是，任何时间判断对象是否是Object的实例，它都会返回true，因为所有对象都继承自Object.prototype。
+
+原始值使用对象包装器判断实例时，比如 'foo' instanceof String返回false。如果使用new操作符创建的字符串，instanceof返回true。所以，请记住instanceof只适用于构造函数创建返回的复杂对象和实例。
+
 ##总结
 
 看完这篇文章，你需要记住一下几点：
@@ -265,4 +269,5 @@ a instanceof A; //false
 参考文献：     
 1.http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html    
 2.http://www.oschina.net/translate/understanding-javascript-prototypes    
-3.http://yehudakatz.com/2011/08/12/understanding-prototypes-in-javascript/   
+3.http://yehudakatz.com/2011/08/12/understanding-prototypes-in-javascript/    
+4.JavaScript启示录
