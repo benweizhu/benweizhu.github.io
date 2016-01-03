@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "JavaScript this指针"
+title: "JavaScript渐入佳境 - this指针"
 date: 2016-01-01 19:04:16 +0800
 comments: true
 categories:
@@ -81,6 +81,17 @@ window.a_global_variable === a_global_variable
 $ true
 {% endcodeblock %}
 
+###为什么在Window下？head/全局对象/顶层对象
+JavaScript代码本身必须包含在对象内部。在Web浏览器环境中编写JavaScript代码时，JavaScript被包含在Window对象内，并在其内部执行。这个Window对象被认为是“head对象”。JavaScript的所有实现都需要使用一种head对象。
+
+head对象是由JavaScript在幕后创建，用于封装用户用自定义代码，并容纳JavaScript预定义的原生代码。JavaScript将用户自定义代码放入head对象中来执行。在编写JavaScript代码时，它将被编写在head对象的上下文中。
+
+换一种解释：
+
+JavaScript的所有对象都存在于一个运行环境之中，这个运行环境本身也是对象，称为“顶层对象”。这就是说，JavaScript的所有对象，都是“顶层对象”的下属。不同的运行环境有不同的“顶层对象”，在浏览器环境中，这个顶层对象就是Window对象。
+
+所有浏览器环境的全局变量，都是Window对象的属性。可以把Window理解成JavaScript Context 上下文环境。
+
 理解了setTimeout是Window的属性之后，理解下面这段代码应该比较容易了：
 {% codeblock lang:javascript %}
 var name = "Bob";  
@@ -141,4 +152,6 @@ someone.showName.apply(other);    //Tom
 {% endcodeblock %}
 
 参考资料：    
-1.http://www.cnblogs.com/justany/archive/2012/11/01/the_keyword_this_in_javascript.html
+1.http://www.cnblogs.com/justany/archive/2012/11/01/the_keyword_this_in_javascript.html    
+2.JavaScript启示录    
+3.http://blog.csdn.net/zoutongyuan/article/details/29355021

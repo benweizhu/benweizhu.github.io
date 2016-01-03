@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "JavaScript的构造函数、new、原型"
+title: "JavaScript渐入佳境 - 构造函数、new、原型"
 date: 2015-12-31 21:38:21 +0800
 comments: true
 categories:
