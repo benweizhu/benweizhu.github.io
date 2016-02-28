@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://benweizhu.github.io/blog/2016/02/28/webpack-your-bags-translation/</loc>
+    <lastmod>2016-02-28T10:40:36+08:00</lastmod>
+  </url>
+  <url>
     <loc>http://benweizhu.github.io/blog/2016/01/17/spring-cache/</loc>
     <lastmod>2016-01-17T09:26:45+08:00</lastmod>
   </url>

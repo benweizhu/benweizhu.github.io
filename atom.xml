@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-01-17T12:04:53+08:00</updated>
+  <updated>2016-02-28T16:12:22+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,401 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[用Webpack构建和打包JS基础（译）]]></title>
+    <link href="http://benweizhu.github.io/blog/2016/02/28/webpack-your-bags-translation/"/>
+    <updated>2016-02-28T10:40:36+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2016/02/28/webpack-your-bags-translation</id>
+    <content type="html"><![CDATA[<p>本文翻译自 <a href="http://blog.madewithlove.be/post/webpack-your-bags/">http://blog.madewithlove.be/post/webpack-your-bags/</a> 的部分内容</p>
+
+<p>译者：原文作者很幽默写了许多幽默的语句，但是为了节省时间，我就不翻译那些营养不多的句子，捡核心有用的内容翻译。</p>
+
+<h2>什么是webpack？</h2>
+
+<p>Webpack是构建系统还是模块bundler。Well，两者都是，但不是说它两件事情都做，而是将两件事情合并在一起，一起做。Webpack没有构建你的assets，然后在单独打包你的模块，而是把assets也当做模块。</p>
+
+<p>更准确的说，它没有构建Sass文件，优化图片，并把它们放在一边后，再打包你的模块，然后把模块放在另一边，相反，你将拥有这些：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">stylesheet</span> <span class="nx">from</span> <span class="s1">&#39;styles/my-styles.scss&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">logo</span> <span class="nx">from</span> <span class="s1">&#39;img/my-logo.svg&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">someTemplate</span> <span class="nx">from</span> <span class="s1">&#39;html/some-template.html&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">stylesheet</span><span class="p">);</span> <span class="c1">// &quot;body{font-size:12px}&quot;</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">logo</span><span class="p">);</span> <span class="c1">// &quot;data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5[...]&quot;</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">someTemplate</span><span class="p">)</span> <span class="c1">// &quot;&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>所有的你的assets都会被当做是一种模块，然后被导入，修改，操作，并最终打包到最后的bundle文件中。</p>
+
+<p>当然为了实现上面说的这些事情，需要在Webpack的配置中注册loader。Loader是一些小的插件，基本上就是说“当你遇到某种类型的文件时，做这个操作”。比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">// When you import a .ts file, parse it with Typescript</span>
+</span><span class='line'>  <span class="nx">test</span><span class="o">:</span> <span class="sr">/\.ts/</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">loader</span><span class="o">:</span> <span class="s1">&#39;typescript&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">// When you encounter images, compress them with image-webpack (wrapper around imagemin)</span>
+</span><span class='line'>  <span class="c1">// and then inline them as data64 URLs</span>
+</span><span class='line'>  <span class="nx">test</span><span class="o">:</span> <span class="sr">/\.(png|jpg|svg)/</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">loaders</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">,</span> <span class="s1">&#39;image-webpack&#39;</span><span class="p">],</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">// When you encounter SCSS files, parse them with node-sass, then pass autoprefixer on them</span>
+</span><span class='line'>  <span class="c1">// then return the results as a string of CSS</span>
+</span><span class='line'>  <span class="nx">test</span><span class="o">:</span> <span class="sr">/\.scss/</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">loaders</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;css&#39;</span><span class="p">,</span> <span class="s1">&#39;autoprefixer&#39;</span><span class="p">,</span> <span class="s1">&#39;sass&#39;</span><span class="p">],</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>最终在食物链的底层，所有的loader都会返回String。这样Webpack会把他们wrap到JavaScript模块中。比如每个Sass文件在被loader给transform之后，它可能看上去像这样：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="s1">&#39;body{font-size:12px}&#39;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>为什么要这样做？</h2>
+
+<p>一旦你知道了Webpack做了什么，第二问题一定是：这样做有什么好处？“Images and CSS? In my JS? What the hell man?”。Well，这样想：长期以来，我们都被告知要将所有的东西都集中到一起，减少我们的HTTP请求。</p>
+
+<p>这样也导致一个不好的情况，今天大部分人都讲所有的assets打包到一个app.js文件中，然后在所有的页面都加载它。这意味着对于任何一个页面在大部分时间都在加载一大堆根本不需要的assets。如果你不这样做，那么你就需要手动的在某个页面加入这些东西，这样会导致要维护一大堆依赖，哪个页面需要这些依赖?</p>
+
+<p>上面两个方法没有一个是正确的或者错误的。Webpack采取了一种折中方式（middleground） - 它不仅仅是构建系统或者打包工具，他是一个顽皮聪明的模块打包系统。一旦被合理配置，他会比你更了解你的技术栈，比你更清楚如何最优化它们。</p>
+
+<h2>简单试用</h2>
+
+<p>我们来创建一个项目，并用Webpack构建/打包它。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="err">$</span> <span class="n">npm</span> <span class="n">init</span>
+</span><span class='line'><span class="err">$</span> <span class="n">npm</span> <span class="n">install</span> <span class="n">jquery</span> <span class="o">--</span><span class="n">save</span>
+</span><span class='line'><span class="err">$</span> <span class="n">npm</span> <span class="n">install</span> <span class="n">webpack</span> <span class="o">--</span><span class="n">save</span><span class="o">-</span><span class="n">dev</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>src/index.js</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">$</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;jquery&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>创建一个webpack.config.js文件。Webpack的配置文件就是JavaScript，但是需要export这个对象。</p>
+
+<p>webpack.config.js</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">entry</span><span class="o">:</span>  <span class="s1">&#39;./src&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">path</span><span class="o">:</span>     <span class="s1">&#39;builds&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">filename</span><span class="o">:</span> <span class="s1">&#39;bundle.js&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里，entry告诉Webpack哪些文件作为应用程序的入口。它们是你的主要文件，是坐落在项目依赖的最顶部。然后，我们告诉它编译，并输出到build目录下的bundle.js中。接着，在index.html中配置引入bundle.js文件。</p>
+
+<p>index.html</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='HTML'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'><span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;h1&gt;</span>My title<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;a&gt;</span>Click me<span class="nt">&lt;/a&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;builds/bundle.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>运行webpack命令，如果一切顺利，你应该看到下面这个信息：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="err">$</span> <span class="n">webpack</span>
+</span><span class='line'><span class="n">Hash</span><span class="p">:</span> <span class="mi">65</span><span class="n">ea4aab7f0755f7fc8e</span>
+</span><span class='line'><span class="n">Version</span><span class="p">:</span> <span class="n">webpack</span> <span class="mf">1.12</span><span class="o">.</span><span class="mi">2</span>
+</span><span class='line'><span class="n">Time</span><span class="p">:</span> <span class="mi">350</span><span class="n">ms</span>
+</span><span class='line'>    <span class="n">Asset</span>    <span class="n">Size</span>  <span class="n">Chunks</span>             <span class="n">Chunk</span> <span class="n">Names</span>
+</span><span class='line'><span class="n">bundle</span><span class="o">.</span><span class="n">js</span>  <span class="mi">257</span> <span class="n">kB</span>       <span class="mi">0</span>  <span class="p">[</span><span class="n">emitted</span><span class="p">]</span>  <span class="n">main</span>
+</span><span class='line'>   <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">./</span><span class="n">src</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">js</span> <span class="mi">53</span> <span class="nb">bytes</span> <span class="p">{</span><span class="mi">0</span><span class="p">}</span> <span class="p">[</span><span class="n">built</span><span class="p">]</span>
+</span><span class='line'>    <span class="o">+</span> <span class="mi">1</span> <span class="n">hidden</span> <span class="n">modules</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里你看到Webpack告诉你在bundle.js文件中包含入口文件(index.js)，已经一个隐藏的模块，jQuery。默认情况下，Webpack会隐藏不属于你的模块。如果你想显示它们，使用&ndash;display-modules标识符。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="err">$</span> <span class="n">webpack</span> <span class="o">--</span><span class="n">display</span><span class="o">-</span><span class="n">modules</span>
+</span><span class='line'><span class="n">bundle</span><span class="o">.</span><span class="n">js</span>  <span class="mi">257</span> <span class="n">kB</span>       <span class="mi">0</span>  <span class="p">[</span><span class="n">emitted</span><span class="p">]</span>  <span class="n">main</span>
+</span><span class='line'>   <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">./</span><span class="n">src</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">js</span> <span class="mi">53</span> <span class="nb">bytes</span> <span class="p">{</span><span class="mi">0</span><span class="p">}</span> <span class="p">[</span><span class="n">built</span><span class="p">]</span>
+</span><span class='line'>   <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">./~/</span><span class="n">jquery</span><span class="o">/</span><span class="n">dist</span><span class="o">/</span><span class="n">jquery</span><span class="o">.</span><span class="n">js</span> <span class="mi">248</span> <span class="n">kB</span> <span class="p">{</span><span class="mi">0</span><span class="p">}</span> <span class="p">[</span><span class="n">built</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>你也可以运行webpack &ndash;watch，他会自动watch你的文件，并在有需要时重新编译。</p>
+
+<h2>配置你的第一个loader</h2>
+
+<p>还记得我们谈到过Webpack可以导入css和html等所有的东西？怎么做到的呢？Well，如果你和最近几年Web Component的步调一致(Angular 2, Vue, React, Polymer, X-Tag, etc.)。也许你已经听说过这个idea，与相互链接庞大的UI不同，Web Component是一系列可维护和自包含的，小的，可重用的UI片段（piece）。为了让组件可以真正的自包含，需要将所有它所需要的东西都打包进去。想象一个按钮组件：有一些HTML代码，需要一些JS代码来让组件可以交互，也许还需要一个样式。如果这些东西只有在需要的时候才被加载，就更好了。</p>
+
+<p>让我们来写一个Button。首先，我假设大部分人现在都更习惯与用ES2015语法，我们来添加第一个loader：Babel。在Webpack中添加添加一个loader，你需要做两件事情：npm install {whatever}-loader，然后在Webpack的配置的module.loaders部分添加该loader。所以：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="err">$</span> <span class="n">npm</span> <span class="n">install</span> <span class="n">babel</span><span class="o">-</span><span class="n">loader</span> <span class="o">--</span><span class="n">save</span><span class="o">-</span><span class="n">dev</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>更新我们的配置：我们想要什么？想要Babel运行所有的以.js结尾的文件，但是Webpack会递归遍历所有的依赖，我们需要Babel避免运行在第三方代码中，比如jQuery，所以需要过滤一下。loader可以有include和exclude规则，可以是字符串，正则，回调等等。在我们的例子中，我们希望Babel仅仅在我们自己的文件上运行，所以我们只需要include我们的源文件目录即可：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">entry</span><span class="o">:</span>  <span class="s1">&#39;./src&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">path</span><span class="o">:</span>     <span class="s1">&#39;builds&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">filename</span><span class="o">:</span> <span class="s1">&#39;bundle.js&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">module</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">loaders</span><span class="o">:</span> <span class="p">[</span>
+</span><span class='line'>            <span class="p">{</span>
+</span><span class='line'>                <span class="nx">test</span><span class="o">:</span>   <span class="sr">/\\.js/</span><span class="p">,</span>
+</span><span class='line'>                <span class="nx">loader</span><span class="o">:</span> <span class="s1">&#39;babel&#39;</span><span class="p">,</span>
+</span><span class='line'>                <span class="nx">include</span><span class="o">:</span> <span class="err">\</span><span class="nx">_</span><span class="err">\</span><span class="nx">_dirname</span> <span class="o">+</span> <span class="s1">&#39;/src&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">],</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在来重写index.js，用ES6的语法。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">import</span> <span class="nx">$</span> <span class="nx">from</span> <span class="s1">&#39;jquery&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>第一个自包含的组件</h2>
+
+<p>现在来写一个小的Button组件，它会包含SCSS样式，HTML模板，和一些行为，所以我们会需要安装一些需要的东西。首先，我们需要Mustache，它是一个轻量级的模板引擎（译者：如果你不知道JavaScript模板引擎，可以查看这篇文章 <a href="http://benweizhu.github.io/blog/2015/10/28/js-template-engine/">http://benweizhu.github.io/blog/2015/10/28/js-template-engine/</a> ），这时我们也需要Sass和HTML的loader。而且，最终需要load的内容会从一个loader流向另一个loader，我们需要一个CSS loader来吹了Sass loader的处理结果，现在一旦我们有了自己的CSS，就有很多方法来处理它们，现在我们会使用一个叫做style-loader的loader，它会取出CSS片段，并把它动态的插入页面。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="err">$</span> <span class="n">npm</span> <span class="n">install</span> <span class="n">mustache</span> <span class="o">--</span><span class="n">save</span>
+</span><span class='line'><span class="err">$</span> <span class="n">npm</span> <span class="n">install</span> <span class="n">css</span><span class="o">-</span><span class="n">loader</span> <span class="n">style</span><span class="o">-</span><span class="n">loader</span> <span class="n">html</span><span class="o">-</span><span class="n">loader</span> <span class="n">sass</span><span class="o">-</span><span class="n">loader</span> <span class="n">node</span><span class="o">-</span><span class="n">sass</span> <span class="o">--</span><span class="n">save</span><span class="o">-</span><span class="n">dev</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在有序的告诉Webpack让load的内容从一个loader流入另一个，我们简单的传入一系列loader，从右到左，用一个!(感叹号)分开。或者你也可以通过一个数组，并使用loaders属性而不是loader属性：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nx">test</span><span class="o">:</span>    <span class="sr">/\.js/</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">loader</span><span class="o">:</span>  <span class="s1">&#39;babel&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">include</span><span class="o">:</span> <span class="err">\</span><span class="nx">_</span><span class="err">\</span><span class="nx">_dirname</span> <span class="o">+</span> <span class="s1">&#39;/src&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nx">test</span><span class="o">:</span>   <span class="sr">/\\.scss/</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">loader</span><span class="o">:</span> <span class="s1">&#39;style!css!sass&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="c1">// Or</span>
+</span><span class='line'>    <span class="nx">loaders</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">,</span> <span class="s1">&#39;css&#39;</span><span class="p">,</span> <span class="s1">&#39;sass&#39;</span><span class="p">],</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nx">test</span><span class="o">:</span>   <span class="sr">/\\.html/</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">loader</span><span class="o">:</span> <span class="s1">&#39;html&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在来写我们的Button组件：</p>
+
+<p>src/Components/Button.scss</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.button</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="nb">tomato</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">color</span><span class="o">:</span> <span class="nb">white</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>src/Components/Button.html</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;a</span> <span class="na">class=</span><span class="s">&quot;button&quot;</span> <span class="na">href=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;&lt;/a&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>src/Components/Button.js</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">$</span> <span class="nx">from</span> <span class="s1">&#39;jquery&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">template</span> <span class="nx">from</span> <span class="s1">&#39;./Button.html&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">Mustache</span> <span class="nx">from</span> <span class="s1">&#39;mustache&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="s1">&#39;./Button.scss&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">Button</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">constructor</span><span class="p">(</span><span class="nx">link</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">link</span> <span class="o">=</span> <span class="nx">link</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">onClick</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">link</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">render</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kr">const</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">node</span><span class="p">).</span><span class="nx">text</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">// Render our button</span>
+</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="nx">node</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span>
+</span><span class='line'>            <span class="nx">Mustache</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">template</span><span class="p">,</span> <span class="p">{</span><span class="nx">text</span><span class="p">})</span>
+</span><span class='line'>        <span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">// Attach our listeners</span>
+</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.button&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">onClick</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>无论何时被导入，在哪个上下文中运行，Button.js是100%自包含的，它会包含所有需要的工具，并正确的渲染，现在我们只需要直接在页面上渲染我们的Button即可。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">Button</span> <span class="nx">from</span> <span class="s1">&#39;./Components/Button&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">button</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Button</span><span class="p">(</span><span class="s1">&#39;google.com&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">button</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考：<a href="http://blog.madewithlove.be/post/webpack-your-bags/">http://blog.madewithlove.be/post/webpack-your-bags/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[了解Spring Cache]]></title>
@@ -3841,158 +4236,6 @@ NaN <br/>
 <p>使用“use strict”指令的目的是说明（脚本或函数中）后续的代码将会解析为严格代码。</p>
 
 <p>严格代码以严格模式执行。ECMAScript5中的严格模式是该语言的一个受限制的子集，它修正了语言的重要缺陷，并提供健壮的查错功能和增强的安全机制。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[当whenever遇到capistrano和rbenv - Linux下的cron Job]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/09/27/whenever-plus-capistrano-plus-rbenv/"/>
-    <updated>2015-09-27T11:01:41+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/09/27/whenever-plus-capistrano-plus-rbenv</id>
-    <content type="html"><![CDATA[<p>当你遇到这样一个需求：用户订阅了很多信息，服务器需要每周，或者每月给用户发送邮件，告知用户订阅信息的更新内容。你需要怎么做？</p>
-
-<p>在RoR的环境下，发送邮件使用Rails Action Mailer。参考资料：<a href="http://guides.ruby-china.org/action_mailer_basics.html">http://guides.ruby-china.org/action_mailer_basics.html</a> 。</p>
-
-<p>那么如何定时呢？答案是Cron Job。</p>
-
-<p>如果大家谷歌rails cron job，就可以得到答案，一个是关于Cron Job的答案， <a href="http://www.gotealeaf.com/blog/cron-jobs-and-rails">http://www.gotealeaf.com/blog/cron-jobs-and-rails</a> ，一个是whener gem， <a href="https://github.com/javan/whenever">https://github.com/javan/whenever</a> 。</p>
-
-<p>Cron是*nux系统中一个基于时间的任务安排软件。通过crontab 命令，我们可以在固定的间隔时间执行指定的系统指令或 shell script脚本。时间间隔的单位可以是分钟、小时、日、月、周及以上的任意组合。</p>
-
-<p>更多关于crontab定时任务，可以查看： <a href="http://linuxtools-rst.readthedocs.org/zh_CN/latest/tool/crontab.html">http://linuxtools-rst.readthedocs.org/zh_CN/latest/tool/crontab.html</a></p>
-
-<p>关于时间的定义：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># +---------------- minute (0 - 59)</span>
-</span><span class='line'><span class="c1"># |  +------------- hour (0 - 23)</span>
-</span><span class='line'><span class="c1"># |  |  +---------- day of month (1 - 31)</span>
-</span><span class='line'><span class="c1"># |  |  |  +------- month (1 - 12)</span>
-</span><span class='line'><span class="c1"># |  |  |  |  +---- day of week (0 - 6) (Sunday=0)</span>
-</span><span class='line'><span class="c1"># |  |  |  |  |</span>
-</span><span class='line'>  <span class="o">*</span>  <span class="o">*</span>  <span class="o">*</span>  <span class="o">*</span>  <span class="o">*</span>  <span class="n">command</span> <span class="n">to</span> <span class="n">be</span> <span class="n">executed</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里，我就不细谈crontab定时任务，大家可以去看上面那个链接。</p>
-
-<p>whenever是一个Ruby的gem，它可以提供一个清晰的语法来编写定时任务。</p>
-
-<p>如果你刚才有停下来看crontab的内容，你会发现crontab任务的语法非常的复杂。</p>
-
-<p>whenever的目的就是为了让你以ruby的语法来编写要执行的任务，再由它来生成真正的crontab任务。</p>
-
-<p>如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">set</span> <span class="ss">:environment</span><span class="p">,</span> <span class="s2">&quot;staging&quot;</span>
-</span><span class='line'><span class="n">set</span> <span class="ss">:output</span><span class="p">,</span> <span class="p">{</span><span class="ss">:error</span> <span class="o">=&gt;</span> <span class="s2">&quot;log/cron_error_log.log&quot;</span><span class="p">,</span> <span class="ss">:standard</span> <span class="o">=&gt;</span> <span class="s2">&quot;log/cron_log.log&quot;</span><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">weekly_of_day</span> <span class="o">=</span> <span class="ss">:sunday</span> <span class="c1"># every sunday</span>
-</span><span class='line'><span class="n">weekly_of_time</span> <span class="o">=</span> <span class="p">{</span><span class="ss">:at</span> <span class="o">=&gt;</span> <span class="s1">&#39;0:00 am&#39;</span><span class="p">}</span> <span class="c1"># every sunday 0:00am</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">monthly</span> <span class="o">=</span> <span class="s1">&#39;0 0 1 * *&#39;</span> <span class="c1"># monthly 0 0 1 * * (every first day of month at 0:00am)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">quarterly</span> <span class="o">=</span> <span class="s1">&#39;0 0 1 1,4,7,10 *&#39;</span> <span class="c1"># quarterly 0 0 1 1,4,7,10 * (every 3 months at 0:00am start from the first day in january)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">job_type</span> <span class="ss">:rbenv_rake</span><span class="p">,</span> <span class="sx">%Q{export PATH=~/.rbenv/shims:~/.rbenv/bin:/usr/bin:$PATH; eval &quot;$(rbenv init -)&quot;; cd :path &amp;&amp; RAILS_ENV=staging bundle exec rake :task --silent &gt;&gt; log/cron_log.log 2&gt;&gt; log/cron_error_log.log}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">every</span> <span class="n">weekly_of_day</span><span class="p">,</span> <span class="n">weekly_of_time</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">rbenv_rake</span> <span class="s2">&quot;email_notification:send_email_notification_weekly&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">every</span> <span class="n">monthly</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">rbenv_rake</span> <span class="s2">&quot;email_notification:send_email_notification_monthly&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>更多关于如何使用whenever的内容，请查看： <a href="https://github.com/javan/whenever">https://github.com/javan/whenever</a></p>
-
-<p>whenever提供提供了四种job类型，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">job_type</span> <span class="ss">:command</span><span class="p">,</span> <span class="s2">&quot;:task :output&quot;</span>
-</span><span class='line'><span class="n">job_type</span> <span class="ss">:rake</span><span class="p">,</span>    <span class="s2">&quot;cd :path &amp;&amp; :environment_variable=:environment bundle exec rake :task --silent :output&quot;</span>
-</span><span class='line'><span class="n">job_type</span> <span class="ss">:runner</span><span class="p">,</span>  <span class="s2">&quot;cd :path &amp;&amp; bin/rails runner -e :environment &#39;:task&#39; :output&quot;</span>
-</span><span class='line'><span class="n">job_type</span> <span class="ss">:script</span><span class="p">,</span>  <span class="s2">&quot;cd :path &amp;&amp; :environment_variable=:environment bundle exec script/:task :output&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>但是，你在我给的例子中可以看到，我并没有使用其中的任何一个，而是自定义了一个rbenv_rake，这便是接下来的重点。</p>
-
-<p>如果你产品环境的Ruby环境是通过rbenv配置，那么在你使用crontab任务的可能会遇到这个问题。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">/</span><span class="n">spec_set</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">92</span><span class="ss">:in</span> <span class="sb">`block in materialize&#39;: Could not find rake-10.4.2 in any of the sources (Bundler::GemNotFound)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>关于原因，可以查看这个： <a href="http://benscheirman.com/2013/12/using-rbenv-in-cron-jobs/">http://benscheirman.com/2013/12/using-rbenv-in-cron-jobs/</a></p>
-
-<p>Crontab运行在一个受限的环境下，所以.bash_profile的配置方式，并不起作用。需要在每次运行该任务前，重新初始化一次rbenv。</p>
-
-<p>最后一点：</p>
-
-<p>关于whenever和capistrano的集成，其实官方网站上也给出了，但是测试过不起作用，至少我这没起作用，所以我在部署的ruby文件中添加了一个task。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">namespace</span> <span class="ss">:deploy</span> <span class="k">do</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">desc</span> <span class="s2">&quot;Update crontab with whenever&quot;</span>
-</span><span class='line'>  <span class="n">task</span> <span class="ss">:update_cron</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">on</span> <span class="n">roles</span><span class="p">(</span><span class="ss">:app</span><span class="p">)</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">within</span> <span class="n">current_path</span> <span class="k">do</span>
-</span><span class='line'>        <span class="n">execute</span> <span class="ss">:bundle</span><span class="p">,</span> <span class="ss">:exec</span><span class="p">,</span> <span class="s2">&quot;whenever --update-crontab </span><span class="si">#{</span><span class="n">fetch</span><span class="p">(</span><span class="ss">:application</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">after</span> <span class="ss">:finishing</span><span class="p">,</span> <span class="s1">&#39;deploy:update_cron&#39;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
 ]]></content>
   </entry>
   
