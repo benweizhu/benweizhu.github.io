@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="原文地址： http://babeljs.io/blog/2015/06/07/react-on-es6-plus/ 文章翻译有些不准确，敬请见谅 当我们正在从内到外的重新设计Instagram Web的时候，我们非常享受使用许多ES6+的特性来编写React组件。 &hellip;">
+  <meta name="description" content="在JavaScript中，对象是一系列的键值对，ECMA-262把对象（object）定义为“属性的无序集合，每个属性存放一个原始值、对象或函数”。 JavaScript是面向对象的语言（而且比C++/Java更加的面向对象），因为所有东西都是对象，包括函数，但是在JavaScript没有类的概念 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,437 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/12/31/javascript-contructor-new-prototype/">JavaScript渐入佳境 - 构造函数、new、原型</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-12-31T21:38:21+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>9:38 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在JavaScript中，对象是一系列的键值对，ECMA-262把对象（object）定义为“属性的无序集合，每个属性存放一个原始值、对象或函数”。</p>
+
+<p>JavaScript是面向对象的语言（而且比C++/Java更加的面向对象），因为所有东西都是对象，包括函数，但是在JavaScript没有类的概念。既然没有类，根据对之前对C++/Java这样的基于类的面向对象语言的理解，应该如何理解JavaScript中构造函数的概念，因为在基于类的面向对象中，构造函数只存在于类当中。</p>
+
+<h3>JavaScript构造函数、JavaScript中的constructor属性</h3>
+
+<p>在JavaScript中，每个具有原型的对象都会自动获得constructor属性。除了arguments、Enumerator、Error、Global、Math、RegExp、Regular Expression等一些特殊对象之外，其他所有的JavaScript内置对象都具备constructor属性。例如：Array、Boolean、Date、Function、Number、Object、String等。所有主流浏览器均支持该属性。</p>
+
+<p>现在，请暂且不要去思考“具有原型的对象”中原型的意思。</p>
+
+<p>对象的constructor属性返回创建该对象的函数的引用，无论直译或者按照基于类的面向对象语言的理解，我们且把该函数称为“构造函数”。下面是一些例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// 字符串：String()</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">str</span> <span class="o">=</span> <span class="s2">&quot;张三&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">str</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function String() { [native code] }</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">str</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nb">String</span><span class="p">);</span> <span class="c1">// true</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 数组：Array()</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">arr</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function Array() { [native code] }</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">arr</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nb">Array</span><span class="p">);</span> <span class="c1">// true</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 数字：Number()</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">num</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">num</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function Number() { [native code] }</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">num</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nb">Number</span><span class="p">);</span> <span class="c1">// true</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 自定义对象：Person()</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">Person</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;CodePlayer&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">();</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function Person(){ this.name = &quot;CodePlayer&quot;; }</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nx">Person</span><span class="p">);</span> <span class="c1">// true</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 字面量对象：Object()</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">o</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;张三&quot;</span><span class="p">};</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">o</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function Object() { [native code] }</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">o</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nb">Object</span><span class="p">);</span> <span class="c1">// true</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 自定义函数：Function()</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">foo</span><span class="p">(){</span>
+</span><span class='line'>    <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;CodePlayer&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function Function() { [native code] }</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nb">Function</span><span class="p">);</span> <span class="c1">// true</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// 函数的原型：bar()</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">bar</span><span class="p">(){</span>
+</span><span class='line'>    <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;CodePlayer&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">bar</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function bar(){ alert(&quot;CodePlayer&quot;); }</span>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">bar</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nx">bar</span><span class="p">);</span> <span class="c1">// true</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>代码中的[native code]，表示这是JavaScript的底层内部代码实现，无法显示代码细节。</p>
+
+<p>你会发现连那些看似是基本类型的数字“5”和字符串“张三”（当然Java里面有String类型）都具有constructor属性。特别是定义一个函数foo，foo也有constructor属性，而且指向名字是Function的函数（暂且不管为什么如此）。</p>
+
+<p>通过var str = &ldquo;张三&rdquo;;，我创建了一个String对象，通过var num = 5;，我创建了一个Number对象。</p>
+
+<p>在Java或者C++中，通过new关键字调用某个类的构造函数，例如：new SomeConstructor()，来创建对象，知识SomeConstructor和类名一样。</p>
+
+<p>那么在JavaScript，如何自定一个具有类型对象呢？上面的Person例子已经给出了答案。</p>
+
+<p>p对象的constructor是它：function Person(){ this.name = &ldquo;CodePlayer&rdquo;; }</p>
+
+<p>那么要创建一个新的p对象，只需要var p = new Person();。表面上的理解和C++或者Java相似。</p>
+
+<p>剩下的疑问是创建这个对象的时候使用了new关键字。它是干什么的？new关键字很容易让你想到C++和Java中通过new来创建新的对象（分配一段内存空间）。</p>
+
+<p>在《JavaScript高级编程》里对new操作符的解释：</p>
+
+<p>new操作符会让构造函数产生如下变化：  <br/>
+1.创建一个新对象  <br/>
+2.将构造函数的作用域赋给新对象（因此this就指向了这个新对象）  <br/>
+3.执行构造函数中的代码（为这个新对象添加属性） <br/>
+4.返回新对象</p>
+
+<p>MDN上也有介绍new关键字： <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/new">https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/new</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Person</span><span class="p">(){</span> <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;CodePlayer&quot;</span><span class="p">;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">()</span>
+</span><span class='line'><span class="nx">$</span> <span class="nx">Window</span> <span class="p">{</span><span class="nx">external</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nx">chrome</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nb">document</span><span class="o">:</span> <span class="nb">document</span><span class="p">,</span> <span class="nx">WPCOMSharing</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nx">RecaptchaTemplates</span><span class="o">:</span> <span class="nb">Object</span><span class="err">…</span><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">()</span>
+</span><span class='line'><span class="nx">$</span> <span class="nx">Person</span> <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;CodePlayer&quot;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>JavaScirpt中的构造函数和普通函数没有什么区别，你一样的可以像普通函数一样调用它，如上例，那么this指向函数执行时的当前对象（关于this指针会在之后的文章中详解）。</p>
+
+<p>但如果通过new关键字来调用函数，该函数就成为了构造函数，this指针就会指向新创建的对象。这就是JavaScript的构造函数。</p>
+
+<h3>通过new和构造函数创建对象的问题</h3>
+
+<p>new的方式创建对象看上去非常好用，而且和C++或者Java语言很相似，比较容易理解它在创建一个新的对象。但是构造函数方法创建对象存在一个浪费内存的问题。</p>
+
+<p>以下摘抄自阮一峰的文章： <a href="http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html">http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html</a></p>
+
+<p>“请看，我们现在为Cat对象添加一个不变的属性&#8221;type&#8221;（种类），再添加一个方法eat（吃老鼠）。那么，原型对象Cat就变成了下面这样：”</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Cat</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="nx">color</span><span class="p">){</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">color</span> <span class="o">=</span> <span class="nx">color</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="s2">&quot;猫科动物&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">eat</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span><span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;吃老鼠&quot;</span><span class="p">);};</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">cat1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Cat</span><span class="p">(</span><span class="s2">&quot;大毛&quot;</span><span class="p">,</span><span class="s2">&quot;黄色&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">cat2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Cat</span> <span class="p">(</span><span class="s2">&quot;二毛&quot;</span><span class="p">,</span><span class="s2">&quot;黑色&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">alert</span><span class="p">(</span><span class="nx">cat1</span><span class="p">.</span><span class="nx">type</span><span class="p">);</span> <span class="c1">// 猫科动物</span>
+</span><span class='line'><span class="nx">cat1</span><span class="p">.</span><span class="nx">eat</span><span class="p">();</span> <span class="c1">// 吃老鼠</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">alert</span><span class="p">(</span><span class="nx">cat1</span><span class="p">.</span><span class="nx">eat</span> <span class="o">==</span> <span class="nx">cat2</span><span class="p">.</span><span class="nx">eat</span><span class="p">);</span> <span class="c1">//false</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>“表面上好像没什么问题，但是实际上这样做，有一个很大的弊端。那就是对于每一个实例对象，type属性和eat()方法都是一模一样的内容，每一次生成一个实例，都必须为重复的内容，多占用一些内存。这样既不环保，也缺乏效率。能不能让type属性和eat()方法在内存中只生成一次，然后所有实例都指向那个内存地址呢？回答是可以的。”</p>
+
+<p>解决这个问题，阮一峰在他的文章中介绍了Prototype模式。我猜测对JavaScript面向对象感兴趣的同志已经无数次看到这样的代码了。</p>
+
+<h2>JavaScript原型、Prototype和__proto__</h2>
+
+<p>prototype英文翻译过来“原型”</p>
+
+<p>什么是原型？原型是一个从其他对象继承属性的对象。</p>
+
+<p>是不是任何对象都可以是原型？是的。</p>
+
+<p>哪些对象有原型？每个对象都有一个默认的原型。原型本身就是对象，每一个原型本身也存在一个原型。（只有一个例外，默认的对象原型在每条原型链的顶端，其他的原型在原型链的后面）</p>
+
+<p>当我看到上面的回答时，加上我对prototype英文含义的理解，我会认为每个对象都有一个prototype. 但当我写({}).prototype的时候，或者&#8221;&ldquo;.prototype，我却得到了undefined，是不是疯了？</p>
+
+<p>忘记你所理解的关于prototype属性的理解（它其实只是函数对象的一个属性，比如Object.prototype，Function.prototype，Array.prototype，在浏览器控制台查看Object，Function，Array这些值，它们都是函数） - 这个名字很可能是迷惑的根源。</p>
+
+<p>一个对象真正的prototype是内部[[Prototype]]属性. ECMA5介绍了标准的访问方法，Object.getPrototypeOf(object)。这个最新的实现已被Firefox, Safari, Chrome and IE9所支持。另外，除了IE，所有的浏览器都支持非标准的访问方法__proto__，它指向当对象被实例化的时候，用作原型的对象。</p>
+
+<p>那么我想知道prototype属性到底是干什么的?比如Object.prototype，Function.prototype，Array.prototype等。特别是上面的阮一峰介绍的Prototype模式。</p>
+
+<p>Object.prototype属性表示对象Object的原型对象，它是所有对象原型链的根节点。</p>
+
+<p>那其他的呢？好吧，首先，在前面介绍构造函数时已经知道，JavaScript不区分构造函数和其它普通函数，所以每个函数都有prototype属性。反而任何不是方法的，都没有这样的属性。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">//永远不是构造函数的方法，无论如何都是有prototype属性的</span>
+</span><span class='line'><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span> <span class="c1">//[object Object]</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//构造函数也有prototype属性</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">A</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">A</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span> <span class="c1">//[object Object]</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//Math不是一个方法，所以没有prototype属性</span>
+</span><span class='line'><span class="nb">Math</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span> <span class="c1">//null</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在可以定义: <br/>
+一个方法的prototype属性是当这个方法被用作构造函数来创建实例时，赋给该实例的原型（内部Prototype）的对象。非常重要的一点是，要理解方法的prototype属性和实际的prototype（原型）没有任何关系。看下面一段代码和解释：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">//构造器，this作为新对象返回并且它内部的[[prototype]]属性将被设置为构造器默认的prototype属性</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Circle</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">radius</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">radius</span> <span class="o">=</span> <span class="nx">radius</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//next line is implicit, added for illustration only</span>
+</span><span class='line'>    <span class="c1">//this.__proto__ = Circle.prototype;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//扩充 Circle默认的prototype对象的属性因此扩充了每个由它新建实例的prototype对象的属性</span>
+</span><span class='line'><span class="nx">Circle</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">area</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>   <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="o">*</span><span class="k">this</span><span class="p">.</span><span class="nx">radius</span><span class="o">*</span><span class="k">this</span><span class="p">.</span><span class="nx">radius</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//创建Circle的两个示例，每个都可以使用相同的真正prototype所拥有属性area</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Circle</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Circle</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</span><span class='line'><span class="nx">a</span><span class="p">.</span><span class="nx">area</span><span class="p">().</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="c1">//28.27</span>
+</span><span class='line'><span class="nx">b</span><span class="p">.</span><span class="nx">area</span><span class="p">().</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="c1">//50.27</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么，根据上面的定义，下面的内容非常有趣：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span>
+</span><span class='line'><span class="nx">$</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">func</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Function</span><span class="p">()</span>
+</span><span class='line'><span class="nx">func</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">functionA</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(){}</span>
+</span><span class='line'><span class="nx">functionA</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">myFunction</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Function</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="s1">&#39;salary&#39;</span><span class="p">,</span> <span class="s1">&#39;return users * salary&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">myFunction</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span>
+</span><span class='line'><span class="nx">$</span> <span class="p">[]</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Array</span><span class="p">()</span>
+</span><span class='line'><span class="nx">arr</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="p">[]</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">array</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class='line'><span class="nx">array</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="p">[]</span>
+</span><span class='line'><span class="nx">Cat</span><span class="p">.</span><span class="nx">prototype</span>
+</span><span class='line'><span class="nx">$</span> <span class="nx">Cat</span> <span class="p">{}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>原型链和instanceof</h2>
+
+<h3>原型链又是什么？</h3>
+
+<p>因为每个对象和每个原型(本身)都有一个原型，我们可以想象，一个接一个的对象连接在一起形成一个原型链。原型链的终端总是默认对象（object）的原型，即Object.prototype。你可以在自定义的对象上调用__proto__方法就来自于Object.prototype.__proto__上。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Cat</span><span class="p">(){}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">cat</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Cat</span><span class="p">()</span>
+</span><span class='line'><span class="nx">cat</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="nx">Cat</span> <span class="p">{}</span>
+</span><span class='line'><span class="nx">cat</span><span class="p">.</span><span class="nx">__proto__</span><span class="p">.</span><span class="nx">__proto__</span>
+</span><span class='line'><span class="nx">$</span> <span class="nb">Object</span> <span class="p">{}</span>
+</span><span class='line'><span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span>
+</span><span class='line'><span class="nx">$</span> <span class="nb">Object</span> <span class="p">{}</span>
+</span><span class='line'><span class="nx">cat</span><span class="p">.</span><span class="nx">__proto__</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">===</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span>
+</span><span class='line'><span class="nx">$</span> <span class="kc">true</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>原型继承机制是内在且隐式实现的。当对象a要访问属性foo时，Javascript会遍历a的原型链（首先从a自身开始），检查原型链的每一个环节中存在的foo属性。如果找到了foo属性就会将其返回，否则返回undefined值。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">A</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{};</span>
+</span><span class='line'><span class="nx">A</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">==</span> <span class="nx">A</span><span class="p">;</span> <span class="c1">//true</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A</span><span class="p">();</span>
+</span><span class='line'><span class="nx">a</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">==</span> <span class="nx">A</span><span class="p">;</span> <span class="c1">//true (a 的constructor属性继承自它的原型)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>instanceof与prototype有啥关系？</h3>
+
+<p>如果A的prototype属性出现在a的原型链中，则表达式a instanceof A会返回true。这意味着我们可以欺骗instanceof，让它失效。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">A</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A</span><span class="p">();</span>
+</span><span class='line'><span class="nx">a</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">==</span> <span class="nx">A</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span> <span class="c1">//true - so instanceof A will return true</span>
+</span><span class='line'><span class="nx">a</span> <span class="k">instanceof</span> <span class="nx">A</span><span class="p">;</span> <span class="c1">//true;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//mess around with a&#39;s prototype</span>
+</span><span class='line'><span class="nx">a</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">=</span> <span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//a&#39;s prototype no longer in same prototype chain as A&#39;s prototype property</span>
+</span><span class='line'><span class="nx">a</span> <span class="k">instanceof</span> <span class="nx">A</span><span class="p">;</span> <span class="c1">//false</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>使用instanceof操作符需要注意的一件事情是，任何时间判断对象是否是Object的实例，它都会返回true，因为所有对象都继承自Object.prototype。</p>
+
+<p>原始值使用对象包装器判断实例时，比如 &lsquo;foo&rsquo; instanceof String返回false。如果使用new操作符创建的字符串，instanceof返回true。所以，请记住instanceof只适用于构造函数创建返回的复杂对象和实例。</p>
+
+<h2>总结</h2>
+
+<p>看完这篇文章，你需要记住一下几点：</p>
+
+<p>构造函数和普通函数没有区别，只有在结合new关键字时，有特定的作用，可以创建一个对象实例，而该对象实例有一个constructor属性指向创建它的函数，即构造函数。每个对象都有原型，不要误解Prototype属性，它是函数对象的属性（比如Object，Array，Function），真正的原型通过Object.getPrototypeOf(object)和__proto__获取。因为构造函数隐式的执行this.__proto__ = Circle.prototype，所以Prototype模式可以实现对象方法是定义（对象中的属性只是引用，指向的是构造函数Prototype属性上定义的一个方法）。</p>
+
+<p>参考文献：   <br/>
+1.<a href="http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html">http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html</a>  <br/>
+2.<a href="http://www.oschina.net/translate/understanding-javascript-prototypes">http://www.oschina.net/translate/understanding-javascript-prototypes</a>  <br/>
+3.<a href="http://yehudakatz.com/2011/08/12/understanding-prototypes-in-javascript/">http://yehudakatz.com/2011/08/12/understanding-prototypes-in-javascript/</a>  <br/>
+4.JavaScript启示录</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -417,411 +848,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/12/05/css-modules-or-bem/">鱼和熊掌的故事 - CSS Modules还是BEM</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-12-05T11:39:48+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:39 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>首先还是最基础的两个问题：什么是BEM？什么是CSS Modules？</p>
-
-<h2>BEM(Block Element Modifer)</h2>
-
-<p><a href="https://en.bem.info/">https://en.bem.info/</a></p>
-
-<p><img src="http://segmentfault.com/img/bVbN4T" alt="Alt text" /></p>
-
-<p>BEM的意思就是块（block）、元素（element）、修饰符（modifier），是由Yandex团队提出的一种<strong>前端命名方法论</strong>。这种巧妙的命名方法让你的CSS类对其他开发者来说更加透明而且更有意义。BEM命名约定更加严格，而且包含更多的信息，它们用于一个团队开发一个耗时的大项目。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.block</span><span class="p">{}</span>
-</span><span class='line'><span class="nc">.block__element</span><span class="p">{}</span>
-</span><span class='line'><span class="nc">.block--modifier</span><span class="p">{}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>.block 代表了更高级别的抽象或组件。 <br/>
-.block__element 代表.block的后代，用于形成一个完整的.block的整体。 <br/>
-.block&ndash;modifier代表.block的不同状态或不同版本。  <br/>
-.block__element&ndash;modifier代表.element的不同状态或不同版本。</p>
-
-<p>我们用一个搜索栏为例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;form</span> <span class="na">class=</span><span class="s">&quot;site-search full&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">class=</span><span class="s">&quot;field&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;Submit&quot;</span> <span class="na">value =</span><span class="s">&quot;Search&quot;</span> <span class="na">class=</span><span class="s">&quot;button&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;/form&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面的这个CSS类名真是太不精确了，比如field，并不能告诉我们足够的信息。尽管我们可以用它们来完成工作，但它们确实非常含糊不清。用BEM记号法就会是下面这个样子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;form</span> <span class="na">class=</span><span class="s">&quot;site-search site-search--full&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">class=</span><span class="s">&quot;site-search__field&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;Submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Search&quot;</span> <span class="na">class=</span><span class="s">&quot;site-search__button&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;/form&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>我们能清晰地看到有个叫.site-search的块，它的内部是一个叫.site-search__field的元素。并且.site-search还有另外一种形态叫.site-search&ndash;full。如果搜索栏还有验证，那么它还有一个error状态，可以用site-search__field&ndash;error。</p>
-
-<p>虽然上面是个简单地例子，但相信你已经可以看到BEM带来的好处是命名独立，有意义，且可以清晰的表示模块结构。</p>
-
-<p>BEM（或BEM的变体）是一个非常有用，强大，简单的命名约定，以至于让你的前端代码更容易阅读和理解，更容易协作，更容易控制，更加健壮和明确而且更加严密。</p>
-
-<h2>CSS Modules</h2>
-
-<p>在React中，我们以Web Component的方式实现应用。组件（Component）的概念中有一个很重要特性：完整和自包含，而对于一个完整的Web Component，包含HTML，JAVASCRIPT和CSS。</p>
-
-<p>React通过JSX实现了在JavaScript中写HTML，但是还缺少一个重要的元素：CSS。</p>
-
-<p>在2014年11月的NationJS上Christopher Chedeau谈到了“CSS in JS”的话题。给许多人带了思想上的一个冲击，也让React实现完整Web Component带来的曙光。</p>
-
-<p>现在，已经有了三种最新的，最明智和最可行的实现React样式的方式。</p>
-
-<p>React Style： <a href="https://github.com/js-next/react-style">https://github.com/js-next/react-style</a>   <br/>
-JSX Style： <a href="https://github.com/petehunt/jsxstyle">https://github.com/petehunt/jsxstyle</a>   <br/>
-Radium： <a href="https://github.com/FormidableLabs/radium">https://github.com/FormidableLabs/radium</a></p>
-
-<h4>一般情况下，如果项目中有大量的CSS，会出现什么问题？如图</h4>
-
-<p><img src="http://glenmaddern.com/assets/images/7_problems_css.jpg" alt="Alt text" /></p>
-
-<p>Christopher指出，如果你将样式都挪到JavaScript中，这些问题都有很好地解决方案，这点说的没错，但是会引入复杂度，以及不太习惯的CSS使用方式。CSS Modules团队觉得可以让CSS还是保持以前的样子，但是构建时，以style-in-JS的方式实现。</p>
-
-<p>CSS Modules的项目地址： <a href="https://github.com/css-modules/css-modules">https://github.com/css-modules/css-modules</a></p>
-
-<h3>默认就是局部命名空间</h3>
-
-<p>在CSS Modules中每个文件都是独立编译，你可以使用更为简单地类命名方式，而不用担心它会污染全局。</p>
-
-<p>我们以不同状态的Button为例，在没有CSS Modules的情况下，你可能会以Suit/BEM的方式来写CSS。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="c">/* components/submit-button.css \*/</span>
-</span><span class='line'><span class="nc">.Button</span> <span class="p">{</span> <span class="c">/* all styles for Normal \*/</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.Button--disabled</span> <span class="p">{</span> <span class="c">/* overrides for Disabled \*/</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.Button--error</span> <span class="p">{</span> <span class="c">/* overrides for Error \*/</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.Button--in-progress</span> <span class="p">{</span> <span class="c">/* overrides for In Progress \*/</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;Button Button--in-progress&quot;</span><span class="nt">&gt;</span>Processing...<span class="nt">&lt;/button&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>使用CSS Modules的方式，你就可以用下面这种方式来写：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="c">/* components/submit-button.css \*/</span>
-</span><span class='line'><span class="nc">.normal</span> <span class="p">{</span> <span class="c">/* all styles for Normal \*/</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.disabled</span> <span class="p">{</span> <span class="c">/* all styles for Disabled \*/</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.error</span> <span class="p">{</span> <span class="c">/* all styles for Error \*/</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.inProgress</span> <span class="p">{</span> <span class="c">/* all styles for In Progress \*/</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>你应该发现，class的前缀button没有了，为什么？因为这个css文件的名字已经叫做submit-button.css，CSS Modules已经知道它的前缀，不需要再次定义了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/* components/submit-button.js \*/</span>
-</span><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./submit-button.css&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nx">buttonElem</span><span class="p">.</span><span class="nx">outerHTML</span> <span class="o">=</span> <span class="err">`</span><span class="o">&lt;</span><span class="nx">button</span> <span class="kr">class</span><span class="o">=</span><span class="nx">$</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">normal</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Submit</span><span class="o">&lt;</span><span class="err">/button&gt;`</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>以JavaScript的方式使用CSS。</p>
-
-<p>然后，你再看看生成的最终页面的样子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;components_submit_button__normal__abc5436&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  Processing...
-</span><span class='line'><span class="nt">&lt;/button&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>最终生成的class的名字是Component Name + Class Name + Base64，保证了层次结构和唯一性。</p>
-
-<h2>鱼和熊掌的问题</h2>
-
-<p>对比一下BEM和CSS Modules，它们最终的目的都是给你带来独立，唯一和有意义的类命名。CSS Modules允许你以变量的方式将class获取并使用到元素上，并且省略了类名中Component Name前缀（也就是BEM中的B）。</p>
-
-<p>在React中，Component一般会由多个元素组成（除了像Button这样比较简单地组件），就以上面的搜索框为例，在React中以CSS Modules的方式写，就有可能如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./site-search.css&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="c1">//省略React代码</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">full</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">field</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">value</span> <span class="o">=</span><span class="s2">&quot;Search&quot;</span> <span class="kr">class</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">button</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/form&gt;  </span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>对比一下BEM方式</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">from</span> <span class="s1">&#39;./site-search-bem.css&#39;</span><span class="p">;</span><span class="c1">//以BEM方式写的样式表</span>
-</span><span class='line'><span class="c1">//省略React代码</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;site-search site-search--full&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;site-search__field&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Search&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;site-search__button&quot;</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/form&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>CSS Modules好像挺完美的，变量的方式传递class，在JavaScript的语境下似乎更有道理，但从本质上来说，与BEM相比，也就只是省略了Block这一个前缀，在这个看似好像很不错的方案下，有没有存在的问题？</p>
-
-<h2>问题</h2>
-
-<h4>测试</h4>
-
-<p>在React的环境下，会使用Jest框架对组件进行测试，import styles from &lsquo;./site-search.css&rsquo;;这一个语句，并不是JavaScript的标准，只是CSS Modules的实现者，帮助你进行了编译，但Jest并不会编译。</p>
-
-<p>所以这个时候，我们会在Jest的PreProcessor中处理这句话，这样才不会有语法解析错误。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">babel</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./babel-jest&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">process</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="nx">filename</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="sr">/\.(css|scss)$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">filename</span><span class="p">))</span> <span class="p">{</span>
-</span><span class='line'>          <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
-</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>          <span class="k">return</span> <span class="nx">babel</span><span class="p">.</span><span class="nx">process</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="nx">filename</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>但与此同时，styles会变成空对象，由于我们使用了变量的方式，在测试中，并不能测试className的改变（因为state改变，去改变className）。相反，BEM因为是纯粹的字符串，所以它使可测试的。</p>
-
-<h2>在React中引入classnames模块</h2>
-
-<p>我们知道，在React中，通过state的改变来决定组件的样式变化，在没有外部力量帮助的情况下，你的代码就会如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/* components/submit-button.jsx \*/</span>
-</span><span class='line'><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./submit-button.css&#39;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">SubmitButton</span> <span class="kr">extends</span> <span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">let</span> <span class="nx">className</span><span class="p">,</span> <span class="nx">text</span> <span class="o">=</span> <span class="s2">&quot;Submit&quot;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">submissionInProgress</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">inProgress</span>
-</span><span class='line'>      <span class="nx">text</span> <span class="o">=</span> <span class="s2">&quot;Processing...&quot;</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">errorOccurred</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">error</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">form</span><span class="p">.</span><span class="nx">valid</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">disabled</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">normal</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">className</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">text</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个时候，可以引入classnames模块，例子来自classnames样例：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;classnames&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Button</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="c1">// ...</span>
-</span><span class='line'>  <span class="nx">render</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">btnClass</span> <span class="o">=</span> <span class="nx">classNames</span><span class="p">({</span>
-</span><span class='line'>      <span class="s1">&#39;btn&#39;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-</span><span class='line'>      <span class="s1">&#39;btn-pressed&#39;</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span><span class="p">,</span>
-</span><span class='line'>      <span class="s1">&#39;btn-over&#39;</span><span class="o">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isHovered</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">btnClass</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">label</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/button&gt;;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>问题是，classNames中传入的JavaScript对象，不可以用styles.normal作为key，如果要在CSS Modules的环境下，使用classnames，你需要像下面这样写：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./site-search.css&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;classnames&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Button</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="c1">// ...</span>
-</span><span class='line'>  <span class="nx">render</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">btnClass</span> <span class="o">=</span> <span class="nx">classNames</span><span class="p">({</span>
-</span><span class='line'>      <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;btn&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-</span><span class='line'>      <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;btn-pressed&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span><span class="p">,</span>
-</span><span class='line'>      <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;btn-over&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isHovered</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">btnClass</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">label</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/button&gt;;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果你不使用classnames，在使用CSS Modules也是可以用styles[&lsquo;normal&rsquo;]来代替styles.normal。</p>
-
-<h2>无意中的发现，结合CSS Modules和BEM方式</h2>
-
-<p>通过用styles[&lsquo;normal&rsquo;]来代替styles.normal，在定义CSS的类名时，你依旧可以使用你习惯的CSS类命名方式，比如：BEM。上面的搜索框的例子，就可以写成：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./site-search.css&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="kr">import</span> <span class="nx">classNames</span> <span class="nx">from</span> <span class="s1">&#39;classnames&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="c1">//省略React代码</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">fieldClass</span> <span class="o">=</span> <span class="nx">classNames</span><span class="p">({</span>
-</span><span class='line'>  <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;field&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isError</span><span class="p">,</span>
-</span><span class='line'>  <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;field__error&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isError</span><span class="p">,</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">[</span><span class="nx">full</span><span class="p">]}</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">fieldClass</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Search&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;submit&#39;</span><span class="p">]}</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/form&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这种方式，既保证了CSS Modules的使用，也保留了BEM通过三种基本元素来描述组件样式的方式。</p>
-
-<h2>总结</h2>
-
-<p>对比两种实现方式，从本质上来讲，并没有区别，否则它们也不可能结合在一起，但是CSS Modules带来的致命伤害是作为一个变量，并不能直接测试（想要测试，可以让Jest的路径指向已经编译过的JavaScript路径）。而纯粹的BEM因为是字符串可以很好地和classnames结合使用，也可以进行测试，所以在选择上占据了很大的优势。</p>
-
-<p>参考资料：  <br/>
-1.<a href="http://glenmaddern.com/articles/css-modules">http://glenmaddern.com/articles/css-modules</a>  <br/>
-2.<a href="http://segmentfault.com/a/1190000000391762">http://segmentfault.com/a/1190000000391762</a>  <br/>
-3.<a href="https://github.com/css-modules/css-modules">https://github.com/css-modules/css-modules</a>  <br/>
-4.<a href="https://www.npmjs.com/package/classnames">https://www.npmjs.com/package/classnames</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/4">&larr; Older</a>
@@ -848,6 +874,10 @@ Radium： <a href="https://github.com/FormidableLabs/radium">https://github.com/
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/03/25/when-to-use-in-on-at/">什么时候用on, In和at？</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/02/28/webpack-your-bags-translation/">用Webpack构建和打包模块（JS，SCSS，HTML等）基础（译）</a>
       </li>
     
@@ -861,10 +891,6 @@ Radium： <a href="https://github.com/FormidableLabs/radium">https://github.com/
     
       <li class="post">
         <a href="/blog/2015/12/31/javascript-contructor-new-prototype/">JavaScript渐入佳境 - 构造函数、new、原型</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/12/13/react-on-es6-plus-translation/">翻译 React on ES6+</a>
       </li>
     
   </ul>
