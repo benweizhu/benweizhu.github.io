@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-04-17T22:15:51+08:00</updated>
+  <updated>2016-04-30T11:58:53+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,64 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript事件流和事件代理/委托]]></title>
+    <link href="http://benweizhu.github.io/blog/2016/04/27/event-stream-and-event-delegation/"/>
+    <updated>2016-04-27T21:05:57+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2016/04/27/event-stream-and-event-delegation</id>
+    <content type="html"><![CDATA[<p>HTML元素都位于另一些。如果鼠标移动到某一个链接，或者点击了链接，同样鼠标也移动到了它的父元素上，并点击了那个父元素。</p>
+
+<p>当你点击某个元素时，产生了一个点击事件，从而产生了一个事件流。</p>
+
+<h3>事件流分为两种：</h3>
+
+<p>事件冒泡：事件从最具体的节点开始向外传播到最宽泛的节点。这是事件流的默认类型，被绝大多数浏览器所支持。</p>
+
+<p>事件捕获：事件从最宽泛的节点开始向内传播到最具体的节点。这种方式在IE8和更早版本的IE中不被支持。</p>
+
+<p><img src="http://benweizhu.github.io/images/js_event_bubble.png" width="500" title="事件流" alt="Alt text" /></p>
+
+<p data-height="424" data-theme-id="0" data-slug-hash="dMgMox" data-default-tab="js,result" data-user="benweizhu" data-embed-version="2" class="codepen">See the Pen <a href="http://codepen.io/benweizhu/pen/dMgMox/">Bubbling Event</a> by Benwei (<a href="http://codepen.io/benweizhu">@benweizhu</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+
+
+<script async src="//assets.codepen.io/assets/embed/ei.js"></script>
+
+
+<p>看一个codepen的例子</p>
+
+<p>什么时候事件冒泡或者说事件流会变得如此重要？</p>
+
+<p>当代码在一个元素和其祖先元素或者后代元素上都有事件处理程序时，事件流就会变得非常重要。</p>
+
+<h3>事件代理/委托</h3>
+
+<p>为大量的元素创建事件监听器会造成页面速度下降，事件流允许你在父元素上监听事件。</p>
+
+<p>如果用户可以和页面中的大量元素进行交互，比如：大量的按钮，很长列表，表格中每一个单元格。如果想这些元素分别添加事件监听器就会使用大量的内存，从而降低性能。</p>
+
+<p>事件可以影响到容器元素（祖先元素），因此可以将事件处理程序放置在一个元素容器上，然后使用事件对象的target属性找到它的后代中是哪一个发生了事件，因此只需要响应一个元素上的事件（而不是在每一个子元素上分别响应事件）。</p>
+
+<p>看一个codepen的例子</p>
+
+<p data-height="266" data-theme-id="0" data-slug-hash="WwaqyP" data-default-tab="js,result" data-user="benweizhu" data-embed-version="2" class="codepen">See the Pen <a href="http://codepen.io/benweizhu/pen/WwaqyP/">WwaqyP</a> by Benwei (<a href="http://codepen.io/benweizhu">@benweizhu</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+
+
+<script async src="//assets.codepen.io/assets/embed/ei.js"></script>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[What the Heck Is Javascript Event Loop]]></title>
+    <link href="http://benweizhu.github.io/blog/2016/04/27/what-the-heck-is-javascript-event-loop/"/>
+    <updated>2016-04-27T08:41:24+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2016/04/27/what-the-heck-is-javascript-event-loop</id>
+    <content type="html"><![CDATA[<p><embed src="http://player.youku.com/player.php/sid/XMTU1MzE1NDQ5Mg==/v.swf" allowFullScreen="true" quality="high" width="550" height="450" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash"></embed></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[什么时候用on, In和at？]]></title>
@@ -3998,131 +4056,6 @@ maps from one value to another (e.g. (key1: value1, key2: value2))</p>
 
 <p>参考资料：  <br/>
 1.<a href="http://expressjs.com/starter/installing.html">http://expressjs.com/starter/installing.html</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[基于Gradle和Intellij的Spring Boot热交换]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/10/26/spring-boot-hot-swap/"/>
-    <updated>2015-10-26T12:19:43+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/10/26/spring-boot-hot-swap</id>
-    <content type="html"><![CDATA[<p>在去年的一篇《Gradle Jetty和Gradle Watch插件实现热部署》中，谈到Java热部署带来的好处，文章地址在： <a href="http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/</a> 。</p>
-
-<p>但是现在越来越多的Spring应用直接使用Spring Boot作为框架，那么这个Jetty插件的配置就不起作用了，好在Spring官方针对热部署问题，提供了解决方案：Spring Reloaded。</p>
-
-<p>项目地址在： <a href="https://github.com/spring-projects/spring-loaded">https://github.com/spring-projects/spring-loaded</a></p>
-
-<p>这里，我就不多说废话了，直接告诉大家怎么用？</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span> <span class="n">jcenter</span><span class="o">()</span> <span class="o">}</span>
-</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">classpath</span> <span class="s2">&quot;org.springframework.boot:spring-boot-gradle-plugin:1.2.7.RELEASE&quot;</span>
-</span><span class='line'>        <span class="n">classpath</span> <span class="s1">&#39;org.springframework:springloaded:1.2.4.RELEASE&#39;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">idea</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">module</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">inheritOutputDirs</span> <span class="o">=</span> <span class="kc">false</span>
-</span><span class='line'>        <span class="n">outputDir</span> <span class="o">=</span> <span class="n">file</span><span class="o">(</span><span class="s2">&quot;$buildDir/classes/main/&quot;</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">testOutputDir</span> <span class="o">=</span> <span class="n">file</span><span class="o">(</span><span class="s2">&quot;$buildDir/classes/test/&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果想将Spring Loaded和Gradle，IntelliJ结合起来，那你需要付出代价。默认情况下，IntelliJ将类编译到一个跟Gradle不同的位置，这会导致Spring Loaded监控失败，所以使用idea模块修改编译输出位置和Gradle一样。</p>
-
-<p>注：IntelliJ必须配置跟命令行Gradle任务相同的Java版本，并且springloaded必须作为一个buildscript依赖被包含进去。</p>
-
-<p>官方文档的springloaded版本是1.2.0.RELEASE，这个版本有问题，会出现：</p>
-
-<p>org.springsource.loaded.jvm.JVM : Problems copying method. Incompatible JVM? 报错</p>
-
-<p>依赖下载完成之后，正常启动Spring Boot Run。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">./</span><span class="n">gradlew</span> <span class="n">bRun</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果你自己有仔细阅读官方文档的代码，你会发现官方少了一行testOutputDir的配置。官方文档上没有设置testOutputDir，这就会导致，intellij编译代码时，输出test下面的class到了out目录的main中。从而改变了Gradle默认的输出测试路径（main和test分开的），所以最好还是手动配置一下。</p>
-
-<p>此时，如果你在应用启动的时候修改了Java代码，只需要点击Intellij的编译按钮，重新编译代码即可。</p>
-
-<h2>导致集成测试的问题</h2>
-
-<p>由于这样配置之后，导致Intellij上进行make project，输出到build/classes下。</p>
-
-<p>这样做会导致集成测试有一个问题，运行集成测试的时候，我们常常需要使用properties文件和xml文件。</p>
-
-<p>如果之前运行过gradle build，而build目录下没有被clean，则gradle默认会将properties文件和xml文件放在build/resources下，这与Intellij的行为不同。</p>
-
-<p>而运行测试的时候，本来Intellij会默认先跑make project，但是由于build/classes已经有文件了，所以就skip了，于是导致Intellij找不到resource文件，因为Intellij要求的resource路径和gradle构建时输出的路径不同。</p>
-
-<h3>手动点击Project Rebuild</h3>
-
-<p>可以手动点击Project Rebuild，它会清理Intellij的输出目录（也就是当前Gradle的classes目录），然后在make。</p>
-
-<h3>配置Intellij的Junit</h3>
-
-<p>又或者改变Intellij中Junit的配置，Junit会在运行测试之前，先跑make，可以然它在make之前先跑Gradle的clean任务。</p>
-
-<h3>通过Watch来解决</h3>
-
-<p>还可以将我在上篇文章中介绍的Watch引入，监测文件变化，自动运行compileJava和processResources等Gradle命令，而不要改变Intellij的输出目录，让Gradle和Intellij采用各自的输出目录，就可以的。</p>
-
-<p>参考文献： <br/>
-1.<a href="http://docs.spring.io/spring-boot/docs/current/reference/html/howto-hotswapping.html">http://docs.spring.io/spring-boot/docs/current/reference/html/howto-hotswapping.html</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[学好JavaScript（二）- 被我忽视的东西(2)对象]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/10/06/learning-js-well-2/"/>
-    <updated>2015-10-06T10:02:04+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/10/06/learning-js-well-2</id>
-    <content type="html"><![CDATA[<p>原型</p>
-
-<p>每个JavaScript对象（null除外）都和另一个对象相关联。“另一个”对象就是我们熟知的原型，每一个对象都从原型继承属性。</p>
-
-<p>所有通过对象直接量创建的对象都具有同一个原型对象，并可以通过JavaScript代码Object.prototype获得对原型对象的引用。通过关键字new和构造函数调用创建的对象的原型就是构造函数的prototype属性的值。因此，同使用{}创建对象一样，通过new Object()创建的对象也继承自Object.prototype。同样，通过new Array()创建的对象的原型就是Array.prototype，通过new Date()创建的对象的原型就是Date.prototype。</p>
-
-<p>没有原型的对象为数不多，Object.prototype就是其中之一。他不继承任何属性。其他原型对象都是普通对象，普通对象也有原型。所有的内置的构造函数都具有一个继承自Object.prototype的原型。例如，Date.prototype的属性继承自Object.prototype，因此由new Date()创建的Date对象的属性同时继承自Date.prototype和Object.prototype。这就是所谓的“原型链”。</p>
-
-<p>关联数组</p>
-
-<p>object.property
-object[&ldquo;property&rdquo;]</p>
-
-<p>第二种语法使用方括号和一个字符串，看起来更像数组，只是这个数组是通过字符串索引而不是数字索引，这种数组就是所说的关联数组。</p>
-
-<p>在C++、Java等强类型语言中，对象只能拥有固定数目的属性，并且这些属性名称必须提前定义好。由于JavaScript是弱类型语言，因此不必遵循这个条规定，在任何对象中程序都可以创建任意数量的属性。但当通过点运算符访问对象的属性时，属性名用一个标识符来表示。标示符必须直接出现在JavaScript程序中，它们不是数据类型，因此程序无法修改它们。</p>
-
-<p>反过来讲，当通过[]来访问对象的属性时，属性名通过字符串来表示。字符串是JavaScript的数据类型，在程序运行时可以修改和创建它们。</p>
-
-<p>for(i = 0; i &lt; 4; i++)
-    addr += customer[&ldquo;address&rdquo; + i];</p>
 ]]></content>
   </entry>
   

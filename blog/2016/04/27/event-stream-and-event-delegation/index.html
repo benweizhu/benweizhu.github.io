@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>JavaScript事件流和事件代理/委托 - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="HTML元素都位于另一些。如果鼠标移动到某一个链接，或者点击了链接，同样鼠标也移动到了它的父元素上，并点击了那个父元素。 当你点击某个元素时，产生了一个点击事件，从而产生了一个事件流。 事件流分为两种： 事件冒泡：事件从最具体的节点开始向外传播到最宽泛的节点。这是事件流的默认类型， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2016/04/27/event-stream-and-event-delegation">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">JavaScript事件流和事件代理/委托</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-04-27T21:05:57+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:05 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>HTML元素都位于另一些。如果鼠标移动到某一个链接，或者点击了链接，同样鼠标也移动到了它的父元素上，并点击了那个父元素。</p>
+
+<p>当你点击某个元素时，产生了一个点击事件，从而产生了一个事件流。</p>
+
+<h3>事件流分为两种：</h3>
+
+<p>事件冒泡：事件从最具体的节点开始向外传播到最宽泛的节点。这是事件流的默认类型，被绝大多数浏览器所支持。</p>
+
+<p>事件捕获：事件从最宽泛的节点开始向内传播到最具体的节点。这种方式在IE8和更早版本的IE中不被支持。</p>
+
+<p><img src="/images/js_event_bubble.png" width="500" title="事件流" alt="Alt text" /></p>
+
+<p data-height="424" data-theme-id="0" data-slug-hash="dMgMox" data-default-tab="js,result" data-user="benweizhu" data-embed-version="2" class="codepen">See the Pen <a href="http://codepen.io/benweizhu/pen/dMgMox/">Bubbling Event</a> by Benwei (<a href="http://codepen.io/benweizhu">@benweizhu</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+
+
+<script async src="//assets.codepen.io/assets/embed/ei.js"></script>
+
+
+<p>看一个codepen的例子</p>
+
+<p>什么时候事件冒泡或者说事件流会变得如此重要？</p>
+
+<p>当代码在一个元素和其祖先元素或者后代元素上都有事件处理程序时，事件流就会变得非常重要。</p>
+
+<h3>事件代理/委托</h3>
+
+<p>为大量的元素创建事件监听器会造成页面速度下降，事件流允许你在父元素上监听事件。</p>
+
+<p>如果用户可以和页面中的大量元素进行交互，比如：大量的按钮，很长列表，表格中每一个单元格。如果想这些元素分别添加事件监听器就会使用大量的内存，从而降低性能。</p>
+
+<p>事件可以影响到容器元素（祖先元素），因此可以将事件处理程序放置在一个元素容器上，然后使用事件对象的target属性找到它的后代中是哪一个发生了事件，因此只需要响应一个元素上的事件（而不是在每一个子元素上分别响应事件）。</p>
+
+<p>看一个codepen的例子</p>
+
+<p data-height="266" data-theme-id="0" data-slug-hash="WwaqyP" data-default-tab="js,result" data-user="benweizhu" data-embed-version="2" class="codepen">See the Pen <a href="http://codepen.io/benweizhu/pen/WwaqyP/">WwaqyP</a> by Benwei (<a href="http://codepen.io/benweizhu">@benweizhu</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+
+
+<script async src="//assets.codepen.io/assets/embed/ei.js"></script>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-04-27T21:05:57+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:05 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2016/04/27/event-stream-and-event-delegation/" data-via="" data-counturl="http://benweizhu.github.io/blog/2016/04/27/event-stream-and-event-delegation/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/04/27/what-the-heck-is-javascript-event-loop/" title="Previous Post: what the heck is javascript event loop">&laquo; what the heck is javascript event loop</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="JavaScript事件流和事件代理/委托"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <div style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</div>
+  <div style="margin-left: 8px;margin-top: 10px;">A Java/RoR/NodeJS-FE/Full Stack Developer</div>
+  <div style="margin-left: 8px;margin-top: 10px;">A Gradle Plugin Contributor</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-left: 8px;margin-top: 10px;"><a href='http://www.legulegu.com' target="_blank" style="text-decoration: blink;font-weight: bolder;">乐咕乐股网 - www.legulegu.com</a></div>
+  <div style="margin-left: 8px;">联合创始人/技术负责人/全栈工程师</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle，Spring，前端开发，自动化构建，自动化测试，Devops</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/04/27/event-stream-and-event-delegation/">JavaScript事件流和事件代理/委托</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/27/what-the-heck-is-javascript-event-loop/">What the Heck Is Javascript Event Loop</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/03/25/when-to-use-in-on-at/">什么时候用on, In和at？</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/28/webpack-your-bags-translation/">用Webpack构建和打包模块（JS，SCSS，HTML等）基础（译）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/01/17/spring-cache/">了解Spring Cache</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
