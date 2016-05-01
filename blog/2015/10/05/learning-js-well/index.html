@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>学好JavaScript（一）- 被我忽视的东西(1) - NO END FOR LEARNING</title>
+  <title>学好JavaScript - 初学者忽视和困惑的东西 - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/10/05/learning-js-well-1">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/10/05/learning-js-well">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -67,7 +67,7 @@
   
   <header>
     
-      <h1 class="entry-title">学好JavaScript（一）- 被我忽视的东西(1)</h1>
+      <h1 class="entry-title">学好JavaScript - 初学者忽视和困惑的东西</h1>
     
     
       <p class="meta">
@@ -91,16 +91,38 @@
 
 <p>JavaScript使用分号将语句分开。但如果语句各自独占一行，通常可以省略语句之间的分号。是否省略分号是一种风格，对于不知道什么时候可以省略分号的开发，在任何时候都采用分号分割是一种常见风格。</p>
 
+<h3>强制类型转换和弱类型</h3>
+
+<p>如果使用的数据类型和JavaScript所需的数据类型不同，那么它会尽量使这个操作变得有意义，而不是直接报错。</p>
+
+<p>为完成操作，JavaScript会在背后进行数据类型转换，这被称作强制类型转换。例如，表达式(&lsquo;1&rsquo; > 0)中，字符串‘1’会被转换成数值1，从而导致该表达式的结果为true。</p>
+
+<p>JavaScript被称作弱类型语言，因为值的数据类型是可以变的。其他一些语言则要求指定每个变量的数据类型，这样的语言被称为强类型，比如说Java，C++。</p>
+
+<p>强制类型转换可能会导致代码出现意外情况。因此，当检测两个值是否相等时，推荐使用更加严格的===和!==来取代==和!=，因为严格相等和严格不等会同时检测值及其类型。</p>
+
 <h3>布尔值</h3>
 
-<p>任意JavaScript的值都可以转换为布尔值，下面这些值会被转换为false， <br/>
-undefined  <br/>
-null  <br/>
-0  <br/>
--0 <br/>
-NaN <br/>
-&ldquo;&rdquo; <br/>
-所有其他值，包括所有对象（数组）都会转换成true，false和上面6个可以转换成false的值有时称作“假值”，其他值称作“真值”。JavaScript期望使用一个布尔值的时候，假值会被当做false，真值会被当做true。</p>
+<p>因为存在强制类型转换，JavaScript中的每个值都可以被当做true或者false处理，这就导致了有趣的现象。</p>
+
+<p>任意JavaScript的值都可以转换为布尔值，下面这些值会被转换为false，</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kc">undefined</span>
+</span><span class='line'><span class="kc">null</span>
+</span><span class='line'><span class="mi">0</span>
+</span><span class='line'><span class="o">-</span><span class="mi">0</span>
+</span><span class='line'><span class="kc">NaN</span>
+</span><span class='line'><span class="s2">&quot;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>所有其他值，包括所有对象（数组）都会转换成true，false和上面6个可以转换成false的值有时称作“假值”，其他值称作“真值”。JavaScript期望使用一个布尔值的时候，假值会被当做false，真值会被当做true。</p>
 
 <h3>null和undefined</h3>
 
@@ -113,6 +135,66 @@ NaN <br/>
 <p>尽管null和undefined是不同的，但它们都表示“值的空缺”，两者往往可以互换。判断相等运算符“==”认为两者是相等的，所以需要使用严格相等运算符“===”来区分它们。</p>
 
 <p>如果你想将它们赋值给变量或者属性，或将它们作为参数传入函数，最佳的选择是使用null。</p>
+
+<h3>检测相等和存在</h3>
+
+<p>因为对象或者数组被视为真值，所以这种方法经常被用来判断页面中的元素是否存在。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#main&#39;</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>  
+</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>  
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>由于强制类型转换，严格等于操作符===和严格不等于操作符!==所得结果比==和!=更容易预料。</p>
+
+<p>如果使用==操作，那么下列值被视为相等的：false、0以及&#8217;&lsquo;（空字符串），但在严格的===下，它们是不相等的。</p>
+
+<p>虽然null和undefined都是假值，但它们除了自身之外不等于任何值。同样在使用严格相等时，也是不相等的。</p>
+
+<p>虽然NaN被视为假值，但是它不等于任何值，它升值不等于它自己（因为NaN表示不可定义的数字，两个不可定义的数字是不相同的）。</p>
+
+<h3>短路值</h3>
+
+<p>逻辑操作符是从左向右计算的，当它们获得确定结果时，立刻会发生“短路”（停止运算），但是它们会返回停止运算时的值（不一定是true或者false），这里很有意思。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="o">||</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="c1">// a</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="o">||</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="c1">// c</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="o">||</span><span class="p">{})</span>
+</span><span class='line'><span class="c1">// Object{}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>逻辑操作符并非总返回true或者false，原因在于：</p>
+
+<p>它们会返回停止运算时的值，那个值可能是真值或者假值，但不一定是布尔类型。这种技巧常常被使用于变量赋值和创建对象。</p>
+
+<p>因为这种短路机制，在“或”运算符常常把最可能返回true的放在第一位，在“与”操作符把最可能返回false的放在第一位，或者把最耗时的操作放在最后一位。</p>
 
 <h3>全局对象</h3>
 
@@ -146,12 +228,6 @@ NaN <br/>
 <p>同字符串一样，数字和布尔值也具有各自的方法：通过Number()和Boolean()构造函数创建一个临时对象。</p>
 
 <p>JavaScript会在必要时将包装对象转换成原始值。“==”等于运算符将原始值和其他包装对象视为相等，但“===”全等运算符将它们视为不等。</p>
-
-<h3>相等和不相等运算符</h3>
-
-<p>“==”和“===”运算符用于比较</p>
-
-<p>详细内容待输入</p>
 
 <h3>in运算符</h3>
 
@@ -197,6 +273,28 @@ NaN <br/>
 <p>使用“use strict”指令的目的是说明（脚本或函数中）后续的代码将会解析为严格代码。</p>
 
 <p>严格代码以严格模式执行。ECMAScript5中的严格模式是该语言的一个受限制的子集，它修正了语言的重要缺陷，并提供健壮的查错功能和增强的安全机制。</p>
+
+<h3>原型</h3>
+
+<p>每个JavaScript对象（null除外）都和另一个对象相关联。“另一个”对象就是我们熟知的原型，每一个对象都从原型继承属性。</p>
+
+<p>所有通过对象直接量创建的对象都具有同一个原型对象，并可以通过JavaScript代码Object.prototype获得对原型对象的引用。通过关键字new和构造函数调用创建的对象的原型就是构造函数的prototype属性的值。因此，同使用{}创建对象一样，通过new Object()创建的对象也继承自Object.prototype。同样，通过new Array()创建的对象的原型就是Array.prototype，通过new Date()创建的对象的原型就是Date.prototype。</p>
+
+<p>没有原型的对象为数不多，Object.prototype就是其中之一。他不继承任何属性。其他原型对象都是普通对象，普通对象也有原型。所有的内置的构造函数都具有一个继承自Object.prototype的原型。例如，Date.prototype的属性继承自Object.prototype，因此由new Date()创建的Date对象的属性同时继承自Date.prototype和Object.prototype。这就是所谓的“原型链”。</p>
+
+<h3>关联数组</h3>
+
+<p>object.property
+object[&ldquo;property&rdquo;]</p>
+
+<p>第二种语法使用方括号和一个字符串，看起来更像数组，只是这个数组是通过字符串索引而不是数字索引，这种数组就是所说的关联数组。</p>
+
+<p>在C++、Java等强类型语言中，对象只能拥有固定数目的属性，并且这些属性名称必须提前定义好。由于JavaScript是弱类型语言，因此不必遵循这个条规定，在任何对象中程序都可以创建任意数量的属性。但当通过点运算符访问对象的属性时，属性名用一个标识符来表示。标示符必须直接出现在JavaScript程序中，它们不是数据类型，因此程序无法修改它们。</p>
+
+<p>反过来讲，当通过[]来访问对象的属性时，属性名通过字符串来表示。字符串是JavaScript的数据类型，在程序运行时可以修改和创建它们。</p>
+
+<p>for(i = 0; i &lt; 4; i++)
+    addr += customer[&ldquo;address&rdquo; + i];</p>
 </div>
 
 
@@ -220,7 +318,7 @@ NaN <br/>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/10/05/learning-js-well-1/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/10/05/learning-js-well-1/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/10/05/learning-js-well/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/10/05/learning-js-well/" >Tweet</a>
   
   
   
@@ -232,7 +330,7 @@ NaN <br/>
         <a class="basic-alignment left" href="/blog/2015/09/27/whenever-plus-capistrano-plus-rbenv/" title="Previous Post: 当whenever遇到capistrano和rbenv - Linux下的cron job">&laquo; 当whenever遇到capistrano和rbenv - Linux下的cron job</a>
       
       
-        <a class="basic-alignment right" href="/blog/2015/10/06/learning-js-well-2/" title="Next Post: 学好JavaScript（二）- 被我忽视的东西(2)对象">学好JavaScript（二）- 被我忽视的东西(2)对象 &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2015/10/26/spring-boot-hot-swap/" title="Next Post: 基于Gradle和Intellij的Spring Boot热交换">基于Gradle和Intellij的Spring Boot热交换 &raquo;</a>
       
     </p>
   </footer>
@@ -242,7 +340,7 @@ NaN <br/>
   <section>
     <h1>Comments</h1>
     <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
-<div class="ds-thread" data-title="学好JavaScript（一）- 被我忽视的东西(1)"></div>
+<div class="ds-thread" data-title="学好JavaScript - 初学者忽视和困惑的东西"></div>
 <script type="text/javascript">
   var duoshuoQuery = {short_name:"benweizhu"};
   (function() {
