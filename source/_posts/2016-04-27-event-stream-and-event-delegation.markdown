@@ -41,4 +41,7 @@ HTML元素都位于另一些。如果鼠标移动到某一个链接，或者点�
 <p data-height="266" data-theme-id="0" data-slug-hash="WwaqyP" data-default-tab="js,result" data-user="benweizhu" data-embed-version="2" class="codepen">See the Pen <a href="http://codepen.io/benweizhu/pen/WwaqyP/">WwaqyP</a> by Benwei (<a href="http://codepen.io/benweizhu">@benweizhu</a>) on <a href="http://codepen.io">CodePen</a>.</p>
 <script async src="//assets.codepen.io/assets/embed/ei.js"></script>
 
+参考资料：   
+1.《JavaScript&jQuery交互式Web前端开发》
+
 
