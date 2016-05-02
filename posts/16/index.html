@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="理解什么是多用户多任务分时操作系统 “将大型电脑的珍贵时间资源适当的分配到所有使用者身上，让所有使用者都有独占整部机器的感觉，这是当时计算机先驱提出的分时系统的概念。依据这个想法，通用电气、麻省理工学院和贝尔实验室联手启动Multics项目，这是在当时看着最靠谱的分时系统概念。但是由于太“靠谱”了 &hellip;">
+  <meta name="description" content="什么是资源？什么是表述？ 就本质而言，任何足够重要并被引用的事物都可以是资源。如果你的用户“想要建立指向它的超文本链接，指出或者反对关于它的断言，获取或者缓存它的表述，共另外的表述引用它的全部或者部分，给它增加注释信息，或者对它执行某些操作”，（源自《万维网的架构》），你都应该将它定义为资源。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,100 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/07/25/restful-web-api-part-1/">理解设计RESTful API - 资源、表述和HTTP协议语义</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-07-25T20:39:45+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:39 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>什么是资源？什么是表述？</h3>
+
+<p>就本质而言，任何足够重要并被引用的事物都可以是资源。如果你的用户“想要建立指向它的超文本链接，指出或者反对关于它的断言，获取或者缓存它的表述，共另外的表述引用它的全部或者部分，给它增加注释信息，或者对它执行某些操作”，（源自《万维网的架构》），你都应该将它定义为资源。</p>
+
+<p>每个资源必须拥有URL，在web上，我们使用URL来为每个资源提供一个全球唯一的地址，将一个事物赋以URL，它就会成为一个资源。</p>
+
+<p>石榴可以是一个资源，但是你不可能通过互联网传输它，数据库中的一条记录可以是一个资源，并且可以通过互联网传输。</p>
+
+<p>当客户端对一个资源发起一个Get请求的时候，服务器会以一种有效的方式提供一个采集了资源信息的文档作为回应。这种资源信息的文档就是一种表述，一种以机器可读的方式对资源当前的状态进行说明。</p>
+
+<h3>资源有多重表述</h3>
+
+<p>一个资源可以有多种表述。比如，有的资源可以有整体概括性的表述，也可以有面面俱到的详细表述，又或者可能以JSON格式或者XML格式来表述同一个资源。</p>
+
+<h3>约束 - HTTP协议语义</h3>
+
+<p>尽管任何事物都可以成为一个资源，但是客户端并不能随心所欲地对资源进行任意的操作。所能进行的操作是有规定的。在一个RESTful系统里，客户端和服务器端只能通过相互发送遵循预定义协议的消息来进行交互。在Web API的世界里，该协议就是HTTP。</p>
+
+<p>在设计Web API时，严格遵守HTTP协议语义是设计好的API的重要基础。</p>
+
+<h4>GET请求</h4>
+
+<p>客户端通过发送Get请求来获取某个URL所标示的资源的表述。Get被定义为安全的HTTP方法。它仅仅是对信息的一次请求。向服务器发送一条Get请求对资源的影响应该和没有发送一样。</p>
+
+<h4>DELETE请求</h4>
+
+<p>发送DELETE请求，客户端希望服务器将资源销毁，并且以后再也不会跳到它。当Get请求再次访问一个已经销毁的资源，服务器应该返回错误响应码，比如404（Not Found）。Delete不是一个安全的方法，它会改变资源的状态，但是DELETE方法有另外一个很重要的属性，就是幂等性。当你发送一个DELETE请求后，资源就永久性的消失了，即便之后，再次发送相同的DELETE请求，也许你会收到404的错误码，但是第二次发送后和第一次发送后，资源的状态是一致的，仍然不存在。</p>
+
+<p>幂等性是一个很重要的特性，因为互联网的不稳定性，假设发送的一个Delete请求，因为连接超时，你并没有收到响应，所以你无法知道发送的Delete请求是否顺利完成，这时你也许会发送第二次Delete请求。幂等性保证了执行两次Delete请求并不会比执行一次Delete请求给资源带来更多的影响。</p>
+
+<h4>POST-to-Append请求</h4>
+
+<p>为什么是Post-to-Append而不是Post呢？因为Post方法可以做两件事情，第一件事情就是Post-to-Append，第二件事情叫做overloaded post。我们先看POST-to-Append，向某个资源发送一条Post请求用以在该资源的下一级中创建新的资源，当客户端发送一个POST-to-Append请求时，它会在请求的实体消息体中添加所希望创建的资源的表述信息并发给服务器。Post方法既不安全也不幂等，如果发送多次Post请求，就会创建多个资源。</p>
+
+<h4>PUT请求</h4>
+
+<p>Put请求用于修改资源的状态。客户端一般会通过Get请求获取表述，然后对其进行修改，最后再将修改后的资源表述作为PUT请求的负载数据发送回去。PUT请求也是幂等的，无论发送多少次PUT请求，结果都和第一次发送PUT请求一样。</p>
+
+<hr />
+
+<p>以上4种请求，我们最常见也是使用最频繁的请求。接下来要介绍的请求，虽然见的不多，但是当你了解后，你会觉得它非常有用。</p>
+
+<h4>PATCH请求</h4>
+
+<p>表述的信息量可能非常大。虽然，我们可以使用PUT请求来修改资源，但是如果只想修改资源状态的部分，或者说很少一部分，才PUT就会造成极大的资源浪费，这对于移动应用所使用的Web API设计是非常重要的。和将完整信息发送过去的PUT方法不同，PATCH方法将一个“diff”的表述放在请求的负载数据中发送给服务器。</p>
+
+<h4>HEAD请求</h4>
+
+<p>Head方法是和Get方法一样的安全方法。服务器应该和处理Get方法一样除了Head方法，但是Head方法不需要发送实体消息，只需要发送HTTP状态码和报头。</p>
+
+<h4>OPTIONS请求</h4>
+
+<p>OPTIONS是HTTP的原生探索机制。一个OPTIONS请求的返回结果包含一个HTTP Allow报头，这个报头展示了这个资源所支持的所有HTTP方法。</p>
+
+<h4>肮脏的Overloaded POST请求</h4>
+
+<p>POST不仅仅被用于创建新的资源，在用浏览器上网的时候，POST也被用于传输任何形式的变化，它将PUT、DELETE、PATCH、LINK和UNLINK所有的方法混合成一个方法。</p>
+
+<p>比如，在页面有一个表单对用户的基本信息进行修改，它是一个POST请求，但是从语义上，它更像是一个PUT，但这完全是合法的，任何数据作为POST请求的一部分发出去，不论是出于什么目的，这都是合法的。这导致POST请求没有任何语义。由于重载后的POST请求可以用来完成任何事情，所以这种POST方法既不安全也不幂等。</p>
+
+<hr />
+
+<p><strong>好的API不应该依靠文档来维护它的使用方式，就好像是优秀的代码，不需要注释来考诉你它是干什么，合理的协议语义的使用会帮助API实现基本的自我描述，虽然这还远远不够，但它最起码是互联网上大家都遵守的约束。</strong></p>
+
+<p>参考资料： <br/>
+1. RESTful Web AIPs</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -149,127 +243,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/06/17/spring-web-security-4/">Spring Web Security 实战 (四) - 了解Security基础架构</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-06-17T21:41:24+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:41 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在了解了Spring Security的基本使用之后，还是需要更深入的了解Spring Security的基础架构，核心组件等。</p>
-
-<p>Spring Security是以自包含的角度来实现安全设计，所以使用Spring Security没有任何侵入性。因为Spring Security的目标是自己容器内管理， 所以不需要为你的Java运行环境进行什么特别的配置。</p>
-
-<h2>核心组件</h2>
-
-<h3>SecurityContextHolder, SecurityContext和Authentication对象</h3>
-
-<p>SecurityContextHolder，就如该类的名字所描述的那样，它用来存放当前应用程序的当前安全上下文中的细节，当然也包括“当事人Principal”的细节。SecurityContextHolder将上下文信息存储在ThreadLocal当中，这意味着，安全环境在同一个线程执行的方法一直是有效的。这种情况下使用ThreadLocal是非常安全的，只要记得在处理完当前主体的请求以后，把这个线程清除就行了。当然，Spring Security自动帮你管理这一切了，你就不用担心什么了。</p>
-
-<p>下面这段代码很清晰的说明了上面的实现策略：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">final</span> <span class="kd">class</span> <span class="nc">ThreadLocalSecurityContextHolderStrategy</span> <span class="kd">implements</span> <span class="n">SecurityContextHolderStrategy</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">SecurityContext</span><span class="o">&gt;</span> <span class="n">contextHolder</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">SecurityContext</span><span class="o">&gt;();</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">SecurityContext</span> <span class="nf">getContext</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">SecurityContext</span> <span class="n">ctx</span> <span class="o">=</span> <span class="n">contextHolder</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">ctx</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">ctx</span> <span class="o">=</span> <span class="n">createEmptyContext</span><span class="o">();</span>
-</span><span class='line'>          <span class="n">contextHolder</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">ctx</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">return</span> <span class="n">ctx</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当你从SecurityContextHolder中拿到SecurityContext后，你就可以通过下面的这段代码取到“当事人”或者说用户的信息：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Object</span> <span class="n">principal</span> <span class="o">=</span> <span class="n">SecurityContextHolder</span><span class="o">.</span><span class="na">getContext</span><span class="o">().</span><span class="na">getAuthentication</span><span class="o">().</span><span class="na">getPrincipal</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">principal</span> <span class="k">instanceof</span> <span class="n">UserDetails</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">String</span> <span class="n">username</span> <span class="o">=</span> <span class="o">((</span><span class="n">UserDetails</span><span class="o">)</span><span class="n">principal</span><span class="o">).</span><span class="na">getUsername</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">String</span> <span class="n">username</span> <span class="o">=</span> <span class="n">principal</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>看完上面的代码，就要引入第二个关键组件Authentication：</p>
-
-<p>Authentication是一个接口，代表着一种“认证”令牌，它里面存放着“当事人”的基本信息和是否认证的标志信息。框架在接受到认证请求时，会将新创建的Authentication对象会传递给AuthenticationManager.authenticate(Authentication)，由它来决定“认证”是否成功。</p>
-
-<p>而一旦“认证”请求通过，Authentication通常都会存储在SecurityContext中，由SecurityContextHolder来管理。</p>
-
-<p>除了主体，另一个Authentication提供的重要方法是getAuthorities()。 这个方法提供了GrantedAuthority对象数组。 毫无疑问，GrantedAuthority是赋予到主体的权限。这些权限通常使用角色表示，比如ROLE_ADMINISTRATOR或ROLE_HR_SUPERVISOR。</p>
-
-<p>SecurityContextHolder，提供访问SecurityContext的方式。 <br/>
-SecurityContext，保存Authentication信息，和请求对应的安全信息。  <br/>
-Authentication，作为认证的令牌。  <br/>
-GrantedAuthority，反应在应用程序范围内，赋予的权限。</p>
-
-<h2>Spring Security的认证(Authentication)过程</h2>
-
-<p>让我们考虑一种标准的验证场景，每个人都很熟悉的那种。 <br/>
-一个用户想使用一个账号和密码进行登陆。     <br/>
-系统（成功的）验证了密码对于这个用户名是正确的。 <br/>
-这个用户对应的信息获取（他们的角色列表以及等等）。 <br/>
-为用户建立一个安全环境。 <br/>
-用户会执行一些操作，这些都是潜在被权限控制机制所保护的，通过对操作的授权，使用当前的安全环境信息。</p>
-
-<p>前三个项目执行了验证过程，所以我们可以看一下Spring Security的作用。 <br/>
-用户名和密码被获得，并进行比对，在一个UsernamePasswordAuthenticationToken的实例中（它是Authentication接口的一个实例，我们在之前已经见过了）。 <br/>
-这个标志被发送给一个AuthenticationManager的实例进行校验。 <br/>
-AuthenticationManager返回一个完全的Authentication实例，在成功校验后。 <br/>
-安全环境被建立，通过调用SecurityContextHolder.getContext().setAuthentication(&hellip;)，传递到返回的验证对象中。</p>
-
-<p>事实上，Spring Security并不介意你如何将Authentication对象放到SecurityContextHolder里。唯一关键的一点是 在AbstractSecurityInterceptor需要验证一个用户操作之前，SecurityContextHolder必须包含了一个表示了主体的Authentication。</p>
-
-<p>待续。。。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/17">&larr; Older</a>
@@ -297,6 +270,10 @@ AuthenticationManager返回一个完全的Authentication实例，在成功校验
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/05/02/js-prevent-default/">JS 改变默认行为 e.preventDefault() e.returnValue e.stopPropagation e.cancelBubble Return False</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/04/27/event-stream-and-event-delegation/">JavaScript事件流和事件代理/委托</a>
       </li>
     
@@ -310,10 +287,6 @@ AuthenticationManager返回一个完全的Authentication实例，在成功校验
     
       <li class="post">
         <a href="/blog/2016/02/28/webpack-your-bags-translation/">用Webpack构建和打包模块（JS，SCSS，HTML等）基础（译）</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/01/17/spring-cache/">了解Spring Cache</a>
       </li>
     
   </ul>
