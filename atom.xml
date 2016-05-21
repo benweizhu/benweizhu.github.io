@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-05-02T09:50:41+08:00</updated>
+  <updated>2016-05-21T21:37:32+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,146 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[将Nginx作为Tomcat的反向代理服务器]]></title>
+    <link href="http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/"/>
+    <updated>2016-05-21T21:15:08+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat</id>
+    <content type="html"><![CDATA[<p>本例子，以mac作为主机：</p>
+
+<h2>安装Nginx</h2>
+
+<p>通过HomeBrew安装Nginx。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>brew install nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后，运行启动nginx。如果启动遇到问题，使用brew doctor查看下，有可能是没有link（brew link nginx），或者没有文件执行权限（chmod去改）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>nginx启动默认是8080端口，所以到 <a href="http://localhost:8080">http://localhost:8080</a> 上测试下。mac上nginx.conf的位置在/usr/local/etc/nginx/nginx.conf，也可以通过brew info nginx查看。
+因为我们要使用80端口，所以需要修改配置，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
+</span><span class='line'>    listen       8080<span class="p">;</span>
+</span><span class='line'>    server_name  localhost<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">#access_log  logs/host.access.log  main;</span>
+</span><span class='line'>
+</span><span class='line'>    location / <span class="o">{</span>
+</span><span class='line'>        root   html<span class="p">;</span>
+</span><span class='line'>        index  index.html index.htm<span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>改为：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
+</span><span class='line'>    listen       80<span class="p">;</span>
+</span><span class='line'>    server_name  localhost<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">#access_log  logs/host.access.log  main;</span>
+</span><span class='line'>
+</span><span class='line'>    location / <span class="o">{</span>
+</span><span class='line'>        root   html<span class="p">;</span>
+</span><span class='line'>        index  index.html index.htm<span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个时候，需要sudo去启动nginx了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>sudo nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>访问 <a href="http://localhost">http://localhost</a> 进行测试，可以看到Nginx的主页。</p>
+
+<h2>安装Tomcat</h2>
+
+<p><a href="https://tomcat.apache.org/download-80.cgi">https://tomcat.apache.org/download-80.cgi</a></p>
+
+<p>运行bin下面的./startup.sh。同样如果没有执行权限，用chmod修改。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>./startup.sh
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>默认是8080，访问 <a href="http://localhost:8080">http://localhost:8080</a> 可以看到Tomcat的主页。</p>
+
+<h2>修改Nginx配置，通过proxy_pass转发80请求到8080</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
+</span><span class='line'>        listen       80<span class="p">;</span>
+</span><span class='line'>        server_name  localhost<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c">#access_log  logs/host.access.log  main;</span>
+</span><span class='line'>
+</span><span class='line'>        location / <span class="o">{</span>
+</span><span class='line'>            proxy_pass http://127.0.0.1:8080<span class="p">;</span>
+</span><span class='line'>            root   html<span class="p">;</span>
+</span><span class='line'>            index  index.html index.htm<span class="p">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>此时，重启Nginx服务器:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo nginx -s stop
+</span><span class='line'>sudo nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>再次访问 <a href="http://localhost">http://localhost</a> 进行测试，就会看到Tomcat的主页了。</p>
+
+<p>参考资料：<br/>
+1. <a href="http://learnaholic.me/2012/10/10/installing-nginx-in-mac-os-x-mountain-lion/">http://learnaholic.me/2012/10/10/installing-nginx-in-mac-os-x-mountain-lion/</a><br/>
+2. <a href="https://devtidbits.com/2015/12/08/nginx-as-a-reverse-proxy-to-apache-tomcat/">https://devtidbits.com/2015/12/08/nginx-as-a-reverse-proxy-to-apache-tomcat/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[JS 改变默认行为 e.preventDefault() e.returnValue e.stopPropagation e.cancelBubble Return False]]></title>
@@ -3546,250 +3686,6 @@ Heroku Enterprise</p>
 
 <p>参考资料  <br/>
 1.<a href="http://handlebarsjs.com">http://handlebarsjs.com</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[重温SASS基础]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/10/27/sass-basic/"/>
-    <updated>2015-10-27T14:18:48+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/10/27/sass-basic</id>
-    <content type="html"><![CDATA[<p>最早因为Bootstrap接触到了LESS，但LESS随着时间，使用的人越来越少，大家都开始转向SASS，至于为什么，原因很多，大家可以去网上搜索，有很多人都对比了LESS和SASS。今天主要是来回顾SASS的基础知识。</p>
-
-<p>CSS很好，但是随着stylesheets的内容增多，变得越来越复杂，也越来越难以维护。此时，CSS预处理器横空出世，SASS就是其中一种。</p>
-
-<p>SASS允许你做许多在CSS中做不了的事情，比如：变量，网状结构（接近DOM结构），mixin，继承等。</p>
-
-<h3>变量</h3>
-
-<p>Sass使用$符号定义变量，就和其他编程语言一定，它可以被赋值和重复使用。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">$</span><span class="nt">font-stack</span><span class="o">:</span>    <span class="nt">Helvetica</span><span class="o">,</span> <span class="nt">sans-serif</span><span class="o">;</span>
-</span><span class='line'><span class="o">$</span><span class="nt">primary-color</span><span class="o">:</span> <span class="nf">#333</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">body</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">font</span><span class="o">:</span> <span class="m">100%</span> <span class="err">$</span><span class="k">font</span><span class="o">-</span><span class="n">stack</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">color</span><span class="o">:</span> <span class="err">$</span><span class="n">primary</span><span class="o">-</span><span class="k">color</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>网状结构</h3>
-
-<p>Sass比CSS强大的一点是，可读性好，CSS有后代选择器和权重的知识，它们与DOM结构息息相关，但是CSS本身却没有很好的语法结构来反映这种结构，Sass做到了这一点。</p>
-
-<p>Sass让你的css选择器符合真实的HTML层次结构，当然Sass官方也提示如果过度的使用网状结构，也会导致CSS很难维护。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">nav</span> <span class="p">{</span>
-</span><span class='line'>  <span class="n">ul</span> <span class="err">{</span>
-</span><span class='line'>    <span class="k">margin</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">padding</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">list-style</span><span class="o">:</span> <span class="k">none</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nt">li</span> <span class="p">{</span> <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nt">a</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">display</span><span class="o">:</span> <span class="k">block</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">padding</span><span class="o">:</span> <span class="m">6px</span> <span class="m">12px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">text-decoration</span><span class="o">:</span> <span class="k">none</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="err">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面的例子中，ul和li是在nav结构之中的。</p>
-
-<h3>通过Partial和Import来做模块化</h3>
-
-<p>CSS本身也是有import功能的，但是缺点是，它会在页面中单独发送一个Http请求来获取这个import进来的css。</p>
-
-<p>Sass是一个CSS预处理器，它的import是建立在编译过程中，将两个或者多个文件合并，所以机制完全不同。</p>
-
-<p>比如，有_reset.scss和base.scss两个文件，注意，定义Partial的sass文件是以下划线开头的。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">//</span> <span class="nt">_reset</span><span class="nc">.scss</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">html</span><span class="o">,</span>
-</span><span class='line'><span class="nt">body</span><span class="o">,</span>
-</span><span class='line'><span class="nt">ul</span><span class="o">,</span>
-</span><span class='line'><span class="nt">ol</span> <span class="p">{</span>
-</span><span class='line'>   <span class="k">margin</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">padding</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">//</span> <span class="nt">base</span><span class="nc">.scss</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">@import</span> <span class="s1">&#39;reset&#39;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">body</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">font</span><span class="o">:</span> <span class="m">100%</span> <span class="n">Helvetica</span><span class="o">,</span> <span class="k">sans-serif</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="m">#efefef</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Mixins</h3>
-
-<p>Mixins是一个非常有用的功能，Mixins允许你将一组css定义在不同的位置重用，而且还可以像函数一样传递变量。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="k">@mixin</span> <span class="nt">border-radius</span><span class="o">($</span><span class="nt">radius</span><span class="o">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nt">-webkit-border-radius</span><span class="o">:</span> <span class="o">$</span><span class="nt">radius</span><span class="o">;</span>
-</span><span class='line'>     <span class="nt">-moz-border-radius</span><span class="o">:</span> <span class="o">$</span><span class="nt">radius</span><span class="o">;</span>
-</span><span class='line'>      <span class="nt">-ms-border-radius</span><span class="o">:</span> <span class="o">$</span><span class="nt">radius</span><span class="o">;</span>
-</span><span class='line'>          <span class="nt">border-radius</span><span class="o">:</span> <span class="o">$</span><span class="nt">radius</span><span class="o">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.box</span> <span class="p">{</span> <span class="o">@</span><span class="n">include</span> <span class="k">border</span><span class="o">-</span><span class="n">radius</span><span class="p">(</span><span class="m">10px</span><span class="p">);</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Extend/Inheritance继承</h3>
-
-<p>通过@extend关键字，你可以让一系列的在某个选择器中css属性，在另一个css选择器中继承，也是重用css定义的一种模式。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.message</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">border</span><span class="o">:</span> <span class="m">1px</span> <span class="k">solid</span> <span class="m">#ccc</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">padding</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">color</span><span class="o">:</span> <span class="m">#333</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.success</span> <span class="p">{</span>
-</span><span class='line'>  <span class="o">@</span><span class="n">extend</span> <span class="o">.</span><span class="n">message</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">border-color</span><span class="o">:</span> <span class="nb">green</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.error</span> <span class="p">{</span>
-</span><span class='line'>  <span class="o">@</span><span class="n">extend</span> <span class="o">.</span><span class="n">message</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">border-color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.warning</span> <span class="p">{</span>
-</span><span class='line'>  <span class="o">@</span><span class="n">extend</span> <span class="o">.</span><span class="n">message</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">border-color</span><span class="o">:</span> <span class="nb">yellow</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Operators操作符/运算符</h3>
-
-<p>Sass可以轻易的进行数学运算，+, -, *, /, %</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.container</span> <span class="p">{</span> <span class="k">width</span><span class="o">:</span> <span class="m">100%</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">article</span><span class="o">[</span><span class="nt">role</span><span class="o">=</span><span class="s2">&quot;main&quot;</span><span class="o">]</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">float</span><span class="o">:</span> <span class="k">left</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">600px</span> <span class="o">/</span> <span class="m">960px</span> <span class="o">*</span> <span class="m">100%</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">aside</span><span class="o">[</span><span class="nt">role</span><span class="o">=</span><span class="s2">&quot;complimentary&quot;</span><span class="o">]</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">float</span><span class="o">:</span> <span class="k">right</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">300px</span> <span class="o">/</span> <span class="m">960px</span> <span class="o">*</span> <span class="m">100%</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Data Types有用的数据类型</h3>
-
-<p>SassScript支持七种主要的数据类型</p>
-
-<p>numbers (e.g. 1.2, 13, 10px) <br/>
-strings of text, with and without quotes (e.g. &ldquo;foo&rdquo;, &lsquo;bar&rsquo;, baz) <br/>
-colors (e.g. blue, #04a3f9, rgba(255, 0, 0, 0.5)) <br/>
-booleans (e.g. true, false) <br/>
-nulls (e.g. null) <br/>
-lists of values, separated by spaces or commas (e.g. 1.5em 1em 0 2em, Helvetica, Arial, sans-serif) <br/>
-maps from one value to another (e.g. (key1: value1, key2: value2))</p>
-
-<p>比如：map</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">$</span><span class="nt">map</span><span class="o">:</span> <span class="o">(</span><span class="nt">key1</span><span class="o">:</span> <span class="nt">value1</span><span class="o">,</span> <span class="nt">key2</span><span class="o">:</span> <span class="nt">value2</span><span class="o">,</span> <span class="nt">key3</span><span class="o">:</span> <span class="nt">value3</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考文献： <br/>
-1.SASS官方文档</p>
 ]]></content>
   </entry>
   

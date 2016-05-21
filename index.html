@@ -9,7 +9,8 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="事件对象有一些方法可以改变一个元素的默认行为，以及它的祖先元素如何对这个事件作出响应。 有一些事件，比如点击链接或提交表单，会把用户导向另一个页面。为了阻止这类元素的这种默认行为，比如在用户点击链接或提交表单之后还是停留在当前页面，而不是导向新的页面， &hellip;">
+  <meta name="description" content="本例子，以mac作为主机： 安装Nginx 通过HomeBrew安装Nginx。 1
+$ brew install nginx 然后，运行启动nginx。如果启动遇到问题，使用brew doctor查看下，有可能是没有link（brew link nginx），或者没有文件执行权限（chmod去改 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +65,166 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">将Nginx作为Tomcat的反向代理服务器</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-05-21T21:15:08+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>9:15 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>本例子，以mac作为主机：</p>
+
+<h2>安装Nginx</h2>
+
+<p>通过HomeBrew安装Nginx。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>brew install nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后，运行启动nginx。如果启动遇到问题，使用brew doctor查看下，有可能是没有link（brew link nginx），或者没有文件执行权限（chmod去改）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>nginx启动默认是8080端口，所以到 <a href="http://localhost:8080">http://localhost:8080</a> 上测试下。mac上nginx.conf的位置在/usr/local/etc/nginx/nginx.conf，也可以通过brew info nginx查看。
+因为我们要使用80端口，所以需要修改配置，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
+</span><span class='line'>    listen       8080<span class="p">;</span>
+</span><span class='line'>    server_name  localhost<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">#access_log  logs/host.access.log  main;</span>
+</span><span class='line'>
+</span><span class='line'>    location / <span class="o">{</span>
+</span><span class='line'>        root   html<span class="p">;</span>
+</span><span class='line'>        index  index.html index.htm<span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>改为：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
+</span><span class='line'>    listen       80<span class="p">;</span>
+</span><span class='line'>    server_name  localhost<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">#access_log  logs/host.access.log  main;</span>
+</span><span class='line'>
+</span><span class='line'>    location / <span class="o">{</span>
+</span><span class='line'>        root   html<span class="p">;</span>
+</span><span class='line'>        index  index.html index.htm<span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个时候，需要sudo去启动nginx了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>sudo nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>访问 <a href="http://localhost">http://localhost</a> 进行测试，可以看到Nginx的主页。</p>
+
+<h2>安装Tomcat</h2>
+
+<p><a href="https://tomcat.apache.org/download-80.cgi">https://tomcat.apache.org/download-80.cgi</a></p>
+
+<p>运行bin下面的./startup.sh。同样如果没有执行权限，用chmod修改。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>./startup.sh
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>默认是8080，访问 <a href="http://localhost:8080">http://localhost:8080</a> 可以看到Tomcat的主页。</p>
+
+<h2>修改Nginx配置，通过proxy_pass转发80请求到8080</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
+</span><span class='line'>        listen       80<span class="p">;</span>
+</span><span class='line'>        server_name  localhost<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c">#access_log  logs/host.access.log  main;</span>
+</span><span class='line'>
+</span><span class='line'>        location / <span class="o">{</span>
+</span><span class='line'>            proxy_pass http://127.0.0.1:8080<span class="p">;</span>
+</span><span class='line'>            root   html<span class="p">;</span>
+</span><span class='line'>            index  index.html index.htm<span class="p">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>此时，重启Nginx服务器:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo nginx -s stop
+</span><span class='line'>sudo nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>再次访问 <a href="http://localhost">http://localhost</a> 进行测试，就会看到Tomcat的主页了。</p>
+
+<p>参考资料：<br/>
+1. <a href="http://learnaholic.me/2012/10/10/installing-nginx-in-mac-os-x-mountain-lion/">http://learnaholic.me/2012/10/10/installing-nginx-in-mac-os-x-mountain-lion/</a><br/>
+2. <a href="https://devtidbits.com/2015/12/08/nginx-as-a-reverse-proxy-to-apache-tomcat/">https://devtidbits.com/2015/12/08/nginx-as-a-reverse-proxy-to-apache-tomcat/</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -144,76 +305,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/04/27/event-stream-and-event-delegation/">JavaScript事件流和事件代理/委托</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-04-27T21:05:57+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:05 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>HTML元素都位于另一些。如果鼠标移动到某一个链接，或者点击了链接，同样鼠标也移动到了它的父元素上，并点击了那个父元素。</p>
-
-<p>当你点击某个元素时，产生了一个点击事件，从而产生了一个事件流。</p>
-
-<h3>事件流分为两种：</h3>
-
-<p>事件冒泡：事件从最具体的节点开始向外传播到最宽泛的节点。这是事件流的默认类型，被绝大多数浏览器所支持。</p>
-
-<p>事件捕获：事件从最宽泛的节点开始向内传播到最具体的节点。这种方式在IE8和更早版本的IE中不被支持。</p>
-
-<p><img src="/images/js_event_bubble.png" width="500" title="事件流" alt="Alt text" /></p>
-
-<p data-height="424" data-theme-id="0" data-slug-hash="dMgMox" data-default-tab="js,result" data-user="benweizhu" data-embed-version="2" class="codepen">See the Pen <a href="http://codepen.io/benweizhu/pen/dMgMox/">Bubbling Event</a> by Benwei (<a href="http://codepen.io/benweizhu">@benweizhu</a>) on <a href="http://codepen.io">CodePen</a>.</p>
-
-
-<script async src="//assets.codepen.io/assets/embed/ei.js"></script>
-
-
-<p>看一个codepen的例子</p>
-
-<p>什么时候事件冒泡或者说事件流会变得如此重要？</p>
-
-<p>当代码在一个元素和其祖先元素或者后代元素上都有事件处理程序时，事件流就会变得非常重要。</p>
-
-<h3>事件代理/委托</h3>
-
-<p>为大量的元素创建事件监听器会造成页面速度下降，事件流允许你在父元素上监听事件。</p>
-
-<p>如果用户可以和页面中的大量元素进行交互，比如：大量的按钮，很长列表，表格中每一个单元格。如果想这些元素分别添加事件监听器就会使用大量的内存，从而降低性能。</p>
-
-<p>事件可以影响到容器元素（祖先元素），因此可以将事件处理程序放置在一个元素容器上，然后使用事件对象的target属性找到它的后代中是哪一个发生了事件，因此只需要响应一个元素上的事件（而不是在每一个子元素上分别响应事件）。</p>
-
-<p>看一个codepen的例子</p>
-
-<p data-height="266" data-theme-id="0" data-slug-hash="WwaqyP" data-default-tab="js,result" data-user="benweizhu" data-embed-version="2" class="codepen">See the Pen <a href="http://codepen.io/benweizhu/pen/WwaqyP/">WwaqyP</a> by Benwei (<a href="http://codepen.io/benweizhu">@benweizhu</a>) on <a href="http://codepen.io">CodePen</a>.</p>
-
-
-<script async src="//assets.codepen.io/assets/embed/ei.js"></script>
-
-
-<p>参考资料： <br/>
-1.《JavaScript&amp;jQuery交互式Web前端开发》</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -239,6 +330,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">将Nginx作为Tomcat的反向代理服务器</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/05/02/js-prevent-default/">JS 改变默认行为 e.preventDefault() e.returnValue e.stopPropagation e.cancelBubble Return False</a>
       </li>
     
@@ -252,10 +347,6 @@
     
       <li class="post">
         <a href="/blog/2016/03/25/when-to-use-in-on-at/">什么时候用on, In和at？</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/02/28/webpack-your-bags-translation/">用Webpack构建和打包模块（JS，SCSS，HTML等）基础（译）</a>
       </li>
     
   </ul>
