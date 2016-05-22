@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="URL静态化一直以来都是最基本的SEO要求之一，但近年来搜索引擎技术进步，抓取动态url已经不是问题，SEO行业对是否一定要做静态化也有了一些观念上的改变。 为什么要做静态化？ 现在的网站绝大多数都是数据库驱动，页面由程序实时生成，而不是真的在服务器上有一个静态HTML文件存在。 &hellip;">
+  <meta name="description" content="这篇博客的起源比较有意思，客户给我们出了一道前端的开发题目，实现一个满足某种需求的web应用程序，算是某种程度的面试或者能力检测。 开发的技术栈采用我比较熟悉的： 环境：Node 脚手架，构建和依赖管理：Yoman，Gulp，Bower，NPM（Node包管理也算依赖管理吧） 开发框架： &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,290 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-11-06T08:06:16+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:06 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>这篇博客的起源比较有意思，客户给我们出了一道前端的开发题目，实现一个满足某种需求的web应用程序，算是某种程度的面试或者能力检测。</p>
+
+<p>开发的技术栈采用我比较熟悉的：</p>
+
+<p>环境：Node  <br/>
+脚手架，构建和依赖管理：Yoman，Gulp，Bower，NPM（Node包管理也算依赖管理吧）  <br/>
+开发框架：AngularJS，Bootstrap  <br/>
+测试框架和Runner：Karma，Protractor，Jasmine，Webdriver</p>
+
+<p>当然还有些七七八八的JavaScript类库，这里就不罗列了。</p>
+
+<p>开发时间大概用了不到一天，考虑到这些环境我都没安装，所以下载还是花了点时间的，基本的本地运行，单元测试，功能测试都完善了，本来想着已经差不多了，但作为一个在以构建，持续集成和持续交付自豪的公司（Build and CI is in our DNA）里工作的开发人员，好像还差点什么。</p>
+
+<p>没错，就是<strong>持续集成和部署到PreProduction环境或者Production环境</strong>，之前没怎么用过Heroku，所以彻底完成还是足足花费了一天的时间，也就是从开发到上线用了两天，不过这其中踩了无数的坑。</p>
+
+<p>关于开发以及构建的部分，我就不详细说明了，这与标题也不符合。</p>
+
+<h2>TravisCI</h2>
+
+<p><img src="https://travis-ci.com/img/travis-mascot-200px.png" alt="Alt text" /></p>
+
+<blockquote><p>Test and Deploy with Confidence
+Easily sync your GitHub projects with Travis CI and you’ll be testing your code in minutes!</p></blockquote>
+
+<p>TravisCI是一个免费的，可以和Github项目同步的持续集成服务器，对持续集成这个概念不懂的同学，请参考我司（我厂）高级咨询师腾云的翻译的Martin Fowler的文章《持续集成》 <a href="http://www.cnblogs.com/CloudTeng/archive/2012/02/25/2367565.html">http://www.cnblogs.com/CloudTeng/archive/2012/02/25/2367565.html</a> 。</p>
+
+<p>其实，要使用TravisCI是非常简单的，假设你是Java的项目，且采用了Maven或者Gradle做构建，那么只需要在项目中添加一个.travis.yml的文件，在里面写上language: java，提交，并在TravisCI上将项目Sync打开，就可以开始构建了。可以参考资料： <a href="http://docs.travis-ci.com/user/languages/java/">http://docs.travis-ci.com/user/languages/java/</a></p>
+
+<p>但是在本例子中，采用的是Node环境，所以相对的配置就需要有所改变。基本配置和Java环境类似：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">language</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">node_js</span>
+</span><span class='line'><span class="l-Scalar-Plain">node_js</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;4.1&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;4.0&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.12&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.11&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.10&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.8&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.6&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;iojs&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里要注意的是Node的版本，如果你使用4.0以上版本，很有可能在TravisCI上会遇到，导致npm install失败：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">../</span><span class="n">node_modules</span><span class="o">/</span><span class="n">nan</span><span class="o">/</span><span class="n">nan</span><span class="o">.</span><span class="n">h</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">3</span><span class="p">:</span> <span class="n">error</span><span class="p">:</span> <span class="c">#error This version of node/NAN/v8 requires a C++11 compiler</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>官方文档上并没有给出解决这个问题的办法，唯一的临时解决办法就是使用低于4的稳定版本，比如我使用是0.12。</p>
+
+<p>对于Node项目，TravisCI默认执行：npm test命令来运行你的测试（官方翻译：测试套件）。</p>
+
+<p>如果你查看了官方文档，项目采用Gulp做构建，它会告诉你还需要在.travis.yml文件中添加：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">before_script</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">npm install -g gulp</span>
+</span><span class='line'><span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">gulp</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果添加script: gulp，TravisCI会运行gulp，而不会运行npm test命令，所以这里取决于你的项目构建（测试）运行方式。我这里采用的npm test，因为需要同时运行单元测试和功能测试，在我的配置中，gulp任务只是最优化打包应用，所以在.travis.yml我并没有这些配置。</p>
+
+<p>官方参考文档： <a href="http://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Using-Gulp">http://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Using-Gulp</a></p>
+
+<p>我的配置全部在package.json的Script中，主要原因是为了方便Heroku部署，这里之所以需要在npm install之后运行bower install是为了功能测试能够正常运行。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;scripts&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;test&quot;</span><span class="o">:</span> <span class="s2">&quot;gulp test &amp; gulp protractor&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;start&quot;</span><span class="o">:</span> <span class="s2">&quot;./node_modules/.bin/gulp serve:dist&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;postinstall&quot;</span><span class="o">:</span> <span class="s2">&quot;./node_modules/.bin/bower install&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>到目前为止，TravisCI的配置就结束了，项目可以正常的在持续集成服务器（CI Server）上运行。</p>
+
+<h2>Heroku</h2>
+
+<p><img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/Heroku_logo.png/220px-Heroku_logo.png" alt="Alt text" /></p>
+
+<blockquote><p>Heroku (pronounced her-OH-koo) is a cloud application platform – a new way of building and deploying web apps.</p></blockquote>
+
+<p>Heroku是国外有名的云应用平台，旗下的产品有： <br/>
+Heroku Platform <br/>
+Heroku Postgres <br/>
+Heroku Redis <br/>
+Heroku Connect <br/>
+Heroku Enterprise</p>
+
+<h3>注册和安装Toolbelt</h3>
+
+<p>首先，你需要注册Heroku的账号，然后安装Heroku的Toolbelt工具。   <br/>
+可以参考： <a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up">https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up</a></p>
+
+<p>安装参考资料的提示，登录：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">heroku</span> <span class="n">login</span>
+</span><span class='line'><span class="n">Enter</span> <span class="n">your</span> <span class="n">Heroku</span> <span class="n">credentials</span><span class="o">.</span>
+</span><span class='line'><span class="n">Email</span><span class="p">:</span> <span class="n">zeke</span><span class="nd">@example.com</span>
+</span><span class='line'><span class="n">Password</span><span class="p">:</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>在Travis中配置Heroku</h3>
+
+<p>登录Heroku创建一个应用程序，名字你自己取（得小写字母）</p>
+
+<p>进入到应用，在Deploy的tab里面，你会看到一个Connect to Github，你可以选择将哪个repository和该应用关联来实现自动部署或手动部署，但TravisCI的自动部署跟它没有关系，所以你不用管它。</p>
+
+<p>你要做的是看这里： <a href="http://docs.travis-ci.com/user/deployment/heroku/">http://docs.travis-ci.com/user/deployment/heroku/</a></p>
+
+<p>在.travis.yml中配置：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">deploy</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">heroku</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">api_key</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">secure</span><span class="p-Indicator">:</span> <span class="s">&quot;YOUR</span><span class="nv"> </span><span class="s">ENCRYPTED</span><span class="nv"> </span><span class="s">API</span><span class="nv"> </span><span class="s">KEY&quot;</span>
+</span><span class='line'><span class="nn">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>虽然，你看得懂文档，但不建议手动配置，建议Travis和Heroku的客户端都安装，然后在项目目录下运行：travis setup heroku，来自动配置.travis.yml文件。</p>
+
+<p>可以参考的文档： <a href="http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/">http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/</a></p>
+
+<p>配置完成之后，.travis.yml文件大概和下面的相似：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">language</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">node_js</span>
+</span><span class='line'><span class="l-Scalar-Plain">node_js</span><span class="p-Indicator">:</span>
+</span><span class='line'><span class="p-Indicator">-</span> <span class="s">&#39;0.12&#39;</span>
+</span><span class='line'><span class="l-Scalar-Plain">deploy</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">heroku</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">api_key</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">secure</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">QFSD0pnNddlsdZ6Wm/...</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">app</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">yourapplicationname</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">on</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">repo</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">benweizhu/yourApplicationRepoName</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>提交代码之后，TravisCI就会开始在构建完成之后，开始执行部署到Heroku。</p>
+
+<p>这样就完了吗？错！！！前面已经踩过一些坑，但还不够坑。</p>
+
+<h2>现在正式开始采坑</h2>
+
+<p>执行完上面的步骤，你会发现构建是绿的，并且显示：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">-----&gt;</span> <span class="n">Compressing</span><span class="o">...</span> <span class="n">done</span><span class="p">,</span> <span class="mf">65.3</span><span class="n">MB</span>
+</span><span class='line'><span class="o">-----&gt;</span> <span class="n">Launching</span><span class="o">...</span> <span class="n">done</span><span class="p">,</span> <span class="n">v28</span>
+</span><span class='line'>       <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">yourapplicationname</span><span class="o">.</span><span class="n">herokuapp</span><span class="o">.</span><span class="n">com</span><span class="o">/</span> <span class="n">deployed</span> <span class="n">to</span> <span class="n">Heroku</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当你通过URL打开应用时，就会出现Application Error的页面。这个时候，就要开始troubleshooting了。</p>
+
+<p>首先，你需要在TravisCI上构建和部署的log，这个就不用我教了。</p>
+
+<p>如果TravisCI上没有问题，那么，你就需要查看Heroku服务器上的log，方法如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">heroku</span> <span class="n">logs</span> <span class="o">--</span><span class="n">tail</span> <span class="o">--</span><span class="n">app</span> <span class="n">appname</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>所有的出现问题/导致失败的原因都可以在log中看到。</p>
+
+<p><strong>常见问题</strong></p>
+
+<p>问题1：Heroku的Node环境启动时，运行npm start，所以，你需要配置好，package中的script命令来正确的启动服务器。你也可以配置Procfile文件，那么它就会执行文件中的命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">web</span><span class="p">:</span> <span class="n">node</span> <span class="n">node_modules</span><span class="o">/.</span><span class="n">bin</span><span class="o">/</span><span class="n">gulp</span> <span class="n">serve</span><span class="p">:</span><span class="n">dist</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>问题2：Heroku没有在全局（global）下安装gulp，所以项目的gulp需要安装在本地，在npm start的命令中也要有相应的配置，比如：gulp命令是执行本地的bin目录。</p>
+
+<p>问题3：Heroku会先运行npm install，所以如果项目使用了BowerJS，那么在postInstall要进行bower install。</p>
+
+<p>问题4：确保package中，dependencies的配置是正确的，很多情况下，我们都把依赖放在了devDependencies中，但在产品环境下，应该在dependencies下。</p>
+
+<p>问题5：端口号配置</p>
+
+<p>一个Web dyno并需和传递给他的$PORT在60秒内绑定。</p>
+
+<p>所以应用程序的端口配置应该：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// set the port of our application</span>
+</span><span class='line'><span class="c1">// process.env.PORT lets the port be set by Heroku</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">8080</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Web Dynos: Web dynos are dynos of the “web” process type that is defined in your Procfile. Only web dynos receive HTTP traffic from Heroku’s routers.</p>
+
+<p>另外还有一些问题：可能出在Heroku的配置上，具体请参考<strong>Heroku官方的troubleshooting</strong>： <a href="https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate">https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate</a></p>
+
+<h2>结束语</h2>
+
+<p>整个项目是一个完整的JavaScript全栈项目，从需求，到开发，最后部署，花费两天时间，虽然辛苦，但是学到不少东西。</p>
+
+<p>参考资料： <br/>
+1.<a href="http://docs.travis-ci.com/user/languages/javascript-with-nodejs/">http://docs.travis-ci.com/user/languages/javascript-with-nodejs/</a>  <br/>
+2.<a href="http://docs.travis-ci.com/user/deployment/heroku/">http://docs.travis-ci.com/user/deployment/heroku/</a>  <br/>
+3.<a href="http://www.sitepoint.com/deploying-heroku-using-gulp-node-git/">http://www.sitepoint.com/deploying-heroku-using-gulp-node-git/</a>
+4.<a href="http://www.hygkui.com/2015/03/13/%E4%BD%BF%E7%94%A8Gulp-Node-Git%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E5%88%B0Heroku%E4%B8%8A/">http://www.hygkui.com/2015/03/13/%E4%BD%BF%E7%94%A8Gulp-Node-Git%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E5%88%B0Heroku%E4%B8%8A/</a> 上面的中文版  <br/>
+5.<a href="http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/">http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/</a>  <br/>
+6.<a href="https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate">https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -180,203 +464,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/10/28/js-template-engine/">了解JavaScript模板引擎</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-10-28T08:36:18+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:36 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>模板引擎这个概念，相信对大家并不陌生，如果做过Java EE的开发，或者Rails开发，那么Jsp，Erb，Haml都是一种模板引擎，也许你还听说过Apache的velocity，只不过它们是后端的模板引擎，模板的渲染由服务器端完成。</p>
-
-<p>比如这样的代码：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>//Jsp With EL
-</span><span class='line'><span class="nt">&lt;div&gt;</span>user name: ${userName}<span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'>//Haml
-</span><span class='line'>%div = &quot;user name: #{userName}&quot;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>JavaScript模板引擎，顾名思义，它也是一种模板引擎，只不过由JavaScript实现，是一种前端或者说是客户端的模板引擎。</p>
-
-<h3>这个时候，也许你要问了，为什么需要前端模板引擎，它有什么作用？</h3>
-
-<p>其实，它的作用和后端的模板引擎作用相似，所以还是回归到了模板引擎的作用。</p>
-
-<p>不知道，大家知不知道JavaEE(J2EE)的发展历程，基本过程是CGI-Servlet-JSP-Model1-Model2，再到之后的MVC。</p>
-
-<p>如果你感兴趣，可以看我的这篇文章： <a href="http://benweizhu.github.io/blog/2013/12/21/web-mvc-by-example-with-spring-mvc/">http://benweizhu.github.io/blog/2013/12/21/web-mvc-by-example-with-spring-mvc/</a></p>
-
-<h3>关于后端模板引擎(JSP)</h3>
-
-<p>在纯Servlet的开发年代，这样的web开发流程都在实现一个servlet类的实例，也就是无论是业务逻辑还是前端显示，都是放在Servlet类中来完成，通过实现doGet和doPost的方法，来完成前端参数的获取和视图的渲染。</p>
-
-<p>这样做的缺点是表现逻辑、控制逻辑和业务逻辑全部写在了Java类中，导致逻辑非常混乱。</p>
-
-<p>JSP的出现改变了这一现状，它是一种后端模板引擎，它由Sun和许多公司参与共同创建的一种使软件开发者可以响应客户端请求，而动态生成HTML、XML或其他格式文档的Web网页的技术标准。</p>
-
-<p>JSP将前端的表现逻辑（用户界面）与后端的业务逻辑相分离，于是，你就可以像这样，动态渲染前端显示内容：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>helloWorldConfirm<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'> hi,${user.name}
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>将前端表现逻辑和后端业务逻辑分离是模板引擎出现的最主要的原因。</strong></p>
-
-<h3>那什么情况或者说场景下，我们要使用到JavaScript模板引擎呢？</h3>
-
-<p>1.通过ajax获取数据，再封装成视图展现到前端 <br/>
-2.经常遇到字符串拼接 <br/>
-3.需要抽取动态的公共模块，以实现重用 <br/>
-等等</p>
-
-<p>那么，目前有哪些比较常见的JavaScript模板引擎呢？</p>
-
-<p>答案是好多，百度或者谷歌搜索，你会得到很多答案。举一个，最近在看的类库的例子，handlebarsjs：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;replace&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;script </span><span class="na">id=</span><span class="s">&quot;entry-template&quot;</span> <span class="na">type=</span><span class="s">&quot;text/x-handlebars-template&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">div</span> <span class="kr">class</span><span class="o">=</span><span class="s2">&quot;entry&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="p">{</span> <span class="p">{</span><span class="nx">title</span><span class="p">}</span> <span class="p">}</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="nx">div</span> <span class="kr">class</span><span class="o">=</span><span class="s2">&quot;body&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>      <span class="p">{</span> <span class="p">{</span><span class="nx">body</span><span class="p">}</span> <span class="p">}</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">source</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#entry-template&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">();</span><span class="c1">//获取到模板内容</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">template</span> <span class="o">=</span> <span class="nx">Handlebars</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">source</span><span class="p">);</span><span class="c1">//编译模板</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;My New Post&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">body</span><span class="o">:</span> <span class="s2">&quot;This is my first post!&quot;</span>
-</span><span class='line'>  <span class="p">};</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">html</span> <span class="o">=</span> <span class="nx">template</span><span class="p">(</span><span class="nx">context</span><span class="p">);</span><span class="c1">//传入Json对象，替换模板中的内容</span>
-</span><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#replace&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">html</span><span class="p">);</span>
-</span><span class='line'><span class="p">}());</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<p data-height="268" data-theme-id="0" data-slug-hash="rOvyde" data-default-tab="result" data-user="benweizhu" class='codepen'>See the Pen <a href='http://codepen.io/benweizhu/pen/rOvyde/'>handlebarsjs example</a> by Benwei (<a href='http://codepen.io/benweizhu'>@benweizhu</a>) on <a href='http://codepen.io'>CodePen</a>.</p>
-
-
-<script async src="//assets.codepen.io/assets/embed/ei.js"></script>
-
-
-<p>你肯定会有些疑问，比如，在HTML中下面这段代码是干什么的？</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">type</span> <span class="o">=</span> <span class="err">“</span><span class="nx">text</span><span class="o">/</span><span class="nx">template</span><span class="err">”</span><span class="o">&gt;</span> <span class="err">…</span> <span class="o">&lt;</span><span class="err">/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这段代码最常用的位置是实现客户端模板功能，通过将类型设置成为“text/template”，它变成了一段浏览器不能解释的脚本代码，所以浏览器就会忽略这段脚本。这样，就允许你在这段脚本片段中存放任何东西，存放的内容可以再之后由JavaScript抽取提供给一个模板库来生产HTML片段。</p>
-
-<p>至于，剩余的函数是干什么的已经在代码中注释了，这里就不多解释。</p>
-
-<p>问题又来了，Handlebars是来源于另外一个有名的模板引擎Mustache，</p>
-
-<p>Mustache声明自己是一个logic-less（无逻辑或轻逻辑）语法模板。那么，什么是logic-less，有什么好处？其实答案在stackoverflow有人回答。参考： <a href="http://stackoverflow.com/questions/3896730/whats-the-advantage-of-logic-less-template-such-as-mustache">http://stackoverflow.com/questions/3896730/whats-the-advantage-of-logic-less-template-such-as-mustache</a></p>
-
-<p>简单来说，比如在JSP中，提供了很多的taglib，实现了如if，loop（循环）等逻辑标签。这样就导致，在纯粹的前端显示代码中，仍然存在许多的逻辑判断和操作。</p>
-
-<p>Mustache从设计上就不允许这样的操作，逼迫你在前端页面不要有任何逻辑的代码。但其实，这一点很难做到。</p>
-
-<p>即便是基于Mustache的Handlebars，也提供了if和loop的语法(代码块中的两个大括号加了空格，只是为了博客中可以显示)：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>{ {permalink} }
-</span><span class='line'>{ {#each comments} }
-</span><span class='line'>  { {../permalink} }
-</span><span class='line'>
-</span><span class='line'>  { {#if title} }
-</span><span class='line'>    { {../permalink} }
-</span><span class='line'>  { {/if} }
-</span><span class='line'>{ {/each} }
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>关于模板引擎的框架还有很多，大家可以自己去搜索，我也可以给一个链接作为参考：<a href="http://www.imooc.com/article/1219">http://www.imooc.com/article/1219</a> 。当然谁好谁坏，众说风云，只有你用了才能知道适不适合你。</p>
-
-<p>参考资料  <br/>
-1.<a href="http://handlebarsjs.com">http://handlebarsjs.com</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/11">&larr; Older</a>
@@ -404,6 +491,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/05/22/nginx-serve-static/">用Nginx服务静态文件</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">将Nginx作为Tomcat的反向代理服务器</a>
       </li>
     
@@ -417,10 +508,6 @@
     
       <li class="post">
         <a href="/blog/2016/04/27/what-the-heck-is-javascript-event-loop/">What the Heck Is Javascript Event Loop</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/03/25/when-to-use-in-on-at/">什么时候用on, In和at？</a>
       </li>
     
   </ul>

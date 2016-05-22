@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-05-21T21:37:32+08:00</updated>
+  <updated>2016-05-22T12:17:22+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,83 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[用Nginx服务静态文件]]></title>
+    <link href="http://benweizhu.github.io/blog/2016/05/22/nginx-serve-static/"/>
+    <updated>2016-05-22T11:58:09+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2016/05/22/nginx-serve-static</id>
+    <content type="html"><![CDATA[<p>使用Nginx服务静态文件的原因很简单：快。</p>
+
+<p>上一篇文章中 <a href="http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/</a> ，我们使用Nginx作为Tomcat服务器的反向代理服务器，这样比在Tomcat直接配置80端口更加方便。</p>
+
+<p>但是，却没有很好的利用Nginx服务器的特点，即 NGINX | High Performance Load Balancer, Web Server, &amp; Reverse等。</p>
+
+<p>我们可以使用Nginx来服务器静态文件，使用Tomcat来处理JSP的动态文件。配置非常简单，分别使用下面两个配置：</p>
+
+<h2>403错误：添加Nginx访问文案件的权限</h2>
+
+<p>nginx配置中有一个user选项，默认，nginx配置的是nobody。 <a href="http://nginx.org/en/docs/ngx_core_module.html#user">http://nginx.org/en/docs/ngx_core_module.html#user</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#user  nobody;</span>
+</span><span class='line'>worker_processes  1<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#error_log  logs/error.log;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  notice;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  info;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#pid        logs/nginx.pid;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>需要将它改为可以访问Tomcat服务器上文件的用户和用户组</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>user  yourusername yourusergroup<span class="p">;</span> <span class="c">#比如 benweizhu stuff</span>
+</span><span class='line'>worker_processes  1<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#error_log  logs/error.log;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  notice;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  info;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#pid        logs/nginx.pid;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>404错误：使用Alias来配置Static文件路径</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>location /static/ <span class="o">{</span>
+</span><span class='line'>  autoindex  on<span class="p">;</span>
+</span><span class='line'>  <span class="nb">alias</span> /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp/static<span class="p">;</span> <span class="c">#完整路径</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料：   <br/>
+1. <a href="https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/">https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/</a>   <br/>
+2. <a href="http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden">http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden</a>   <br/>
+3. <a href="http://stackoverflow.com/questions/1474374/nginx-doesnt-serve-static">http://stackoverflow.com/questions/1474374/nginx-doesnt-serve-static</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[将Nginx作为Tomcat的反向代理服务器]]></title>
@@ -3509,183 +3586,6 @@ Heroku Enterprise</p>
 
 <p>参考资料： <br/>
 1.《SEO实战密码》</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[了解JavaScript模板引擎]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/10/28/js-template-engine/"/>
-    <updated>2015-10-28T08:36:18+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/10/28/js-template-engine</id>
-    <content type="html"><![CDATA[<p>模板引擎这个概念，相信对大家并不陌生，如果做过Java EE的开发，或者Rails开发，那么Jsp，Erb，Haml都是一种模板引擎，也许你还听说过Apache的velocity，只不过它们是后端的模板引擎，模板的渲染由服务器端完成。</p>
-
-<p>比如这样的代码：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>//Jsp With EL
-</span><span class='line'><span class="nt">&lt;div&gt;</span>user name: ${userName}<span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'>//Haml
-</span><span class='line'>%div = &quot;user name: #{userName}&quot;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>JavaScript模板引擎，顾名思义，它也是一种模板引擎，只不过由JavaScript实现，是一种前端或者说是客户端的模板引擎。</p>
-
-<h3>这个时候，也许你要问了，为什么需要前端模板引擎，它有什么作用？</h3>
-
-<p>其实，它的作用和后端的模板引擎作用相似，所以还是回归到了模板引擎的作用。</p>
-
-<p>不知道，大家知不知道JavaEE(J2EE)的发展历程，基本过程是CGI-Servlet-JSP-Model1-Model2，再到之后的MVC。</p>
-
-<p>如果你感兴趣，可以看我的这篇文章： <a href="http://benweizhu.github.io/blog/2013/12/21/web-mvc-by-example-with-spring-mvc/">http://benweizhu.github.io/blog/2013/12/21/web-mvc-by-example-with-spring-mvc/</a></p>
-
-<h3>关于后端模板引擎(JSP)</h3>
-
-<p>在纯Servlet的开发年代，这样的web开发流程都在实现一个servlet类的实例，也就是无论是业务逻辑还是前端显示，都是放在Servlet类中来完成，通过实现doGet和doPost的方法，来完成前端参数的获取和视图的渲染。</p>
-
-<p>这样做的缺点是表现逻辑、控制逻辑和业务逻辑全部写在了Java类中，导致逻辑非常混乱。</p>
-
-<p>JSP的出现改变了这一现状，它是一种后端模板引擎，它由Sun和许多公司参与共同创建的一种使软件开发者可以响应客户端请求，而动态生成HTML、XML或其他格式文档的Web网页的技术标准。</p>
-
-<p>JSP将前端的表现逻辑（用户界面）与后端的业务逻辑相分离，于是，你就可以像这样，动态渲染前端显示内容：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>helloWorldConfirm<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'> hi,${user.name}
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>将前端表现逻辑和后端业务逻辑分离是模板引擎出现的最主要的原因。</strong></p>
-
-<h3>那什么情况或者说场景下，我们要使用到JavaScript模板引擎呢？</h3>
-
-<p>1.通过ajax获取数据，再封装成视图展现到前端 <br/>
-2.经常遇到字符串拼接 <br/>
-3.需要抽取动态的公共模块，以实现重用 <br/>
-等等</p>
-
-<p>那么，目前有哪些比较常见的JavaScript模板引擎呢？</p>
-
-<p>答案是好多，百度或者谷歌搜索，你会得到很多答案。举一个，最近在看的类库的例子，handlebarsjs：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;replace&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;script </span><span class="na">id=</span><span class="s">&quot;entry-template&quot;</span> <span class="na">type=</span><span class="s">&quot;text/x-handlebars-template&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">div</span> <span class="kr">class</span><span class="o">=</span><span class="s2">&quot;entry&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="p">{</span> <span class="p">{</span><span class="nx">title</span><span class="p">}</span> <span class="p">}</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="nx">div</span> <span class="kr">class</span><span class="o">=</span><span class="s2">&quot;body&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>      <span class="p">{</span> <span class="p">{</span><span class="nx">body</span><span class="p">}</span> <span class="p">}</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">source</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#entry-template&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">();</span><span class="c1">//获取到模板内容</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">template</span> <span class="o">=</span> <span class="nx">Handlebars</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">source</span><span class="p">);</span><span class="c1">//编译模板</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;My New Post&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">body</span><span class="o">:</span> <span class="s2">&quot;This is my first post!&quot;</span>
-</span><span class='line'>  <span class="p">};</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">html</span> <span class="o">=</span> <span class="nx">template</span><span class="p">(</span><span class="nx">context</span><span class="p">);</span><span class="c1">//传入Json对象，替换模板中的内容</span>
-</span><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#replace&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">html</span><span class="p">);</span>
-</span><span class='line'><span class="p">}());</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<p data-height="268" data-theme-id="0" data-slug-hash="rOvyde" data-default-tab="result" data-user="benweizhu" class='codepen'>See the Pen <a href='http://codepen.io/benweizhu/pen/rOvyde/'>handlebarsjs example</a> by Benwei (<a href='http://codepen.io/benweizhu'>@benweizhu</a>) on <a href='http://codepen.io'>CodePen</a>.</p>
-
-
-<script async src="//assets.codepen.io/assets/embed/ei.js"></script>
-
-
-<p>你肯定会有些疑问，比如，在HTML中下面这段代码是干什么的？</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">type</span> <span class="o">=</span> <span class="err">“</span><span class="nx">text</span><span class="o">/</span><span class="nx">template</span><span class="err">”</span><span class="o">&gt;</span> <span class="err">…</span> <span class="o">&lt;</span><span class="err">/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这段代码最常用的位置是实现客户端模板功能，通过将类型设置成为“text/template”，它变成了一段浏览器不能解释的脚本代码，所以浏览器就会忽略这段脚本。这样，就允许你在这段脚本片段中存放任何东西，存放的内容可以再之后由JavaScript抽取提供给一个模板库来生产HTML片段。</p>
-
-<p>至于，剩余的函数是干什么的已经在代码中注释了，这里就不多解释。</p>
-
-<p>问题又来了，Handlebars是来源于另外一个有名的模板引擎Mustache，</p>
-
-<p>Mustache声明自己是一个logic-less（无逻辑或轻逻辑）语法模板。那么，什么是logic-less，有什么好处？其实答案在stackoverflow有人回答。参考： <a href="http://stackoverflow.com/questions/3896730/whats-the-advantage-of-logic-less-template-such-as-mustache">http://stackoverflow.com/questions/3896730/whats-the-advantage-of-logic-less-template-such-as-mustache</a></p>
-
-<p>简单来说，比如在JSP中，提供了很多的taglib，实现了如if，loop（循环）等逻辑标签。这样就导致，在纯粹的前端显示代码中，仍然存在许多的逻辑判断和操作。</p>
-
-<p>Mustache从设计上就不允许这样的操作，逼迫你在前端页面不要有任何逻辑的代码。但其实，这一点很难做到。</p>
-
-<p>即便是基于Mustache的Handlebars，也提供了if和loop的语法(代码块中的两个大括号加了空格，只是为了博客中可以显示)：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>{ {permalink} }
-</span><span class='line'>{ {#each comments} }
-</span><span class='line'>  { {../permalink} }
-</span><span class='line'>
-</span><span class='line'>  { {#if title} }
-</span><span class='line'>    { {../permalink} }
-</span><span class='line'>  { {/if} }
-</span><span class='line'>{ {/each} }
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>关于模板引擎的框架还有很多，大家可以自己去搜索，我也可以给一个链接作为参考：<a href="http://www.imooc.com/article/1219">http://www.imooc.com/article/1219</a> 。当然谁好谁坏，众说风云，只有你用了才能知道适不适合你。</p>
-
-<p>参考资料  <br/>
-1.<a href="http://handlebarsjs.com">http://handlebarsjs.com</a></p>
 ]]></content>
   </entry>
   

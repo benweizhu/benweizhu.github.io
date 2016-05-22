@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Rails环境和Capistrano部署 - NO END FOR LEARNING</title>
+  <title>用Nginx服务静态文件 - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="默认情况下，Rails 提供了三个环境：开发（development），测试（test）和生产（production）。这三个环境能满足大多数需求，但有时需要更多的环境。 假设有个服务器镜像了生产环境，但只用于测试。这种服务器一般叫做“交付准备服务器”（staging server）。 &hellip;">
+  <meta name="description" content="使用Nginx服务静态文件的原因很简单：快。 上一篇文章中 http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/ ，我们使用Nginx作为Tomcat服务器的反向代理服务器， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/09/26/rails-env-and-capistrano">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2016/05/22/nginx-serve-static">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -67,7 +67,7 @@
   
   <header>
     
-      <h1 class="entry-title">Rails环境和Capistrano部署</h1>
+      <h1 class="entry-title">用Nginx服务静态文件</h1>
     
     
       <p class="meta">
@@ -76,20 +76,24 @@
 
 
 
-<time class='entry-date' datetime='2015-09-26T10:09:49+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:09 am</span></time>
+<time class='entry-date' datetime='2016-05-22T11:58:09+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>11:58 am</span></time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>默认情况下，Rails 提供了三个环境：开发（development），测试（test）和生产（production）。这三个环境能满足大多数需求，但有时需要更多的环境。</p>
+<div class="entry-content"><p>使用Nginx服务静态文件的原因很简单：快。</p>
 
-<p>假设有个服务器镜像了生产环境，但只用于测试。这种服务器一般叫做“交付准备服务器”（staging server）。要想为这个服务器定义一个名为“staging”的环境，新建文件 config/environments/staging.rb 即可。请使用 config/environments 文件夹中的任一文件作为模板，以此为基础修改设置。</p>
+<p>上一篇文章中 <a href="http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/</a> ，我们使用Nginx作为Tomcat服务器的反向代理服务器，这样比在Tomcat直接配置80端口更加方便。</p>
 
-<p>在持续集成开发的场景下，除了开发环境（提供给Dev的验证环境），测试环境（提供QA的测试环境），一般还会有一个UAT环境（用户验收测试环境 - User Acceptance Test），它是离生产环境最近的一个预备环境，就像上面所说的staging。</p>
+<p>但是，却没有很好的利用Nginx服务器的特点，即 NGINX | High Performance Load Balancer, Web Server, &amp; Reverse等。</p>
 
-<p>通过Rails Server命令启动环境，默认是development。</p>
+<p>我们可以使用Nginx来服务器静态文件，使用Tomcat来处理JSP的动态文件。配置非常简单，分别使用下面两个配置：</p>
+
+<h2>403错误：添加Nginx访问文案件的权限</h2>
+
+<p>nginx配置中有一个user选项，默认，nginx配置的是nobody。 <a href="http://nginx.org/en/docs/ngx_core_module.html#user">http://nginx.org/en/docs/ngx_core_module.html#user</a></p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -99,23 +103,55 @@
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">=&gt;</span> <span class="n">Booting</span> <span class="n">Puma</span>
-</span><span class='line'><span class="o">=&gt;</span> <span class="n">Rails</span> <span class="mf">4.2</span><span class="o">.</span><span class="mi">0</span> <span class="n">application</span> <span class="n">starting</span> <span class="ow">in</span> <span class="n">development</span> <span class="n">on</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span>
-</span><span class='line'><span class="o">=&gt;</span> <span class="n">Run</span> <span class="sb">`rails server -h`</span> <span class="k">for</span> <span class="n">more</span> <span class="n">startup</span> <span class="n">options</span>
-</span><span class='line'><span class="o">=&gt;</span> <span class="n">Ctrl</span><span class="o">-</span><span class="n">C</span> <span class="n">to</span> <span class="n">shutdown</span> <span class="n">server</span>
-</span><span class='line'><span class="n">Puma</span> <span class="mf">2.11</span><span class="o">.</span><span class="mi">1</span> <span class="n">starting</span><span class="o">...</span>
-</span><span class='line'><span class="o">*</span> <span class="n">Min</span> <span class="n">threads</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">max</span> <span class="n">threads</span><span class="p">:</span> <span class="mi">16</span>
-</span><span class='line'><span class="o">*</span> <span class="n">Environment</span><span class="p">:</span> <span class="n">development</span>
-</span><span class='line'><span class="o">*</span> <span class="n">Listening</span> <span class="n">on</span> <span class="n">tcp</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#user  nobody;</span>
+</span><span class='line'>worker_processes  1<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#error_log  logs/error.log;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  notice;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  info;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#pid        logs/nginx.pid;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>切换不同的环境启动可以通过参数-e</p>
+<p>需要将它改为可以访问Tomcat服务器上文件的用户和用户组</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">rails</span> <span class="n">server</span> <span class="o">-</span><span class="n">e</span> <span class="n">production</span> <span class="o">-</span><span class="n">p</span> <span class="mi">4000</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>user  yourusername yourusergroup<span class="p">;</span> <span class="c">#比如 benweizhu stuff</span>
+</span><span class='line'>worker_processes  1<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#error_log  logs/error.log;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  notice;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  info;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#pid        logs/nginx.pid;</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+<h2>404错误：使用Alias来配置Static文件路径</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>location /static/ <span class="o">{</span>
+</span><span class='line'>  autoindex  on<span class="p">;</span>
+</span><span class='line'>  <span class="nb">alias</span> /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp/static<span class="p">;</span> <span class="c">#完整路径</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料：   <br/>
+1. <a href="https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/">https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/</a>   <br/>
+2. <a href="http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden">http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden</a>   <br/>
+3. <a href="http://stackoverflow.com/questions/1474374/nginx-doesnt-serve-static">http://stackoverflow.com/questions/1474374/nginx-doesnt-serve-static</a></p>
 </div>
 
 
@@ -131,7 +167,7 @@
 
 
 
-<time class='entry-date' datetime='2015-09-26T10:09:49+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:09 am</span></time>
+<time class='entry-date' datetime='2016-05-22T11:58:09+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>11:58 am</span></time>
       
 
 
@@ -139,7 +175,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/09/26/rails-env-and-capistrano/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/09/26/rails-env-and-capistrano/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2016/05/22/nginx-serve-static/" data-via="" data-counturl="http://benweizhu.github.io/blog/2016/05/22/nginx-serve-static/" >Tweet</a>
   
   
   
@@ -148,10 +184,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2015/09/19/gradle-in-action-chinese-version/" title="Previous Post: 《实战Gradle》译者序">&laquo; 《实战Gradle》译者序</a>
+        <a class="basic-alignment left" href="/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/" title="Previous Post: 将Nginx作为Tomcat的反向代理服务器">&laquo; 将Nginx作为Tomcat的反向代理服务器</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2015/09/27/whenever-plus-capistrano-plus-rbenv/" title="Next Post: 当whenever遇到capistrano和rbenv - Linux下的cron job">当whenever遇到capistrano和rbenv - Linux下的cron job &raquo;</a>
       
     </p>
   </footer>
@@ -161,7 +195,7 @@
   <section>
     <h1>Comments</h1>
     <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
-<div class="ds-thread" data-title="Rails环境和Capistrano部署"></div>
+<div class="ds-thread" data-title="用Nginx服务静态文件"></div>
 <script type="text/javascript">
   var duoshuoQuery = {short_name:"benweizhu"};
   (function() {
