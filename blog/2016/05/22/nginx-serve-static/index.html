@@ -148,6 +148,19 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>Nginx的Wiki推荐使用root字段</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>location /static/ <span class="o">{</span>
+</span><span class='line'>  autoindex  on<span class="p">;</span>
+</span><span class='line'>  root /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp<span class="p">;</span> <span class="c">#完整路径</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
 <p>参考资料：   <br/>
 1. <a href="https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/">https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/</a>   <br/>
 2. <a href="http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden">http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden</a>   <br/>
