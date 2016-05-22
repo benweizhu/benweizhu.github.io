@@ -46,6 +46,14 @@ location /static/ {
   alias /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp/static; #完整路径
 }
 {% endcodeblock %}
+Nginx的Wiki推荐使用root字段
+{% codeblock lang:sh %}
+location /static/ {
+  autoindex  on;
+  root /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp; #完整路径
+}
+{% endcodeblock %}
+
 
 
 参考资料：     
