@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>NO END FOR LEARNING</title>
+  <title>全民安全站Let&#8217;s Encrypt配置NGINX - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -62,15 +62,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/05/29/nginx-lets-encrypt/">全民安全站Let&#8217;s Encrypt配置NGINX</a></h1>
+      <h1 class="entry-title">全民安全站Let&#8217;s Encrypt配置NGINX</h1>
     
     
       <p class="meta">
@@ -86,7 +83,7 @@
   </header>
 
 
-  <div class="entry-content"><p>ThoughtWorks2016年4月份最新发布的技术雷达对Let’s Encrypt项目的介绍：</p>
+<div class="entry-content"><p>ThoughtWorks2016年4月份最新发布的技术雷达对Let’s Encrypt项目的介绍：</p>
 
 <p>从2015年，12月开始，Let’s Encrypt项目从封闭测试阶段转向公开测试阶段，也就是说用户不再需要收到邀请才能使用它了。Let’s Encrypt为那些寻求网站安全的用户提供了一种简单的方式获取和管理证书。Let’s Encrypt也促使安全和隐私前进了一大步，而这一趋势已经随着ThoughtWorks和我们许多使用其进行证书认证的项目开始了。</p>
 
@@ -343,130 +340,65 @@
 2.<a href="https://community.letsencrypt.org/t/how-to-nginx-configuration-to-enable-acme-challenge-support-on-all-http-virtual-hosts/5622">https://community.letsencrypt.org/t/how-to-nginx-configuration-to-enable-acme-challenge-support-on-all-http-virtual-hosts/5622</a>   <br/>
 3.<a href="https://letsencrypt.org/getting-started/">https://letsencrypt.org/getting-started/</a></p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-05-29T17:40:12+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>5:40 pm</span></time>
+      
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2016/05/22/nginx-serve-static/">用Nginx服务静态文件</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-05-22T11:58:09+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>11:58 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>使用Nginx服务静态文件的原因很简单：快。</p>
-
-<p>上一篇文章中 <a href="http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/</a> ，我们使用Nginx作为Tomcat服务器的反向代理服务器，这样比在Tomcat直接配置80端口更加方便。</p>
-
-<p>但是，却没有很好的利用Nginx服务器的特点，即 NGINX | High Performance Load Balancer, Web Server, &amp; Reverse等。</p>
-
-<p>我们可以使用Nginx来服务器静态文件，使用Tomcat来处理JSP的动态文件。配置非常简单，分别使用下面两个配置：</p>
-
-<h2>403错误：添加Nginx访问文案件的权限</h2>
-
-<p>nginx配置中有一个user选项，默认，nginx配置的是nobody。 <a href="http://nginx.org/en/docs/ngx_core_module.html#user">http://nginx.org/en/docs/ngx_core_module.html#user</a></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#user  nobody;</span>
-</span><span class='line'>worker_processes  1<span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#error_log  logs/error.log;</span>
-</span><span class='line'><span class="c">#error_log  logs/error.log  notice;</span>
-</span><span class='line'><span class="c">#error_log  logs/error.log  info;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#pid        logs/nginx.pid;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>需要将它改为可以访问Tomcat服务器上文件的用户和用户组</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>user  yourusername yourusergroup<span class="p">;</span> <span class="c">#比如 benweizhu stuff</span>
-</span><span class='line'>worker_processes  1<span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#error_log  logs/error.log;</span>
-</span><span class='line'><span class="c">#error_log  logs/error.log  notice;</span>
-</span><span class='line'><span class="c">#error_log  logs/error.log  info;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#pid        logs/nginx.pid;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>404错误：使用Alias来配置Static文件路径</h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>location /static/ <span class="o">{</span>
-</span><span class='line'>  autoindex  on<span class="p">;</span>
-</span><span class='line'>  <span class="nb">alias</span> /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp/static<span class="p">;</span> <span class="c">#完整路径</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Nginx的Wiki推荐使用root字段</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>location /static/ <span class="o">{</span>
-</span><span class='line'>  autoindex  on<span class="p">;</span>
-</span><span class='line'>  root /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp<span class="p">;</span> <span class="c">#完整路径</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料：   <br/>
-1. <a href="https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/">https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/</a>   <br/>
-2. <a href="http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden">http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden</a>   <br/>
-3. <a href="http://stackoverflow.com/questions/1474374/nginx-doesnt-serve-static">http://stackoverflow.com/questions/1474374/nginx-doesnt-serve-static</a></p>
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt/" data-via="" data-counturl="http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/05/22/nginx-serve-static/" title="Previous Post: 用Nginx服务静态文件">&laquo; 用Nginx服务静态文件</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
 
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/posts/2">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="全民安全站Let's Encrypt配置NGINX"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -556,6 +488,7 @@
 
   
 </aside>
+
 
     </div>
   </div>

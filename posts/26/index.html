@@ -9,10 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="由于本小节，涉及到自定义任务，所以穿插一点自定义任务的知识。 Gradle Task 在前面已经介绍过Gradle和Ant相似，由任务驱动，以任务依赖的方式形成任务链，从而实现构建生命周期。所以，任务是Gradle中一个完整的可执行单元。 如何定义任务： 1
-2
-3
-task hello { &hellip;">
+  <meta name="description" content="Servlet线程不安全 以下内容摘录自Java™ Servlet Specification，在开始阅读本文章之前，请仔细阅读： 2.1 Request Handling Methods &hellip; The handling of concurrent requests to a Web &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +64,259 @@ task hello { &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/02/03/servlet-multiple-thread-and-threadlocal/">Servlet多线程安全问题和LocalThread</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-02-03T21:13:53+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>9:13 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>Servlet线程不安全</h2>
+
+<h4>以下内容摘录自Java™ Servlet Specification，在开始阅读本文章之前，请仔细阅读：</h4>
+
+<p>2.1 Request Handling Methods  <br/>
+&hellip;  <br/>
+The handling of concurrent requests to a Web application generally requires that the
+Web Developer design servlets that can deal with multiple threads executing within
+the service method at a particular time.  <br/>
+Generally the Web container handles concurrent requests to the same servlet by
+concurrent execution of the service method on different threads.</p>
+
+<p>2.2 Number of Instances   <br/>
+&hellip;  <br/>
+For a servlet not hosted in a distributed environment (the default), the servlet
+container must use only one instance per servlet declaration. However, for a servlet
+implementing the SingleThreadModel interface, the servlet container may
+instantiate multiple instances to handle a heavy request load and serialize requests
+to a particular instance.
+&hellip;</p>
+
+<p>2.3.3.1 Multithreading Issues   <br/>
+&hellip;<br/>
+Although it is not recommended, an alternative for the Developer is to implement
+the SingleThreadModel interface which requires the container to guarantee that
+there is only one request thread at a time in the service method. A servlet container
+may satisfy this requirement by serializing requests on a servlet, or by maintaining a
+pool of servlet instances. If the servlet is part of a Web application that has been
+marked as distributable, the container may maintain a pool of servlet instances in
+each JVM that the application is distributed across.</p>
+
+<p>For servlets not implementing the SingleThreadModel interface, if the service
+method (or methods such as doGet or doPost which are dispatched to the service
+method of the HttpServlet abstract class) has been defined with the synchronized
+keyword, the servlet container cannot use the instance pool approach, but must
+serialize requests through it. It is strongly recommended that Developers not
+synchronize the service method (or methods dispatched to it)</p>
+
+<p>默认情况下，非分布式系统，Servlet容器只会维护一个Servlet的实例，当多个请求到达同一个Servlet，Servlet容器会启动多个线程分配给不同请求来执行同一个Servlet实例中的服务方法。为什么这么做？有效利用JVM允许多个线程访问同一个实例的特性，来提高服务器性能。因为，无论是同步线程对Servlet的调用，还是为每一个线程初始化一个Servlet实例，都会带来巨大的性能问题。</p>
+
+<p>这也就是为什么Servlet会存在多线程安全问题。</p>
+
+<p>大部分线程安全问题出现的原因都是Servlet实现者在不经意间创建了一个Servlet的实例变量（成员变量），而导致多个线程公有这个实例变量，存在不同阶段对该变量的读写操作。</p>
+
+<h3>预防它很简单：就是避免这样写，用方法中的本地变量替代它。</h3>
+
+<p>“Java虚拟机栈（Java Virtual Machine Stacks）也是线程私有的，它的生命周期与线程相同。虚拟机栈描述的是Java方法执行的内存模型：每个方法被执行的时候都会同时创建一个栈帧用于存储局部变量表、操作栈、动态链接、方法出口等信息。每一个方法被调用直至执行完成的过程，就对应着一个栈帧在虚拟机栈中从入栈到出栈的过程。”   <br/>
+&mdash;深入理解Java虚拟机</p>
+
+<h2>ThreadLocal</h2>
+
+<p>那如果你希望定义一个变量，让每一个线程都拥有不同的拷贝，应该怎么办？答案是ThreadLocal。</p>
+
+<p>ThreadLocal是Java语言包提供的一个实现类，与其命名ThreadLocal，叫它thread-local variables更合适。和普通变量不同，通过该对象的set和get方法，可以给每一个调用它的线程保存一个独立的变量的拷贝。什么意思？也就是说，该变量保存下来的变量和当时调用该方法的线程是绑定的，不同线程的值是不一样的。</p>
+
+<p>在Java Doc中介绍过：定义该变量的典型方法是private static</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">threadId</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当要保存时，调用它的set方法，获取时，调用get方法。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">threadId</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
+</span><span class='line'><span class="n">threadId</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>下面看一个例子，单例类中定义了两个变量，实例变量和ThreadLocal变量，多线程读写，并随机等待一段时间，得到的结果会是普通实例变量和time的值不一致，而threadLocal是一致的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">relations</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.Random</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Singleton</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">value</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="n">Singleton</span> <span class="n">instance</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">threadLocal</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;&gt;();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="nf">Singleton</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">set</span><span class="o">(</span><span class="kt">int</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">threadLocal</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">get</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">threadLocal</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">synchronized</span> <span class="n">Singleton</span> <span class="nf">getInstance</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">instance</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Singleton</span><span class="o">();</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">instance</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getValue</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">value</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setValue</span><span class="o">(</span><span class="kt">int</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
+</span><span class='line'>      <span class="kd">final</span> <span class="n">Singleton</span> <span class="n">singleton</span> <span class="o">=</span> <span class="n">Singleton</span><span class="o">.</span><span class="na">getInstance</span><span class="o">();</span>
+</span><span class='line'>      <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">Thread</span> <span class="n">thread</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Thread</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>              <span class="nd">@Override</span>
+</span><span class='line'>              <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>                  <span class="kt">int</span> <span class="n">time</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Random</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()).</span><span class="na">nextInt</span><span class="o">(</span><span class="mi">2000</span><span class="o">);</span>
+</span><span class='line'>                  <span class="n">singleton</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">time</span><span class="o">);</span>
+</span><span class='line'>                  <span class="n">singleton</span><span class="o">.</span><span class="na">setValue</span><span class="o">(</span><span class="n">time</span><span class="o">);</span>
+</span><span class='line'>                  <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>                      <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">time</span><span class="o">);</span>
+</span><span class='line'>                  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                      <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>                  <span class="o">}</span>
+</span><span class='line'>                  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">time</span> <span class="o">+</span> <span class="s">&quot;---ThreadLocal---&quot;</span> <span class="o">+</span> <span class="n">singleton</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+</span><span class='line'>                  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">time</span> <span class="o">+</span> <span class="s">&quot;---NonThreadLocal-----&quot;</span> <span class="o">+</span> <span class="n">singleton</span><span class="o">.</span><span class="na">getValue</span><span class="o">());</span>
+</span><span class='line'>              <span class="o">}</span>
+</span><span class='line'>          <span class="o">};</span>
+</span><span class='line'>          <span class="n">thread</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+</span><span class='line'>          <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>              <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">1000</span><span class="o">);</span>
+</span><span class='line'>          <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>              <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>          <span class="o">}</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>了解到它的作用和如何使用之后，你肯定在想，它是怎么实现的？</h3>
+
+<p>一种办法是：在这个对象的里面存放一个map对象，map对象的key就是Thread.currentThread()的一些信息，value就是对应的值。这是最显而易见而直接的实现方式。</p>
+
+<p><strong>但是，它不是这么实现的！！！是反过来的！！！</strong></p>
+
+<p>在当前的线程对象里面存放一个Map，Map的key是当前的ThreadLocal对象，value是对应的值。</p>
+
+<p>那么当程序中有多个ThreadLocal是就不是每个threadLocal对象维护一个线程的map，而是每个线程有一个map来维护所有的ThreadLocal。</p>
+
+<h3>这么做有什么好处？</h3>
+
+<p>我的猜测是，资源释放问题，如果是第一种方式，线程已经完成了它的任务，但是ThreadLocal仍然保存它的引用，那么线程资源就不会立刻释放（根据不同的垃圾回收策略，可能不同）。</p>
+
+<p>以上只是Servlet线程安全问题中一种常见情况，Servlet线程安全问题还有很多，比如Session的访问，但重点是，需要大家意识到Servlet是线程不安全的，于是在编写代码的时候一定要多思考，这样写是否存在线程安全问题。</p>
+
+<p>参考资料：  <br/>
+1.Servlet Specification  <br/>
+2.深入理解Java虚拟机</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -377,183 +627,6 @@ task hello { &hellip;">
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/01/31/deep-into-gradle-in-action-3/">Gradle深入与实战（三）依赖管理工具</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-01-31T18:41:46+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>6:41 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>大部分的项目都不是自包含的，也就是说，需要使用到其他项目的构建结果，比如一些Jar文件。它们作为输入文件，必须存在于项目的ClassPath下，程序才能编译和运行。这些输入文件有一个很表意的名字，叫做依赖。</p>
-
-<p>Gradle允许你告诉它项目的依赖是什么，然后它就会负责找到这些依赖。这些依赖会从Maven或者Ivy的远程仓库下载下来（大部分情况），并缓存在本地的某个路径，这个过程叫做依赖解析。</p>
-
-<p>Maven和Gradle一样也提供了类似的功能，而Ant没有，你只能告诉Ant依赖文件的相对或者绝对路径，让它去加载。</p>
-
-<p>常常一个依赖自己也存在依赖，我们称为传递依赖，依赖管理工具又具有解析传递依赖的能力。</p>
-
-<h3>Gradle的依赖管理</h3>
-
-<p>那么如何在Gradle中定义依赖呢？看个最简单的例子。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;junit:junit:4.11&#39;</span><span class="c1">// testCompile group: &#39;junit&#39;, name: &#39;junit&#39;, version: &#39;4.11&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>项目使用了Java的插件，在repositories块中告诉Gradle使用maven的远程仓库作为依赖下载地址，在dependencies块定义了一个junit的依赖，并说明了分组(Maven中的Scope)，后面注释中有一个表意更完整的依赖定义，说明了依赖声明使用的三个坐标group，name，version。</p>
-
-<p>整个看起来是那么的表意，使用过Maven更会觉得是无缝转换，甚至更简洁。</p>
-
-<h3>Dependency configurations 依赖分组</h3>
-
-<p>在Gradle中，依赖都被会分配到某一个具体的configuration中（这里我不倾向于翻译成配置，我觉得布局，或者分组更适合）。Configuration代表着一个或多个构件及构件所需依赖的一个分组。</p>
-
-<p>Java插件已经预定义了一些configuration，比如，compile，runtime，testCompile，testRuntime等。</p>
-
-<p><strong>compile</strong> 放在这个configuration下的依赖是在编译产品代码时所使用的，但它作为一个分组，包含产品代码和编译所需的依赖。  <br/>
-<strong>runtime</strong> 产品代码在运行时需要的依赖，默认，也会包含compile中的依赖。  <br/>
-<strong>testCompile</strong> 编译测试代码时所需要的依赖，默认，被编译的产品代码和产品代码需要的编译依赖也属于该分组。  <br/>
-<strong>testRuntime</strong> 运行测试时需要的依赖。默认，包含compile，runtime和testCompile的分组的构建和依赖。</p>
-
-<p>使用过Maven的都应该知道分组的含义，这里讲解给不明白的同学，依赖之所以要分组，是因为，每个阶段对依赖的需要不一样，最明显的是产品代码和测试代码，比如junit在产品代码中就不需要。</p>
-
-<p>那么，为什么产品代码的编译阶段和运行阶段也分组，一般编译阶段需要的依赖，在运行阶段也需要，但是反过来就不一定了。比如，你通过反射去load一个class，这时该class就不一定需要在编译阶段存在。</p>
-
-<p>一个更常见的例子，做web开发时需要servlet的依赖，但是只是编译阶段，运行时servlet依赖由servlet容器来提供。所以Gradle的War插件也提供了两个configuration，分别是providedCompile和providedRuntime，它们对依赖的使用范围定义和compile以及runtime一致，只不过依赖的Jar包不会被加到War包里面。</p>
-
-<h3>定义SourceSet时，添加的Configuration</h3>
-
-<p>上一节，在介绍Java插件的时候，提到了SourceSet概念。针对每一个新添加的SourceSet，Java插件都会动态的给它添加两个Configuration，分别是sourceSetCompile和sourceSetRuntime。</p>
-
-<p>比如：新添加一个SourceSet，叫做int，那么对应的Configuration是intCompile和intRuntime。</p>
-
-<p>这一特性也正好印证，Java插件是如何识别自定义SourceSet来进行编译和运行。</p>
-
-<h3>依赖的多种定义方式</h3>
-
-<p>除了通过远程仓库和依赖坐标来定义依赖，Gradle还提供了另外两种常用的依赖定义方式，对本地文件的依赖，对某个项目的依赖。</p>
-
-<h4>对文件的依赖</h4>
-
-<p>这种情况看起来是不是很奇葩，都有依赖管理了和Maven仓库了还要什么文件依赖。其实不然，使用这种定义方式，最常见场景是项目构建工具的迁移，从Ant到Gradle。无论任何项目，迁移过程都是小步前进，Gradle提供文件依赖的配置，就是为了解决这些特殊性。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">runtime</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;libs/a.jar&#39;</span><span class="o">,</span> <span class="s1">&#39;libs/b.jar&#39;</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">runtime</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="s1">&#39;libs&#39;</span><span class="o">,</span> <span class="nl">include:</span> <span class="s1">&#39;*.jar&#39;</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>对另一个工程的依赖</h4>
-
-<p>项目中划分子模块是很平常的事情，前端Controller和数据层Dao分离管理就是一个例子，那么在进行前端Controller模块构建时，就需要将数据层模块作为依赖。定义方式如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="nf">project</span><span class="o">(</span><span class="s1">&#39;:shared&#39;</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>依赖版本冲突</h3>
-
-<p>依赖冲突是所以依赖管理中最头痛的问题，这常常出现在传递依赖中。Gradle对解决传递依赖提供了两种策略，使用最新版本或者直接导致构建失败。默认的策略是使用最新版本。虽然这样的策略能够解决一些问题，但是还是不够。常见的一种情况是，NoSuchMethond或者ClassNotFound。这时候，你可能需要一些特殊手段，比如排除不想要的传递依赖。</p>
-
-<h4>排除传递依赖</h4>
-
-<p>排除传递依赖有多种原因，远程仓库中不存在，运行时不需要，或者版本冲突。排除传递依赖的方式有两种：1.直接在configuration中排除 2.在具体的某个dependency中排除</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">configurations</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">.</span><span class="na">exclude</span> <span class="nl">module:</span> <span class="s1">&#39;commons&#39;</span>
-</span><span class='line'>    <span class="n">all</span><span class="o">*.</span><span class="na">exclude</span> <span class="nl">group:</span> <span class="s1">&#39;org.gradle.test.excludes&#39;</span><span class="o">,</span> <span class="nl">module:</span> <span class="s1">&#39;reports&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.gradle.test.excludes:api:1.0&quot;</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">exclude</span> <span class="nl">module:</span> <span class="s1">&#39;shared&#39;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>通过命令行查看依赖关系</h4>
-
-<p>当出现依赖冲突时，最主要的还是要分析依赖冲突的原因，Gradle提供了两个任务来帮助你分析依赖关系</p>
-
-<p>dependencies - Displays all dependencies declared in root project &lsquo;projectReports&rsquo;. <br/>
-dependencyInsight - Displays the insight into a specific dependency in root project &lsquo;projectReports&rsquo;.</p>
-
-<h5><strong>Tips：输出依赖关系图到文件</strong></h5>
-
-<p>在命令行中直接使用gradle dependencies可以打印出依赖图，但是在命令行中查看始终不太方便，我们可以将结果输出到一个文件中，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">gradle</span> <span class="n">dependencies</span> <span class="o">&gt;</span> <span class="n">dependencies</span><span class="o">.</span><span class="n">txt</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>dependencies.txt保存在项目的根目录</p>
-
-<p>Gradle的官方文档中关于Gradle的依赖管理的内容还有很多，比如，如何访问需要用户名密码授权的Maven仓库等等。等多内容，可以参考官方文档：<a href="http://gradle.org/docs/current/userguide/dependency_management.html">http://gradle.org/docs/current/userguide/dependency_management.html</a></p>
-
-<p>下一节，利用前三节学到的知识，编写集成测试任务，并单独划分SourceSet。</p>
-
-<p>参考资料： <br/>
-1.Gradle官方文档</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/27">&larr; Older</a>
@@ -581,6 +654,10 @@ dependencyInsight - Displays the insight into a specific dependency in root proj
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/05/29/nginx-lets-encrypt/">全民安全站Let&#8217;s Encrypt配置NGINX</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/05/22/nginx-serve-static/">用Nginx服务静态文件</a>
       </li>
     
@@ -594,10 +671,6 @@ dependencyInsight - Displays the insight into a specific dependency in root proj
     
       <li class="post">
         <a href="/blog/2016/04/27/event-stream-and-event-delegation/">JavaScript事件流和事件代理/委托</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/04/27/what-the-heck-is-javascript-event-loop/">What the Heck Is Javascript Event Loop</a>
       </li>
     
   </ul>

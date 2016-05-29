@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-05-22T18:40:40+08:00</updated>
+  <updated>2016-05-29T19:30:51+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,270 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[全民安全站Let's Encrypt配置NGINX]]></title>
+    <link href="http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt/"/>
+    <updated>2016-05-29T17:40:12+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt</id>
+    <content type="html"><![CDATA[<p>ThoughtWorks2016年4月份最新发布的技术雷达对Let’s Encrypt项目的介绍：</p>
+
+<p>从2015年，12月开始，Let’s Encrypt项目从封闭测试阶段转向公开测试阶段，也就是说用户不再需要收到邀请才能使用它了。Let’s Encrypt为那些寻求网站安全的用户提供了一种简单的方式获取和管理证书。Let’s Encrypt也促使安全和隐私前进了一大步，而这一趋势已经随着ThoughtWorks和我们许多使用其进行证书认证的项目开始了。</p>
+
+<p>Let&rsquo;s Encrypt发布最新数据，至今该项目已经颁发了超过300万份证书——300万这个数字是在5月8日-9日之间达成的。Let&rsquo;s Encrypt是为了让HTTP连接做得更加安全的一个项目，所以越多的网站能够加入进来，则整个互联网也会变得更加安全。</p>
+
+<p>本文是一个简单的Tutorial，告诉你怎样在NGINX服务器配置SSL实现网站的https：</p>
+
+<h2>登录到你的服务器上</h2>
+
+<p>保证你申请SSL的域名和服务器的IP是一致的，即域名确实是解析到你的服务器上的，可以使用nslookup命令查询。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>nslookup www.yourwebsite.com
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let’s Encrypt在给你分配证书时，会检查你所在的服务器是否和域名解析的服务器一致。</p>
+
+<h2>配置基本的Nginx设置：</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
+</span><span class='line'>    listen       <span class="m">80</span> default_server<span class="p">;</span>
+</span><span class='line'>    listen       <span class="o">[</span>::<span class="o">]</span>:80 default_server<span class="p">;</span>
+</span><span class='line'>    server_name  yourwebsite.com<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    location ^~ /.well-known/acme-challenge/ <span class="o">{</span>
+</span><span class='line'>       default_type <span class="s2">&quot;text/plain&quot;</span><span class="p">;</span>
+</span><span class='line'>       root     /var/www/letsencrypt<span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">location</span> <span class="o">=</span> /.well-known/acme-challenge/ <span class="o">{</span>
+</span><span class='line'>       <span class="k">return</span> 404<span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    ... 其他配置，例如
+</span><span class='line'>    location / <span class="o">{</span>
+</span><span class='line'>      proxy_pass http://localhost:8080<span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里location配置了一个/.well-known/acme-challenge/路径，里面host了简单文件，我这里host了一个简单的html文件。原因是你必须证明，你拥有所请求的证书的域名。因为 Let&rsquo;s Encrypt要求你host一些文件。</p>
+
+<h2>使用certbot申请证书</h2>
+
+<p>克隆certbot仓库：<a href="https://github.com/certbot/certbot">https://github.com/certbot/certbot</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install -y git
+</span><span class='line'>sudo git clone https://github.com/certbot/certbot /opt/letsencrypt
+</span><span class='line'>/opt/letsencrypt/letsencrypt-auto
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>运行certbot提供的脚本获取证书</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">DOMAINS</span><span class="o">=</span><span class="s2">&quot;yourdomain.here,www.yourdomain.here&quot;</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">DIR</span><span class="o">=</span>/var/www/letsencrypt
+</span><span class='line'>/opt/letsencrypt/letsencrypt-auto certonly --server https://acme-v01.api.letsencrypt.org/directory -a webroot --webroot-path<span class="o">=</span><span class="nv">$DIR</span> -d <span class="nv">$DOMAINS</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>注意这里指定了一个webroot-path，他应该和上面well-known配置的root一样。</p>
+
+<p>运行成功之后，你会看到下面这个提示</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>IMPORTANT NOTES:
+</span><span class='line'>- Congratulations! Your certificate and chain have been saved at
+</span><span class='line'>  /etc/letsencrypt/live/letsecure.me/fullchain.pem. Your cert will
+</span><span class='line'>  expire on 2016-XX-XX. To obtain a new version of the certificate in
+</span><span class='line'>  the future, simply run Let<span class="s1">&#39;s Encrypt again.</span>
+</span><span class='line'><span class="s1">- Your account credentials have been saved in your Let&#39;</span>s Encrypt
+</span><span class='line'>  configuration directory at /etc/letsencrypt. You should make a
+</span><span class='line'>  secure backup of this folder now. This configuration directory will
+</span><span class='line'>  also contain certificates and private keys obtained by Let<span class="s1">&#39;s</span>
+</span><span class='line'><span class="s1">  Encrypt so making regular backups of this folder is ideal.</span>
+</span><span class='line'><span class="s1">- If you like Let&#39;</span>s Encrypt, please consider supporting our work by:
+</span><span class='line'>
+</span><span class='line'>Donating to ISRG / Let<span class="err">&#39;</span>s Encrypt:   https://letsencrypt.org/donate
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>配置https证书</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>ssl_certificate /etc/letsencrypt/live/yourdomain.here/fullchain.pem<span class="p">;</span>
+</span><span class='line'>ssl_certificate_key /etc/letsencrypt/live/yourdomain.here/privkey.pem<span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>完整配置</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
+</span><span class='line'>    listen <span class="m">443</span> ssl<span class="p">;</span>
+</span><span class='line'>    server_name yourdomain.here www.yourdomain.here<span class="p">;</span>
+</span><span class='line'>    ssl_protocols TLSv1 TLSv1.1 TLSv1.2<span class="p">;</span>
+</span><span class='line'>    ssl_ciphers EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5<span class="p">;</span>
+</span><span class='line'>    ssl_prefer_server_ciphers On<span class="p">;</span>
+</span><span class='line'>    ssl_certificate /etc/letsencrypt/live/yourdomain.here/fullchain.pem<span class="p">;</span>
+</span><span class='line'>    ssl_certificate_key /etc/letsencrypt/live/yourdomain.here/privkey.pem<span class="p">;</span>
+</span><span class='line'>    ssl_session_cache shared:SSL:128m<span class="p">;</span>
+</span><span class='line'>    add_header Strict-Transport-Security <span class="s2">&quot;max-age=31557600; includeSubDomains&quot;</span><span class="p">;</span>
+</span><span class='line'>    ssl_stapling on<span class="p">;</span>
+</span><span class='line'>    ssl_stapling_verify on<span class="p">;</span>
+</span><span class='line'>    location / <span class="o">{</span>
+</span><span class='line'>      proxy_pass http://localhost:8080<span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>配置80端口跳转：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">return</span> <span class="m">301</span> https://<span class="nv">$server_name$request_uri</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>完整配置</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
+</span><span class='line'>    listen       <span class="m">80</span> default_server<span class="p">;</span>
+</span><span class='line'>    listen       <span class="o">[</span>::<span class="o">]</span>:80 default_server<span class="p">;</span>
+</span><span class='line'>    server_name  yourwebsite.com<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    location ^~ /.well-known/acme-challenge/ <span class="o">{</span>
+</span><span class='line'>       default_type <span class="s2">&quot;text/plain&quot;</span><span class="p">;</span>
+</span><span class='line'>       root     /var/www/letsencrypt<span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">location</span> <span class="o">=</span> /.well-known/acme-challenge/ <span class="o">{</span>
+</span><span class='line'>       <span class="k">return</span> 404<span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    location / <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="m">301</span> https://<span class="nv">$server_name$request_uri</span><span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>证书90天过期</h2>
+
+<p>Let’s Encrypt证书会在90天后过期，需要配置脚本自动更新证书。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'><span class="c"># This script renews all the Let&#39;s Encrypt certificates with a validity &lt; 30 days</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> ! /opt/letsencrypt/letsencrypt-auto renew &gt; /var/log/letsencrypt/renew.log 2&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    <span class="nb">echo </span>Automated renewal failed:
+</span><span class='line'>    cat /var/log/letsencrypt/renew.log
+</span><span class='line'>    <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>nginx -t <span class="o">&amp;&amp;</span> nginx -s reload
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>开启定时任务Cron</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo crontab -e
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>编辑任务内容</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>@daily /path/to/renewCerts.sh
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料：  <br/>
+1.<a href="https://letsecure.me/secure-web-deployment-with-lets-encrypt-and-nginx/">https://letsecure.me/secure-web-deployment-with-lets-encrypt-and-nginx/</a>  <br/>
+2.<a href="https://community.letsencrypt.org/t/how-to-nginx-configuration-to-enable-acme-challenge-support-on-all-http-virtual-hosts/5622">https://community.letsencrypt.org/t/how-to-nginx-configuration-to-enable-acme-challenge-support-on-all-http-virtual-hosts/5622</a>   <br/>
+3.<a href="https://letsencrypt.org/getting-started/">https://letsencrypt.org/getting-started/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[用Nginx服务静态文件]]></title>
@@ -3504,101 +3768,6 @@ Heroku Enterprise</p>
 4.<a href="http://www.hygkui.com/2015/03/13/%E4%BD%BF%E7%94%A8Gulp-Node-Git%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E5%88%B0Heroku%E4%B8%8A/">http://www.hygkui.com/2015/03/13/%E4%BD%BF%E7%94%A8Gulp-Node-Git%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E5%88%B0Heroku%E4%B8%8A/</a> 上面的中文版  <br/>
 5.<a href="http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/">http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/</a>  <br/>
 6.<a href="https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate">https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[SEO实战密码：URL静态化]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/10/31/static-url-for-seo/"/>
-    <updated>2015-10-31T19:01:24+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/10/31/static-url-for-seo</id>
-    <content type="html"><![CDATA[<p>URL静态化一直以来都是最基本的SEO要求之一，但近年来搜索引擎技术进步，抓取动态url已经不是问题，SEO行业对是否一定要做静态化也有了一些观念上的改变。</p>
-
-<h2>为什么要做静态化？</h2>
-
-<p>现在的网站绝大多数都是数据库驱动，页面由程序实时生成，而不是真的在服务器上有一个静态HTML文件存在。当用户访问一个网址时，程序根据URL中的参数调用数据库，实时生成页面内容。因此动态页面相对应的URL原始状态也是动态的，包含问号，等号及参数。</p>
-
-<p>搜索引擎在发展初期，一般不愿意爬行和收录动态URL，主要原因是可能陷入无限循环或收录大量重复内容，造成资源极大的浪费。最典型的无线循环就是某些网站上出现的万年历。万年历会使得蜘蛛可以无限点击下去。</p>
-
-<p>真实用户一眼就能看出这是一个万年历，但是搜索引擎蜘蛛面对的只是一串代码，不一定能判断它。</p>
-
-<p>有时候就算不是无限循环，动态URL也可能造成大量重复页面。比如：想用的URL和参数（也就是相同的页面），但是参数的顺序不同（有多个参数）。</p>
-
-<p>更麻烦的是，有时候某些参数完全可以是任意值，服务器都能够正常的返回某个固定页面。</p>
-
-<p>这就是为什么搜索引擎对动态URL敬而远之的原因。</p>
-
-<h2>如何静态化URL呢？</h2>
-
-<p>最常见的方式是使用服务器URL重写模块，LAMP（Linux+Apache+MySQL+PHP）服务器上一般使用mod_rewrite模块，Windows服务器上也有类似的功能。</p>
-
-<p>举例：</p>
-
-<p><a href="http://www.domain.com/products.php?id=123">http://www.domain.com/products.php?id=123</a></p>
-
-<p>静态化为:</p>
-
-<p><a href="http://www.domain.com/products/123">http://www.domain.com/products/123</a></p>
-
-<p>需要请用服务器模块mod_rewrite，然后在.htaccess文件写入代码：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">RewriteRule</span> <span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="p">([</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="o">/</span><span class="n">products</span><span class="o">.</span><span class="n">php</span><span class="err">?</span><span class="nb">id</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>URL重写基于正则表达式，每个网站的动态URL结构都不同，所以写起来就很麻烦。</p>
-
-<p>严格的说，这里所说的URL静态化应该称为“伪静态化”，也就是说服务器上还是不存在相应的HTML文件，用户访问时还是动态生成页面，只不过通过URL重写技术使网站看起来像是静态的。当然，也有CMS系统可以实现真正静态化，系统会自动真实生成静态的HTML文件。但对于搜索引擎来说，真正的静态化和伪静态化没有区别。</p>
-
-<h2>到底是否需要URL静态化？</h2>
-
-<p>近年来搜索引擎对URL的抓取有了很大进步。一般来说，URL中有两三个参数，对于收录不会造成任何影响。权重高的域名，再多几个问号也不是问题。不过一般还是建议将URL静态化，即能提高用户体验，又能降低收录难度。</p>
-
-<p>2008年9月，Google站长博客发表了一篇关于动态网址还是静态网址的帖子，颠覆了SEO界的观念。</p>
-
-<p>Google的帖子有几个要点。</p>
-
-<p>一是Google完全有能力抓取动态网址，多少个问号也不是问题。这一点基本靠谱。</p>
-
-<p>第二，动态网址更有助于Google蜘蛛读懂URL含义，并进行鉴别，因为网址中的参数有提示性。比如Google举了这个例子：</p>
-
-<p>www.example.com/article/bin/answer.foo?language=en&amp;answer=3&amp;sid=98971298178906&amp;query=URL</p>
-
-<p>URL里的参数都有助于Google理解URL及网页内容。比如language后面跟的参数是提示语言，answer后面跟的是文章编号，sid后面的肯定是session ID。其他常用的包括color后面跟的参数指的是颜色，size后面跟的参数是尺寸等。有了这些参数的帮助，Google更容易理解网页。</p>
-
-<p>而将网址静态化后，这些参数的意义通常就变得不明显了。比如这个URL：</p>
-
-<p>www.example.com/shoes/red/7/12/men/index.html</p>
-
-<p>就可能使Google不知道哪个是产品序列号，哪个是尺寸等。</p>
-
-<p>第三，网址静态化很容易弄错，那就更得不偿失了。比如通常动态网址的参数调换顺序，所得到的页面其实是相同的，比如这两个网址很可能就是同一个页面：</p>
-
-<p>www.example.com/article/bin/answer.foo?language=en&amp;answer=3</p>
-
-<p>www.example.com/article/bin/answer.foo?answer=3&amp;language=en</p>
-
-<p>保留动态网址，Google还比较容易明白这是一样的网页。而经过静态化后，这样两个网址Google就不容易判断是不是同一个页面，从而可能引起复制内容：</p>
-
-<p>www.example.com/shoes/men/7/red/index.html</p>
-
-<p>www.example.com/shoes/red/7/men/index.html</p>
-
-<p>再一个容易搞错的是session ID，也可能被静态化进URL：</p>
-
-<p>www.example.com/article/bin/answer.foo/en/3/98971298178906/URL</p>
-
-<p>这样网站将产生大量URL不同，但其实内容相同的页面。</p>
-
-<p>所以，Google建议不要静态化URL。</p>
-
-<h2>虽然如此</h2>
-
-<p>但是《SEO实战密码》的作者建议还是做静态化。他认为Google的这个帖子解释的有些极端和牵强，也没有从其他搜索引擎的角度出发。</p>
-
-<p>参考资料： <br/>
-1.《SEO实战密码》</p>
 ]]></content>
   </entry>
   
