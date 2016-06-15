@@ -134,9 +134,9 @@
 
 <p><img src="/images/TLS.png" title="TLS层" alt="Alt text" /></p>
 
-<h2>还是想要说说HTTPS背后基本原理和概念</h2>
+<h2>看来，重点是TLS层，但是再谈之前，还是想要先说说HTTPS背后基本原理和概念</h2>
 
-<p>今天的重点是介绍HTTPS背后的基本原理和概念，涉及到的概念：密码学基础知识-非对称加密算法，数字证书，CA中心等。</p>
+<p>这也是本文的重点，介绍HTTPS背后的基本原理和概念，涉及到的概念：密码学基础知识-非对称加密算法，数字证书，CA中心等。</p>
 
 <p><strong>先谈 对称加密算法（一堆概念和解释）</strong></p>
 
@@ -245,7 +245,7 @@
 
 <p><img src="/images/letsencrpt.png" title="letsencrpt" alt="Alt text" /></p>
 
-<p>简单的介绍了以上这些概念，我们再回到HTTPS上。</p>
+<p>以上这些概念会在下面的TLS层引用，如果没看懂，请回头再看看对应概念的含义。</p>
 
 <h2>了解TLS协议</h2>
 
@@ -270,7 +270,9 @@ TLS运行在一个可靠的TCP协议上，意味着我们必须首先完成TCP�
 <p>由于历史和商业原因，基于RSA的秘钥交换占据了TLS协议的大片江山：客户端生成一个对称秘钥，使用服务器端证书的公钥加密，然后发送给服务器端，服务器端利用私钥解密得到对称秘钥。</p>
 
 <p>140 ms
-服务器处理由客户端发送的秘钥交换参数，验证消息的完整性，通过验证MAC，返回一个加密过的“Finished”消息给客户端。</p>
+服务器处理由客户端发送的秘钥交换参数，通过验证MAC（Message Authentication Code，消息认证码）来验证消息的完整性，返回一个加密过的“Finished”消息给客户端。</p>
+
+<p>在密码学中，消息认证码（英语：Message authentication code，缩写为MAC），又译为消息鉴别码、文件消息认证码、讯息鉴别码、信息认证码，是经过特定算法后产生的一小段信息，检查某段消息的完整性，以及作身份验证。</p>
 
 <p>168 ms
 客户端用协商得到的堆成秘钥解密“Finished”消息，验证MAC，如果一切ok，那么这个加密的通道就建立完成，可以开始数据传输了。</p>
@@ -302,7 +304,7 @@ TLS运行在一个可靠的TCP协议上，意味着我们必须首先完成TCP�
 2. 《High Performance Browser Networking》Chapter 4. Transport Layer Security (TLS) <br/>
 3. <a href="https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html">https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html</a> <br/>
 4. <a href="http://zhanzhang.baidu.com/wiki/494">http://zhanzhang.baidu.com/wiki/494</a> <br/>
-5. 维基百科 HTTPS <br/>
+5. 维基百科 HTTPS，消息认证码 <br/>
 6. 百度百科 对称加密，非对称加密，数字证书 <br/>
 7. <a href="https://www.zhihu.com/question/19979490">https://www.zhihu.com/question/19979490</a> <br/>
 8. <a href="http://www.leiphone.com/news/201412/AYbd3Tp7tbbSa0AD.html">http://www.leiphone.com/news/201412/AYbd3Tp7tbbSa0AD.html</a></p>
