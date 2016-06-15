@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-06-15T10:04:18+08:00</updated>
+  <updated>2016-06-15T10:20:00+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[我也想来谈谈HTTPS]]></title>
-    <link href="http://benweizhu.github.io/blog/2016/06/13/https-%1Bis-so-important/"/>
+    <link href="http://benweizhu.github.io/blog/2016/06/13/I-want-to-talk-about-https-too/"/>
     <updated>2016-06-13T17:50:10+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2016/06/13/https-is-so-important</id>
+    <id>http://benweizhu.github.io/blog/2016/06/13/I-want-to-talk-about-https-too</id>
     <content type="html"><![CDATA[<h2>我们需要安全</h2>
 
 <p>2014年8月份Google在它的官博上发表<a href="https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html">《HTTPS as a ranking signal》</a>

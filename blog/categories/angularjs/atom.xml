@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Angularjs | NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/blog/categories/angularjs/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-06-15T10:04:18+08:00</updated>
+  <updated>2016-06-15T10:20:19+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -22,63 +22,36 @@
 
 <p>而模块化的办法一般都是利用函数对象立即执行。</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">feature</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span><span class="c1">// Private variables and functions</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">privateThing</span> <span class="o">=</span> <span class="s2">&quot;secret&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">publicThing</span> <span class="o">=</span> <span class="s2">&quot;not secret&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">changePrivateThing</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">privateThing</span> <span class="o">=</span> <span class="s2">&quot;super secret&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">sayPrivateThing</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">privateThing</span> <span class="p">);</span>
-</span><span class='line'>    <span class="nx">changePrivateThing</span><span class="p">();</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Public API</span>
-</span><span class='line'><span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">publicThing</span><span class="o">:</span> <span class="nx">publicThing</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">sayPrivateThing</span><span class="o">:</span> <span class="nx">sayPrivateThing</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">})();</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">feature</span><span class="p">.</span><span class="nx">publicThing</span><span class="p">;</span> <span class="c1">// &amp;ldquo;not secret&amp;rdquo;&lt;/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="c1">// Logs &amp;ldquo;secret&amp;rdquo; and changes the value of privateThing</span>
-</span><span class='line'><span class="nx">feature</span><span class="p">.</span><span class="nx">sayPrivateThing</span><span class="p">();</span>
-</span></code></pre></td></tr></table></div></figure></p>
+<p>{% codeblock lang:js %}
+var feature = (function() {</p>
+
+<pre><code>// Private variables and functions
+var privateThing = "secret";
+var publicThing = "not secret";
+
+var changePrivateThing = function() {
+    privateThing = "super secret";
+};
+
+var sayPrivateThing = function() {
+    console.log( privateThing );
+    changePrivateThing();
+};
+
+// Public API
+return {
+    publicThing: publicThing,
+    sayPrivateThing: sayPrivateThing
+};
+</code></pre>
+
+<p>})();</p>
+
+<p>feature.publicThing; // &ldquo;not secret&rdquo;</p>
+
+<p>// Logs &ldquo;secret&rdquo; and changes the value of privateThing
+feature.sayPrivateThing();
+{% endcodeblock %}</p>
 
 <h3>模块与ng-app指令</h3>
 
@@ -86,35 +59,23 @@
 
 <p>看一个最简单的例子：</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;textApp&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;textController&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure></p>
+<p>{% codeblock lang:html %}
+<body ng-app="textApp">
+    <div ng-controller="textController">
+        <input type="text" ng-model="name" />
+    </div>
+</body>
+{% endcodeblock %}</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">lsquo</span><span class="p">;</span><span class="nx">textApp</span><span class="o">&amp;</span><span class="nx">rsquo</span><span class="p">;,</span> <span class="p">[])</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;textController&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Benwei&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>{% codeblock lang:js %}
+angular.module(&lsquo;textApp&rsquo;, [])</p>
+
+<pre><code>.controller('textController', function ($scope) {
+    $scope.name = 'Benwei';
+});
+</code></pre>
+
+<p>{% endcodeblock %}
 在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/73kn66kd/">http://jsfiddle.net/benweizhu/73kn66kd/</a></p>
 
 <p>在前面我们已经无数次的看到ng-app指令。它的作用是自动启动一个AngularJS应用，ng-app指令一般指派在应用的根元素上，比如，body或者html标签。在每一个HTML文档中，只能有一个AngularJS应用可以被自动启动，在HTML文档中第一个被找到定义在根元素上的ng-app指令将会作为自动启动的应用。</p>
@@ -125,13 +86,11 @@
 
 <p>但是，赋值与否和启动一个AngularJS的应用无关：</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
-</span><span class='line'>     <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure></p>
+<p>{% codeblock lang:html %}
+<body ng-app>
+     <input type="text" ng-model="name" />{{name}}
+</body>
+{% endcodeblock %}</p>
 
 <p>这样也是可以启动AngularJS应用，并实现name模型的绑定。</p>
 
@@ -168,29 +127,19 @@
 
 <p>来看一个模块依赖的例子：</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">lsquo</span><span class="p">;</span><span class="nx">restApp</span><span class="o">&amp;</span><span class="nx">rsquo</span><span class="p">;,</span> <span class="p">[</span><span class="o">&amp;</span><span class="nx">lsquo</span><span class="p">;</span><span class="nx">ngResource</span><span class="o">&amp;</span><span class="nx">rsquo</span><span class="p">;])</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">lsquo</span><span class="p">;</span><span class="nx">personRest</span><span class="o">&amp;</span><span class="nx">rsquo</span><span class="p">;,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$resource</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">$resource</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">lsquo</span><span class="p">;</span><span class="err">/app/person&amp;rsquo;);</span>
-</span><span class='line'>    <span class="p">});</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">lsquo</span><span class="p">;</span><span class="nx">myApp</span><span class="o">&amp;</span><span class="nx">rsquo</span><span class="p">;,</span> <span class="p">[</span><span class="o">&amp;</span><span class="nx">lsquo</span><span class="p">;</span><span class="nx">restApp</span><span class="o">&amp;</span><span class="nx">rsquo</span><span class="p">;])</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">lsquo</span><span class="p">;</span><span class="nx">parentsController</span><span class="o">&amp;</span><span class="nx">rsquo</span><span class="p">;,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">personRest</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">personRest</span><span class="p">.</span><span class="nx">get</span><span class="p">({},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">person</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">person</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">});</span>
-</span><span class='line'>    <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure></p>
+<p>{% codeblock lang:js %}
+angular.module(&lsquo;restApp&rsquo;, [&lsquo;ngResource&rsquo;])
+    .factory(&lsquo;personRest&rsquo;, function ($resource) {
+        return $resource(&lsquo;/app/person&rsquo;);
+    });</p>
+
+<p>angular.module(&lsquo;myApp&rsquo;, [&lsquo;restApp&rsquo;])
+    .controller(&lsquo;parentsController&rsquo;, function ($scope, personRest) {
+        personRest.get({}, function (data) {
+            $scope.person = data.person;
+        });
+    });
+{% endcodeblock %}</p>
 
 <p>我需要写一个Rest的客户端模块restApp，需要使用到AngularJS提供的$resource服务，那么首先我需要引入AngularJS的ngResource服务模块，最后在我的应用模块，引入我自己定义的restApp模块然后，我就可以注入我自己定义personRest服务，继而使用它，这是一个典型的模块依赖例子。</p>
 
@@ -222,37 +171,25 @@
 
 <p>Angular允许我们在全局作用域下(window)定义控制器函数，就像在第二节中介绍的那样，定义一个JavaScript的全局函数函数。但不建议这种方式，推荐在Angular模块 下通过.controller为你的应用创建控制器，如第三节中那样。</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;controllerSampleApp&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;sampleController&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        first name <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;firstName&quot;</span> <span class="nt">/&gt;&lt;br/&gt;</span>
-</span><span class='line'>        last name<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;lastName&quot;</span> <span class="nt">/&gt;&lt;br/&gt;</span>
-</span><span class='line'>        my name is .
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure></p>
+<p>{% codeblock lang:html %}
+<body ng-app="controllerSampleApp">
+    <div ng-controller="sampleController">
+        first name <input type="text" ng-model="firstName" /><br/>
+        last name<input type="text" ng-model="lastName" /><br/>
+        my name is {{fullName()}}.
+    </div>
+</body>
+{% endcodeblock %}</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">controllerSampleApp</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span> <span class="p">[])</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">sampleController</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">fullName</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span> <span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;</span> <span class="o">+</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>{% codeblock lang:js %}
+angular.module(&ldquo;controllerSampleApp&rdquo;, [])</p>
+
+<p>.controller(&ldquo;sampleController&rdquo;, function ($scope) {
+    $scope.fullName = function () {
+        return $scope.firstName + &ldquo; &rdquo; + $scope.lastName;
+    };
+});
+{% endcodeblock %}
 在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/3whwfj3n/">http://jsfiddle.net/benweizhu/3whwfj3n/</a></p>
 
 <p><strong>明白控制器的作用，正确的使用控制器</strong></p>
@@ -322,41 +259,27 @@ DOM操作则属于应用程序的表现层逻辑操作，向来以测试难度�
 
 <p>我们来看个一个具体的例子，贯穿一下上面所提到的概念：</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;listApp&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;listController&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        my name is <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;ul</span> <span class="na">ng-repeat=</span><span class="s">&quot;friend in friends&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;li&gt;</span>Hi { {friend} }, { {introduce()} }<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/ul&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure></p>
+<p>{% codeblock lang:html %}
+<body ng-app="listApp">
+    <div ng-controller="listController">
+        my name is <input type="text" ng-model="name"/>
+        <ul ng-repeat="friend in friends">
+            <li>Hi { {friend} }, { {introduce()} }</li>
+        </ul>
+    </div>
+</body>
+{% endcodeblock %}</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">listApp</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span> <span class="p">[])</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">listController</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">friends</span> <span class="o">=</span> <span class="p">[</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">Lily</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">Kate</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">Mike</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;];</span>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">introduce</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="k">this</span> <span class="nx">is</span> <span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;</span> <span class="o">+</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;.</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;;</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>{% codeblock lang:js %}
+angular.module(&ldquo;listApp&rdquo;, [])</p>
+
+<p>.controller(&ldquo;listController&rdquo;, function ($scope) {
+    $scope.friends = [&ldquo;Lily&rdquo;,&ldquo;Kate&rdquo;,&ldquo;Mike&rdquo;];
+    $scope.introduce = function() {
+        return &ldquo;this is &rdquo; + $scope.name + &ldquo;.&rdquo;;
+    };
+});
+{% endcodeblock %}
 在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/wLufL8p1/1/">http://jsfiddle.net/benweizhu/wLufL8p1/1/</a></p>
 
 <p>在这个例子中，你可能会看到和上一节定义控制器的方式不同。没错，上一节已经说过，以直接定义函数的方式定义控制器并不是常用的方式，只是为了让你知道控制器的本质是函数。</p>
@@ -390,18 +313,15 @@ DOM操作则属于应用程序的表现层逻辑操作，向来以测试难度�
 
 <p>看第一个的例子，模型与模板：</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    { {name} }
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>{% codeblock lang:html %}
+<body ng-app>
+    <input type="text" ng-model="name"/>
+    { {name} }
+</body>
+{% endcodeblock %}
 在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/j6b5271r/">http://jsfiddle.net/benweizhu/j6b5271r/</a></p>
 
-<p>在这个例子中，使用了一个HTML本身没有的语法ng-model=&ldquo;name&#8221;，它是AngularJS扩展的HTML语法，叫做ng-model指令，还用到了，AngularJS的数值表达式。</p>
+<p>在这个例子中，使用了一个HTML本身没有的语法ng-model=&ldquo;name&#8221;，它是AngularJS扩展的HTML语法，叫做ng-model指令，还用到了{{name}}，AngularJS的数值表达式。</p>
 
 <p>我们知道在大部分传统模板系统中，对模板的渲染都是线性单向的过程：模型和模板混合在一起产生标记的计算结果。当任何模型发生改变后都需要模板重新计算。</p>
 
@@ -412,25 +332,19 @@ DOM操作则属于应用程序的表现层逻辑操作，向来以测试难度�
 <p><strong>控制器</strong></p>
 
 <p>再来第二个例子，模型和控制器：
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;textController&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>         <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure></p>
+{% codeblock lang:html %}
+<body ng-app>
+    <div ng-controller="textController">
+         <input type="text" ng-model="name"/>
+    </div>
+</body>
+{% endcodeblock %}</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">textController</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$scope</span><span class="p">){</span>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span><span class="o">=&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">benwei</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>{% codeblock lang:js %}
+var textController = function($scope){
+    $scope.name=&ldquo;benwei&rdquo;;
+}
+{% endcodeblock %}
 在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/m5gue0zs/">http://jsfiddle.net/benweizhu/m5gue0zs/</a></p>
 
 <p>在这里，用到了AngularJS中的另一个指令ng-controller，在这个Controller的范围内，定义了一个模型name，我们通过模板域模型$scope对象得到controller范围内定义的模型name，并赋值。</p>
@@ -472,49 +386,31 @@ DOM操作则属于应用程序的表现层逻辑操作，向来以测试难度�
     <id>http://benweizhu.github.io/blog/2014/12/19/yes-angularjs-1</id>
     <content type="html"><![CDATA[<p>看这样一个例子：</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;textLengthLimitController&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;textarea</span> <span class="na">ng-model=</span><span class="s">&quot;text&quot;</span><span class="nt">&gt;&lt;/textarea&gt;</span> <span class="nt">&lt;span&gt;&lt;/span&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">ng-disabled=</span><span class="s">&quot;!hasValidLength()&quot;</span> <span class="na">value=</span><span class="s">&quot;send&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure></p>
+<p>{% codeblock lang:html %}
+<body ng-app>
+    <div ng-controller="textLengthLimitController">
+        <textarea ng-model="text"></textarea> <span>{{remaining()}}</span>
+        <input type="button" ng-disabled="!hasValidLength()" value="send" />
+    </div>
+</body>
+{% endcodeblock %}</p>
 
-<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">MAX_LENGTH</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="kd">function</span> <span class="nx">textLengthLimitController</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">remaining</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">MAX_LENGTH</span> <span class="o">-</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">$scope</span><span class="p">.</span><span class="nx">hasValidLength</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">remaining</span><span class="p">()</span> <span class="o">&amp;</span><span class="nx">gt</span><span class="p">;</span><span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></p>
+<p>{% codeblock lang:javascript %}
+var MAX_LENGTH = 10;</p>
+
+<p>function textLengthLimitController($scope) {</p>
+
+<pre><code>$scope.remaining = function () {
+    return MAX_LENGTH - $scope.text.length;
+};
+
+$scope.hasValidLength = function () {
+    return $scope.remaining() &gt;= 0;
+};
+</code></pre>
+
+<p>}
+{% endcodeblock %}</p>
 
 <p>代码的功能是告诉用户还可输入多少字符，当字符超过限制，将发送按钮灰掉。在jsFiddle里运行该代码，<a href="http://jsfiddle.net/benweizhu/cbcn995m/">http://jsfiddle.net/benweizhu/cbcn995m/</a></p>
 
