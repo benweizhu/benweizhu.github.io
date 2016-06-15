@@ -151,6 +151,12 @@
 
 <p>目前，常用的非对称加密算法：RSA（1024/2048位，目前比较流行的），ECC（椭圆曲线加密算法，更前沿的算法，相对RSA，需要的秘钥更短）。</p>
 
+<p><strong>HASH散列函数</strong></p>
+
+<p>散列函数（或散列算法，又称哈希函数，英语：Hash Function）是一种从任何一种数据中创建小的数字“指纹”的方法。散列函数把消息或数据压缩成摘要，使得数据量变小，将数据的格式固定下来。该函数将数据打乱混合，重新创建一个叫做散列值（hash values，hash codes，hash sums，或hashes）的指纹。</p>
+
+<p>所有散列函数都有如下一个基本特性：如果两个散列值是不相同的（根据同一函数），那么这两个散列值的原始输入也是不相同的。这个特性是散列函数具有确定性的结果，具有这种性质的散列函数称为单向散列函数。但另一方面，散列函数的输入和输出不是唯一对应关系的，如果两个散列值相同，两个输入值很可能是相同的，但也可能不同，这种情况称为“哈希碰撞”，这通常是两个不同长度的输入值，刻意计算出相同的输出值。</p>
+
 <p><strong>那么，有一个很重要的问题：加密算法是如何保证数据传输的安全？</strong></p>
 
 <p>利用数学计算的困难性</p>
@@ -272,10 +278,12 @@ TLS运行在一个可靠的TCP协议上，意味着我们必须首先完成TCP�
 <p>140 ms
 服务器处理由客户端发送的秘钥交换参数，通过验证MAC（Message Authentication Code，消息认证码）来验证消息的完整性，返回一个加密过的“Finished”消息给客户端。</p>
 
-<p>在密码学中，消息认证码（英语：Message authentication code，缩写为MAC），又译为消息鉴别码、文件消息认证码、讯息鉴别码、信息认证码，是经过特定算法后产生的一小段信息，检查某段消息的完整性，以及作身份验证。</p>
+<p>在密码学中，消息认证码（英语：Message authentication code，缩写为MAC），又译为消息鉴别码、文件消息认证码、讯息鉴别码、信息认证码，是经过特定算法后产生的一小段信息，检查某段消息的完整性，以及作身份验证。它可以用来检查在消息传递过程中，其内容是否被更改过，不管更改的原因是来自意外或是蓄意攻击。同时可以作为消息来源的身份验证，确认消息的来源。</p>
+
+<p>消息认证码的算法中，通常会使用使用带密钥的散列函数，或者块密码的带认证工作模式（如CBC）。</p>
 
 <p>168 ms
-客户端用协商得到的堆成秘钥解密“Finished”消息，验证MAC，如果一切ok，那么这个加密的通道就建立完成，可以开始数据传输了。</p>
+客户端用协商得到的堆成秘钥解密“Finished”消息，验证MAC（消息完整性验证），如果一切ok，那么这个加密的通道就建立完成，可以开始数据传输了。</p>
 
 <p>在这之后的通信，采用对称秘钥对数据加密传输，从而保证数据的机密性。</p>
 
@@ -304,7 +312,7 @@ TLS运行在一个可靠的TCP协议上，意味着我们必须首先完成TCP�
 2. 《High Performance Browser Networking》Chapter 4. Transport Layer Security (TLS) <br/>
 3. <a href="https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html">https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html</a> <br/>
 4. <a href="http://zhanzhang.baidu.com/wiki/494">http://zhanzhang.baidu.com/wiki/494</a> <br/>
-5. 维基百科 HTTPS，消息认证码 <br/>
+5. 维基百科 HTTPS，消息认证码，HASH散列函数 <br/>
 6. 百度百科 对称加密，非对称加密，数字证书 <br/>
 7. <a href="https://www.zhihu.com/question/19979490">https://www.zhihu.com/question/19979490</a> <br/>
 8. <a href="http://www.leiphone.com/news/201412/AYbd3Tp7tbbSa0AD.html">http://www.leiphone.com/news/201412/AYbd3Tp7tbbSa0AD.html</a></p>
