@@ -277,13 +277,13 @@ TLS运行在一个可靠的TCP协议上，意味着我们必须首先完成TCP�
 
 <p>在这之后的通信，采用对称秘钥对数据加密传输，从而保证数据的机密性。</p>
 
-<p>说了这么理论的东西，我也写累了，来点干货！！</p>
+<p>到此为止，我是想要介绍的基本原理的全部内容，但HTTPS得知识点不止如此，还有更多说，现在来点干货！！</p>
 
 <h2>那么，教练，我想用HTTPS</h2>
 
 <p><img src="/images/anxi.jpg" title="安西教练" alt="Alt text" /></p>
 
-<h3>选择合适的证书</h3>
+<h3>有两点，选择合适的证书和了解服务器的配置方式</h3>
 
 <p><strong>Let’s Encrypt(It’s free, automated, and open.)是一种不错的选择</strong></p>
 
@@ -295,7 +295,7 @@ TLS运行在一个可靠的TCP协议上，意味着我们必须首先完成TCP�
 
 <p>Let’s Encrypt发布最新数据，至今该项目已经颁发了超过300万份证书——300万这个数字是在5月8日-9日之间达成的。Let’s Encrypt是为了让HTTP连接做得更加安全的一个项目，所以越多的网站能够加入进来，则整个互联网也会变得更加安全。</p>
 
-<p>关于如何配置服务器来使用证书，请参考我的另外一篇博客（全民安全站Let’s Encrypt配置NGINX）： <a href="http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt/">http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt/</a></p>
+<p>关于如何配置服务器来使用证书，请参考我的另外一篇以NGINX为例的博客（全民安全站Let’s Encrypt配置NGINX）： <a href="http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt/">http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt/</a></p>
 
 <p>参考资料： <br/>
 1. HTTP权威指南  <br/>
