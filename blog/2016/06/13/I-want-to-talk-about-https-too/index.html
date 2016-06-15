@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="我们需要安全 2014年8月份Google在它的官博上发表《HTTPS as a ranking signal》 公告已经调整其搜索引擎算法，采用 HTTPS 加密的网站在搜索结果中的排名将会更高，其目标非常简单，就是要鼓励全球网站采用安全度更高的HTTPS以保证访客安全。 同一年（2014年）， &hellip;">
+  <meta name="description" content="安全越来越被重视 2014年8月份Google在它的官博上发表《HTTPS as a ranking signal》 公告已经调整其搜索引擎算法，采用 HTTPS 加密的网站在搜索结果中的排名将会更高，其目标非常简单，就是要鼓励全球网站采用安全度更高的HTTPS以保证访客安全。 同一年（2014年 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,7 +83,7 @@
   </header>
 
 
-<div class="entry-content"><h2>我们需要安全</h2>
+<div class="entry-content"><h2>安全越来越被重视</h2>
 
 <p>2014年8月份Google在它的官博上发表<a href="https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html">《HTTPS as a ranking signal》</a>
  公告已经调整其搜索引擎算法，采用 HTTPS 加密的网站在搜索结果中的排名将会更高，其目标非常简单，就是要鼓励全球网站采用安全度更高的HTTPS以保证访客安全。</p>
@@ -111,6 +111,12 @@
 </ul>
 
 
+<h2>HTTP不安全</h2>
+
+<p>HTTP传输的内容是明文的，你上网浏览过、提交过的内容，所有在后台工作的人，比如路由器的所有者、网线途径路线的不明意图者、省市运营商、运营商骨干网、跨运营商网关等都能够查看。如果你访问的是国外网站，那么还得加上国际宽带出口、国外运营商等。这串名单可以不断延伸，一直到你对互联网由崇拜转为恐惧。</p>
+
+<p>Google希望互联网HTTPS化、乃至于提出“HTTP = 不安全”口号的原因，过去数年里，我们一直生活在明文时代，上网的所有痕迹都暴露在巨型机构眼中。</p>
+
 <h2>HTTPS和HTTP的不同：TLS安全层（会话层）</h2>
 
 <p>超文本传输安全协议（英语：Hypertext Transfer Protocol Secure，HTTPS，也被称为HTTP over TLS，HTTP over SSL或HTTP Secure）是一种网络安全传输协议。</p>
@@ -125,7 +131,7 @@
 
 <p><img src="/images/TLS.png" title="TLS层" alt="Alt text" /></p>
 
-<h2>还是想要说说基本原理</h2>
+<h2>还是想要说说HTTPS背后基本原理和概念</h2>
 
 <p>今天的重点是介绍HTTPS背后的基本原理和概念，涉及到的概念：密码学基础知识-非对称加密算法，数字证书，CA中心等。</p>
 
@@ -164,7 +170,69 @@
 <p>数字证书是一种权威性的电子文档，可以由权威公正的第三方机构，即CA（例如中国各地方的CA公司）中心签发的证书，也可以由企业级CA系统进行签发。
 它以数字证书为核心的加密技术(加密传输、数字签名、数字信封等安全技术)可以对网络上传输的信息进行加密和解密、数字签名和签名验证，确保网上传递信息的机密性、完整性及交易的不可抵赖性。使用了数字证书，即使您发送的信息在网上被他人截获，甚至您丢失了个人的账户、密码等信息，仍可以保证您的账户、资金安全。</p>
 
-<p>身份认证</p>
+<p>以X.509证书为例，可以看一下它的关键信息的结构</p>
+
+<table>
+<thead>
+<tr>
+<th> 英文 </th>
+<th> 解释 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> Version </td>
+<td> 版本 </td>
+</tr>
+<tr>
+<td> Algorithm ID </td>
+<td> 算法标识 </td>
+</tr>
+<tr>
+<td> Issuer </td>
+<td> 颁发者 </td>
+</tr>
+<tr>
+<td> Validity </td>
+<td> 有效期 </td>
+</tr>
+<tr>
+<td> Subject</td>
+<td> 使用者 </td>
+</tr>
+<tr>
+<td> Subject Public Key Info </td>
+<td> 使用者公钥信息 </td>
+</tr>
+<tr>
+<td> Public Key Algorithm </td>
+<td> 公钥算法 </td>
+</tr>
+<tr>
+<td> Subject Public Key </td>
+<td> 公钥 </td>
+</tr>
+<tr>
+<td> Issuer Unique Identifier (Optional) </td>
+<td> 颁发者唯一标识 </td>
+</tr>
+<tr>
+<td> Subject Unique Identifier (Optional) </td>
+<td> 使用者唯一标识 </td>
+</tr>
+<tr>
+<td> Certificate Signature Algorithm </td>
+<td> 证书签名算法 </td>
+</tr>
+<tr>
+<td> Certificate Signature </td>
+<td> 证书签名 </td>
+</tr>
+</tbody>
+</table>
+
+
+<p><strong>身份认证（我凭什么信任你）</strong></p>
 
 <p>身份认证是建立每一个TLS连接的不可或缺的部分。比如，你有可能和任何一方建立一个加密的通道，包括攻击者，除非我们可以确定通信的服务端是我们可以信任的，否则，所有的加密（保密）工作都没有任何作用。</p>
 
@@ -174,9 +242,9 @@
 
 <p><img src="/images/letsencrpt.png" title="letsencrpt" alt="Alt text" /></p>
 
-<p>简单的介绍了下概念，我们再回到HTTPS上。</p>
+<p>简单的介绍了以上这些概念，我们再回到HTTPS上。</p>
 
-<h2>TLS协议</h2>
+<h2>了解TLS协议</h2>
 
 <p>如上面的那张所示，HTTPS的安全主要靠的是TLS协议层的操作。那么它到底做了什么，来建立一条安全的数据传输通道呢？</p>
 
@@ -203,6 +271,40 @@ TLS运行在一个可靠的TCP协议上，意味着我们必须首先完成TCP�
 
 <p>168 ms
 客户端用协商得到的堆成秘钥解密“Finished”消息，验证MAC，如果一切ok，那么这个加密的通道就建立完成，可以开始数据传输了。</p>
+
+<p>在这之后的通信，采用对称秘钥对数据加密传输，从而保证数据的机密性。</p>
+
+<p>说了这么理论的东西，我也写累了，来点干货！！</p>
+
+<h2>那么，教练，我想用HTTPS</h2>
+
+<p><img src="/images/anxi.jpg" title="安西教练" alt="Alt text" /></p>
+
+<h3>选择合适的证书</h3>
+
+<p><strong>Let’s Encrypt(It’s free, automated, and open.)是一种不错的选择</strong></p>
+
+<p><a href="https://letsencrypt.org/">https://letsencrypt.org/</a></p>
+
+<p>ThoughtWorks2016年4月份最新发布的技术雷达对Let’s Encrypt项目的介绍：</p>
+
+<p>从2015年，12月开始，Let’s Encrypt项目从封闭测试阶段转向公开测试阶段，也就是说用户不再需要收到邀请才能使用它了。Let’s Encrypt为那些寻求网站安全的用户提供了一种简单的方式获取和管理证书。Let’s Encrypt也促使安全和隐私前进了一大步，而这一趋势已经随着ThoughtWorks和我们许多使用其进行证书认证的项目开始了。</p>
+
+<p>Let’s Encrypt发布最新数据，至今该项目已经颁发了超过300万份证书——300万这个数字是在5月8日-9日之间达成的。Let’s Encrypt是为了让HTTP连接做得更加安全的一个项目，所以越多的网站能够加入进来，则整个互联网也会变得更加安全。</p>
+
+<p>关于如何配置服务器来使用证书，请参考我的另外一篇博客（全民安全站Let’s Encrypt配置NGINX）： <a href="http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt/">http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt/</a></p>
+
+<p>参考资料： <br/>
+1. HTTP权威指南  <br/>
+2. 《High Performance Browser Networking》Chapter 4. Transport Layer Security (TLS) <br/>
+3. <a href="https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html">https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html</a> <br/>
+4. <a href="http://zhanzhang.baidu.com/wiki/494">http://zhanzhang.baidu.com/wiki/494</a> <br/>
+5. 维基百科 HTTPS <br/>
+6. 百度百科 对称加密，非对称加密，数字证书 <br/>
+7. <a href="https://www.zhihu.com/question/19979490">https://www.zhihu.com/question/19979490</a> <br/>
+8. <a href="http://www.leiphone.com/news/201412/AYbd3Tp7tbbSa0AD.html">http://www.leiphone.com/news/201412/AYbd3Tp7tbbSa0AD.html</a></p>
+
+<p>本文参考大量网络资料，如有发现文中参考资料遗漏，请联系本文作者，我会及时更新</p>
 </div>
 
 
