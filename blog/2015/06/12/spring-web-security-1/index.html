@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Spring Web Security 实战 (一) - 最少配置启动 - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="你大概应该知道对于应用的安全性（无论是Web应用还是非Web应用），都包含两个方面“身份认证”（authentication）和“权限认证”（authorization，access-control）。身份认证是确立“访问者”所声称的“当事人”（principal）的一个过程（当事人可以是一个用户 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/06/12/spring-web-security-1">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Spring Web Security 实战 (一) - 最少配置启动</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-06-12T21:12:38+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:12 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>你大概应该知道对于应用的安全性（无论是Web应用还是非Web应用），都包含两个方面“身份认证”（authentication）和“权限认证”（authorization，access-control）。身份认证是确立“访问者”所声称的“当事人”（principal）的一个过程（当事人可以是一个用户，设备，或者其他任何要在该应用操作的系统）。权限认证指的是确定该“当事人”是否可以在应用执行某一个操作的过程。</p>
+
+<p>Spring Security能提供的功能亦围绕着这两个核心概念展开。</p>
+
+<p>在“身份认证”方面，Spring Security能提供什么样的支持呢？如下：</p>
+
+<p>HTTP BASIC authentication headers(an IETF RFC-based standard)   <br/>
+HTTP Digest authentication headers(an IETF RFC-based standard)   <br/>
+HTTPX.509 client certificate exchange(an IETF RFC-based standard)   <br/>
+Form-based authentication(for simple user interface needs)   <br/>
+&hellip;
+更多类型，请参考Spring Security官文。</p>
+
+<p>好吧，概念性的东西就介绍到这，本篇文章以实战为主，下面我们还是来聊聊大家更关心的实现：</p>
+
+<p>在Spring Security 3.0中，相应的功能代码被分到了不同的Jar包中，以清晰的区分不同的功能和第三方依赖。下面介绍三个主要的Jar包：</p>
+
+<p>Core - spring-security-core.jar</p>
+
+<p>包含核心的“身份认证”和“访问控制”类和接口。任何Spring Security的应用都需要这个包，支持独立应用，远程客户端，方法级别（服务层）的安全，以及JDBC，主要包含下面几个顶级包：      <br/>
+org.springframework.security.core  <br/>
+org.springframework.security.access  <br/>
+org.springframework.security.authentication    <br/>
+org.springframework.security.provisioning</p>
+
+<p>Web - spring-security-web.jar</p>
+
+<p>包含对应的filter和web security相关的基础架构代码。任何与Servlet API相关的依赖。如果你需要Spring Security对web身份认证和URL级别的访问控制的支持，就需要它。里面主要包含的包是：org.springframework.security.web。</p>
+
+<p>Config - spring-security-config.jar</p>
+
+<p>包含security命名空间解析代码。如果你要使用XML方式的配置Security，那么你就会需要它。主要包含的包：org.springframework.security.config。</p>
+
+<p>以web应用和xml配置为例，要开始使用Spring Security，需要至少下面的两个依赖，web和config，web会自动依赖于core，所以不用显示的指定core。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework.security:spring-security-web:3.2.7.RELEASE&#39;</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework.security:spring-security-config:3.2.7.RELEASE&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>为了能够支持更多的Spring使用，我们以XML方法来配置Security框架。</p>
+
+<p>下面介绍下在Security命名空间下，都有哪些重要的元素节点。</p>
+
+<p>• Web/HTTP Security - 设置filter和相关的Service Bean，以应用框架的用户认证机制，安全化URL，渲染登录，错误页面等。</p>
+
+<p>• Business Object(Method) Security - 用来保证业务层的安全。</p>
+
+<p>• Authentication Manager - 处理身份认证请求</p>
+
+<p>• Access Decision Manager - 为web和method提供访问决策。框架提供了一个默认实现，你也可以自定义一个，语法和普通Bean定义一样。</p>
+
+<p>• AuthenticationProviders - 与Authentication Manager相对应的身份认真机制提供方，提供了多种标准选择，同样也支持自定义。</p>
+
+<p>• UserDetailsService - 与authentication providers联系紧密，也会被其他Bean使用。</p>
+
+<p>接下来，我们开始正式写代码。</p>
+
+<p>首先，你需要在web.xml中定义一个名字是springSecurityFilterChain的filter。它提供了一个“钩子“，来启动Spring Security Web的基础架构。DelegatingFilterProxy是Spring框架中一个类，它代理着一个以Spring Bean方式定义在Spring上下文中的filter。在本例中，bean的名字是springSecurityFilterChain，它是Spring提供的内部基础架构Bean，所以，我们定义的一些自定义的Bean的时候，就不可以使用这个名字springSecurityFilterChain。代码如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;filter&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;filter-name&gt;</span>springSecurityFilterChain<span class="nt">&lt;/filter-name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;filter-class&gt;</span>org.springframework.web.filter.DelegatingFilterProxy<span class="nt">&lt;/filter-class&gt;</span>
+</span><span class='line'><span class="nt">&lt;/filter&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;filter-mapping&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;filter-name&gt;</span>springSecurityFilterChain<span class="nt">&lt;/filter-name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;url-pattern&gt;</span>/*<span class="nt">&lt;/url-pattern&gt;</span>
+</span><span class='line'><span class="nt">&lt;/filter-mapping&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>springSecurityFilterChain是由Spring框架定义。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">security</span><span class="o">.</span><span class="na">config</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">configuration</span><span class="o">;</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebSecurityConfiguration</span><span class="o">{</span>
+</span><span class='line'>  <span class="nd">@org.springframework.context.annotation.Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="o">{</span><span class="s">&quot;springSecurityFilterChain&quot;</span><span class="o">})</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">javax</span><span class="o">.</span><span class="na">servlet</span><span class="o">.</span><span class="na">Filter</span> <span class="nf">springSecurityFilterChain</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Exception</span> <span class="o">{</span> <span class="cm">/* compiled code */</span> <span class="o">}</span>   
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>做完上面的”钩子”配置，你就可以正式开始Spring上下文的定义。首先来配置Web/HTTP Security节点部分“http”：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;ROLE_USER&#39;)&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;form-login/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;logout/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/http&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面是使得Spring Security工作的最小http节点配置。安全拦截所有应用中的URL，要求访问者（“当事人”）含有ROLE_USER权限，要求使用带有用户名和密码的表单登录，并提供一个登出的URL。上面的pattern可以使用正则表达式来匹配对应路径，access中的hasRole必须配合use-expressions=&ldquo;true&#8221;才能使用（4.0以上有所不同）。如果提供多种权限，ROLE_USER后面可以以逗号分隔以允许多种权限（如果是4.0以上版本，Spring会自动给hasRole中的值加上ROLE_作为前缀，所以需要注意）。</p>
+
+<p>这里允许定义多个intercept-url以应对不同的url，比如，css，js的访问，自定义登陆页面的访问，等。由于该intercept-url会根据定义的先后顺序来解析输入的url，所以，越明确的url模式，越应该放在前面。</p>
+
+<p>note：如果你对filter比较熟悉，你应该能明白intercept-url其实是在配置FilterChainProxy所使用的filter。</p>
+
+<p>接下来，需要配置Authentication Manager：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;authentication-provider&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;user-service&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;ben&quot;</span> <span class="na">password=</span><span class="s">&quot;ben&quot;</span> <span class="na">authorities=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/user-service&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/authentication-provider&gt;</span>
+</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>authentication-provider和user-service分别创建了两个bean，DaoAuthenticationProvider和InMemoryDaoImpl。它们作为authentication-manager的子元素存在，而authentication-manager则创建了一个ProviderManager的Bean，并将authentication-provider注册到该ProviderManager。理解这段代码的含义很简单，一个用户ben，密码ben，拥有ROLE_USER这个权限。</p>
+
+<p>你还可以通过user-service上的properties属性来指定一个properties文件作为用户定义的输入。</p>
+
+<p>到此，你就完成了一个最简单的Spring Web Security的配置。拦截所有url，需要输入用户名和密码登录访问。</p>
+
+<p>参考资料：   <br/>
+1. Spring Security Reference。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-06-12T21:12:38+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:12 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/06/12/spring-web-security-1/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/06/12/spring-web-security-1/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/06/11/spring-boot-starter-2/" title="Previous Post: Spring Boot 深入浅出系列（二） - 用Gradle启动应用">&laquo; Spring Boot 深入浅出系列（二） - 用Gradle启动应用</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/06/14/spring-web-security-2/" title="Next Post: Spring Web Security 实战 (二) - 自定义登录页面">Spring Web Security 实战 (二) - 自定义登录页面 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="Spring Web Security 实战 (一) - 最少配置启动"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <div style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</div>
+  <div style="margin-left: 8px;margin-top: 10px;">A Java/RoR/NodeJS-FE/Full Stack Developer</div>
+  <div style="margin-left: 8px;margin-top: 10px;">A Gradle Plugin Contributor</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-left: 8px;margin-top: 10px;"><a href='http://www.legulegu.com' target="_blank" style="text-decoration: blink;font-weight: bolder;">乐咕乐股网 - www.legulegu.com</a></div>
+  <div style="margin-left: 8px;">联合创始人/技术负责人/全栈工程师</div>
+  <div style="margin-left: 8px;">计算机应用技术学术性硕士-信息安全方向</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle，Spring，前端开发，自动化构建，自动化测试，Devops，信息安全</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/06/13/https-%1Bis-so-important/">我也想来谈谈HTTPS</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/29/nginx-lets-encrypt/">全民安全站Let&#8217;s Encrypt配置NGINX</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/22/nginx-serve-static/">用Nginx服务静态文件</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">将Nginx作为Tomcat的反向代理服务器</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/02/js-prevent-default/">JS 改变默认行为 e.preventDefault() e.returnValue e.stopPropagation e.cancelBubble Return False</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,1048 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Gradle深入与实战 | NO END FOR LEARNING]]></title>
+  <link href="http://benweizhu.github.io/blog/categories/gradleshen-ru-yu-shi-zhan/atom.xml" rel="self"/>
+  <link href="http://benweizhu.github.io/"/>
+  <updated>2016-06-15T10:04:18+08:00</updated>
+  <id>http://benweizhu.github.io/</id>
+  <author>
+    <name><![CDATA[ZHU Benwei]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Gradle深入与实战（六）Gradle的背后是什么？]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/03/31/deep-into-gradle-in-action-6/"/>
+    <updated>2015-03-31T23:20:24+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/03/31/deep-into-gradle-in-action-6</id>
+    <content type="html"><![CDATA[<h2>理解DSL（领域特定语言）</h2>
+
+<p>DSLs come in two main forms: external and internal. An external DSL is a language that&rsquo;s parsed independently of the host general purpose language: good examples include regular expressions and CSS. External DSLs have a strong tradition in the Unix community. Internal DSLs are a particular form of API in a host general purpose language, often referred to as a fluent interface. &mdash;- Martin Fowler</p>
+
+<p>Martin Fowler将DSL分为两类：外部DSL和内部DSL。外部DSL是一种独立的可解析的语言，举一个最常见的是例子，SQL，它专注于数据库的操作。内部DSL是通用语言所暴露的用来执行特定任务的API，它利用语言本身的特性，将API以特殊的形式（或者格式）暴露出来的。比如，Martin Fowler给出了关于流接口（fluent interface）。</p>
+
+<p>总结一下，外部DSL是一种特定的独立语言，内部DSL是通用语言为实现特殊目的提供的API。</p>
+
+<p>我们可以看下Martin Fowler提供的关于流接口的一个例子。流接口的实现方式同样是通用语言的写法，但相对于连续的调用set方法或者add方法，可读性方面要好很多。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="kt">void</span> <span class="nf">makeFluent</span><span class="o">(</span><span class="n">Customer</span> <span class="n">customer</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">customer</span><span class="o">.</span><span class="na">newOrder</span><span class="o">()</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="mi">6</span><span class="o">,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">TAL</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;)</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">HPK</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;).</span><span class="na">skippable</span><span class="o">()</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">LGV</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;)</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">priorityRush</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>Gradle的DSL</h2>
+
+<p>Gradle为了很好的描述构建，它提供了一套DSL，它是一种内部DSL。这套语言基于Groovy，但增加了一点点的特殊处理，以便在利用Groovy语言特性的之外，让它更像一个构建语言。</p>
+
+<p>所以，Gradle的构建脚本和Groovy之间的关系是大于(>)。换句话说，如果你在Gradle的构建脚本中，写纯粹的Groovy代码是绝对没有问题的，这一点在官方文档的用户手册中也单独拿出一章来说明。</p>
+
+<h2>构建脚本</h2>
+
+<p>我们先暂且不去验证这一点，也不要着急着用Groovy去写一个功能强大且复杂的task，从构建脚本中跳出来，站在一个更高的位置来俯视Gradle。</p>
+
+<p>在我们写Gradle脚本的时候，我们一般会写两种类型的，一种脚本，默认命名是build.gradle，另一种脚本，命名是settings.gradle。它们各自的作用，相信不用我在这里过多的介绍。在Gradle的世界里面，它们都叫做配置脚本。举个很简单的例子，在settings中配置，多项目结构有哪些模块，或者在build.gradle中，配置Java的sourceset。</p>
+
+<p>那可能就有人问了，那在构建脚本中写一个task也算配置吗？我并没有配置什么东西，而是在用语言实实在在的写一系列的动作。这个算配置吗？</p>
+
+<p>我想，这取决于对“配置”这个概念的理解。如果，我只是应用Java插件，写一个sourceset，或者写一个dependencies，这个配置就有点类似，传统意义上理解的“键值对”的配置。</p>
+
+<p>如果涉及到写一个task的时候，我们就要把它想象成“对某一个对象的配置”，想象成一系列的set或者add操作（即便是sourceset，你也应该这么去理解，因为这才是本质）。</p>
+
+<h2>基于Groovy的本质</h2>
+
+<p>在前面介绍DSL概念的时候，我们了解到Gradle是一种内部DSL，是一系列的API，它基于Groovy。Groovy是什么？它是一种面向对象的编程语言，它的核心概念是对象。</p>
+
+<p>Gradle基于Groovy但大于Groovy，它是经过“定制”的Groovy，是经过“定制”的面向对象语言，所以，由始至终，Gradle都离不开对象这个概念。</p>
+
+<p>如果你明白了这个本质，那么就明白了写Gradle脚本，就和写Java代码是一个道理，写Gradle构建脚本就是写代码调用Gradle的API，只不过因为一些特性和特殊处理，让他看上去不太像一个标准的类C的编程语言（我更倾向于说类Java，因为C语言不是面向对象的），那么接下来，你所需要知道的就是Gradle提供的API长啥样。</p>
+
+<h2>Gradle的对象</h2>
+
+<p>既然我们知道了Gradle的本质是经过“定制”的<strong>面向对象</strong>语言（Groovy语言），那么我们就来看看Gradle里面有些什么对象。</p>
+
+<p>如果你有读过Gradle的用户手册，那么，第六章，Build Script Basics，肯定是你必读的一章节，即便你当时看不太明白，只是依葫芦画瓢。现在你可以回过头来看下，该章节在一开始就进入主题，介绍了Gradle中两个的核心概念，project和task。</p>
+
+<p>从组成关系上来看，我们知道，或者文档是这么说的，一个构建是由多个project组成，一个project是由多个task组成，task之间的依赖关系，构成了整个构建的流水线。</p>
+
+<p>对于task的概念相对比较好理解，因为在命令行中，我们通过gradle build，进行Java的构建，这是一个看得见，摸得着的概念。</p>
+
+<p>那project是什么？从你学习Gradle开始，到应用Java插件，实现Java的构建，好像从头到尾都没有直接接触过project这个概念，至少没有像task这样如此真实的接触。我们需要了解它吗？如果你只是依葫芦画瓢，参考Gradle的文档，进行构建的“配置”，那么你不用。</p>
+
+<p>如果你想知道写的那些配置在本质上是什么？那么就有必要。</p>
+
+<h2>Project对象和build.gradle</h2>
+
+<p>为了不深究Gradle的实现原理（就是去读源代码），又要让大家觉得有据可依。我通过引用官方文档的一些描述来帮助大家理解Project对象。</p>
+
+<p>For each project in the build, Gradle creates an object of type Project and associates this Project object with the build script. (Chapter 13. Writing Build Scripts)   <br/>
+构建中的每一个project，Gradle都会创建一个Project对象，并将这个对象与构建脚本相关联。</p>
+
+<p>There is a one-to-one relationship between a Project and a &ldquo;build.gradle&rdquo; file. (Interface Project API)   <br/>
+Project对象与build.gradle是一对一的关系。</p>
+
+<p>First, Gradle scripts are configuration scripts. As the script executes, it configures an object of a particular type. For example, as a build script executes, it configures an object of type Project. This object is called the delegate object of the script. (Gradle Build Language Reference)   <br/>
+Gradle的脚本是配置脚本，当脚本执行时，它是在配置某一个特殊类型的对象。比如一个构建脚本的执行，它就是在配置一个Project类型的对象。这个对象叫做脚本的代理对象。</p>
+
+<p>读完这三句话，应该可以清楚的明白build.gradle的本质，简单的说，build.gradle是对一个Project对象的配置。</p>
+
+<h2>深入理解</h2>
+
+<p>如果你还没明白，你可以仔细考量这三句话。因为这里，我们要进一步深入探讨上个部分引出的另一个概念：代理。</p>
+
+<p>这个概念并不来自于Gradle，如果你熟悉Groovy，你肯定会立刻想到这是Groovy中很重要的一个概念。</p>
+
+<p>在Groovy中，Object对象提供了一个重要的方法with，这个方法在JavaScript中也是存在的。with方法可以在一个闭包内辅助实现委托调用，在with的作用域内调用的任何方法，都被定向到该上下文对象上，这样就去掉了对该实例的多余引用，举个例子：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kt">def</span> <span class="n">list</span> <span class="o">=</span> <span class="o">[</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">]</span>
+</span><span class='line'><span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
+</span><span class='line'><span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span>
+</span><span class='line'><span class="n">println</span><span class="o">(</span><span class="n">list</span><span class="o">.</span><span class="na">size</span><span class="o">())</span>
+</span><span class='line'><span class="n">println</span><span class="o">(</span><span class="n">list</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="mi">2</span><span class="o">))&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kt">def</span> <span class="n">listWith</span> <span class="o">=</span> <span class="o">[</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">]</span>
+</span><span class='line'><span class="n">listWith</span><span class="o">.</span><span class="na">with</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">add</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">add</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">println</span><span class="o">(</span><span class="n">size</span><span class="o">())</span>
+</span><span class='line'>    <span class="n">println</span><span class="o">(</span><span class="n">contains</span><span class="o">(</span><span class="mi">2</span><span class="o">))</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>在with中，省去了对 list对象的引用。</p>
+
+<p>而build.gradle和project对象，虽然从解析的角度不一定是通过with方式实现，但是它们之间就是这样的一个关系。</p>
+
+<p>闭包内的内容就是build.gradle对project对象的操作。</p>
+
+<p>这里我引用Gradle用户手册第十三章的内容来进一步说明，</p>
+
+<p>Any method you call in your build script which is not defined in the build script, is delegated to the Project object.
+Any property you access in your build script, which is not defined in the build script, is delegated to the Project object.（Chapter 13. Writing Build Scripts）</p>
+
+<h2>通过现象看本质</h2>
+
+<p>我们从理论上讲了这么多关于Gradle本质的东西，而且好像还有点道理，但我们还是要验证一下，透过现象来看本质。通过实践，进一步加强我们的理解。</p>
+
+<h4>一个小小的task</h4>
+
+<p>举个例子，我们在build.gradle中，写一个简单的task</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">helloWorld</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">println</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">helloWorld</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>如果你熟悉Groovy，并且知道它是针对project为上下文的一段代码，你会怎么看上面这段代码。是不是会有几个疑问？</p>
+
+<p>问题一：是否有一个project的方法叫做task？答案：是，Project.task(String name)，返回一个Task对象。</p>
+
+<p>问题二：helloWorld是一个参数吗？答案：是，它被解析为一个String类型的实参变量</p>
+
+<p>问题三：符号“&lt;&lt;”是什么意思？答案：Groovy的强大特性，操作符重载。Task.leftShift(Closure action)，用来给task的action列表中添加一个action。</p>
+
+<p>如果我用Groovy的写法，把它写成下面这样，是否就更好理解一些呢？</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">helloWorld</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;).</span><span class="na">leftShift</span><span class="o">({</span>
+</span><span class='line'>    <span class="n">println</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">hello</span> <span class="n">world</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'><span class="o">})</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h2>总结</h2>
+
+<p>当我们透过现象看到本质之后，你对Gradle的理解是不是不再是冷冰冰的闭包配置。是不是觉得Gradle其实没有那么神秘，不需要为Gradle中的奇怪的DSL感到困惑，它只是个API，读下API文档就好了。</p>
+
+<p>最后总结，Gradle is Groovy but more than Groovy。</p>
+
+<p>参考资料：</p>
+
+<p>1.<a href="http://gradle.org/docs/current/userguide/writing_build_scripts.html">http://gradle.org/docs/current/userguide/writing_build_scripts.html</a>  <br/>
+2.<a href="http://gradle.org/docs/current/javadoc/">http://gradle.org/docs/current/javadoc/</a>   <br/>
+3.<a href="http://docs.groovy-lang.org/latest/html/documentation/index.html#_delegation_strategy">http://docs.groovy-lang.org/latest/html/documentation/index.html#_delegation_strategy</a>   <br/>
+4.Groovy程序设计</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Gradle深入与实战（五）自定义插件]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/03/15/deep-into-gradle-in-action-5/"/>
+    <updated>2015-03-15T14:18:10+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/03/15/deep-into-gradle-in-action-5</id>
+    <content type="html"><![CDATA[<p>利用Gradle做构建，必然逃不掉Gradle的插件的使用，即便是最简单的Java或Groovy的应用都需要使用Java插件或者Groovy插件。</p>
+
+<p>Gradle插件的作用就是将会被重复利用的逻辑打包，这样就可以在不同的项目中重复的使用。比如在上一节中实现的集成测试任务，就可以打包到插件中，然后在其他的工程中使用，而不需要重复的写相同的任务。</p>
+
+<p><strong>Gradle提供了三种写插件的方式：</strong></p>
+
+<p>1.直接在build.gradle文件中写插件，然后直接使用，不好的地方很明显，不能在该build.gradle脚本之外的位置（其他脚本或者工程）中使用。</p>
+
+<p>2.将插件写在项目的rootProjectDir/buildSrc/src/main/groovy包下，Gradle会负责编译和放置到classpath，虽然可以多个gradle脚本中使用，但是不能在其他工程中使用。</p>
+
+<p>3.一个独立的插件工程，很明显，这是最常见的实现方式，因为可以被任何脚本或者工程使用。</p>
+
+<p>为了节省时间，我们直接进入到最常见的实现方式：<strong>实现一个独立的插件工程</strong>。</p>
+
+<h2>这是一个Groovy工程</h2>
+
+<p>我们知道，Gradle项目是基于Groovy语言开发的，所以插件功能必然是一个Groovy工程，构建创建一个build.gradle文件。</p>
+
+<p><figure class='code'><figcaption><span>build.gradle </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">idea</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">groovy</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;p&gt;dependencies {</span>
+</span><span class='line'><span class="s">    compile gradleApi()</span>
+</span><span class='line'><span class="s">    compile localGroovy()</span>
+</span><span class='line'><span class="s">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">task</span> <span class="n">wrapper</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Wrapper</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">gradleVersion</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="mf">1.11</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>按照Groovy插件推荐的目录结构建立好下面结构的目录，你可以忽略java那一级</p>
+
+<p>src/main/java     <br/>
+src/main/resources   <br/>
+src/main/groovy  <br/>
+src/test/java   <br/>
+src/test/resources        <br/>
+src/test/groovy</p>
+
+<h2>利用Plugin接口实现插件</h2>
+
+<p>然后，我们写一个Groovy类，让它实现Plugin接口，如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugin</span><span class="o">&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;p&gt;import me.zeph.gradle.extension.HelloExtension</span>
+</span><span class='line'><span class="s">import org.gradle.api.Plugin</span>
+</span><span class='line'><span class="s">import org.gradle.api.Project&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">class</span> <span class="nc">HelloPlugin</span> <span class="kd">implements</span> <span class="n">Plugin</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;pre&gt;&lt;code&gt;@Override</span>
+</span><span class='line'><span class="s">void apply(Project project) {</span>
+</span><span class='line'><span class="s">    project.task(&#39;hello&#39;) &amp;lt;&amp;lt; {</span>
+</span><span class='line'><span class="s">        println &#39;hello plugin&#39;</span>
+</span><span class='line'><span class="s">    }</span>
+</span><span class='line'><span class="s">}</span>
+</span><span class='line'><span class="s">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>这里，我们通过project的task方法实现了一个名字是hello的task，里面打印了一句话。这个任务很简单，现在我们来增加一点点复杂度。记不记得大部分插件在使用之后，除了提供一些列的task，还提供了许多的closure（闭包），可以通过这些闭包传递一些参数进去。那么，这是怎么是实现的呢？很简单，利用project提供的扩展。</p>
+
+<h2>扩展的使用</h2>
+
+<p>定义一个名字是HelloExtension的Groovy类（名字其实无所谓叫什么，而且居然不需要实现任何的接口）：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">extension</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">class</span> <span class="nc">HelloExtension</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">String</span> <span class="n">message</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>改变一些插件的实现：</p>
+
+<p><figure class='code'><figcaption><span>build.gradle </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugin</span><span class="o">&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;p&gt;import me.zeph.gradle.extension.HelloExtension</span>
+</span><span class='line'><span class="s">import org.gradle.api.Plugin</span>
+</span><span class='line'><span class="s">import org.gradle.api.Project&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">class</span> <span class="nc">HelloPlugin</span> <span class="kd">implements</span> <span class="n">Plugin</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;pre&gt;&lt;code&gt;@Override</span>
+</span><span class='line'><span class="s">void apply(Project project) {</span>
+</span><span class='line'><span class="s">    project.extensions.add(&#39;hello&#39;, HelloExtension)</span>
+</span><span class='line'><span class="s">    project.task(&#39;hello&#39;) &amp;lt;&amp;lt; {</span>
+</span><span class='line'><span class="s">        println project.hello.message</span>
+</span><span class='line'><span class="s">    }</span>
+</span><span class='line'><span class="s">}</span>
+</span><span class='line'><span class="s">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>project.extensions.add(&lsquo;hello&rsquo;, HelloExtension)，这段代码将HelloExtension添加到project的extensions中，于是task就可以通过project.hello.message来获取。是不是很简单？</p>
+
+<h2>告诉别人这是个插件：插件id</h2>
+
+<p>那么，功能部分都写完了，怎么样让其他构件脚本知道这是一个插件能？配置META-INF。</p>
+
+<p>在resources目录下建立这样一个目录结构：/resources/META-INF/gradle-plugins</p>
+
+<p>然后在这里建立一个名字是me.zeph.hello.properties的Property文件，文件里的内容是：
+<figure class='code'><figcaption><span>me.zeph.hello.properties </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="na">implementation-class</span><span class="o">=</span><span class="s">me.zeph.gradle.plugin.HelloPlugin</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>这个Property文件的命名并不是随意定义的，名字的作用是定义该插件的id，什么意思？说白了就是apply时使用的名字。如下：
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">hello</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>至于里面的内容，我就不解释了，一眼就看明白了。</p>
+
+<h2>使用生成的插件</h2>
+
+<p>到这里，一个独立的插件工程就完成了，实验一把！！</p>
+
+<p>运行gredlew clean assemble，将生成的jar文件，拷贝到其他的项目目录中（这里没有upload到仓库，所以直接文件形式引入依赖）。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">classpath</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">libs</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;,</span> <span class="nl">include:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;*.</span><span class="na">jar</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;p&gt;apply plugin: &amp;lsquo;me.zeph.hello&amp;rsquo;&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">hello</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">message</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">hello</span> <span class="n">gradle</span> <span class="n">plugin</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>然后运行gradlew hello，就可以看到hello任务的执行。</p>
+
+<p>总结，其实实现一个Gradle的独立插件工程，从建立工程的角度还是比较简单的，关键在如何通过Groovy实现插件，已经理解插件的api。</p>
+
+<p>参考资料：</p>
+
+<p>1.<a href="https://gradle.org/docs/current/userguide/custom_plugins.html">https://gradle.org/docs/current/userguide/custom_plugins.html</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Gradle深入与实战（四）自定义集成测试任务]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-4/"/>
+    <updated>2015-01-31T21:47:45+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-4</id>
+    <content type="html"><![CDATA[<p>由于本小节，涉及到自定义任务，所以穿插一点自定义任务的知识。</p>
+
+<h2>Gradle Task</h2>
+
+<p>在前面已经介绍过Gradle和Ant相似，由任务驱动，以任务依赖的方式形成任务链，从而实现构建生命周期。所以，任务是Gradle中一个完整的可执行单元。</p>
+
+<p>如何定义任务：
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">hello</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">println</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">hello</span> <span class="n">Gradle</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+执行该任务，只需要输入命令gradle hello。定义task的方式有很多种：
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">myTask</span>
+</span><span class='line'><span class="n">task</span> <span class="n">myTask</span> <span class="o">{</span> <span class="n">configure</span> <span class="n">closure</span> <span class="o">}</span>
+</span><span class='line'><span class="n">task</span> <span class="n">myType</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="o">{</span> <span class="n">task</span> <span class="n">action</span> <span class="o">}</span>
+</span><span class='line'><span class="n">task</span> <span class="nf">myTask</span><span class="o">(</span><span class="nl">type:</span> <span class="n">SomeType</span><span class="o">)</span>
+</span><span class='line'><span class="n">task</span> <span class="nf">myTask</span><span class="o">(</span><span class="nl">type:</span> <span class="n">SomeType</span><span class="o">)</span> <span class="o">{</span> <span class="n">configure</span> <span class="n">closure</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>其中有一种定义方式，传入了一个参数type，作用是预定义该task的类型，指定类型之后，在传入的闭包中就可以使用该类型task提供的特殊变量或函数。</p>
+
+<p>比如一个拷贝类型的task
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="nf">copyDocs</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Copy</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">from</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">src</span><span class="s">/main/</span><span class="n">doc</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">into</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">build</span><span class="s">/target/</span><span class="n">doc</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+更过关于Task的内容，在以后的章节中再介绍。</p>
+
+<h2>自定义集成测试任务</h2>
+
+<p><strong>现在我们开始写一个集成测试的task，需求是这样的：</strong></p>
+
+<p>作为一个Java的程序员，我想要将单元测试和集成测试分离</p>
+
+<p>1.我想要 将单元测试全部放在src/test/unit目录中，将集成测试全部放在src/test/intgetaion中   <br/>
+2.我想要 能够单独运行我的集成测试  <br/>
+3.我想要 在运行build命令时，同时跑单元测试和集成测试</p>
+
+<p><strong>根据这样的一个需求，划分几步来做：</strong> <br/>
+1.建立目录  <br/>
+2.目录结构已经和原来的默认规约不同，所以要更改Java插件提供的SourceSet test，来映射单元测试目录结构  <br/>
+3.需要新建一个SourceSet intTest，来映射集成测试目录结构  <br/>
+4.Java插件会给新建的SourceSet intTest定义两个Configuration，分别是intTestCompile和intTestRuntime，那么就需要给这两个分组指定构件内容和依赖  <br/>
+5.定义一个名字叫做integrationTest的测试的task</p>
+
+<p><strong>那么我们从第二步和第三步开始，修改Java插件提供的SourceSet test和新建SourceSet intTest：</strong></p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="c1">// 定义一些常量，在其他位置使用</span>
+</span><span class='line'><span class="n">ext</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">unitJavaSrcDir</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">src</span><span class="s">/test/</span><span class="n">unit</span><span class="s">/java&amp;rsquo;</span>
+</span><span class='line'><span class="s">    unitResourcesSrcDir = &amp;lsquo;src/</span><span class="n">test</span><span class="s">/unit/</span><span class="n">resources</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">intJavaSrcDir</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">src</span><span class="s">/test/</span><span class="n">integration</span><span class="s">/java&amp;rsquo;</span>
+</span><span class='line'><span class="s">    intResourcesSrcDir = &amp;lsquo;src/</span><span class="n">test</span><span class="s">/integration/</span><span class="n">resources</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">sourceSets</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitJavaSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitResourcesSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">intTest</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intJavaSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intResourcesSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p><strong>第三步，给intTestCompile和intTestRuntime指定指定构件内容（产品代码）和依赖</strong>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">testCompile</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="nl">junit:junit:</span><span class="mf">4.11</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">testCompile</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">org</span><span class="o">.</span><span class="na">mockito</span><span class="o">:</span><span class="n">mockito</span><span class="o">-</span><span class="nl">core:</span><span class="mf">1.9</span><span class="o">.</span><span class="mi">5</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;pre&gt;&lt;code&gt;intTestCompile sourceSets.main.output // 将sourceSets.main中的输出class指定到intTestCompile中</span>
+</span><span class='line'><span class="s">intTestCompile configurations.testCompile // 将configurations.testCompile的依赖拿过来</span>
+</span><span class='line'><span class="s">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p><strong>最后一步，定义一个test类型的task，并让check任务依赖于它</strong>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="nf">integrationTest</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Test</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">testClassesDir</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">output</span><span class="o">.</span><span class="na">classesDir</span>
+</span><span class='line'>    <span class="n">classpath</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">runtimeClasspath</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">check</span><span class="o">.</span><span class="na">dependsOn</span> <span class="n">integrationTest</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>然后，你就可以在命令行中运行gradle integrationTest。</p>
+
+<p>完整版本如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">java</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">idea</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;p&gt;ext {</span>
+</span><span class='line'><span class="s">    unitJavaSrcDir = &amp;lsquo;src/</span><span class="n">test</span><span class="s">/unit/</span><span class="n">java</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">unitResourcesSrcDir</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">src</span><span class="s">/test/</span><span class="n">unit</span><span class="s">/resources&amp;rsquo;</span>
+</span><span class='line'><span class="s">    intJavaSrcDir = &amp;lsquo;src/</span><span class="n">test</span><span class="s">/integration/</span><span class="n">java</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">intResourcesSrcDir</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">src</span><span class="s">/test/</span><span class="n">integration</span><span class="s">/resources&amp;rsquo;</span>
+</span><span class='line'><span class="s">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">sourceSets</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitJavaSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitResourcesSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">intTest</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intJavaSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intResourcesSrcDir</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;p&gt;repositories {</span>
+</span><span class='line'><span class="s">    mavenCentral()</span>
+</span><span class='line'><span class="s">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">testCompile</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="nl">junit:junit:</span><span class="mf">4.11</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">testCompile</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">org</span><span class="o">.</span><span class="na">mockito</span><span class="o">:</span><span class="n">mockito</span><span class="o">-</span><span class="nl">core:</span><span class="mf">1.9</span><span class="o">.</span><span class="mi">5</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;pre&gt;&lt;code&gt;intTestCompile sourceSets.main.output</span>
+</span><span class='line'><span class="s">intTestCompile configurations.testCompile</span>
+</span><span class='line'><span class="s">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="s">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;p&gt;}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">task</span> <span class="n">integrationTest</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Test</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">testClassesDir</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">output</span><span class="o">.</span><span class="na">classesDir</span>
+</span><span class='line'>    <span class="n">classpath</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">runtimeClasspath</span>
+</span><span class='line'><span class="o">}&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;p&gt;check.dependsOn integrationTest&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">idea</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">module</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">unitJavaSrcDir</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">unitResourcesSrcDir</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">intJavaSrcDir</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">intResourcesSrcDir</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>参考资料： <br/>
+1.Gradle官方文档 <br/>
+2.<a href="http://selimober.com/blog/2014/01/24/separate-unit-and-integration-tests-using-gradle/">http://selimober.com/blog/2014/01/24/separate-unit-and-integration-tests-using-gradle/</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Gradle深入与实战（三）依赖管理工具]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-3/"/>
+    <updated>2015-01-31T18:41:46+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-3</id>
+    <content type="html"><![CDATA[<p>大部分的项目都不是自包含的，也就是说，需要使用到其他项目的构建结果，比如一些Jar文件。它们作为输入文件，必须存在于项目的ClassPath下，程序才能编译和运行。这些输入文件有一个很表意的名字，叫做依赖。</p>
+
+<p>Gradle允许你告诉它项目的依赖是什么，然后它就会负责找到这些依赖。这些依赖会从Maven或者Ivy的远程仓库下载下来（大部分情况），并缓存在本地的某个路径，这个过程叫做依赖解析。</p>
+
+<p>Maven和Gradle一样也提供了类似的功能，而Ant没有，你只能告诉Ant依赖文件的相对或者绝对路径，让它去加载。</p>
+
+<p>常常一个依赖自己也存在依赖，我们称为传递依赖，依赖管理工具又具有解析传递依赖的能力。</p>
+
+<h3>Gradle的依赖管理</h3>
+
+<p>那么如何在Gradle中定义依赖呢？看个最简单的例子。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">java</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;p&gt;repositories {</span>
+</span><span class='line'><span class="s">    mavenCentral()</span>
+</span><span class='line'><span class="s">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">testCompile</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="nl">junit:junit:</span><span class="mf">4.11</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span><span class="c1">// testCompile group: &amp;lsquo;junit&amp;rsquo;, name: &amp;lsquo;junit&amp;rsquo;, version: &amp;lsquo;4.11&amp;rsquo;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>项目使用了Java的插件，在repositories块中告诉Gradle使用maven的远程仓库作为依赖下载地址，在dependencies块定义了一个junit的依赖，并说明了分组(Maven中的Scope)，后面注释中有一个表意更完整的依赖定义，说明了依赖声明使用的三个坐标group，name，version。</p>
+
+<p>整个看起来是那么的表意，使用过Maven更会觉得是无缝转换，甚至更简洁。</p>
+
+<h3>Dependency configurations 依赖分组</h3>
+
+<p>在Gradle中，依赖都被会分配到某一个具体的configuration中（这里我不倾向于翻译成配置，我觉得布局，或者分组更适合）。Configuration代表着一个或多个构件及构件所需依赖的一个分组。</p>
+
+<p>Java插件已经预定义了一些configuration，比如，compile，runtime，testCompile，testRuntime等。</p>
+
+<p><strong>compile</strong> 放在这个configuration下的依赖是在编译产品代码时所使用的，但它作为一个分组，包含产品代码和编译所需的依赖。  <br/>
+<strong>runtime</strong> 产品代码在运行时需要的依赖，默认，也会包含compile中的依赖。  <br/>
+<strong>testCompile</strong> 编译测试代码时所需要的依赖，默认，被编译的产品代码和产品代码需要的编译依赖也属于该分组。  <br/>
+<strong>testRuntime</strong> 运行测试时需要的依赖。默认，包含compile，runtime和testCompile的分组的构建和依赖。</p>
+
+<p>使用过Maven的都应该知道分组的含义，这里讲解给不明白的同学，依赖之所以要分组，是因为，每个阶段对依赖的需要不一样，最明显的是产品代码和测试代码，比如junit在产品代码中就不需要。</p>
+
+<p>那么，为什么产品代码的编译阶段和运行阶段也分组，一般编译阶段需要的依赖，在运行阶段也需要，但是反过来就不一定了。比如，你通过反射去load一个class，这时该class就不一定需要在编译阶段存在。</p>
+
+<p>一个更常见的例子，做web开发时需要servlet的依赖，但是只是编译阶段，运行时servlet依赖由servlet容器来提供。所以Gradle的War插件也提供了两个configuration，分别是providedCompile和providedRuntime，它们对依赖的使用范围定义和compile以及runtime一致，只不过依赖的Jar包不会被加到War包里面。</p>
+
+<h3>定义SourceSet时，添加的Configuration</h3>
+
+<p>上一节，在介绍Java插件的时候，提到了SourceSet概念。针对每一个新添加的SourceSet，Java插件都会动态的给它添加两个Configuration，分别是sourceSetCompile和sourceSetRuntime。</p>
+
+<p>比如：新添加一个SourceSet，叫做int，那么对应的Configuration是intCompile和intRuntime。</p>
+
+<p>这一特性也正好印证，Java插件是如何识别自定义SourceSet来进行编译和运行。</p>
+
+<h3>依赖的多种定义方式</h3>
+
+<p>除了通过远程仓库和依赖坐标来定义依赖，Gradle还提供了另外两种常用的依赖定义方式，对本地文件的依赖，对某个项目的依赖。</p>
+
+<h4>对文件的依赖</h4>
+
+<p>这种情况看起来是不是很奇葩，都有依赖管理了和Maven仓库了还要什么文件依赖。其实不然，使用这种定义方式，最常见场景是项目构建工具的迁移，从Ant到Gradle。无论任何项目，迁移过程都是小步前进，Gradle提供文件依赖的配置，就是为了解决这些特殊性。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">runtime</span> <span class="nf">files</span><span class="o">(&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">libs</span><span class="s">/a.jar&amp;rsquo;, &amp;lsquo;libs/</span><span class="n">b</span><span class="o">.</span><span class="na">jar</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;)</span>
+</span><span class='line'>    <span class="n">runtime</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">libs</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;,</span> <span class="nl">include:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;*.</span><span class="na">jar</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h4>对另一个工程的依赖</h4>
+
+<p>项目中划分子模块是很平常的事情，前端Controller和数据层Dao分离管理就是一个例子，那么在进行前端Controller模块构建时，就需要将数据层模块作为依赖。定义方式如下：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="nf">project</span><span class="o">(&amp;</span><span class="n">lsquo</span><span class="o">;:</span><span class="n">shared</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h3>依赖版本冲突</h3>
+
+<p>依赖冲突是所以依赖管理中最头痛的问题，这常常出现在传递依赖中。Gradle对解决传递依赖提供了两种策略，使用最新版本或者直接导致构建失败。默认的策略是使用最新版本。虽然这样的策略能够解决一些问题，但是还是不够。常见的一种情况是，NoSuchMethond或者ClassNotFound。这时候，你可能需要一些特殊手段，比如排除不想要的传递依赖。</p>
+
+<h4>排除传递依赖</h4>
+
+<p>排除传递依赖有多种原因，远程仓库中不存在，运行时不需要，或者版本冲突。排除传递依赖的方式有两种：1.直接在configuration中排除 2.在具体的某个dependency中排除</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">configurations</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">.</span><span class="na">exclude</span> <span class="nl">module:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">commons</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">all</span><span class="o">*.</span><span class="na">exclude</span> <span class="nl">group:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">org</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">test</span><span class="o">.</span><span class="na">excludes</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;,</span> <span class="nl">module:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">reports</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">org</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">test</span><span class="o">.</span><span class="na">excludes</span><span class="o">:</span><span class="nl">api:</span><span class="mf">1.0</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">exclude</span> <span class="nl">module:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">shared</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h4>通过命令行查看依赖关系</h4>
+
+<p>当出现依赖冲突时，最主要的还是要分析依赖冲突的原因，Gradle提供了两个任务来帮助你分析依赖关系</p>
+
+<p>dependencies - Displays all dependencies declared in root project &lsquo;projectReports&rsquo;. <br/>
+dependencyInsight - Displays the insight into a specific dependency in root project &lsquo;projectReports&rsquo;.</p>
+
+<h5><strong>Tips：输出依赖关系图到文件</strong></h5>
+
+<p>在命令行中直接使用gradle dependencies可以打印出依赖图，但是在命令行中查看始终不太方便，我们可以将结果输出到一个文件中，如下：
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">gradle</span> <span class="n">dependencies</span> <span class="o">&gt;</span> <span class="n">dependencies</span><span class="o">.</span><span class="n">txt</span>
+</span></code></pre></td></tr></table></div></figure>
+dependencies.txt保存在项目的根目录</p>
+
+<p>Gradle的官方文档中关于Gradle的依赖管理的内容还有很多，比如，如何访问需要用户名密码授权的Maven仓库等等。等多内容，可以参考官方文档：<a href="http://gradle.org/docs/current/userguide/dependency_management.html">http://gradle.org/docs/current/userguide/dependency_management.html</a></p>
+
+<p>下一节，利用前三节学到的知识，编写集成测试任务，并单独划分SourceSet。</p>
+
+<p>参考资料： <br/>
+1.Gradle官方文档</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Gradle深入与实战（二）Java插件]]></title>
+    <link href="http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-2/"/>
+    <updated>2015-01-31T13:57:55+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2015/01/31/deep-into-gradle-in-action-2</id>
+    <content type="html"><![CDATA[<p>没有介绍Gradle的基础知识，直接开始实战，目的是为了更快的让大家开始使用Gradle做构建，快速上手，当需要实现的自动化需求更复杂时，在深入学习基础知识。</p>
+
+<p>这一篇，我们直接开始Java插件的使用。</p>
+
+<h3>应用Java插件</h3>
+
+<p>Gradle是一个通用构建工具，也就是说，它不单是为Java而生。比如，还可以做Groovy，Scala的构建。这取决于你使用什么样的插件。</p>
+
+<p>大部分Java项目的基本步骤都非常类似，编译Java源代码，运行单元测试，拷贝生成的class文件到目标目录，打包Jar文件（或者War包，Ear包），而这些重复且约定俗成的任务，如果可以不用写一行构建代码就实现，是多么的棒！Maven就做到这一点，采用约定由于配置的思想，预先定义常用的任务，并定义它们的执行顺序。</p>
+
+<p>Gradle吸收了Maven的这个优点，通过插件，实现预定义任务和任务之间依赖关系的导入，这样就可以在一行代码都不写的情况下（如果应用插件，你觉得也算一行的话，那就写一行吧），直接使用已经定义的任务。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">java</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h3>SourceSet和项目布局</h3>
+
+<p>就和Maven一样，在默认的情况下，项目的目录结构是固定的Java世界的标准项目目录布局，只不过Maven的不可以改，但是Gradle可以改。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">src</span> <span class="o">{</span><span class="c1">//目录结构而已，不是代码</span>
+</span><span class='line'>     <span class="n">main</span> <span class="o">{</span>
+</span><span class='line'>         <span class="n">java</span>
+</span><span class='line'>         <span class="n">resources</span>
+</span><span class='line'>     <span class="o">}</span>
+</span><span class='line'>     <span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>         <span class="n">java</span>
+</span><span class='line'>         <span class="n">resources</span>
+</span><span class='line'>     <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>Java插件引入了一个概念叫做SourceSets，它代表了一组源文件，通过修改SourceSets中的属性，可以指定哪些源文件（或文件夹下的源文件）要被编译，哪些源文件要被排除。Gradle就是通过它实现Java项目的布局定义。</p>
+
+<p>Java插件默认实现了两个SourceSet，main和test。每个SourceSet都提供了一系列的属性，通过这些属性，可以定义该SourceSet所包含的源文件。比如，java.srcDirs，resources.srcDirs。Java插件中定义的其他任务，就根据main和test的这两个SourceSet的定义来寻找产品代码和测试代码等。</p>
+
+<p>在构建脚本中，怎么样定义或者修改SourceSet呢？Gradle提供了一系列的DSL，可以让你方便的定义或者修改配置。比如，sourceSets的DSL。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">main</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">srcDir</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;</span><span class="n">src</span><span class="s">/java&amp;rsquo;</span>
+</span><span class='line'><span class="s">        }</span>
+</span><span class='line'><span class="s">        resources {</span>
+</span><span class='line'><span class="s">            srcDir &amp;lsquo;src/</span><span class="n">resources</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+上面的这个例子，在sourceSets中，修改了Java插件中已经定义的SourceSet main，修改了它的java.srcDir和resources.srcDir。于是，项目的目录结构就改变了。</p>
+
+<p>改变Java插件中预定义的项目目录结构，不是我们最终的目的，因为它是目前Java世界，标准的项目布局，或者说大家都遵守的项目布局。</p>
+
+<p>sourceSets最主要的作用是增加新的目录约定，比如，你想要定义一个新的SourceSet来管理集成测试的源文件，这样可以将单元测试和集成测试分开管理。</p>
+
+<p>至于，关于具体如何为集成测试写一个新的SourceSet会在后面介绍依赖管理时举例说明。</p>
+
+<h3>Java插件提供的任务</h3>
+
+<p>Java插件提供了一系列的任务给你使用，包括编译，运行测试，打包等等。当你在项目中应用Java插件时，就已经将这些任务集成到你的项目中了。</p>
+
+<p>在命令行中，运行gradle tasks命令，可以查看当前项目下主要的task。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">Build</span> <span class="n">tasks</span>
+</span><span class='line'><span class="n">assemble</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="n">the</span> <span class="n">outputs</span> <span class="n">of</span> <span class="n">this</span> <span class="n">project</span><span class="o">.</span> <span class="o">&lt;</span><span class="n">br</span><span class="o">/&gt;</span>
+</span><span class='line'><span class="n">build</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="ow">and</span> <span class="n">tests</span> <span class="n">this</span> <span class="n">project</span><span class="o">.</span> <span class="o">&lt;</span><span class="n">br</span><span class="o">/&gt;</span>
+</span><span class='line'><span class="n">buildDependents</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="ow">and</span> <span class="n">tests</span> <span class="n">this</span> <span class="n">project</span> <span class="ow">and</span> <span class="nb">all</span> <span class="n">projects</span> <span class="n">that</span> <span class="n">depend</span> <span class="n">on</span> <span class="n">it</span><span class="o">.</span> <span class="o">&lt;</span><span class="n">br</span><span class="o">/&gt;</span>
+</span><span class='line'><span class="n">buildNeeded</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="ow">and</span> <span class="n">tests</span> <span class="n">this</span> <span class="n">project</span> <span class="ow">and</span> <span class="nb">all</span> <span class="n">projects</span> <span class="n">it</span> <span class="n">depends</span> <span class="n">on</span><span class="o">.</span>  <span class="o">&lt;</span><span class="n">br</span><span class="o">/&gt;</span>
+</span><span class='line'><span class="n">clean</span> <span class="o">-</span> <span class="n">Deletes</span> <span class="n">the</span> <span class="n">build</span> <span class="n">directory</span><span class="o">.</span> <span class="o">&lt;</span><span class="n">br</span><span class="o">/&gt;</span>
+</span><span class='line'><span class="n">jar</span> <span class="o">-</span> <span class="n">Assembles</span> <span class="n">a</span> <span class="n">jar</span> <span class="n">archive</span> <span class="n">containing</span> <span class="n">the</span> <span class="n">main</span> <span class="n">classes</span><span class="o">.&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">Documentation</span> <span class="n">tasks</span>
+</span><span class='line'><span class="n">javadoc</span> <span class="o">-</span> <span class="n">Generates</span> <span class="n">Javadoc</span> <span class="n">API</span> <span class="n">documentation</span> <span class="k">for</span> <span class="n">the</span> <span class="n">main</span> <span class="n">source</span> <span class="n">code</span><span class="o">.&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">Verification</span> <span class="n">tasks</span>
+</span><span class='line'><span class="n">check</span> <span class="o">-</span> <span class="n">Runs</span> <span class="nb">all</span> <span class="n">checks</span><span class="o">.&lt;</span><span class="n">br</span><span class="o">/&gt;</span>
+</span><span class='line'><span class="n">test</span> <span class="o">-</span> <span class="n">Runs</span> <span class="n">the</span> <span class="n">unit</span> <span class="n">tests</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>你可以对比Java插件应用前和应用后该命令的输出，Java插件提供的任务有很多，至于每个任务是做什么，这里就不赘述了。</p>
+
+<p>Java插件除了为你预定义这些任务，该预定义了这些任务之间的依赖关系。如下图：</p>
+
+<p><img class="<a" src="href="http://gradle.org/docs/current/userguide/img/javaPluginTasks.png">http://gradle.org/docs/current/userguide/img/javaPluginTasks.png</a>&#8221;></p>
+
+<p>你也可以通过命令gradle tasks &ndash;all来查看每个task各自有什么依赖。</p>
+
+<p>当然，这里还是重点提下，Java插件中四个重要和常用的任务，assemble，check，build，clean。</p>
+
+<p><strong>assemble</strong> <br/>
+All archive tasks in the project, including jar. Some plugins add additional archive tasks to the project. <br/>
+<strong>check</strong> <br/>
+All verification tasks in the project, including test. Some plugins add additional verification tasks to the project. <br/>
+<strong>build</strong> <br/>
+check and assemble   <br/>
+<strong>clean</strong>  <br/>
+Deletes the project build directory.</p>
+
+<p>assemble被用来产生Jar文件，输出目录在build/libs下。</p>
+
+<p>check用来运行所有的验收任务，包括test任务，以及其他验收任务，比如checkstyle。</p>
+
+<h3>Tips：在命令行中运行单个测试</h3>
+
+<p>JAVA插件中的test任务提供了一个filter属性，可以帮助指定运行test任务时，什么测试源文件要包含，什么要排除。</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">filter</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">//include specific method in any of the tests</span>
+</span><span class='line'>        <span class="n">includeTestsMatching</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;*</span><span class="n">UiCheck</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;&lt;</span><span class="s">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&lt;pre&gt;&lt;code&gt;    //include all tests from package</span>
+</span><span class='line'><span class="s">    includeTestsMatching &quot;org.gradle.internal.*&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">    //include all integration tests</span>
+</span><span class='line'><span class="s">    includeTestsMatching &quot;*IntegTest&quot;</span>
+</span><span class='line'><span class="s">}</span>
+</span><span class='line'><span class="s">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>当然一般情况下，你不会这么去做。</p>
+
+<p>但重点是，你可以通过<strong>命令行传递的参数</strong>来指定这个matching规则，这样你就可以通过命令行来指定跑某一类测试，或者单个测试。你一定遇到过，某个测试在命令行中可以运行，在IDE中不能运行，或者反过来。这时，你可以不会想要跑全部的测试来验证某一个测试。于是，你就可以通过命令行来运行某一个测试：</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">gradle</span> <span class="n">test</span> <span class="o">&amp;</span><span class="n">ndash</span><span class="o">;</span><span class="n">tests</span> <span class="n">org</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">SomeTest</span><span class="o">.</span><span class="na">someSpecificFeature</span>
+</span><span class='line'><span class="n">gradle</span> <span class="n">test</span> <span class="o">&amp;</span><span class="n">ndash</span><span class="o">;</span><span class="n">tests</span> <span class="o">*</span><span class="n">IntegTest</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>到目前为止，你已经了解了Java插件提供的一些核心功能和有用小技巧。虽然还未涉及到Jar任务和uploadfile任务（这些任务当需要时，再去看就行了），但是就启动项目而言，对Java插件的使用所需要了解的知识已经足够了。</p>
+
+<p>下一节，讲解依赖管理</p>
+
+<p>参考资料： <br/>
+1.Gradle官方文档</p>
+]]></content>
+  </entry>
+  
+</feed>

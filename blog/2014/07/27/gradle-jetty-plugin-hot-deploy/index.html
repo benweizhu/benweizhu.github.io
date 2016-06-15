@@ -1,0 +1,519 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Gradle Jetty和Gradle Watch插件实现热部署 - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="Jetty插件 Jetty插件提供两个重要方法：jettyRun和jettyRunWar。 jettyRun会将一个已暴露（解包的）的web应用部署到嵌入式Jetty Web容器中。它不需要将web应用打包成一个war文件，目的是为了节省部署时间。 jettyRunWar正好相反， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Gradle Jetty和Gradle Watch插件实现热部署</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-07-27T14:53:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>2:53 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2><strong>Jetty插件</strong></h2>
+
+<p>Jetty插件提供两个重要方法：jettyRun和jettyRunWar。</p>
+
+<p>jettyRun会将一个已暴露（解包的）的web应用部署到嵌入式Jetty Web容器中。它不需要将web应用打包成一个war文件，目的是为了节省部署时间。</p>
+
+<p>jettyRunWar正好相反，是将一个War包部署到Web容器中。</p>
+
+<p><strong>jettyRun的好处是，你可以改变静态文件和JSP文件，而不需要重新启动服务器。</strong></p>
+
+<p>但是即便如此，对于日常开发还是不方便，因为开发过程中改动最多的其实是Java文件和资源配置文件，所以真正需要的是<strong>热部署</strong>。</p>
+
+<p>jettyRun的Gradle API文档中有这么一句话：Once started, the web container can be configured to run continuously, scanning for changes in the project and automatically performing a hot redeploy when necessary. This allows the developer to concentrate on coding changes to the project using their IDE of choice and have those changes immediately and transparently reflected in the running web container, eliminating development time that is wasted on rebuilding, reassembling and redeploying.</p>
+
+<p>这句话简单总结就是Jetty提供实现热部署的特性，开发人员只需要专注于编写代码，减少重新构建，重新组装和重新部署所浪费的时间。</p>
+
+<p>但问题是，官方文档上写了这句话后，就不了了之了，没有说怎么做。我们都试过，默认配置是不会实现热部署的，那么应该怎么做呢？</p>
+
+<h3><strong>两个属性：</strong></h3>
+
+<p><strong>reload</strong>  The reload mode, which is either &ldquo;automatic&rdquo; or &ldquo;manual&rdquo;.</p>
+
+<p><strong>scanIntervalSeconds</strong>  The interval in seconds between scanning the web app for file changes. If file changes are detected, the web app is reloaded. Only relevant if reload is set to &ldquo;automatic&rdquo;. Defaults to 0, which disables automatic reloading.</p>
+
+<p>读完上面两段，说明默认scanIntervalSeconds的配置是不支持自动重新载入变化文件的。</p>
+
+<p>试一把，把它改为支持：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">jettyRun</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">reload</span> <span class="o">=</span> <span class="s2">&quot;automatic&quot;</span>
+</span><span class='line'>    <span class="n">scanIntervalSeconds</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后运行gradle jettyRun启动jetty容器，修改Java类，然后去页面验证变化，结果是没有变化。为什么？</p>
+
+<p>原来，jetty监听的是build目录下的class文件变化，而不是源代码变化，也就说源代码内容改变了，但class文件没有变化，那么不会自动触发jetty重载变化文件，那么该怎么办？最简单粗暴的解决方案就是另起一个命令行窗口，手动运行一次gradle compileJava命令。</p>
+
+<p>没错，这个方法是行得通的。但仍然不是最好的解决方案。我查了下，到目前为止，官方没有给出正式的解决方案，但是该特性是在GradleWare的To-Do-List上的，预计以后应该会有。</p>
+
+<h2><strong>Gradle Watch</strong></h2>
+
+<p>那么，唯一的办法只有借助第三方的插件来协助Jetty插件，一起实现热部署了，gradle-watch（日本人写的，因为上面的饿提交记录全是日文的）。 <a href="https://github.com/bluepapa32/gradle-watch-plugin">https://github.com/bluepapa32/gradle-watch-plugin</a></p>
+
+<p>gradle watch的作用是监听某种类型的文件的变化，包括添加，删除和修改，然后执行预定义的任务。</p>
+
+<p>使用起来很简单：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">jettyRun</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">reload</span> <span class="o">=</span> <span class="s2">&quot;automatic&quot;</span>
+</span><span class='line'>    <span class="n">scanIntervalSeconds</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">jcenter</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">classpath</span> <span class="s1">&#39;com.bluepapa32:gradle-watch-plugin:0.1.3&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;watch&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">watch</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">files</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;src/main/java&#39;</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;compileJava&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>配置watch闭包，什么文件发生变化后就执行什么任务（好像它没有提供默认配置，所以需要手动显示的配置）。</p>
+
+<p>在启动了gradle jettyRun之后，开启另一个窗口运行gradle watch。一次Java文件变化的输出如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">:</span><span class="nx">watch</span>
+</span><span class='line'><span class="nx">Starting</span><span class="p">............</span> <span class="nx">OK</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">--------------------------------------------------------------------------------</span>
+</span><span class='line'><span class="nx">Sun</span> <span class="nx">Jul</span> <span class="mi">27</span> <span class="mi">15</span><span class="o">:</span><span class="mi">36</span><span class="o">:</span><span class="mi">51</span> <span class="nx">CST</span> <span class="mi">2014</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">File</span> <span class="s2">&quot;src/main/java/me/zeph/springmvc/jrebel/controller/HelloJRebelController.java&quot;</span> <span class="nx">was</span> <span class="nx">changed</span><span class="p">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-----------------------------------------------------</span>
+</span><span class='line'><span class="o">:</span><span class="nx">compileJava</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">BUILD</span> <span class="nx">SUCCESSFUL</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Total</span> <span class="nx">time</span><span class="o">:</span> <span class="mf">0.954</span> <span class="nx">secs</span>
+</span><span class='line'><span class="nx">Building</span> <span class="o">&gt;</span> <span class="o">:</span><span class="nx">watch</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可见，成功的更新了Java的class文件到build目录。刷新一次页面，就可以查看变化了。</p>
+
+<p>那么对于资源文件呢？比如，我使用了Spring，需要改变Spring的Bean配置文件，同样可以。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">watch</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">files</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;src/main/java&#39;</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;compileJava&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">files</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="s1">&#39;src/main/resources&#39;</span><span class="o">,</span> <span class="nl">include:</span> <span class="s1">&#39;**/*.xml&#39;</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;processResources&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>输出结果如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">--------------------------------------------------------------------------------</span>
+</span><span class='line'><span class="nx">Sun</span> <span class="nx">Jul</span> <span class="mi">27</span> <span class="mi">15</span><span class="o">:</span><span class="mi">56</span><span class="o">:</span><span class="mi">39</span> <span class="nx">CST</span> <span class="mi">2014</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">File</span> <span class="s2">&quot;src/main/resources/applicationContextService.xml&quot;</span> <span class="nx">was</span> <span class="nx">changed</span><span class="p">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">--------------------------------------------------------------------------------</span>
+</span><span class='line'><span class="o">:</span><span class="nx">processResources</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">BUILD</span> <span class="nx">SUCCESSFUL</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Total</span> <span class="nx">time</span><span class="o">:</span> <span class="mf">0.501</span> <span class="nx">secs</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>是不是很爽，这样是不是就再也不用重启服务器了，开发速度瞬间提升好几万战斗力。</p>
+
+<p>加一句，该插件同样支持properties文件的改变，与XML一样配置。</p>
+
+<p>好吧，就到这里，我觉得热部署也算的上某种自动化开发的一部分，至少他们的目的一样，提升开发效率，得到快速反馈，希望这篇文章对大家有所帮助。</p>
+
+<p>参考资料：</p>
+
+<p>1.<a href="http://forums.gradle.org/gradle/topics/hot_deploy_with_jetty_plugins_jettyrun">http://forums.gradle.org/gradle/topics/hot_deploy_with_jetty_plugins_jettyrun</a></p>
+
+<p>2.<a href="http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.jetty.JettyRun.html">http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.jetty.JettyRun.html</a></p>
+
+<p>3.<a href="https://github.com/bluepapa32/gradle-watch-plugin">https://github.com/bluepapa32/gradle-watch-plugin</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2014-07-27T14:53:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>2:53 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/" data-via="" data-counturl="http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/07/24/the-web-dot-xml-you-need-to-know/" title="Previous Post: Spring，Gradle，Web.xml和Intellij">&laquo; Spring，Gradle，Web.xml和Intellij</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/12/19/yes-angularjs-1/" title="Next Post: 开始！AngularJS!（一）- 刚刚开始">开始！AngularJS!（一）- 刚刚开始 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="Gradle Jetty和Gradle Watch插件实现热部署"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <div style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</div>
+  <div style="margin-left: 8px;margin-top: 10px;">A Java/RoR/NodeJS-FE/Full Stack Developer</div>
+  <div style="margin-left: 8px;margin-top: 10px;">A Gradle Plugin Contributor</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-left: 8px;margin-top: 10px;"><a href='http://www.legulegu.com' target="_blank" style="text-decoration: blink;font-weight: bolder;">乐咕乐股网 - www.legulegu.com</a></div>
+  <div style="margin-left: 8px;">联合创始人/技术负责人/全栈工程师</div>
+  <div style="margin-left: 8px;">计算机应用技术学术性硕士-信息安全方向</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle，Spring，前端开发，自动化构建，自动化测试，Devops，信息安全</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/06/13/https-%1Bis-so-important/">我也想来谈谈HTTPS</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/29/nginx-lets-encrypt/">全民安全站Let&#8217;s Encrypt配置NGINX</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/22/nginx-serve-static/">用Nginx服务静态文件</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">将Nginx作为Tomcat的反向代理服务器</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/02/js-prevent-default/">JS 改变默认行为 e.preventDefault() e.returnValue e.stopPropagation e.cancelBubble Return False</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

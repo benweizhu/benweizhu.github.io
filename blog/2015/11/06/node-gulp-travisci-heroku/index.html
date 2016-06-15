@@ -1,0 +1,527 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="这篇博客的起源比较有意思，客户给我们出了一道前端的开发题目，实现一个满足某种需求的web应用程序，算是某种程度的面试或者能力检测。 开发的技术栈采用我比较熟悉的： 环境：Node 脚手架，构建和依赖管理：Yoman，Gulp，Bower，NPM（Node包管理也算依赖管理吧） 开发框架： &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2015/11/06/node-gulp-travisci-heroku">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-11-06T08:06:16+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:06 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>这篇博客的起源比较有意思，客户给我们出了一道前端的开发题目，实现一个满足某种需求的web应用程序，算是某种程度的面试或者能力检测。</p>
+
+<p>开发的技术栈采用我比较熟悉的：</p>
+
+<p>环境：Node  <br/>
+脚手架，构建和依赖管理：Yoman，Gulp，Bower，NPM（Node包管理也算依赖管理吧）  <br/>
+开发框架：AngularJS，Bootstrap  <br/>
+测试框架和Runner：Karma，Protractor，Jasmine，Webdriver</p>
+
+<p>当然还有些七七八八的JavaScript类库，这里就不罗列了。</p>
+
+<p>开发时间大概用了不到一天，考虑到这些环境我都没安装，所以下载还是花了点时间的，基本的本地运行，单元测试，功能测试都完善了，本来想着已经差不多了，但作为一个在以构建，持续集成和持续交付自豪的公司（Build and CI is in our DNA）里工作的开发人员，好像还差点什么。</p>
+
+<p>没错，就是<strong>持续集成和部署到PreProduction环境或者Production环境</strong>，之前没怎么用过Heroku，所以彻底完成还是足足花费了一天的时间，也就是从开发到上线用了两天，不过这其中踩了无数的坑。</p>
+
+<p>关于开发以及构建的部分，我就不详细说明了，这与标题也不符合。</p>
+
+<h2>TravisCI</h2>
+
+<p><img src="https://travis-ci.com/img/travis-mascot-200px.png" alt="Alt text" /></p>
+
+<blockquote><p>Test and Deploy with Confidence
+Easily sync your GitHub projects with Travis CI and you’ll be testing your code in minutes!</p></blockquote>
+
+<p>TravisCI是一个免费的，可以和Github项目同步的持续集成服务器，对持续集成这个概念不懂的同学，请参考我司（我厂）高级咨询师腾云的翻译的Martin Fowler的文章《持续集成》 <a href="http://www.cnblogs.com/CloudTeng/archive/2012/02/25/2367565.html">http://www.cnblogs.com/CloudTeng/archive/2012/02/25/2367565.html</a> 。</p>
+
+<p>其实，要使用TravisCI是非常简单的，假设你是Java的项目，且采用了Maven或者Gradle做构建，那么只需要在项目中添加一个.travis.yml的文件，在里面写上language: java，提交，并在TravisCI上将项目Sync打开，就可以开始构建了。可以参考资料： <a href="http://docs.travis-ci.com/user/languages/java/">http://docs.travis-ci.com/user/languages/java/</a></p>
+
+<p>但是在本例子中，采用的是Node环境，所以相对的配置就需要有所改变。基本配置和Java环境类似：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">language</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">node_js</span>
+</span><span class='line'><span class="l-Scalar-Plain">node_js</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;4.1&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;4.0&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.12&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.11&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.10&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.8&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.6&quot;</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;iojs&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里要注意的是Node的版本，如果你使用4.0以上版本，很有可能在TravisCI上会遇到，导致npm install失败：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">../</span><span class="n">node_modules</span><span class="o">/</span><span class="n">nan</span><span class="o">/</span><span class="n">nan</span><span class="o">.</span><span class="n">h</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">3</span><span class="p">:</span> <span class="n">error</span><span class="p">:</span> <span class="c">#error This version of node/NAN/v8 requires a C++11 compiler</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>官方文档上并没有给出解决这个问题的办法，唯一的临时解决办法就是使用低于4的稳定版本，比如我使用是0.12。</p>
+
+<p>对于Node项目，TravisCI默认执行：npm test命令来运行你的测试（官方翻译：测试套件）。</p>
+
+<p>如果你查看了官方文档，项目采用Gulp做构建，它会告诉你还需要在.travis.yml文件中添加：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">before_script</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">npm install -g gulp</span>
+</span><span class='line'><span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">gulp</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果添加script: gulp，TravisCI会运行gulp，而不会运行npm test命令，所以这里取决于你的项目构建（测试）运行方式。我这里采用的npm test，因为需要同时运行单元测试和功能测试，在我的配置中，gulp任务只是最优化打包应用，所以在.travis.yml我并没有这些配置。</p>
+
+<p>官方参考文档： <a href="http://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Using-Gulp">http://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Using-Gulp</a></p>
+
+<p>我的配置全部在package.json的Script中，主要原因是为了方便Heroku部署，这里之所以需要在npm install之后运行bower install是为了功能测试能够正常运行。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;scripts&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;test&quot;</span><span class="o">:</span> <span class="s2">&quot;gulp test &amp; gulp protractor&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;start&quot;</span><span class="o">:</span> <span class="s2">&quot;./node_modules/.bin/gulp serve:dist&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;postinstall&quot;</span><span class="o">:</span> <span class="s2">&quot;./node_modules/.bin/bower install&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>到目前为止，TravisCI的配置就结束了，项目可以正常的在持续集成服务器（CI Server）上运行。</p>
+
+<h2>Heroku</h2>
+
+<p><img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/Heroku_logo.png/220px-Heroku_logo.png" alt="Alt text" /></p>
+
+<blockquote><p>Heroku (pronounced her-OH-koo) is a cloud application platform – a new way of building and deploying web apps.</p></blockquote>
+
+<p>Heroku是国外有名的云应用平台，旗下的产品有： <br/>
+Heroku Platform <br/>
+Heroku Postgres <br/>
+Heroku Redis <br/>
+Heroku Connect <br/>
+Heroku Enterprise</p>
+
+<h3>注册和安装Toolbelt</h3>
+
+<p>首先，你需要注册Heroku的账号，然后安装Heroku的Toolbelt工具。   <br/>
+可以参考： <a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up">https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up</a></p>
+
+<p>安装参考资料的提示，登录：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">heroku</span> <span class="n">login</span>
+</span><span class='line'><span class="n">Enter</span> <span class="n">your</span> <span class="n">Heroku</span> <span class="n">credentials</span><span class="o">.</span>
+</span><span class='line'><span class="n">Email</span><span class="p">:</span> <span class="n">zeke</span><span class="nd">@example.com</span>
+</span><span class='line'><span class="n">Password</span><span class="p">:</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>在Travis中配置Heroku</h3>
+
+<p>登录Heroku创建一个应用程序，名字你自己取（得小写字母）</p>
+
+<p>进入到应用，在Deploy的tab里面，你会看到一个Connect to Github，你可以选择将哪个repository和该应用关联来实现自动部署或手动部署，但TravisCI的自动部署跟它没有关系，所以你不用管它。</p>
+
+<p>你要做的是看这里： <a href="http://docs.travis-ci.com/user/deployment/heroku/">http://docs.travis-ci.com/user/deployment/heroku/</a></p>
+
+<p>在.travis.yml中配置：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">deploy</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">heroku</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">api_key</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">secure</span><span class="p-Indicator">:</span> <span class="s">&quot;YOUR</span><span class="nv"> </span><span class="s">ENCRYPTED</span><span class="nv"> </span><span class="s">API</span><span class="nv"> </span><span class="s">KEY&quot;</span>
+</span><span class='line'><span class="nn">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>虽然，你看得懂文档，但不建议手动配置，建议Travis和Heroku的客户端都安装，然后在项目目录下运行：travis setup heroku，来自动配置.travis.yml文件。</p>
+
+<p>可以参考的文档： <a href="http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/">http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/</a></p>
+
+<p>配置完成之后，.travis.yml文件大概和下面的相似：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">language</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">node_js</span>
+</span><span class='line'><span class="l-Scalar-Plain">node_js</span><span class="p-Indicator">:</span>
+</span><span class='line'><span class="p-Indicator">-</span> <span class="s">&#39;0.12&#39;</span>
+</span><span class='line'><span class="l-Scalar-Plain">deploy</span><span class="p-Indicator">:</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">heroku</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">api_key</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">secure</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">QFSD0pnNddlsdZ6Wm/...</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">app</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">yourapplicationname</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">on</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">repo</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">benweizhu/yourApplicationRepoName</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>提交代码之后，TravisCI就会开始在构建完成之后，开始执行部署到Heroku。</p>
+
+<p>这样就完了吗？错！！！前面已经踩过一些坑，但还不够坑。</p>
+
+<h2>现在正式开始采坑</h2>
+
+<p>执行完上面的步骤，你会发现构建是绿的，并且显示：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">-----&gt;</span> <span class="n">Compressing</span><span class="o">...</span> <span class="n">done</span><span class="p">,</span> <span class="mf">65.3</span><span class="n">MB</span>
+</span><span class='line'><span class="o">-----&gt;</span> <span class="n">Launching</span><span class="o">...</span> <span class="n">done</span><span class="p">,</span> <span class="n">v28</span>
+</span><span class='line'>       <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">yourapplicationname</span><span class="o">.</span><span class="n">herokuapp</span><span class="o">.</span><span class="n">com</span><span class="o">/</span> <span class="n">deployed</span> <span class="n">to</span> <span class="n">Heroku</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当你通过URL打开应用时，就会出现Application Error的页面。这个时候，就要开始troubleshooting了。</p>
+
+<p>首先，你需要在TravisCI上构建和部署的log，这个就不用我教了。</p>
+
+<p>如果TravisCI上没有问题，那么，你就需要查看Heroku服务器上的log，方法如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">heroku</span> <span class="n">logs</span> <span class="o">--</span><span class="n">tail</span> <span class="o">--</span><span class="n">app</span> <span class="n">appname</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>所有的出现问题/导致失败的原因都可以在log中看到。</p>
+
+<p><strong>常见问题</strong></p>
+
+<p>问题1：Heroku的Node环境启动时，运行npm start，所以，你需要配置好，package中的script命令来正确的启动服务器。你也可以配置Procfile文件，那么它就会执行文件中的命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">web</span><span class="p">:</span> <span class="n">node</span> <span class="n">node_modules</span><span class="o">/.</span><span class="n">bin</span><span class="o">/</span><span class="n">gulp</span> <span class="n">serve</span><span class="p">:</span><span class="n">dist</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>问题2：Heroku没有在全局（global）下安装gulp，所以项目的gulp需要安装在本地，在npm start的命令中也要有相应的配置，比如：gulp命令是执行本地的bin目录。</p>
+
+<p>问题3：Heroku会先运行npm install，所以如果项目使用了BowerJS，那么在postInstall要进行bower install。</p>
+
+<p>问题4：确保package中，dependencies的配置是正确的，很多情况下，我们都把依赖放在了devDependencies中，但在产品环境下，应该在dependencies下。</p>
+
+<p>问题5：端口号配置</p>
+
+<p>一个Web dyno并需和传递给他的$PORT在60秒内绑定。</p>
+
+<p>所以应用程序的端口配置应该：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// set the port of our application</span>
+</span><span class='line'><span class="c1">// process.env.PORT lets the port be set by Heroku</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">8080</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Web Dynos: Web dynos are dynos of the “web” process type that is defined in your Procfile. Only web dynos receive HTTP traffic from Heroku’s routers.</p>
+
+<p>另外还有一些问题：可能出在Heroku的配置上，具体请参考<strong>Heroku官方的troubleshooting</strong>： <a href="https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate">https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate</a></p>
+
+<h2>结束语</h2>
+
+<p>整个项目是一个完整的JavaScript全栈项目，从需求，到开发，最后部署，花费两天时间，虽然辛苦，但是学到不少东西。</p>
+
+<p>参考资料： <br/>
+1.<a href="http://docs.travis-ci.com/user/languages/javascript-with-nodejs/">http://docs.travis-ci.com/user/languages/javascript-with-nodejs/</a>  <br/>
+2.<a href="http://docs.travis-ci.com/user/deployment/heroku/">http://docs.travis-ci.com/user/deployment/heroku/</a>  <br/>
+3.<a href="http://www.sitepoint.com/deploying-heroku-using-gulp-node-git/">http://www.sitepoint.com/deploying-heroku-using-gulp-node-git/</a>
+4.<a href="http://www.hygkui.com/2015/03/13/%E4%BD%BF%E7%94%A8Gulp-Node-Git%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E5%88%B0Heroku%E4%B8%8A/">http://www.hygkui.com/2015/03/13/%E4%BD%BF%E7%94%A8Gulp-Node-Git%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E5%88%B0Heroku%E4%B8%8A/</a> 上面的中文版  <br/>
+5.<a href="http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/">http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/</a>  <br/>
+6.<a href="https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate">https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-11-06T08:06:16+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:06 am</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2015/11/06/node-gulp-travisci-heroku/" data-via="" data-counturl="http://benweizhu.github.io/blog/2015/11/06/node-gulp-travisci-heroku/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/10/31/static-url-for-seo/" title="Previous Post: SEO实战密码：URL静态化">&laquo; SEO实战密码：URL静态化</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/11/07/coding-net-and-dao-cloud/" title="Next Post: 通过DaoCloud配置Coding平台的持续集成服务">通过DaoCloud配置Coding平台的持续集成服务 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <div style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</div>
+  <div style="margin-left: 8px;margin-top: 10px;">A Java/RoR/NodeJS-FE/Full Stack Developer</div>
+  <div style="margin-left: 8px;margin-top: 10px;">A Gradle Plugin Contributor</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-left: 8px;margin-top: 10px;"><a href='http://www.legulegu.com' target="_blank" style="text-decoration: blink;font-weight: bolder;">乐咕乐股网 - www.legulegu.com</a></div>
+  <div style="margin-left: 8px;">联合创始人/技术负责人/全栈工程师</div>
+  <div style="margin-left: 8px;">计算机应用技术学术性硕士-信息安全方向</div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle，Spring，前端开发，自动化构建，自动化测试，Devops，信息安全</div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/06/13/https-%1Bis-so-important/">我也想来谈谈HTTPS</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/29/nginx-lets-encrypt/">全民安全站Let&#8217;s Encrypt配置NGINX</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/22/nginx-serve-static/">用Nginx服务静态文件</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">将Nginx作为Tomcat的反向代理服务器</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/02/js-prevent-default/">JS 改变默认行为 e.preventDefault() e.returnValue e.stopPropagation e.cancelBubble Return False</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+  <div>
+    <h1>Currently Working On</h1>
+    <div>
+      <span>relations-back-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
+    </div>
+    <br/>
+    <div>
+      <span>relations-front-end</span>
+      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
+    </div>
+    <br/>
+    <div>
+      <span>gradle-plugin-database</span>
+      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
