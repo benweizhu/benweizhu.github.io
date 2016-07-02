@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "【转】.bash_profile和.bashrc"
+title: ".bash_profile和.bashrc"
 date: 2016-07-02 12:54:48 +0800
 comments: true
 categories:
