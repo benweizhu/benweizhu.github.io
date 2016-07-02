@@ -9,8 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="本例子，以mac作为主机： 安装Nginx 通过HomeBrew安装Nginx。 1
-$ brew install nginx 然后，运行启动nginx。如果启动遇到问题，使用brew doctor查看下，有可能是没有link（brew link nginx），或者没有文件执行权限（chmod去改 &hellip;">
+  <meta name="description" content="使用Nginx服务静态文件的原因很简单：快。 上一篇文章中 http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/ ，我们使用Nginx作为Tomcat服务器的反向代理服务器， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +64,116 @@ $ brew install nginx 然后，运行启动nginx。如果启动遇到问题，使
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/05/22/nginx-serve-static/">用Nginx服务静态文件</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-05-22T11:58:09+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>11:58 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>使用Nginx服务静态文件的原因很简单：快。</p>
+
+<p>上一篇文章中 <a href="http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/</a> ，我们使用Nginx作为Tomcat服务器的反向代理服务器，这样比在Tomcat直接配置80端口更加方便。</p>
+
+<p>但是，却没有很好的利用Nginx服务器的特点，即 NGINX | High Performance Load Balancer, Web Server, &amp; Reverse等。</p>
+
+<p>我们可以使用Nginx来服务器静态文件，使用Tomcat来处理JSP的动态文件。配置非常简单，分别使用下面两个配置：</p>
+
+<h2>403错误：添加Nginx访问文案件的权限</h2>
+
+<p>nginx配置中有一个user选项，默认，nginx配置的是nobody。 <a href="http://nginx.org/en/docs/ngx_core_module.html#user">http://nginx.org/en/docs/ngx_core_module.html#user</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#user  nobody;</span>
+</span><span class='line'>worker_processes  1<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#error_log  logs/error.log;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  notice;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  info;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#pid        logs/nginx.pid;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>需要将它改为可以访问Tomcat服务器上文件的用户和用户组</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>user  yourusername yourusergroup<span class="p">;</span> <span class="c">#比如 benweizhu stuff</span>
+</span><span class='line'>worker_processes  1<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#error_log  logs/error.log;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  notice;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  info;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#pid        logs/nginx.pid;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>404错误：使用Alias来配置Static文件路径</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>location /static/ <span class="o">{</span>
+</span><span class='line'>  autoindex  on<span class="p">;</span>
+</span><span class='line'>  <span class="nb">alias</span> /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp/static<span class="p">;</span> <span class="c">#完整路径</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Nginx的Wiki推荐使用root字段</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>location /static/ <span class="o">{</span>
+</span><span class='line'>  autoindex  on<span class="p">;</span>
+</span><span class='line'>  root /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp<span class="p">;</span> <span class="c">#完整路径</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料：   <br/>
+1. <a href="https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/">https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/</a>   <br/>
+2. <a href="http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden">http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden</a>   <br/>
+3. <a href="http://stackoverflow.com/questions/1474374/nginx-doesnt-serve-static">http://stackoverflow.com/questions/1474374/nginx-doesnt-serve-static</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -226,85 +335,6 @@ $ brew install nginx 然后，运行启动nginx。如果启动遇到问题，使
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/05/02/js-prevent-default/">JS 改变默认行为 e.preventDefault() e.returnValue e.stopPropagation e.cancelBubble Return False</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-05-02T09:31:27+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>9:31 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>事件对象有一些方法可以改变一个元素的默认行为，以及它的祖先元素如何对这个事件作出响应。</p>
-
-<p>有一些事件，比如点击链接或提交表单，会把用户导向另一个页面。为了阻止这类元素的这种默认行为，比如在用户点击链接或提交表单之后还是停留在当前页面，而不是导向新的页面，可以使用事件对象e的preventDefault()。</p>
-
-<p>IE5~IE8有一个同样功能的属性returnValue，如果将其设置为false，就能达到同样的效果。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
-</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">e</span><span class="p">.</span><span class="nx">returnValue</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>处理完某个元素上的事件之后，可能需要阻止这个事件向其祖先元素继续冒泡传播。这时候，可以使用e.stopPropagation()方法。</p>
-
-<p>IE8或更早的IE版本中，使用拥有同样功能的属性e.cancelBubble，将其设置为true可以达到同样的效果。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">stopPropagation</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">e</span><span class="p">.</span><span class="nx">stopPropagation</span><span class="p">();</span>
-</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">e</span><span class="p">.</span><span class="nx">cancelBubble</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果你想要同时实现，preventDefault和stopPropagation，可以使用return false。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>   <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;href&quot;</span><span class="p">));</span>
-</span><span class='line'>   <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料： <br/>
-1.《JavaScript&amp;jQuery交互式Web前端开发》</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/4">&larr; Older</a>
@@ -334,6 +364,10 @@ $ brew install nginx 然后，运行启动nginx。如果启动遇到问题，使
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/07/02/bash-profile-and-bashrc/">【转】.bash_profile和.bashrc</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/06/27/host-jenkins-on-aws/">在AWS上部署Jenkins</a>
       </li>
     
@@ -347,10 +381,6 @@ $ brew install nginx 然后，运行启动nginx。如果启动遇到问题，使
     
       <li class="post">
         <a href="/blog/2016/05/22/nginx-serve-static/">用Nginx服务静态文件</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">将Nginx作为Tomcat的反向代理服务器</a>
       </li>
     
   </ul>
