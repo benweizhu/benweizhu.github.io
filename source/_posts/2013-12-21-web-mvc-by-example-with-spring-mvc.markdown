@@ -3,11 +3,11 @@ layout: post
 title: "Web MVC By Example"
 date: 2013-12-21 17:03
 comments: true
-categories: 
+categories:
 ---
 早期的web应用主要是静态页面的浏览。静态页面使用HTML语言来编写，放在服务器上。用户使用浏览器通过HTTP协议请求服务器上的Web页面，服务器上的Web服务器软件接收到用户发送的请求后，读取请求URI所标识的资源，加上消息报头发送给客户端的浏览器；浏览器解析响应中的HTML数据，从而向用户呈现多姿多彩的HTML页面。
 
-###**CGI-Servlet-JSP-Model1-Model2**
+###**CGI->Servlet->JSP->Model1->Model2**
 
 早期使用的Web服务器扩展机制是CGI，它允许用户调用Web服务器上的CGI程序。CGI的全称是Common Gateway Interface，即公共网关接口。用户通过单击某个链接或者直接在浏览器的地址栏中输入URL来访问CGI程序，Web服务器接收到请求后，发现这个请求是给CGI程序的，于是就启动并运行这个CGI程序，对用户请求进行处理。CGI程序解析请求中的CGI数据，处理数据，并产生一个响应（通常是HTML页面）。这个响应被返回给Web服务器，Web服务器包装这个响应（例如添加消息报头），以HTTP响应的形式发送给Web浏览器。
 
@@ -30,7 +30,7 @@ Servlet不能独立运行，它必须被部署到Servlet容器（例如：Tomcat
        <servlet-name>hello</servlet-name>
        <servlet-class>me.zeph.springview.demo.HelloWorldServlet</servlet-class>
    </servlet>
-    
+
    <servlet-mapping>
        <servlet-name>hello</servlet-name>
        <url-pattern>/hello</url-pattern>
