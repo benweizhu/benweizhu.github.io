@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-07-06T17:09:08+08:00</updated>
+  <updated>2016-08-21T18:40:46+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,96 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[CSS和软件工程中的设计原则]]></title>
+    <link href="http://benweizhu.github.io/blog/2016/08/21/css-for-software-engineers-for-css-developers/"/>
+    <updated>2016-08-21T18:10:13+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2016/08/21/css-for-software-engineers-for-css-developers</id>
+    <content type="html"><![CDATA[<p>原视频： <a href="https://vimeo.com/177216958">https://vimeo.com/177216958</a></p>
+
+<p>PPT如下：</p>
+
+<script async class="speakerdeck-embed" data-id="087e1c8ae1c4452f82ae6fd5e6215a9a" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
+
+
+<p>作者提到CSS开发过程的很多原则：
+  • DRY/Single Source of Truth <br/>
+  • The Single Responsibility Principle <br/>
+  • The Separation of Concerns <br/>
+  • Immutability <br/>
+  • Cylcomatic Complexity <br/>
+  • The Open/Close Principle <br/>
+  • Orthogonality</p>
+
+<p>这些原则在其他软件开发领域应用非常广泛，然而绝大多数人在写CSS的时候却又显得相当随意。
+可以参考一下作者的观点，每一原则他都给出了对应的应用场景。</p>
+
+<p>同时对于非常喜欢写嵌套规则的同学，强烈建议去了解<a href="%E5%9C%88%E5%A4%8D%E6%9D%82%E5%BA%A6">Cylcomatic Complexity</a>，尝试着去减少嵌套，减少以后的维护成本。</p>
+
+<p>个人感觉，作者对于这些设计原则本身的说明，占用了太多的篇幅，并没有告诉你如果要实现这个设计，应该怎么做？但作者讲解了一些反例，并印证它不满足那些原则。我们应该反向思考，我们在css中过于随意的css选择器，定义出scope正确的合理的css。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[SVG和IconFont]]></title>
+    <link href="http://benweizhu.github.io/blog/2016/07/12/svg-and-icon-font/"/>
+    <updated>2016-07-12T15:28:07+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2016/07/12/svg-and-icon-font</id>
+    <content type="html"><![CDATA[<p>在大型企业中，它们都拥有自己的VI，有自己的设计团队，他们来开发设计一些企业特有的图标和标志。而这些图标一般以矢量图的方式提供给我们。</p>
+
+<p>矢量图，也称为面向对象的图像或绘图图像，在数学上定义为一系列由线连接的点。矢量文件中的图形元素称为对象。每个对象都是一个自成一体的实体，它具有颜色、形状、轮廓、大小和屏幕位置等属性。</p>
+
+<p>SVG（Scalable Vector Graphics）是什么？</p>
+
+<p>大部分人第一次见到它，肯定认为是一种矢量图图形格式，但严格来说它也是一种开放标准的矢量图形语言，是使用XML来描述二维图形和绘图程序的语言，它是一门语言，DSL（领域特定语言）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; standalone=&quot;no&quot;?&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">&lt;!DOCTYPE svg PUBLIC &quot;-//W3C//DTD SVG 1.1//EN&quot;</span>
+</span><span class='line'><span class="cp">&quot;http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd&quot;&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;svg</span> <span class="na">width=</span><span class="s">&quot;100%&quot;</span> <span class="na">height=</span><span class="s">&quot;100%&quot;</span> <span class="na">version=</span><span class="s">&quot;1.1&quot;</span>
+</span><span class='line'><span class="na">xmlns=</span><span class="s">&quot;http://www.w3.org/2000/svg&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;circle</span> <span class="na">cx=</span><span class="s">&quot;100&quot;</span> <span class="na">cy=</span><span class="s">&quot;50&quot;</span> <span class="na">r=</span><span class="s">&quot;40&quot;</span> <span class="na">stroke=</span><span class="s">&quot;black&quot;</span>
+</span><span class='line'><span class="na">stroke-width=</span><span class="s">&quot;2&quot;</span> <span class="na">fill=</span><span class="s">&quot;red&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/svg&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面这段代码得到的svg矢量图，如下：</p>
+
+<p><img src="https://rawgit.com/benweizhu/5036fcaf39960a28ce9b0aca17a78caa/raw/31797b14c698431c9a6f5435a2f5a28dda2ce1bd/circle.svg" alt="Alt text" /></p>
+
+<p>我们在响应式网页设计的工作中经常用到SVG，因为一般的图片没有办法进行适当的缩放，普通图片的缩放会导致图像的失真，同时，图片的文件大小也可能和你希望的图片不一致（大图被缩小使用，导致图片文件大小仍然很大）。</p>
+
+<p>我相信大部分前端开发工程师都用过IconFont，比如：<a href="http://fontawesome.io/icons/">http://fontawesome.io/icons/</a> 和bootstrap中的glyphicons <a href="http://v3.bootcss.com/components/#glyphicons">http://v3.bootcss.com/components/#glyphicons</a> 。</p>
+
+<p>关于为什么要转换为Icon Font？CSS-Tricks中有一篇文章详细的对比了SVG和ICON Font，见： <a href="https://css-tricks.com/icon-fonts-vs-svg/">https://css-tricks.com/icon-fonts-vs-svg/</a></p>
+
+<p>简单版，一个最主要的原因必须使用IconFont，因为要兼容IE8。</p>
+
+<p>一个比较有用的gulp插件，可以将SVG文件转化为font字体文件，并自动生成对应的scss文件（包含font-familly和content）。</p>
+
+<p><a href="https://github.com/nfroidure/gulp-iconfont">https://github.com/nfroidure/gulp-iconfont</a></p>
+
+<p>当然，我们也可以使用一些在线工具来将SVG文件转化成字体文件比如： <a href="https://icomoon.io/">https://icomoon.io/</a> 。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[.bash_profile和.bashrc]]></title>
@@ -3290,283 +3380,6 @@ Radium： <a href="https://github.com/FormidableLabs/radium">https://github.com/
 <p>And that’s all you really need to know to start rebasing your branches. If you would prefer a clean, linear history free of unnecessary merge commits, you should reach for git rebase instead of git merge when integrating changes from another branch.</p>
 
 <p>On the other hand, if you want to preserve the complete history of your project and avoid the risk of re-writing public commits, you can stick with git merge. Either option is perfectly valid, but at least now you have the option of leveraging the benefits of git rebase.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[JavaScript发布订阅模式]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/11/15/javascript-publish-and-subscribe-pattern/"/>
-    <updated>2015-11-15T11:21:36+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/11/15/javascript-publish-and-subscribe-pattern</id>
-    <content type="html"><![CDATA[<p>发布者和订阅者的目的就是为了对象之间的解耦，或者更大一点是JavaScript组件之间的解耦。</p>
-
-<blockquote><p>Subscribe/Publish模式使用了一个主题/事件通道，这个通道介于订阅者和发布者之间。该事件系统允许代码定义应用程序的特定事件，该事件可以传递自定义参数，自定义参数包含订阅者所需要的值。其目的是避免订阅者和发布者产生依赖关系。 - 《Javascript设计模式》</p></blockquote>
-
-<p>下面是它的一种实现方式：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">EventBus</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">topics</span><span class="o">:</span> <span class="p">{},</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">subscribe</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">listener</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// create the topic if not yet created</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">])</span> <span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">]</span> <span class="o">=</span> <span class="p">[];</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c1">// add the listener</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="nx">listener</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">publish</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// return if the topic doesn&#39;t exist, or there are no listeners</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">]</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c1">// send the event to all listeners</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">listener</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">listener</span><span class="p">(</span><span class="nx">data</span> <span class="o">||</span> <span class="p">{});</span>
-</span><span class='line'>        <span class="p">});</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">EventBus</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="nx">alert</span><span class="p">);</span>
-</span><span class='line'><span class="nx">EventBus</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;Hello World!&#39;</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>订阅者，在EventBus中注册事件/主题，并传递对应事件/主题的回调函数。 <br/>
-发布者，发布对应的事件/主题，并传递需要的回调函数所需要的数据对象。</p>
-
-<p>下面的这个写法，从函数命名上看更倾向于以注册事件和触发事件的方式理解，并且对事件的命名和回调函数的约束更加明确，也就是更鲁邦。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">eventService</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">EventService</span> <span class="o">=</span> <span class="p">{};</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">_listeners</span> <span class="o">=</span> <span class="p">{};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">eventService</span><span class="p">.</span><span class="nx">add</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">func</span> <span class="k">instanceof</span> <span class="nb">Function</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="nx">topic</span> <span class="o">+</span> <span class="s2">&quot; must add a function.&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">])</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">]</span> <span class="o">=</span> <span class="p">[];</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="nx">func</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">eventService</span><span class="p">.</span><span class="nx">remove</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">])</span> <span class="p">{</span>
-</span><span class='line'>            <span class="kd">var</span> <span class="nx">index</span> <span class="o">=</span> <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">func</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nx">index</span> <span class="o">!==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">splice</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">eventService</span><span class="p">.</span><span class="nx">fire</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">listeners</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">topic</span> <span class="o">!==</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="s1">&#39;EventDispatcher&#39;</span><span class="p">,</span> <span class="s1">&#39;First params must be an event type (String)&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">]</span> <span class="o">==</span> <span class="kc">undefined</span><span class="p">)</span>
-</span><span class='line'>            <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="s1">&#39;EventDispatcher&#39;</span><span class="p">,</span> <span class="s1">&#39;No Event Register&#39;</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nx">func</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">});</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">eventService</span><span class="p">;</span>
-</span><span class='line'><span class="p">}.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料：  <br/>
-1.<a href="http://dev.housetrip.com/2014/09/15/decoupling-javascript-apps-using-pub-sub-pattern/">http://dev.housetrip.com/2014/09/15/decoupling-javascript-apps-using-pub-sub-pattern/</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[配置Jenkins运行Github的仓库代码构建]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/11/10/make-jenkins-run-github-code/"/>
-    <updated>2015-11-10T13:38:27+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/11/10/make-jenkins-run-github-code</id>
-    <content type="html"><![CDATA[<p>用了这么久的CI服务应用，Jenkins， Go pipeline，还没有自己尝试搭建一个。今天花点时间在本地搭建了Jenkins。</p>
-
-<h2>安装</h2>
-
-<p>以Mac版本为例：</p>
-
-<p>打开： <a href="https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins">https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins</a> ，下载Mac版本。</p>
-
-<p>安装完成之后，会直接启动 <a href="http://localhost:8080">http://localhost:8080</a> ，也就是说，Jenkins会默认启动8080端口作为服务端口。</p>
-
-<p>在mac下，如果你想要切换端口，你需要这么做：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">unload</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpPort</span> <span class="mi">8443</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">load</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果切换成https，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpPort</span> <span class="mi">8443</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpsKeyStore</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">keystore</span><span class="o">/</span><span class="nb">file</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpsKeyStorePassword</span> <span class="o">&lt;</span><span class="n">keystore</span> <span class="n">password</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>你会发现，它们都有下面的两个命令，它们用来在mac中启动和关闭Jenkins服务：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">load</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
-</span><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">unload</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>安装Github插件和配置项目第一个项目</h2>
-
-<p>安装完成之后，你可以点击new item来新建一个构建项目，选择Freestyle project。</p>
-
-<p>在Source Code Management中，你会发现，它CVS和Subversion的支持。没错，Jenkins默认并不支持Git配置。你需要安装Github Plugin。</p>
-
-<p>回到Jenkins服务器的首页，打开Manage Jenkins，里面有Manage Plugins。在Available Plugin中搜索GitHub plugin，安装并重启Jenkins（页面上又重启的checkbox，点击一下即可）。</p>
-
-<p>安装完成后，再次新建item，可以看GitHub project字段，Source Code Management中多了Git，Build Triggers中多了Build when a change is pushed to GitHub(但简单配置这个，还不能实现自动trigger，后面讲)。</p>
-
-<p>在Build那一栏，选择添加Build Step，在本例中选择python。</p>
-
-<p>我的项目是一个NodeJS项目，所以第一步是npm install。</p>
-
-<p>保存项目，回到项目栏，点击Schedule a build。</p>
-
-<h2>构建执行失败和Jenkins用户</h2>
-
-<p>正如这个小标题，构建执行失败了，你会发现失败的原因是command npm not found。</p>
-
-<p>NPM这个命令不存在，原因是Jenkins在执行该shell脚本的时候是以jenkins这个用户身份去执行，所以命令的PATH配置是不正确的。</p>
-
-<h2>Prepare Env Before Run</h2>
-
-<p>在运行前配置Jenkins运行命令的环境，有两种方式：</p>
-
-<p>1.直接在Prepare an environment for the run中配置   <br/>
-2.安装Environment Inject插件，在Inject environment variables to the build process中配置</p>
-
-<p>我这里配置了下node的bin，npm中的bin。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">PATH</span><span class="o">=</span><span class="err">$</span><span class="n">PATH</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">node</span><span class="o">/</span><span class="mf">0.12</span><span class="o">.</span><span class="mi">5</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">npm</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>A Blue Ball Appear，一个蓝色灯泡的故事</h2>
-
-<p>配置完成之后，再次执行，构建成功。但是构建的提示是一个蓝颜色的球。为什么是蓝色球呢？请看： <a href="http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls">http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls</a></p>
-
-<p>当然我不太习惯，好在要换成绿色球也很简单，安装插件：Green Ball Plugin。</p>
-
-<h2>Pipeline插件</h2>
-
-<p>根据现代软件的开发方式，我们更习惯于构建CI以pipeline的方式呈现，pipeline中有不同的step，有可以自动的trigger，也有可以手动trigger，比如：部署到Test或者Production环境，理论上应该是手动的触发。</p>
-
-<p>这个时候，你需要安装Jenkins的pipeline插件。安装完成之后，回到首页，点击tab上的加号，添加一个tab，你就可以看到pipeline选项。</p>
-
-<p>新建一个pipeline的tab，需要你填写一些信息，比如：在pipeline页面一次显示多少个构建的pipeline，配置完成之后，你就可以看到pipeline页面了。</p>
-
-<p>在pipeline页面，你可以添加一个step，其实也就是新建一个item，选项可以是free style的，也可以从别现有项目copy生成。</p>
-
-<p>配置方式和新建一个item一样。</p>
-
-<p>配置完成之后，你可以在前一个项目的Post-build Actions中添加Build Other Projects，选择Trigger only if build is stable或者其他，填写被trigger的项目。</p>
-
-<p>这样就可以自动触发后续的step。</p>
-
-<h2>Clone Workspace</h2>
-
-<p>你肯定会发现，既然新的step就是一个新的item，那么不是要重新check out一次代码，而且之前build的archive也不在了。</p>
-
-<p>没错，这是个问题，这个时候，你需要安装Clone Workspace SCM Plugin，安装完成之后，你需要做两件事情：</p>
-
-<p>1.在upstream的项目中的Post-Build Actions中添加Achieve for Clone Workspace SCM <br/>
-2.在downstream的项目的Source Code Management中选择Clone Workspace</p>
-
-<h2>关于Build when a change is pushed to GitHub</h2>
-
-<p>简单的添加这个选项还不行，需要你在github的webhook中进行配置，方法在下面的链接中，但是前提是，需要配置的jenkins有url，如果是像我这样在本地配置的，可能就会有问题。
-<a href="http://thepracticalsysadmin.com/setting-up-a-github-webhook-in-jenkins/">http://thepracticalsysadmin.com/setting-up-a-github-webhook-in-jenkins/</a></p>
 ]]></content>
   </entry>
   

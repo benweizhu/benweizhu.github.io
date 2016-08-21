@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="什么是React？ 官方网站上是这么写的： A JAVASCRIPT LIBRARY FOR BUILDING USER INTERFACES React只关心UI，至于怎么路由（route），怎么获取数据（ajax），你可以通过结合其他技术来做。 什么UI，在web中UI指的是HTML和CSS， &hellip;">
+  <meta name="description" content="原文地址： http://babeljs.io/blog/2015/06/07/react-on-es6-plus/ 文章翻译有些不准确，敬请见谅 当我们正在从内到外的重新设计Instagram Web的时候，我们非常享受使用许多ES6+的特性来编写React组件。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/11/22/ok-react-1/">继续前行！React（一）- 用JavaScript构建Web UI</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/12/13/react-on-es6-plus-translation/">翻译 React on ES6+</a></h1>
     
     
       <p class="meta">
@@ -79,24 +79,37 @@
 
 
 
-<time class='entry-date' datetime='2015-11-22T15:12:52+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2015</span></span> <span class='time'>3:12 pm</span></time>
+<time class='entry-date' datetime='2015-12-13T10:32:12+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:32 am</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h2>什么是React？</h2>
+  <div class="entry-content"><p>原文地址： <a href="http://babeljs.io/blog/2015/06/07/react-on-es6-plus/">http://babeljs.io/blog/2015/06/07/react-on-es6-plus/</a></p>
 
-<p>官方网站上是这么写的：</p>
+<h3>文章翻译有些不准确，敬请见谅</h3>
 
-<blockquote><p>A JAVASCRIPT LIBRARY FOR BUILDING USER INTERFACES</p></blockquote>
+<p>当我们正在从内到外的重新设计Instagram Web的时候，我们非常享受使用许多ES6+的特性来编写React组件。这让我有机会去说明这些新的语言特性可以改变你写React应用的方式，让它变得更简单也更有趣。</p>
 
-<p>React只关心UI，至于怎么路由（route），怎么获取数据（ajax），你可以通过结合其他技术来做。</p>
+<h2>Classes</h2>
 
-<p>什么UI，在web中UI指的是HTML和CSS，React通过JavaScript的方式来写HTML和CSS，这就是它所说的“构建用户界面的JavaScript类库”。</p>
+<p>到目前为止，最明显的变化就是当我们选择使用ES6+中的类定义语法时，如何来编写React组件。相对于使用React.createClass方法来定义一个组件，我们可以使用真正的ES6类来继承React.Component：</p>
 
-<h3>用JavaScript绘制UI</h3>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">class</span> <span class="nx">Photo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">img</span> <span class="nx">alt</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">caption</span><span class="p">}</span> <span class="nx">src</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">src</span><span class="p">}</span> <span class="o">/&gt;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>立马，你就会注意到一个微妙的不同 - 当定义类时，使用一个更加简洁的语法：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -107,32 +120,23 @@
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">HelloMessage</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">displayName</span><span class="o">:</span> <span class="s2">&quot;HelloMessage&quot;</span><span class="p">,</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;Hello &quot;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// The ES5 way</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Photo</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">handleDoubleTap</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span> <span class="err">…</span> <span class="p">},</span>
+</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="err">…</span> <span class="p">},</span>
 </span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">React</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="nx">HelloMessage</span><span class="p">,</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;John&quot;</span> <span class="p">}),</span> <span class="nx">mountNode</span><span class="p">);</span>
+</span><span class='line'><span class="c1">// The ES6+ way</span>
+</span><span class='line'><span class="kr">class</span> <span class="nx">Photo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">handleDoubleTap</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span> <span class="err">…</span> <span class="p">}</span>
+</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span> <span class="err">…</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>mountNode是一个在页面上的元素，通过document.getElementByXXX得到。</p>
+<p>很明显，我们丢掉了两个括号和一个分号，而且每一个方法声明忽略了一个冒号，一个function关键字和一个逗号。</p>
 
-<p>该代码执行得到的结果如下：</p>
-
-<div data-reactid=".1">
-    <span data-reactid=".1.0">Hello </span><span data-reactid=".1.1">John</span>
-</div>
-
-
-<p>简单地说，就是它找到页面上的mountNode节点，将Hello John插入，其中John来自于动态传入的JSON数据。</p>
-
-<p>根据上面的解释，是否让你联想到了JavaScript模板引擎，对JavaScript模板引擎不了解的，可以看这篇文章： <a href="http://benweizhu.github.io/blog/2015/10/28/js-template-engine/">http://benweizhu.github.io/blog/2015/10/28/js-template-engine/</a> 。</p>
-
-<p>和JavaScript模板引擎相比，上面这种方式通过JavaScript来编写UI代码，可读性相差甚远，于是React提出了JSX的概念 - JavaScript XML，上面的代码就变成如下：</p>
+<p>当使用新的类语法时，所有的生命周期方法（除了一个）都可以像你所期望的那样定义。类的构造函数现在的角色，之前是由componentWillMount来扮演：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -141,33 +145,29 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">HelloMessage</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Hello</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;;</span>
-</span><span class='line'>  <span class="p">}</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// The ES5 way</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">EmbedModal</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">componentWillMount</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="err">…</span> <span class="p">},</span>
 </span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">HelloMessage</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;John&quot;</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nx">mountNode</span><span class="p">);</span>
+</span><span class='line'><span class="c1">// The ES6+ way</span>
+</span><span class='line'><span class="kr">class</span> <span class="nx">EmbedModal</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+</span><span class='line'>    <span class="c1">// Operations usually carried out in componentWillMount go here</span>
+</span><span class='line'>    <span class="c1">// 所有componentWillMount的操作都放在这里</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>不管你现在了不了解JSX，但是你应该可以看出来，React所指的用JavaScript构建UI的概念。</p>
+<h2>属性初始化</h2>
 
-<p>HelloMessage就像是一个自定义的新标签，在React的概念中，叫做一个组件。</p>
-
-<h3>组件</h3>
-
-<p>React的核心概念是组件，广义的理解组件，组件（Component）是对数据和方法的简单封装，能够独立的实现某一种功能。</p>
-
-<p>组件是一种封装，它应该是自包含的，不需要外界的帮助，即可完成自身相应的功能(多个组件相互合作，也是组件本身可以完成相应功能的前提下实现的)，比如上面代码中的HelloMessage。</p>
-
-<p>有状态的组件（Props和State）：</p>
-
-<p>React不需要你去操作DOM，你只要告诉它，你想要绘制的DOM长什么样？如何去绘制，由它自己来操作。</p>
-
-<p>你只需要根据事件相应来改变组件的状态，当组件状态改变，它会自动重新绘制DOM。</p>
-
-<p>看下面的例子：</p>
+<p>在ES6+的类世界，属性类型和默认值都是作为类自己的静态属性。同样，Component的状态初始化可以使用ES7的属性初始化：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -190,34 +190,226 @@
 <span class='line-number'>19</span>
 <span class='line-number'>20</span>
 <span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">Timer</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// The ES5 way</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Video</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">getDefaultProps</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">autoPlay</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">maxLoops</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>  <span class="p">},</span>
 </span><span class='line'>  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">{</span><span class="nx">secondsElapsed</span><span class="o">:</span> <span class="mi">0</span><span class="p">};</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">loopsRemaining</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">maxLoops</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">};</span>
 </span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">tick</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">secondsElapsed</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">secondsElapsed</span> <span class="o">+</span> <span class="mi">1</span><span class="p">});</span>
+</span><span class='line'>  <span class="nx">propTypes</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">autoPlay</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">bool</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">maxLoops</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">number</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">posterFrameSrc</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">videoSrc</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
 </span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">interval</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">tick</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">componentWillUnmount</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">clearInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">interval</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">(</span>
-</span><span class='line'>      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Seconds</span> <span class="nx">Elapsed</span><span class="o">:</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">secondsElapsed</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>    <span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
 </span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Timer</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nx">mountNode</span><span class="p">);</span>
+</span><span class='line'><span class="c1">// The ES6+ way</span>
+</span><span class='line'><span class="kr">class</span> <span class="nx">Video</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">static</span> <span class="nx">defaultProps</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">autoPlay</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">maxLoops</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="kr">static</span> <span class="nx">propTypes</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">autoPlay</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">bool</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">maxLoops</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">number</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">posterFrameSrc</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">videoSrc</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">loopsRemaining</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">maxLoops</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>你改变的是组件的状态this.state.secondsElapsed，DOM的绘制由React自己完成，你只是告诉他画成这样。</p>
+<p>ES7属性初始化操作在类的构造函数中，这里指向的是类实例的构造，所以state的初始化可以设置为依赖于this.props。值得注意的是，我们不在需要，针对getter方法，定义prop的默认值，和初始化state对象。</p>
 
-<p>参考资料： <br/>
-1. <a href="https://facebook.github.io/react/index.html">https://facebook.github.io/react/index.html</a></p>
+<h2>箭头函数</h2>
+
+<p>React.createClass方法用来在组件实例方法上执行一些额外的绑定工作来保证，在他们里面，this关键字可以被考虑指向组件的实例。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Autobinding, brought to you by React.createClass</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">PostInfo</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">handleOptionsButtonClick</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// Here, &#39;this&#39; refers to the component instance.</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">showOptionsModal</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>既然我们不使用React.createClass方法了，当我们用ES6+的类语法定义组件时，似乎我们就需要在我们想要这些行为时，手动的绑定实例方法：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Manually bind, wherever you need to</span>
+</span><span class='line'><span class="kr">class</span> <span class="nx">PostInfo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+</span><span class='line'>    <span class="c1">// Manually bind this method to the component instance...</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">handleOptionsButtonClick</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">handleOptionsButtonClick</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="nx">handleOptionsButtonClick</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// ...to ensure that &#39;this&#39; refers to the component instance here.</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">showOptionsModal</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>幸运的是，通过结合两个ES6+的特性 - 箭头方法和属性初始化 - 选择性的绑定到组件实例变得轻而易举：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">class</span> <span class="nx">PostInfo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">handleOptionsButtonClick</span> <span class="o">=</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">showOptionsModal</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The body of ES6 arrow functions share the same lexical this as the code that surrounds them, which gets us the desired result because of the way that ES7 property initializers are scoped. Peek under the hood to see why this works.</p>
+
+<h2>动态属性名和模板字符串</h2>
+
+<p>对对象字面量的一个增强是，拥有给一个衍生而来的属性名赋值的能力。以前，我们可能需要像下面这样做来设置state对象：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">Form</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">onChange</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">inputName</span><span class="p">,</span> <span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">stateToSet</span> <span class="o">=</span> <span class="p">{};</span>
+</span><span class='line'>    <span class="nx">stateToSet</span><span class="p">[</span><span class="nx">inputName</span> <span class="o">+</span> <span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">stateToSet</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在，我们可以构建那些属性名由JavaScript表达式在运行时决定的对象。这里，我们用模板字符串来决定将哪个属性设置到state上：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">class</span> <span class="nx">Form</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">onChange</span><span class="p">(</span><span class="nx">inputName</span><span class="p">,</span> <span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+</span><span class='line'>      <span class="p">[</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">inputName</span><span class="p">}</span><span class="nx">Value</span><span class="err">`</span><span class="p">]</span><span class="o">:</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>析构和JSX扩展属性（spread attributes)</h2>
+
+<p>Often when composing components, we might want to pass down most of a parent component&rsquo;s props to a child component, but not all of them. In combining ES6+ destructuring with JSX spread attributes, this becomes possible without ceremony:
+常常当我们组合组件时，我们也许想要将父组件的大部分属性传递到子组件中，但是并不是全部。结合ES6+的destructuring和JSX spread attributes，这变成可能且不太复杂：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">class</span> <span class="nx">AutoloadingPostsGrid</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">className</span><span class="p">,</span>
+</span><span class='line'>      <span class="p">...</span><span class="nx">others</span><span class="p">,</span>  <span class="c1">// contains all properties of this.props except for className</span>
+</span><span class='line'>    <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">className</span><span class="p">}</span><span class="o">&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="nx">PostsGrid</span> <span class="p">{...</span><span class="nx">others</span><span class="p">}</span> <span class="o">/&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleLoadMoreClick</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Load</span> <span class="nx">more</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'>    <span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们可以将JSX扩展属性和正常的属性相结合，利用简单地优先级规则来实现复写和默认值指定。下面这个元素会获得className “override”，即便className属性已经在this.props中定义：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="p">{...</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">}</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="err">…</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个元素会正常的拥有className “base”，除非在this.props中存在一个className属性复写了它：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;base&quot;</span> <span class="p">{...</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">}</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="err">…</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
 </div>
   
   
@@ -230,7 +422,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/11/17/merging-vs-rebasing-translation/">译 Merging vs Rebasing（未完成）</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/12/05/css-modules-or-bem/">鱼和熊掌的故事 - CSS Modules还是BEM</a></h1>
     
     
       <p class="meta">
@@ -239,218 +431,163 @@
 
 
 
-<time class='entry-date' datetime='2015-11-17T21:58:52+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:58 pm</span></time>
+<time class='entry-date' datetime='2015-12-05T11:39:48+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:39 am</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>原文地址：<a href="https://www.atlassian.com/git/tutorials/merging-vs-rebasing">https://www.atlassian.com/git/tutorials/merging-vs-rebasing</a></p>
+  <div class="entry-content"><p>首先还是最基础的两个问题：什么是BEM？什么是CSS Modules？</p>
 
-<p>git rebase命令对于初学git的人就是像是一种巫术，应该远离之，但是实际上如果使用适当，会让你的git生活变得更轻松。在本文中，我将会比较git rebase和相关的git merge命令，鉴别出在git工作流所有使用git rebase的可能性。</p>
+<h2>BEM(Block Element Modifer)</h2>
 
-<h3>基本概念</h3>
+<p><a href="https://en.bem.info/">https://en.bem.info/</a></p>
 
-<p>理解git rebase的第一件事情就是它和git merge是解决相同的问题。两个命令都是设计出来将一个分支上的代码变化和另一个分支上的代码变化进行集成-只是他们的做法不同。</p>
+<p><img src="http://segmentfault.com/img/bVbN4T" alt="Alt text" /></p>
 
-<p>考虑这样的场景，当你开始在专注于在某一个分支上进行一个新的feature（特性）开发时，另外一个团队在master分支上进行了新的提交。这导致一个forked的历史，这对于任何属性Git作为团队合作工作的人都是比较清楚的。</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/01.svg" alt="Alt text" /></p>
-
-<p>现在，假设在master分支上新提交的代码和你正在开发的特性相关。为了将这些新提交的代码吸收/包含（incorporate，在这里就翻译成合并，避免混淆），你有两个选择：merging（合并）和rebasing（复位基底/复基）。</p>
-
-<h3>Merge选项</h3>
-
-<p>最简单的选择是将master分支合并（merge）到正在开发的特性分支上，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
-</span><span class='line'>git merge master
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>或者，你可以将他们压缩成一行：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git merge master feature
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这样就是在特性分支上创建了一个新的“merge commit”，他讲两个分支上的历史绑在了一起，就像下面你看到的分支结构：
-<img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/02.svg" alt="Alt text" /></p>
-
-<p>合并（merge）是很好的，因为他是一个非破坏性的操作。当前存在的分支是无论如何都不会改变的。这样就避免了所有因为rebase导致的坑（pitfall）。</p>
-
-<p>另外一方面，这样意味着，在每次你吸收/包含（incorprate）特性分支会有外部（extraneous）来的合并提交。如果master分支比较活跃，这样机会污染你的特性分支的历史记录。当然也有减轻该问题影响的的高级git log选项，但是他就让其他开发人员很难理解项目的历史。</p>
-
-<h3>Rebase选项</h3>
-
-<p>作为merge的另一种选择，又可以将特性分支rebase到master分支，通过下面的命令：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
-</span><span class='line'>git rebase master
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>他将整个特性分支移动到了master分支的末梢（tip），有效的吸收/包含（incorprate）所有的提交到master分支。但是，和merge不同，rebase通过给原始分支上每一次提交创建全新的提交，从而重写了项目的历史。</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/03.svg" alt="Alt text" /></p>
-
-<p>Rebase的主要好处是你会得到一个更为清晰的项目历史。首先，它消除了所有git merge所需要的不必要的merge提交（merge commit）。其次，正如你在上面那张图中看到的，rebase也产生一个完美的线性项目历史-你可以从特性的末端一路查看到项目的开始而没有任何的fork。这样，使得你更容易使用像git log， git bisect和gitk来浏览项目（原文字面含义：在项目中导航（navigate））。</p>
-
-<p>但是，为了这样淳朴的提交历史，有两点权衡/交易（trade-off，翻译为妥协更合适）：安全性和可追溯性（traceability）。如果你不遵循rebase的黄金准则，重写项目历史可能会给你的合作工作流带来潜在的悲惨结局。还有一点，虽然没有那么重要，rebase会丢失merge commit所提供的上下文-你无法看到上游的代码变化是合适包含（incorprate）到特性分支上的。</p>
-
-<h3>Interactive Rebasing</h3>
-
-<p>Interactive rebasing gives you the opportunity to alter commits as they are moved to the new branch. This is even more powerful than an automated rebase, since it offers complete control over the branch’s commit history. Typically, this is used to clean up a messy history before merging a feature branch into master.</p>
-
-<p>To begin an interactive rebasing session, pass the i option to the git rebase command:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
-</span><span class='line'>git rebase -i master
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This will open a text editor listing all of the commits that are about to be moved:</p>
+<p>BEM的意思就是块（block）、元素（element）、修饰符（modifier），是由Yandex团队提出的一种<strong>前端命名方法论</strong>。这种巧妙的命名方法让你的CSS类对其他开发者来说更加透明而且更有意义。BEM命名约定更加严格，而且包含更多的信息，它们用于一个团队开发一个耗时的大项目。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pick 33d5b7a Message <span class="k">for</span> commit <span class="c">#1</span>
-</span><span class='line'>pick 9480b3d Message <span class="k">for</span> commit <span class="c">#2</span>
-</span><span class='line'>pick 5c67e61 Message <span class="k">for</span> commit <span class="c">#3</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.block</span><span class="p">{}</span>
+</span><span class='line'><span class="nc">.block__element</span><span class="p">{}</span>
+</span><span class='line'><span class="nc">.block--modifier</span><span class="p">{}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This listing defines exactly what the branch will look like after the rebase is performed. By changing the pick command and/or re-ordering the entries, you can make the branch’s history look like whatever you want. For example, if the 2nd commit fixes a small problem in the 1st commit, you can condense them into a single commit with the fixup command:</p>
+<p>.block 代表了更高级别的抽象或组件。 <br/>
+.block__element 代表.block的后代，用于形成一个完整的.block的整体。 <br/>
+.block&ndash;modifier代表.block的不同状态或不同版本。  <br/>
+.block__element&ndash;modifier代表.element的不同状态或不同版本。</p>
+
+<p>我们用一个搜索栏为例子：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pick 33d5b7a Message <span class="k">for</span> commit <span class="c">#1</span>
-</span><span class='line'>fixup 9480b3d Message <span class="k">for</span> commit <span class="c">#2</span>
-</span><span class='line'>pick 5c67e61 Message <span class="k">for</span> commit <span class="c">#3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;form</span> <span class="na">class=</span><span class="s">&quot;site-search full&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">class=</span><span class="s">&quot;field&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;Submit&quot;</span> <span class="na">value =</span><span class="s">&quot;Search&quot;</span> <span class="na">class=</span><span class="s">&quot;button&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="nt">&lt;/form&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>When you save and close the file, Git will perform the rebase according to your instructions, resulting in project history that looks like the following:</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/04.svg" alt="Alt text" /></p>
-
-<p>Eliminating insignificant commits like this makes your feature’s history much easier to understand. This is something that git merge simply cannot do.</p>
-
-<p>Rebase的黄金准则</p>
-
-<p>一旦你理解了什么是rebase，最重要的就是学会合适不要用它。git rebase的黄金准则就是不要在公共的分支上使用。</p>
-
-<p>比如，想象一下如果你将master分支rebase到特性分支：</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/05.svg" alt="Alt text" /></p>
-
-<p>这个rebase会将所有在master上的提交移动到feature分支的末端。问题是这还只是在你自己的仓库中发生了。所有其他的开发人员仍然工作在原来的master分支上。因为rebase导致了新的提交，Git会认为你的master分支的历史和其他人的偏离。</p>
-
-<p>唯一同步两个master分支的办法就是将他们合并（merge）回去，导致一个额外的合并提交（merge commit），和两个一系列的提交的，这两个一系列提交的代码改变是相同的（一个是原始master分支上的，一个是你rebased的分支上的）。不用说，这是非常让人困惑的情况。</p>
-
-<p>所以，在你开始做rebase的时候，永远问你自己一下，“是否有人也在用这个分支”，如果回答是，那么把你手移开键盘，开始思考一种非破坏性的方式来做改变(e.g., the git revert command，这个位置没搞懂)。</p>
-
-<p>否则，你就可以安全的重写历史。</p>
-
-<p>Force-Pushing</p>
-
-<p>如果你想要rebased过的master分支push到远程服务器，Git就会阻止你这么做，因为他和远程的master分支是冲突的。但是，你可以强制push，通过 &ndash;force标志，比如：</p>
+<p>上面的这个CSS类名真是太不精确了，比如field，并不能告诉我们足够的信息。尽管我们可以用它们来完成工作，但它们确实非常含糊不清。用BEM记号法就会是下面这个样子：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Be very careful with this command!</span>
-</span><span class='line'>git push --force
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;form</span> <span class="na">class=</span><span class="s">&quot;site-search site-search--full&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">class=</span><span class="s">&quot;site-search__field&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;Submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Search&quot;</span> <span class="na">class=</span><span class="s">&quot;site-search__button&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="nt">&lt;/form&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这样会重写远程master的分支来匹配在你仓库rebased过得master分支，这会让团队中的其他成员非常困惑。所以，只有当你非常清楚你要做什么的时候，你才可以非常小心的使用。</p>
+<p>我们能清晰地看到有个叫.site-search的块，它的内部是一个叫.site-search__field的元素。并且.site-search还有另外一种形态叫.site-search&ndash;full。如果搜索栏还有验证，那么它还有一个error状态，可以用site-search__field&ndash;error。</p>
 
-<p>一种情况下，你应该使用force-pushing，就是在你push一个私有特性分支到远程仓库后，你执行一个本地清理。这就是像是在说“哎呀，我不是真的想要push特性分支的原始版本。就用当前这一个吧”，而且，很重要的是，没有其他人在原来的特性分支上工作。</p>
+<p>虽然上面是个简单地例子，但相信你已经可以看到BEM带来的好处是命名独立，有意义，且可以清晰的表示模块结构。</p>
 
-<h2>工作流指导</h2>
+<p>BEM（或BEM的变体）是一个非常有用，强大，简单的命名约定，以至于让你的前端代码更容易阅读和理解，更容易协作，更容易控制，更加健壮和明确而且更加严密。</p>
 
-<p>Rebase可以根据你的团队或多或少的包含到现有的Git工作流中。在本节，我们将看看rebase在一个特性开发的不同阶段所提供的好处。</p>
+<h2>CSS Modules</h2>
 
-<p>在任何工作流中启用git rebase的第一步就是为每一个特性创建单独的分支。这将提供你必备的分支结构来安全的使用rebase：</p>
+<p>在React中，我们以Web Component的方式实现应用。组件（Component）的概念中有一个很重要特性：完整和自包含，而对于一个完整的Web Component，包含HTML，JAVASCRIPT和CSS。</p>
 
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/06.svg" alt="Alt text" /></p>
+<p>React通过JSX实现了在JavaScript中写HTML，但是还缺少一个重要的元素：CSS。</p>
 
-<h2>清理本地</h2>
+<p>在2014年11月的NationJS上Christopher Chedeau谈到了“CSS in JS”的话题。给许多人带了思想上的一个冲击，也让React实现完整Web Component带来的曙光。</p>
 
-<p>将rebase包含到工作流中最好的办法之一就是清理本地，同步特性。通过周期性的执行一个interactive（交互性的）rebase，你可以保证在你的特性开发中的每次提交都是专注和有意义的（focused and meaningful）。这就让你在写你的代码的时候，不用担心变成被独立的提交 - 你可以在这样的事情发生之后，修好它。</p>
+<p>现在，已经有了三种最新的，最明智和最可行的实现React样式的方式。</p>
 
-<p>当调用git rebase，对于新的base，你有两个选项：特性的父分支（比如：父分支），或者是特性分支的更早提交。我们在之前的Interactive Rebasing部分看到了第一种选项的例子。当你仅仅需要修复上几次提交的时候，第二个选项也是不错的选择。比如，下面的命令进行了一个只有最后三次提交提交的interactive rebase。</p>
+<p>React Style： <a href="https://github.com/js-next/react-style">https://github.com/js-next/react-style</a>   <br/>
+JSX Style： <a href="https://github.com/petehunt/jsxstyle">https://github.com/petehunt/jsxstyle</a>   <br/>
+Radium： <a href="https://github.com/FormidableLabs/radium">https://github.com/FormidableLabs/radium</a></p>
+
+<h4>一般情况下，如果项目中有大量的CSS，会出现什么问题？如图</h4>
+
+<p><img src="http://glenmaddern.com/assets/images/7_problems_css.jpg" alt="Alt text" /></p>
+
+<p>Christopher指出，如果你将样式都挪到JavaScript中，这些问题都有很好地解决方案，这点说的没错，但是会引入复杂度，以及不太习惯的CSS使用方式。CSS Modules团队觉得可以让CSS还是保持以前的样子，但是构建时，以style-in-JS的方式实现。</p>
+
+<p>CSS Modules的项目地址： <a href="https://github.com/css-modules/css-modules">https://github.com/css-modules/css-modules</a></p>
+
+<h3>默认就是局部命名空间</h3>
+
+<p>在CSS Modules中每个文件都是独立编译，你可以使用更为简单地类命名方式，而不用担心它会污染全局。</p>
+
+<p>我们以不同状态的Button为例，在没有CSS Modules的情况下，你可能会以Suit/BEM的方式来写CSS。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
-</span><span class='line'>git rebase -i HEAD~3
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="c">/* components/submit-button.css \*/</span>
+</span><span class='line'><span class="nc">.Button</span> <span class="p">{</span> <span class="c">/* all styles for Normal \*/</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.Button--disabled</span> <span class="p">{</span> <span class="c">/* overrides for Disabled \*/</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.Button--error</span> <span class="p">{</span> <span class="c">/* overrides for Error \*/</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.Button--in-progress</span> <span class="p">{</span> <span class="c">/* overrides for In Progress \*/</span><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>通过指定HEAD~3新的base，你并没有真的移动你的分支，交互性的重写了跟在它后面三次提交。注意这并不会将上游的改变包含到特性分支。</p>
 
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/07.svg" alt="Alt text" /></p>
-
-<p>如果你想要用这种方法重写整个特性，git merge-base命令可以用来找到特性分支原来的base。下面的命令将返回原来base的提交ID，你可以将它传递给git rebase：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git merge-base feature master
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;Button Button--in-progress&quot;</span><span class="nt">&gt;</span>Processing...<span class="nt">&lt;/button&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>interactive rebasing是向你的工作流中引入git rebase的最好方法。其他开发人员能够看到的，只有你的完成的产品，这样可以有非常干净，容易理解的特性分支历史。</p>
+<p>使用CSS Modules的方式，你就可以用下面这种方式来写：</p>
 
-<p>但是，还是要说，这仅仅能够用在私有的特性分支上。如果你和其他开发人员工作在同一个特性分支上，那么这个分支就是共有的，那么你就不允许重写它的历史。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="c">/* components/submit-button.css \*/</span>
+</span><span class='line'><span class="nc">.normal</span> <span class="p">{</span> <span class="c">/* all styles for Normal \*/</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.disabled</span> <span class="p">{</span> <span class="c">/* all styles for Disabled \*/</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.error</span> <span class="p">{</span> <span class="c">/* all styles for Error \*/</span> <span class="p">}</span>
+</span><span class='line'><span class="nc">.inProgress</span> <span class="p">{</span> <span class="c">/* all styles for In Progress \*/</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>没有任何git合并方式来清除带有interactive rebase的本地提交。</p>
 
-<h3>Incorporating Upstream Changes Into a Feature</h3>
+<p>你应该发现，class的前缀button没有了，为什么？因为这个css文件的名字已经叫做submit-button.css，CSS Modules已经知道它的前缀，不需要再次定义了。</p>
 
-<p>In the Conceptual Overview section, we saw how a feature branch can incorporate upstream changes from master using either git merge or git rebase. Merging is a safe option that preserves the entire history of your repository, while rebasing creates a linear history by moving your feature branch onto the tip of master.</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/* components/submit-button.js \*/</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./submit-button.css&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nx">buttonElem</span><span class="p">.</span><span class="nx">outerHTML</span> <span class="o">=</span> <span class="err">`</span><span class="o">&lt;</span><span class="nx">button</span> <span class="kr">class</span><span class="o">=</span><span class="nx">$</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">normal</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Submit</span><span class="o">&lt;</span><span class="err">/button&gt;`</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>This use of git rebase is similar to a local cleanup (and can be performed simultaneously), but in the process it incorporates those upstream commits from master.</p>
 
-<p>Keep in mind that it’s perfectly legal to rebase onto a remote branch instead of master. This can happen when collaborating on the same feature with another developer and you need to incorporate their changes into your repository.</p>
+<p>以JavaScript的方式使用CSS。</p>
 
-<p>For example, if you and another developer named John added commits to the feature branch, your repository might look like the following after fetching the remote feature branch from John’s repository:</p>
+<p>然后，你再看看生成的最终页面的样子：</p>
 
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/08.svg" alt="Alt text" /></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;components_submit_button__normal__abc5436&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  Processing...
+</span><span class='line'><span class="nt">&lt;/button&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>You can resolve this fork the exact same way as you integrate upstream changes from master: either merge your local feature with john/feature, or rebase your local feature onto the tip of john/feature.</p>
 
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/09.svg" alt="Alt text" /></p>
+<p>最终生成的class的名字是Component Name + Class Name + Base64，保证了层次结构和唯一性。</p>
 
-<p>Note that this rebase doesn’t violate the Golden Rule of Rebasing because only your local feature commits are being moved—everything before that is untouched. This is like saying, “add my changes to what John has already done.” In most circumstances, this is more intuitive than synchronizing with the remote branch via a merge commit.</p>
+<h2>鱼和熊掌的问题</h2>
 
-<p>By default, the git pull command performs a merge, but you can force it to integrate the remote branch with a rebase by passing it the &ndash;rebase option.</p>
+<p>对比一下BEM和CSS Modules，它们最终的目的都是给你带来独立，唯一和有意义的类命名。CSS Modules允许你以变量的方式将class获取并使用到元素上，并且省略了类名中Component Name前缀（也就是BEM中的B）。</p>
 
-<h3>Reviewing a Feature With a Pull Request</h3>
-
-<p>If you use pull requests as part of your code review process, you need to avoid using git rebase after creating the pull request. As soon as you make the pull request, other developers will be looking at your commits, which means that it’s a public branch. Re-writing its history will make it impossible for Git and your teammates to track any follow-up commits added to the feature.</p>
-
-<p>Any changes from other developers need to be incorporated with git merge instead of git rebase.</p>
-
-<p>For this reason, it’s usually a good idea to clean up your code with an interactive rebase before submitting your pull request.</p>
-
-<h3>Integrating an Approved Feature</h3>
-
-<p>After a feature has been approved by your team, you have the option of rebasing the feature onto the tip of the master branch before using git merge to integrate the feature into the main code base.</p>
-
-<p>This is a similar situation to incorporating upstream changes into a feature branch, but since you’re not allowed to re-write commits in the master branch, you have to eventually use git merge to integrate the feature. However, by performing a rebase before the merge, you’re assured that the merge will be fast-forwarded, resulting in a perfectly linear history. This also gives you the chance to squash any follow-up commits added during a pull request.</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/10.svg" alt="Alt text" /></p>
-
-<p>If you’re not entirely comfortable with git rebase, you can always perform the rebase in a temporary branch. That way, if you accidentally mess up your feature’s history, you can check out the original branch and try again. For example:</p>
+<p>在React中，Component一般会由多个元素组成（除了像Button这样比较简单地组件），就以上面的搜索框为例，在React中以CSS Modules的方式写，就有可能如下：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -458,20 +595,226 @@
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
-</span><span class='line'>git checkout -b temporary-branch
-</span><span class='line'>git rebase -i master
-</span><span class='line'><span class="c"># [Clean up the history]</span>
-</span><span class='line'>git checkout master
-</span><span class='line'>git merge temporary-branch
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./site-search.css&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="c1">//省略React代码</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">full</span><span class="p">}</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">field</span><span class="p">}</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">value</span> <span class="o">=</span><span class="s2">&quot;Search&quot;</span> <span class="kr">class</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">button</span><span class="p">}</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/form&gt;  </span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>Summary</h3>
+<p>对比一下BEM方式</p>
 
-<p>And that’s all you really need to know to start rebasing your branches. If you would prefer a clean, linear history free of unnecessary merge commits, you should reach for git rebase instead of git merge when integrating changes from another branch.</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">from</span> <span class="s1">&#39;./site-search-bem.css&#39;</span><span class="p">;</span><span class="c1">//以BEM方式写的样式表</span>
+</span><span class='line'><span class="c1">//省略React代码</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;site-search site-search--full&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;site-search__field&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Search&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;site-search__button&quot;</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/form&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>On the other hand, if you want to preserve the complete history of your project and avoid the risk of re-writing public commits, you can stick with git merge. Either option is perfectly valid, but at least now you have the option of leveraging the benefits of git rebase.</p>
+
+<p>CSS Modules好像挺完美的，变量的方式传递class，在JavaScript的语境下似乎更有道理，但从本质上来说，与BEM相比，也就只是省略了Block这一个前缀，在这个看似好像很不错的方案下，有没有存在的问题？</p>
+
+<h2>问题</h2>
+
+<h4>测试</h4>
+
+<p>在React的环境下，会使用Jest框架对组件进行测试，import styles from &lsquo;./site-search.css&rsquo;;这一个语句，并不是JavaScript的标准，只是CSS Modules的实现者，帮助你进行了编译，但Jest并不会编译。</p>
+
+<p>所以这个时候，我们会在Jest的PreProcessor中处理这句话，这样才不会有语法解析错误。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">babel</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./babel-jest&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">process</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="nx">filename</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="sr">/\.(css|scss)$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">filename</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">babel</span><span class="p">.</span><span class="nx">process</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="nx">filename</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>但与此同时，styles会变成空对象，由于我们使用了变量的方式，在测试中，并不能测试className的改变（因为state改变，去改变className）。相反，BEM因为是纯粹的字符串，所以它使可测试的。</p>
+
+<h2>在React中引入classnames模块</h2>
+
+<p>我们知道，在React中，通过state的改变来决定组件的样式变化，在没有外部力量帮助的情况下，你的代码就会如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/* components/submit-button.jsx \*/</span>
+</span><span class='line'><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./submit-button.css&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">SubmitButton</span> <span class="kr">extends</span> <span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">let</span> <span class="nx">className</span><span class="p">,</span> <span class="nx">text</span> <span class="o">=</span> <span class="s2">&quot;Submit&quot;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">submissionInProgress</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">inProgress</span>
+</span><span class='line'>      <span class="nx">text</span> <span class="o">=</span> <span class="s2">&quot;Processing...&quot;</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">errorOccurred</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">error</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">form</span><span class="p">.</span><span class="nx">valid</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">disabled</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">normal</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">className</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">text</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个时候，可以引入classnames模块，例子来自classnames样例：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;classnames&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Button</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="c1">// ...</span>
+</span><span class='line'>  <span class="nx">render</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">btnClass</span> <span class="o">=</span> <span class="nx">classNames</span><span class="p">({</span>
+</span><span class='line'>      <span class="s1">&#39;btn&#39;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;btn-pressed&#39;</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;btn-over&#39;</span><span class="o">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isHovered</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">btnClass</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">label</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/button&gt;;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>问题是，classNames中传入的JavaScript对象，不可以用styles.normal作为key，如果要在CSS Modules的环境下，使用classnames，你需要像下面这样写：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./site-search.css&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;classnames&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Button</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="c1">// ...</span>
+</span><span class='line'>  <span class="nx">render</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">btnClass</span> <span class="o">=</span> <span class="nx">classNames</span><span class="p">({</span>
+</span><span class='line'>      <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;btn&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>      <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;btn-pressed&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span><span class="p">,</span>
+</span><span class='line'>      <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;btn-over&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isHovered</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">btnClass</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">label</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/button&gt;;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果你不使用classnames，在使用CSS Modules也是可以用styles[&lsquo;normal&rsquo;]来代替styles.normal。</p>
+
+<h2>无意中的发现，结合CSS Modules和BEM方式</h2>
+
+<p>通过用styles[&lsquo;normal&rsquo;]来代替styles.normal，在定义CSS的类名时，你依旧可以使用你习惯的CSS类命名方式，比如：BEM。上面的搜索框的例子，就可以写成：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./site-search.css&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">classNames</span> <span class="nx">from</span> <span class="s1">&#39;classnames&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="c1">//省略React代码</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">fieldClass</span> <span class="o">=</span> <span class="nx">classNames</span><span class="p">({</span>
+</span><span class='line'>  <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;field&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isError</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;field__error&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isError</span><span class="p">,</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">[</span><span class="nx">full</span><span class="p">]}</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">fieldClass</span><span class="p">}</span><span class="o">&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Search&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;submit&#39;</span><span class="p">]}</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/form&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这种方式，既保证了CSS Modules的使用，也保留了BEM通过三种基本元素来描述组件样式的方式。</p>
+
+<h2>总结</h2>
+
+<p>对比两种实现方式，从本质上来讲，并没有区别，否则它们也不可能结合在一起，但是CSS Modules带来的致命伤害是作为一个变量，并不能直接测试（想要测试，可以让Jest的路径指向已经编译过的JavaScript路径）。而纯粹的BEM因为是字符串可以很好地和classnames结合使用，也可以进行测试，所以在选择上占据了很大的优势。</p>
+
+<p>参考资料：  <br/>
+1.<a href="http://glenmaddern.com/articles/css-modules">http://glenmaddern.com/articles/css-modules</a>  <br/>
+2.<a href="http://segmentfault.com/a/1190000000391762">http://segmentfault.com/a/1190000000391762</a>  <br/>
+3.<a href="https://github.com/css-modules/css-modules">https://github.com/css-modules/css-modules</a>  <br/>
+4.<a href="https://www.npmjs.com/package/classnames">https://www.npmjs.com/package/classnames</a></p>
 </div>
   
   
@@ -508,6 +851,14 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/08/21/css-for-software-engineers-for-css-developers/">CSS和软件工程中的设计原则</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/07/12/svg-and-icon-font/">SVG和IconFont</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/07/02/bash-profile-and-bashrc/">.bash_profile和.bashrc</a>
       </li>
     
@@ -517,14 +868,6 @@
     
       <li class="post">
         <a href="/blog/2016/06/13/I-want-to-talk-about-https-too/">我也想来谈谈HTTPS</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/29/nginx-lets-encrypt/">全民安全站Let&#8217;s Encrypt配置NGINX</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/22/nginx-serve-static/">用Nginx服务静态文件</a>
       </li>
     
   </ul>
