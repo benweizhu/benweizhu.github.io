@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://benweizhu.github.io/blog/2016/08/27/legulegu-ui/</loc>
+<lastmod>2016-08-27T17:20:06+08:00</lastmod>
+</url>
+<url>
 <loc>http://benweizhu.github.io/blog/2016/08/21/css-for-software-engineers-for-css-developers/</loc>
 <lastmod>2016-08-21T18:10:13+08:00</lastmod>
 </url>
@@ -402,5 +406,8 @@
 </url>
 <url>
 <loc>http://benweizhu.github.io/blog/categories/gradleshen-ru-yu-shi-zhan/</loc>
+</url>
+<url>
+<loc>http://benweizhu.github.io/blog/categories/chuang-ye-wei-jian/</loc>
 </url>
 </urlset>

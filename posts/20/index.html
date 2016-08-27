@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="什么是资源？什么是表述？ 就本质而言，任何足够重要并被引用的事物都可以是资源。如果你的用户“想要建立指向它的超文本链接，指出或者反对关于它的断言，获取或者缓存它的表述，共另外的表述引用它的全部或者部分，给它增加注释信息，或者对它执行某些操作”，（源自《万维网的架构》），你都应该将它定义为资源。 &hellip;">
+  <meta name="description" content="常用的重要选择器规则： element,element div,p 选择所有 div 元素和所有 p 元素。 element element div p 后代选择器：选择 div 元素内部的所有 p 元素。 element>element div>p 子选择器：选择父元素为 div 元素的所有 p &hellip;&#8221;>
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,126 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/08/01/css-selector-basic/">CSS后代选择器以及选择器特殊性</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-08-01T17:46:56+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>5:46 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>常用的重要选择器规则：</h3>
+
+<p>element,element div,p   选择所有 div 元素和所有 p 元素。  <br/>
+element element div p   后代选择器：选择 div 元素内部的所有 p 元素。 <br/>
+element>element div>p   子选择器：选择父元素为 div 元素的所有 p 元素。  <br/>
+element+element div+p   第一个子元素选择器：选择紧接在 div 元素之后的所有 p 元素。</p>
+
+<h3>后代选择器</h3>
+
+<p>后代选择器（descendant selector）又称为包含选择器。后代选择器可以选择作为某元素后代的元素。</p>
+
+<p>我们可以定义后代选择器来创建一些规则，使这些规则在某些文档结构中起作用，而在另外一些结构中不起作用。
+举例来说，如果你希望只对 h1 元素中的 em 元素应用样式，可以这样写：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">h1</span> <span class="nt">em</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span><span class="nb">red</span><span class="p">;}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面这个规则会把作为 h1 元素后代的 em 元素的文本变为 红色。其他 em 文本（如段落或块引用中的 em）则不会被这个规则选中：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;h1&gt;</span>This is a <span class="nt">&lt;em&gt;</span>important<span class="nt">&lt;/em&gt;</span> heading<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>This is a <span class="nt">&lt;em&gt;</span>important<span class="nt">&lt;/em&gt;</span> paragraph.<span class="nt">&lt;/p&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在后代选择器中，规则左边的选择器一端包括两个或多个用空格分隔的选择器。选择器之间的空格是一种结合符（combinator）。每个空格结合符可以解释为“&hellip; 在 &hellip; 找到”、“&hellip; 作为 &hellip; 的一部分”、“&hellip; 作为 &hellip; 的后代”，但是要求必须从右向左读选择器。
+因此，h1 em 选择器可以解释为 “作为 h1 元素后代的任何 em 元素”。如果要从左向右读选择器，可以换成以下说法：“包含 em 的所有 h1 会把以下样式应用到该 em”。</p>
+
+<p>关于后代选择器有一个常被忽略的方面，即两个元素之间的层次间隔可以是无限的。例如，如果写作ul em，这个语法就会选择从u1元素继承的所有em元素，而无论em的嵌套层次有多深。</p>
+
+<h3>子选择器</h3>
+
+<p>某些情况下，可能并不想选择一个任意的后代元素，而是希望缩小范围，只选择另一个元素的子元素（不是所有后代元素）。可以使用子结合符，即大于号(>)</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">h1</span> <span class="o">&gt;</span> <span class="nt">strong</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>特殊性</h3>
+
+<p>如果有多个选择器都满足同一个元素，即冲突了，怎么知道哪一个规则更强？</p>
+
+<p>答案在于每个选择器的特殊性。对于每个规则，用户代理会计算选择器的特殊性，并将这个特殊性附加在规则中的各个声明。如果一个元素有两个或者多个冲突的属性声明，那么有最高特殊性的声明就会胜出。</p>
+
+<p>选择器的特殊性由选择器本身的组件确定。特殊性表述为4个部分，0,0,0,0</p>
+
+<p>1.对于选择器中给定的各个ID属性，加 0,1,0,0
+2.对于选择器中给定的各个类元素，属性选择器或伪类，加 0,0,1,0
+3.对于选择器中给定的各个元素和伪元素，加0,0,0,1
+4.结合符和通配选择器对特殊性没有任何贡献</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">h1</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">1</span>
+</span><span class='line'><span class="nt">p</span> <span class="nt">em</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">purple</span><span class="p">;}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">2</span>
+</span><span class='line'><span class="nc">.grape</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">purple</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">0</span>
+</span><span class='line'><span class="o">*</span><span class="nc">.bright</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">yellow</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">0</span>
+</span><span class='line'><span class="nt">p</span><span class="nc">.bright</span> <span class="nt">em</span><span class="nc">.dark</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">maroon</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">2</span><span class="o">,</span><span class="nt">2</span>
+</span><span class='line'><span class="nt">div</span><span class="nf">#sidebar</span> <span class="o">*[</span><span class="nt">href</span><span class="o">]</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">silver</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>第五条规则强于第二条</p>
+
+<p>0011 > 0001
+0101 > 0017</p>
+
+<p>内联样式的特殊性
+我们已经见过以0开头的特殊性，所以你可能会奇怪为什么会有这些特殊性。一般地，第一个0是为内联样式声明保留的，它比所有其他声明的特殊性都高，内联样式的特殊性是1,0,0,0</p>
+
+<h3>!important 重要性规则</h3>
+
+<p>有时某个声明可能非常重要，超过了所有其他声明。CSS2.1称之为重要声明，并允许在这些声明的结束分号之前插入!important来标识。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">p</span><span class="nc">.dark</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="m">#333</span> <span class="cp">!important</span><span class="p">;</span> <span class="k">background</span><span class="o">:</span> <span class="nb">white</span><span class="p">;}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>必须正确地放置!important，否则声明将无效，它应该总是放在声明的最后，即分号之前。如果一个属性的值包含多个关键字，则必须放在最后一个关键词的后面，比如font：sss,sss !important;</p>
+
+<p>标志位!important的声明并没有特殊的特殊性值，不过要与非重要声明分开考虑。实际上，所有!important声明会分组在一起，重要声明的特殊性冲突会在重要声明内部解决，而不会与非重要声明相混肴。类似的，非重要声明也归为一组，使用特殊性来解决冲突。如果一个重要声明和一个非重要声明冲突，胜出的总是重要声明。</p>
+
+<p>1.《css权威指南》</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -159,90 +279,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/07/13/linux-you-dont-understand-all-these-years/">《Linux就是这个范儿》读书笔记（一） - 理解Linux用户和用户组</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-07-13T17:03:21+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>5:03 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>理解什么是多用户多任务分时操作系统</h3>
-
-<p>“将大型电脑的珍贵时间资源适当的分配到所有使用者身上，让所有使用者都有独占整部机器的感觉，这是当时计算机先驱提出的分时系统的概念。依据这个想法，通用电气、麻省理工学院和贝尔实验室联手启动Multics项目，这是在当时看着最靠谱的分时系统概念。但是由于太“靠谱”了（真正的多用户多任务分时操作系统），在当时的技术条件下去完成它实在是吃力，所以最终的命运很悲惨。但是有两个游戏爱好者，Multics的成员Ken和Dennis为了能够有电脑玩游戏，决定自己给一台闲置的电脑写个操作系统，于是 — 一个实用的多用户多任务分时操作系统就诞生了。” &mdash;-《Linux就是这个范》</p>
-
-<p>我们所熟知的Windows、Linux、Mac OS X等都是多用户多任务分时操作系统。最显著的特点就是可以让多个人使用同一台电脑而不能互相窥探对方的秘密（多用户）。当你使用电脑时，可以边放音乐，边聊QQ，边浏览网页（多任务）。分时就像之前的定义那样，将电脑的时间资源适当的分配给所有的使用者身上，如果将使用者抽象，它不仅仅代表“人”，可以代表任何使用电脑时间资源的任务，在这样的理解下，分时就成为了多用户和多任务的基础。</p>
-
-<h3>澡堂文化 - 多用户</h3>
-
-<p>Linux中的用户管理是管理用户的等级和对文件的访问权限。</p>
-
-<p>用户等级只有两个root和非root用户。root用户拥有至高无上的权利，用户名就是root，相当于Windows中的Administrator，但幸运的是root用户只有一个。root用户通过文件严格控制着非root用户的访问权限。</p>
-
-<p>在《Linux就是这个范》这本书中，作者将这种管理方式形象的描述为“澡堂子模型”。root用户就是澡堂子的服务生，每个来澡堂子的人，服务生都会给分配一个号码牌，就像root用户给非root用户分配账号。每个号码牌上都有一个钥匙，可以打开对应的柜子。</p>
-
-<p>而每个非root用户一般会拥有自己的文件目录（某些不会，它们可能是执行特殊任务的用户，不需要自己的文件目录），目录路径一般是/home/[username]，这就是，每个非root用户的目录就对应着每个来澡堂中的柜子。</p>
-
-<h3>用户权限（不同的职业）</h3>
-
-<p>在使用Linux的时候，经常会遇到无法对文件读写，或者执行，因为当前登录账号的权限不够。因此，会给予一种错觉，那就是账号分为不同的权限级别，另一个账号可以访问，因为它比当前登录账号权限更高。</p>
-
-<p>但这其实是一种错误的理解，前面已经提到，Linux中用户等级只有两个，root和非root，除了root用户拥有至高无上的权利外，其他用户都是一样的渣渣。</p>
-
-<p>导致这种错觉的原因，是因为还有一个用户组的概念（职业）。</p>
-
-<p>一个用户可以属于多个用户组，就像一个人可以身兼多职一样。由于用户组能够在更高的层面来抽象用户所能够访问文件的数量，因此结合不同的用户组，就能给每个用户构建出独一无二的文件访问列表。</p>
-
-<h3>用户和用户组管理</h3>
-
-<p>用户和用户组信息分别存放在etc/passwd和etc/group中，Linux系统为用户和用户组文件的CRUD操作提供了一些基本命令，这些命令的作用就是对etc/passwd和etc/group两个文件的文件内容进行增删改，然后，外加一个etc/shadow文件来管理密码，就实现了对用户和用户组的管理。</p>
-
-<p>关于什么样的命令来管理用户和用户组，这里不做更多介绍，可以参考其他资料。</p>
-
-<h3>神秘的sudo-假借身份</h3>
-
-<p>安装软件是使用Linux操作系统最常见的操作。但Linux中的用户除了root就是普通用户，而普通用户的权限非常低，就连向系统中安装软件的权利都没有。很多时候系统管理员为了能够让普通用户具备一点root的特权，就赋给普通用户一个称为sudo的特权。</p>
-
-<p>普通用户一旦拥有sudo的特权，几乎就可以胡作非为，但需要付出一点代价，需要在将要执行的命令前加上sudo作为前缀，同时被系统提示输入当前用户的密码。这样做的好处是防止不怀好意的进行不安全的操作。因为你不是root用户，所以如果有恶意软件要使用sudo进行操作，此时就会被需要输入密码，这种无缘无故需要输入密码的行为一定会被你发现。</p>
-
-<p>不同的Linux发行版本，可能一般的非root用户不会立即拥有sudo特权。所以这时就需要自己去给某个用户赋予sudo特权，方法是修改/etc/sudoers这个文件。至于文件里的内容长什么样，这里也不过多介绍，可以参考其他资料。</p>
-
-<h3>每次都要sudo，好麻烦，干脆su</h3>
-
-<p>要使用sudo特权，必须每次在命令前加上sudo，这样对管理Linux系统不太方便。su命令可以临时切换用户，默认是切换到root用户。</p>
-
-<p>切换用户需要输入目标用户的密码，切换到root用户就需要root用户的密码。</p>
-
-<h3>我是谁和我到底是谁</h3>
-
-<p>要知道当前用户是谁，有三条命令可以用，whoami，who am i和who。第一个命令和后两条命令有本质区别，这里要引入实际用户（UID）和有效用户（EUID）的概念。</p>
-
-<p>实际用户就是指用户登录时所使用的用户，整个登录会话中，实际用户不会改变；有效用户是指当前执行操作的用户，该用户可以通过su切换，决定了权限的高低。</p>
-
-<p>whoami查看的是有效用户，而who和who am i可以查看实际用户。</p>
-
-<p>参考资料：  <br/>
-1.Linux就是这个范儿</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/21">&larr; Older</a>
@@ -272,6 +308,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/08/27/legulegu-ui/">乐咕乐股网 - 新版UI上线</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/08/21/css-for-software-engineers-for-css-developers/">CSS和软件工程中的设计原则</a>
       </li>
     
@@ -285,10 +325,6 @@
     
       <li class="post">
         <a href="/blog/2016/06/27/host-jenkins-on-aws/">在AWS上部署Jenkins</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/06/13/I-want-to-talk-about-https-too/">我也想来谈谈HTTPS</a>
       </li>
     
   </ul>
