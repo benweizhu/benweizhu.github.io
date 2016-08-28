@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="没想到第一篇关于创业的博客居然是写在几乎开始创业的一年之后，这篇博客确实滞后了好久，主要原因还是感觉没有一个找到一个合适的里程碑，直到现在。 先睹为快，我们来看下旧版和新版的差别吧！！！ 老版本 新版本 UI变化 是否感觉从一个“XX门户网站”转变成“一个关注用户体验的互联网产品”，通俗点， &hellip;">
+  <meta name="description" content="原视频： https://vimeo.com/177216958 PPT如下： 作者提到CSS开发过程的很多原则： • DRY/Single Source of Truth • The Single Responsibility Principle • The Separation of &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,105 +70,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/08/27/legulegu-ui/">【创业维艰】写在乐咕乐股网-新版UI上线之后</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-08-27T17:20:06+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>5:20 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>没想到第一篇关于创业的博客居然是写在几乎开始创业的一年之后，这篇博客确实滞后了好久，主要原因还是感觉没有一个找到一个合适的里程碑，直到现在。</p>
-
-<p>先睹为快，我们来看下旧版和新版的差别吧！！！</p>
-
-<p>老版本</p>
-
-<p><img src="/images/chuangye/legu_old_ui.jpg" width="600" title="乐咕乐股网旧版UI" alt="Alt text" /></p>
-
-<p>新版本</p>
-
-<p><img src="/images/chuangye/legu_new_ui.jpg" width="600" title="乐咕乐股网旧版UI" alt="Alt text" /></p>
-
-<p><img src="/images/chuangye/legu_course.jpg" width="600" title="乐咕乐股网旧版UI" alt="Alt text" /></p>
-
-<h2>UI变化</h2>
-
-<p>是否感觉从一个“<strong>XX门户网站</strong>”转变成“<strong>一个关注用户体验的互联网产品</strong>”，通俗点，是否看着更加高大上了？</p>
-
-<p>这一次的UI改版没有任何的UX参与，完全由两个全栈（全干）工程师自己设计完成。</p>
-
-<p>开始设计页面之初，我们需要定位我们的产品，我们的目标，我们的用户。我们的设计就不是仅仅是由“好看”来驱动，更重要的是业务和产品定位来驱动。</p>
-
-<h2>设想（设项）之初</h2>
-
-<p>Ason提出了一个关于股票信息（泛指各种信息）自动发布的想法。想通过自动化和微博来做一些自动的消息推送和营销。</p>
-
-<p>而此时，我和Ason在各自的领域都已经有了一定的经验，能够独当一面的去完成对应的内容，我们都感觉是时候去做一些有意义的事情，自己的产品，可以帮助和影响别人。</p>
-
-<p>刚开始我们给这个项目取了一个超级牛逼的名字：a_shares_predictor。算法和数据都已经开始着手，并且已经完成一部分。</p>
-
-<p>但在项目前期spike阶段，我们发现和微博的集成存在一些技术gap，而从业务上来说，我们还缺少一个用户的聚集地。所以被暂停了，codebase还在，我感觉主要原因还是被技术门槛挡住，导致搁置，责任在我。</p>
-
-<p>Ason作为技术人员，同时也是领域专家，继续做这方面市场需求的调查。</p>
-
-<p>于是，有了第二项目，a_shares_predictor_web。</p>
-
-<p>我们在去年（2015年9月份）开始了这个项目，想法非常简单，就是实现一个CMS系统，管理关于股票知识的内容，我们希望以内容取胜，来赢取一部分的市场流量，我们野性并不大。</p>
-
-<h2>技术栈选型</h2>
-
-<p>虽然，我们的定位是CMS系统，但在选择技术栈时，我们没有采用现有成熟的CMS产品（比如某些php的产品，或者一些开源产品），而是优先考虑到开发团队的现已掌握的技术能力，我不希望开发团队具有过高的学习曲线，其次，希望团队能够有完全的代码控制权，即便当时我们只需要做简单的定制化，以满足需求。不过，现在回过头来思考，当时的技术选择是正确的。</p>
-
-<p>我们的技术栈是Spring Boot，Gradle，阿里云ECS，阿里云RDS，七牛云对象存储，七牛云CDN，MySQL，Spring JPA，Baidu Echarts，BootStrap，JQuery，Responsive Design，WebDriver等。</p>
-
-<h2>迭代演进</h2>
-
-<p>从开始到这一次上线，我们一共经历三个MVP：“存粹的CMS”，“CMS+数据可视化”，到现在，我们的定位是“股票在线教育”。</p>
-
-<p>花费了几乎半年的时间（2015年10月到2016年4月），我们完成了第一个MVP的内容，因为团队的开发人员并不是全部都拥有很强的web开发经验，我们也是在前进的过程中摸爬滚打，不断学习。我们从零开始编写代码，实现文章发布，管理后台，文章展示，目录，首页等等，自己了解如何备案，如何使用云技术完成部署。</p>
-
-<p>在第一个MVP完成之后，我们开始以迭代的方式（虽然迭代周期不定，因为时间受限）演进，研究需求=>构思=>设计=>实现=>测试=>上线，然后再来一轮迭代，直到这一轮MVP，因为彻底改变UI，所以迭代周期较长。</p>
-
-<h2>我们是精益的全功能团队</h2>
-
-<p>初创团队一般情况下，都应该是精益团队。</p>
-
-<p>在一个只有两个开发（同时还要兼职领域专家，测试人员，DEVOPS，UX）的创业团队中，我们要不断的变换自己的角色，做不同的事情，学习不同的工具，因此，我们常常称自己是跨领域的“全栈（全干）工程师”。</p>
-
-<p>虽然，我们全干，但是精力是有限的，我们需要自动化的实践来帮助我们减少那些可以重复的工作量，比如测试：在没有足够测试资源的情况下，为了保证项目的质量，我们从一个开始实现完整的自动化测试实践，单元测试，集成测试，到功能的端到端测试，通过自动化来保证我们代码质量和产品稳定性。</p>
-
-<h2>之后的计划</h2>
-
-<p>从技术上来说，我们因为团队的能力还不是那么完善，留下了部分技术债，我们需要花时间去还。</p>
-
-<p>从产品的角度，乐咕乐股网以“股票在线教育”给自己定位，期望能够以更好的互联网化的产品来提升用户的股票学习的体验，增强用户粘性，提高用户交互力度。</p>
-
-<h2>关于乐咕乐股网</h2>
-
-<p><a href="http://www.legulegu.com">乐咕乐股网_在这里学会股票投资</a></p>
-
-<p>我们的主要三大部分内容：股票投资知识，量化指标，模拟炒股</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
       <h1 class="entry-title"><a href="/blog/2016/08/21/css-for-software-engineers-for-css-developers/">CSS和软件工程中的设计原则</a></h1>
     
     
@@ -214,6 +115,86 @@
 
     </article>
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/07/12/svg-and-icon-font/">SVG和IconFont</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-07-12T15:28:07+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>3:28 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在大型企业中，它们都拥有自己的VI，有自己的设计团队，他们来开发设计一些企业特有的图标和标志。而这些图标一般以矢量图的方式提供给我们。</p>
+
+<p>矢量图，也称为面向对象的图像或绘图图像，在数学上定义为一系列由线连接的点。矢量文件中的图形元素称为对象。每个对象都是一个自成一体的实体，它具有颜色、形状、轮廓、大小和屏幕位置等属性。</p>
+
+<p>SVG（Scalable Vector Graphics）是什么？</p>
+
+<p>大部分人第一次见到它，肯定认为是一种矢量图图形格式，但严格来说它也是一种开放标准的矢量图形语言，是使用XML来描述二维图形和绘图程序的语言，它是一门语言，DSL（领域特定语言）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; standalone=&quot;no&quot;?&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">&lt;!DOCTYPE svg PUBLIC &quot;-//W3C//DTD SVG 1.1//EN&quot;</span>
+</span><span class='line'><span class="cp">&quot;http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd&quot;&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;svg</span> <span class="na">width=</span><span class="s">&quot;100%&quot;</span> <span class="na">height=</span><span class="s">&quot;100%&quot;</span> <span class="na">version=</span><span class="s">&quot;1.1&quot;</span>
+</span><span class='line'><span class="na">xmlns=</span><span class="s">&quot;http://www.w3.org/2000/svg&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;circle</span> <span class="na">cx=</span><span class="s">&quot;100&quot;</span> <span class="na">cy=</span><span class="s">&quot;50&quot;</span> <span class="na">r=</span><span class="s">&quot;40&quot;</span> <span class="na">stroke=</span><span class="s">&quot;black&quot;</span>
+</span><span class='line'><span class="na">stroke-width=</span><span class="s">&quot;2&quot;</span> <span class="na">fill=</span><span class="s">&quot;red&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/svg&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面这段代码得到的svg矢量图，如下：</p>
+
+<p><img src="https://rawgit.com/benweizhu/5036fcaf39960a28ce9b0aca17a78caa/raw/31797b14c698431c9a6f5435a2f5a28dda2ce1bd/circle.svg" alt="Alt text" /></p>
+
+<p>我们在响应式网页设计的工作中经常用到SVG，因为一般的图片没有办法进行适当的缩放，普通图片的缩放会导致图像的失真，同时，图片的文件大小也可能和你希望的图片不一致（大图被缩小使用，导致图片文件大小仍然很大）。</p>
+
+<p>我相信大部分前端开发工程师都用过IconFont，比如：<a href="http://fontawesome.io/icons/">http://fontawesome.io/icons/</a> 和bootstrap中的glyphicons <a href="http://v3.bootcss.com/components/#glyphicons">http://v3.bootcss.com/components/#glyphicons</a> 。</p>
+
+<p>关于为什么要转换为Icon Font？CSS-Tricks中有一篇文章详细的对比了SVG和ICON Font，见： <a href="https://css-tricks.com/icon-fonts-vs-svg/">https://css-tricks.com/icon-fonts-vs-svg/</a></p>
+
+<p>简单版，一个最主要的原因必须使用IconFont，因为要兼容IE8。</p>
+
+<p>一个比较有用的gulp插件，可以将SVG文件转化为font字体文件，并自动生成对应的scss文件（包含font-familly和content）。</p>
+
+<p><a href="https://github.com/nfroidure/gulp-iconfont">https://github.com/nfroidure/gulp-iconfont</a></p>
+
+<p>当然，我们也可以使用一些在线工具来将SVG文件转化成字体文件比如： <a href="https://icomoon.io/">https://icomoon.io/</a> 。</p>
+</div>
+  
+  
+
+
+    </article>
+  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -241,10 +222,6 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2016/08/27/legulegu-ui/">【创业维艰】写在乐咕乐股网-新版UI上线之后</a>
-      </li>
-    
-      <li class="post">
         <a href="/blog/2016/08/21/css-for-software-engineers-for-css-developers/">CSS和软件工程中的设计原则</a>
       </li>
     
@@ -258,6 +235,10 @@
     
       <li class="post">
         <a href="/blog/2016/06/27/host-jenkins-on-aws/">在AWS上部署Jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/13/I-want-to-talk-about-https-too/">我也想来谈谈HTTPS</a>
       </li>
     
   </ul>

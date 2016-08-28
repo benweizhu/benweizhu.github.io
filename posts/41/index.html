@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="最近，《实现领域驱动设计》的译者，ThoughtWorks的“滕老板”（腾云）给我们上了一堂基础课，就是没有IDE的情况下，去编译和运行用文本编辑器编写的Java代码。 这本应该是基础中的基础，我记得应该是Java第一堂课就应该讲到的东西。但是我们这群用惯了IDE的程序员，在没有了IDE之后， &hellip;">
+  <meta name="description" content="REST是Roy Fielding在他的2000年博士论文《Architectural Styles and the Design of Network-based Software Architectures》中提出的概念，全称是Representational State Transfer。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,253 +64,6 @@
     <div id="content">
       <div class="blog-index">
   
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/04/07/write-java-code-without-ide/">丢掉IDE，回到Java的第一堂课</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-04-07T13:56:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:56 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>最近，《实现领域驱动设计》的译者，ThoughtWorks的<a href="http://www.davenkin.me/">“滕老板”</a>（腾云）给我们上了一堂基础课，就是没有IDE的情况下，去编译和运行用文本编辑器编写的Java代码。</p>
-
-<p>这本应该是基础中的基础，我记得应该是Java第一堂课就应该讲到的东西。但是我们这群用惯了IDE的程序员，在没有了IDE之后，就开始不知所措了。虽然不知道这些知识，对于普通开发似乎是没有影响，但毕竟是Java的重要基础知识，了解这些知识可以帮助你理解IDE帮你做了什么，可以更快速的定位问题。</p>
-
-<p>还是举例子，滕老板的例子：</p>
-
-<p>目录结构</p>
-
-<p>src</p>
-
-<p>&ndash;client</p>
-
-<p>&mdash;-Client.java</p>
-
-<p>&ndash;service</p>
-
-<p>&mdash;-Service.java</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Service</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">run</span><span class="o">(){</span>
-</span><span class='line'>      <span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">String</span><span class="o">(</span><span class="s">&quot;as your service&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">str</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">client</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">service.*</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Client</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[]){</span>
-</span><span class='line'>      <span class="n">Service</span> <span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Service</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">service</span><span class="o">.</span><span class="na">run</span><span class="o">());</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>ok，代码写完了，你知道该怎么运行吗？</p>
-
-<p>命令行：进入到src目录下</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='powershell'><span class='line'><span class="n">javac</span> <span class="n">client</span><span class="p">/</span><span class="n">Client</span><span class="p">.</span><span class="n">java</span>
-</span><span class='line'><span class="n">java</span> <span class="n">client</span><span class="p">.</span><span class="n">Client</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这样就会输出正确结果：as your service。</p>
-
-<p>再来看一下目录结构</p>
-
-<p>src</p>
-
-<p>&ndash;client</p>
-
-<p>&mdash;-Client.java</p>
-
-<p>&mdash;-Client.class</p>
-
-<p>&ndash;service</p>
-
-<p>&mdash;-Service.java</p>
-
-<p>&mdash;-Service.class</p>
-
-<p>我们知道javac命令编译的是.java文件，而java命令运行是.class文件。</p>
-
-<p>但是这里还是有几个疑问：</p>
-
-<p>1.javac client/Client.java时，它怎么知道去哪里找Service类？</p>
-
-<p>2.对于上一个疑问，你的答案可能是import service.*;告诉它去service包下找，那么第二疑问，为什么是import service.*;而不是import src.service.*?</p>
-
-<p>3.第三个疑问和第一个疑问类似，答案也类似，java client.Client，怎么知道去哪里找service.class文件？</p>
-
-<p>面对这三个问题，答案是，要引入两个概念。</p>
-
-<p>sourcepath和classpath。</p>
-
-<p>classpath大家听得比较多，用来告诉JVM或者Java编译器到哪里去寻找用户定义的类和包。</p>
-
-<p>sourcepath和classpath一样，只不过它是用来告诉编译器到哪里去寻找源文件。</p>
-
-<p>在上面的javac和java命令中，既没有显示的指定sourcepath，也没有显示的指定classpath。但是它们都有默认值，就是将当前目录作为各自的路径。</p>
-
-<p>比如：我现在从当前路径src，进入到它的一个子目录中src/sub。</p>
-
-<p>然后我运行：javac ../client/Client.java命令</p>
-
-<p>它提示我找不到Service类。 那是因为当前的sourcepath是src/sub，在这个路径下没有Service.java。我们改一下，显示的设置它sourcepath。</p>
-
-<p>运行命令：javac -sourcepath ../ ../client/Client.java</p>
-
-<p>编译成功。</p>
-
-<p>那么运行呢？</p>
-
-<p>直接在src/sub路径下，运行：java client.Client。能行吗？肯定不行。</p>
-
-<p>Error: Could not find or load main class client.Client</p>
-
-<p>必须要显示的指定它的classpath为上一级目录：</p>
-
-<p>java -classpath ../ client.Client</p>
-
-<p>ok，成功。</p>
-
-<p>现在再来让我们回到刚才的第二个问题。为什么import的不是src.service.* ，因为我们设置它的sourcepath，它就成为一个相对路径。</p>
-
-<p>这不禁让我想到一个问题。package和import到底有什么用？为什么package名字和目录结构一致？</p>
-
-<p>这不是白痴问题吗？</p>
-
-<p>package是作为命名空间，因为不同开发商，开发出来的类库可能会有相同的类名。为了区分，防止冲突，用不同的包名区分。</p>
-
-<p>import是根据你要使用的类，从classpath下找到你要使用的类，并引入到你的类中。</p>
-
-<p>我做了一个实验：</p>
-
-<p>将Service类的package定义，改为service.something，这样包名和目录结构就不一致了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">service</span><span class="o">.</span><span class="na">something</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Service</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">run</span><span class="o">(){</span>
-</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;as your service&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后还是照常编译。</p>
-
-<pre><code>client/Client.java:7: error: cannot access Service
-    Service service = new Service();
-    ^
-    bad source file: ./service/Service.java
-    file does not contain class service.Service
-Please remove or make sure it appears in the correct subdirectory of the sourcepath.
-1 error
-</code></pre>
-
-<p>第四行，bad source file: ./service/Service.java表明他在编译Client.java文件时，通过import找到了该文件，说明import是通过文件结构去找到的。</p>
-
-<p>但是他又说file does not contain class service.Service，说明在这个Service.java中找不到对应的Service类。</p>
-
-<p>为什么呢？因为我的包名是service.something，但是他要找的是service。</p>
-
-<p>所以包的作用是和类的名字组成完整的类名，这里的Service类的全名应该是service.something.Service。但是他去找到的是service.Service。所以它找不到。</p>
-
-<p>那是不是将import改为import service.something.*;就可以呢？</p>
-
-<p>不行，前面说了，import是根据目录结构去找到的，根本就没有service/something这个目录结构，所以不可能找到。</p>
-
-<pre><code>client/Client.java:3: error: package service.something does not exist
-import service.something.*;
-^
-client/Client.java:7: error: cannot find symbol
-    Service service = new Service();
-    ^
-    symbol:   class Service
-    location: class Client
-    client/Client.java:7: error: cannot find symbol
-    Service service = new Service();
-                          ^
-    symbol:   class Service
-    location: class Client
-</code></pre>
-
-<p>你看，第一行：client/Client.java:3: error: package service.something does not exist</p>
-
-<p>回过头来想，这也是为什么，有时候，当同时导入两个不同包中名字相同的类时，其中有一个要用完全限定名。因为类的名字本来就是由包的名字和类的自身名字组成。</p>
-
-<p>总而言之，这堂课的收获还是挺大的，重点要掌握上面提到的两个概念。</p>
-
-<p>课上本来还有一点关于，打jar包和如何引用jar包的内容，以及通过java -d命令，将class文件编译到指定的目录下。</p>
-
-<p>这里我就不多说了，万变不离其宗。</p>
-
-<p>javac -classpath &ldquo;.:service.jar&rdquo; client/Client.java //linux下面是冒号，windows下面是分号</p>
-
-<p>java -classpath &ldquo;.:service.jar&rdquo; client.Client</p>
-
-<p>只不过要注意一点的是，打jar包时，一定要按照package定义的目录结构去打。因为在将jar包加入到classpath时和将一个目录下的class文件加入是一样的，相对路径。</p>
-
-<p>java -d out client/Client.java，会将class文件编译到out目录下，且内部目录结构与包的结构一致。</p>
-</div>
-  
-  
-
-
-    </article>
   
   
     <article>
@@ -722,6 +475,284 @@ client/Client.java:7: error: cannot find symbol
 
     </article>
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/29/something-you-need-to-know-about-javascript-2/">JavaScript中你需要了解的基本知识（二）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-29T22:44:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>10:44 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2><strong>表达式</strong></h2>
+
+<p>表达式是一组可以计算出一个数值的有效的代码的集合，是一个单纯的运算过程。</p>
+
+<h2><strong>函数立刻调用</strong></h2>
+
+<p>当你声明类似function foo(){}或var foo = function(){}函数的时候，通过在后面加个括弧就可以实现函数的执行，例如foo()。</p>
+
+<p>在一个表达式后面加上括号()，该表达式会立即执行，但是在一个语句后面加上括号()，是完全不一样的意思，他的只是分组操作符。</p>
+
+<p>我们只需要用大括弧将代码的代码全部括住就行了，因为JavaScript里括弧()里面不能包含语句，所以在这一点上，解析器在解析function关键字的时候，会将相应的代码解析成function表达式，而不是function声明。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">runImmediately</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">getValue</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">}());</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">runImmediately</span><span class="p">.</span><span class="nx">getValue</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>关于函数立即执行有两种写法，(function f(){}())和(function f(){})()，我个人认为第二种更容易理解，加入括号()，语句变成表达式，然后再加一个括号()，表达式执行。但是我看到大部分例子中都倾向于前一种写法，可能更容易说明他是一个整体。</p>
+
+<h2><strong>闭包</strong></h2>
+
+<p>我在这里给出多个解释，因为有时候，我感觉从一种解释中不一定能够获得完全理解。</p>
+
+<p>在计算机科学中，闭包（Closure）是词法闭包（Lexical Closure）的简称，是引用了自由变量的<strong>函数</strong>。这个被引用的自由变量将和这个函数一同存在，<strong>即使已经离开了创造它的环境也不例外</strong>。所以，有另一种说法认为闭包是由函数和与其相关的引用环境组合而成的实体。闭包在运行时可以有多个实例，不同的引用环境和相同的函数组合可以产生不同的实例。&mdash;&mdash;-维基百科</p>
+
+<p>闭包可以用来在一个函数与一组“私有”变量之间建立关联关系。在给定函数被多次调用的过程中，这些私有变量能够保持其持久性。变量的作用域仅限于包含它们的函数，因此无法从其它程序代码部分进行访问。&mdash;&mdash;-维基百科</p>
+
+<p>闭包是能够指向独立自由变量的函数。换句话说，定义在闭包中的函数能够“记住”定义它的环境。&mdash;&mdash;-mozilla社区</p>
+
+<p>闭包是一种特殊的对象。它由两部分构成：函数，以及创建该函数的环境。环境由闭包创建时在作用域中的任何局部变量组成。&mdash;&mdash;-mozilla社区</p>
+
+<p><strong>JavaScript的作用域是让JavaScript拥有闭包特性的根本。</strong></p>
+
+<p>看下面这段代码：</p>
+
+<p>闭包是一个函数和该函数所引用的自由变量组成。在下面的代码中isBigEnough函数和它所引用的自由变量threshold组成了一个闭包。该闭包传递给了list对象的filter函数。filter函数会反复调用这个函数。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">130</span><span class="p">,</span> <span class="mi">44</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">getNumberBigThan</span><span class="p">(</span><span class="nx">list</span><span class="p">,</span><span class="nx">threshold</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">list</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span> <span class="nx">isBigEnough</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">element</span> <span class="o">&gt;=</span> <span class="nx">threshold</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">filteredList</span> <span class="o">=</span> <span class="nx">getNumberBigThan</span><span class="p">(</span><span class="nx">list</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">filteredList</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面那个例子还不够清楚，再看下面这个：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">f1</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span><span class="err">　　　　</span>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">f2</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">n</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">f2</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">f1</span><span class="p">(</span><span class="mi">999</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">());</span> <span class="c1">// 1000</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">result2</span> <span class="o">=</span> <span class="nx">f1</span><span class="p">(</span><span class="mi">499</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result2</span><span class="p">());</span> <span class="c1">// 500</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>闭包f2由f2函数和它引用的自由变量n组成。在f1运行之后，将f2返回给了result对象。此时运行result就是运行f2，得到结果是1000。说明，闭包f2保留了创建它的环境，变量n并没有在离开函数f1之后被销毁。而且根据创建的环境不同，闭包有不同的实例。
+最后看一个例子，来自：<a href="http://bonsaiden.github.io/JavaScript-Garden/zh/#function.closures">http://bonsaiden.github.io/JavaScript-Garden/zh/#function.closures</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Counter</span><span class="p">(</span><span class="nx">start</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">count</span> <span class="o">=</span> <span class="nx">start</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">increment</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">count</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">count</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="nx">Counter</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</span><span class='line'><span class="nx">foo</span><span class="p">.</span><span class="nx">increment</span><span class="p">();</span>
+</span><span class='line'><span class="nx">foo</span><span class="p">.</span><span class="nx">get</span><span class="p">();</span> <span class="c1">// 5</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里，Counter函数返回两个闭包，函数increment和函数get。这两个函数都维持着对外部作用域Counter的引用，因此总可以访问此作用域内定义的变量count。</p>
+
+<h2><strong>匿名函数立即执行</strong></h2>
+
+<p>我们知道定义函数有两种方式：直接定义和函数表达式（函数字面量）</p>
+
+<p>在定义函数字面量时，我们可以不写函数的名字，通过该在函数对象加上括号来执行该函数。</p>
+
+<p>我们可以在定义该函数字面量时，直接将函数表达式执行。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">funRun</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">c</span><span class="p">;</span>
+</span><span class='line'><span class="p">}());</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">funRun</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果不return任何东西，则funRun为undefined。</p>
+
+<p>通过匿名函数立即执行，可以实现匿名闭包。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">funRun</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'><span class="p">}());</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">funRun</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2><strong>模块化</strong></h2>
+
+<p>JavaScript最讨厌的特性就是它的全局性，随便创建一个方法或者变量，就是全局的，因为它没有像Java或者C++这种语言性上，类方式的模块划分，所以很容易冲突。</p>
+
+<p>那JavaScript为了实现模块化只有借助于实现模式：模块模式。</p>
+
+<p>利用JavaScript的作用域特性，以函数作为模块，利用闭包特性，定义不会污染全局的局部变量和方法（我这描述的有点抽象），直接看怎么写。</p>
+
+<p>通过匿名函数的立即执行返回两个闭包add和sub。这样定义出来的方法add和sub不会暴露到全局中，同时还可以访问在函数内部定义的“私有变量”。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">fact</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">(</span><span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">)</span> <span class="o">*</span> <span class="nx">fact</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">sub</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">(</span><span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">)</span> <span class="o">*</span> <span class="nx">fact</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">add</span><span class="o">:</span> <span class="nx">add</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">sub</span><span class="o">:</span> <span class="nx">sub</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">}());</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">module</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">module</span><span class="p">.</span><span class="nx">sub</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>关于模块化，还更多深入和高级的知识，例如导入全局变量（要用jQuery的时候）等。
+可以查看这边译文。<a href="http://www.oschina.net/translate/javascript-module-pattern-in-depth">http://www.oschina.net/translate/javascript-module-pattern-in-depth</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
   <div class="pagination">
     
       <a class="prev" href="/posts/42">&larr; Older</a>
@@ -751,10 +782,6 @@ client/Client.java:7: error: cannot find symbol
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2016/08/27/legulegu-ui/">【创业维艰】写在乐咕乐股网-新版UI上线之后</a>
-      </li>
-    
-      <li class="post">
         <a href="/blog/2016/08/21/css-for-software-engineers-for-css-developers/">CSS和软件工程中的设计原则</a>
       </li>
     
@@ -768,6 +795,10 @@ client/Client.java:7: error: cannot find symbol
     
       <li class="post">
         <a href="/blog/2016/06/27/host-jenkins-on-aws/">在AWS上部署Jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/13/I-want-to-talk-about-https-too/">我也想来谈谈HTTPS</a>
       </li>
     
   </ul>

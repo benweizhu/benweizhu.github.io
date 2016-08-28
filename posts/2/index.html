@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在大型企业中，它们都拥有自己的VI，有自己的设计团队，他们来开发设计一些企业特有的图标和标志。而这些图标一般以矢量图的方式提供给我们。 矢量图，也称为面向对象的图像或绘图图像，在数学上定义为一系列由线连接的点。矢量文件中的图形元素称为对象。每个对象都是一个自成一体的实体，它具有颜色、形状、轮廓、 &hellip;">
+  <meta name="description" content="做个记录 转载自： http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html WHEN working with Linux, Unix, and Mac OS X, I always forget which bash &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,86 +70,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/07/12/svg-and-icon-font/">SVG和IconFont</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-07-12T15:28:07+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>3:28 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在大型企业中，它们都拥有自己的VI，有自己的设计团队，他们来开发设计一些企业特有的图标和标志。而这些图标一般以矢量图的方式提供给我们。</p>
-
-<p>矢量图，也称为面向对象的图像或绘图图像，在数学上定义为一系列由线连接的点。矢量文件中的图形元素称为对象。每个对象都是一个自成一体的实体，它具有颜色、形状、轮廓、大小和屏幕位置等属性。</p>
-
-<p>SVG（Scalable Vector Graphics）是什么？</p>
-
-<p>大部分人第一次见到它，肯定认为是一种矢量图图形格式，但严格来说它也是一种开放标准的矢量图形语言，是使用XML来描述二维图形和绘图程序的语言，它是一门语言，DSL（领域特定语言）。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; standalone=&quot;no&quot;?&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">&lt;!DOCTYPE svg PUBLIC &quot;-//W3C//DTD SVG 1.1//EN&quot;</span>
-</span><span class='line'><span class="cp">&quot;http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd&quot;&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;svg</span> <span class="na">width=</span><span class="s">&quot;100%&quot;</span> <span class="na">height=</span><span class="s">&quot;100%&quot;</span> <span class="na">version=</span><span class="s">&quot;1.1&quot;</span>
-</span><span class='line'><span class="na">xmlns=</span><span class="s">&quot;http://www.w3.org/2000/svg&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;circle</span> <span class="na">cx=</span><span class="s">&quot;100&quot;</span> <span class="na">cy=</span><span class="s">&quot;50&quot;</span> <span class="na">r=</span><span class="s">&quot;40&quot;</span> <span class="na">stroke=</span><span class="s">&quot;black&quot;</span>
-</span><span class='line'><span class="na">stroke-width=</span><span class="s">&quot;2&quot;</span> <span class="na">fill=</span><span class="s">&quot;red&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/svg&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面这段代码得到的svg矢量图，如下：</p>
-
-<p><img src="https://rawgit.com/benweizhu/5036fcaf39960a28ce9b0aca17a78caa/raw/31797b14c698431c9a6f5435a2f5a28dda2ce1bd/circle.svg" alt="Alt text" /></p>
-
-<p>我们在响应式网页设计的工作中经常用到SVG，因为一般的图片没有办法进行适当的缩放，普通图片的缩放会导致图像的失真，同时，图片的文件大小也可能和你希望的图片不一致（大图被缩小使用，导致图片文件大小仍然很大）。</p>
-
-<p>我相信大部分前端开发工程师都用过IconFont，比如：<a href="http://fontawesome.io/icons/">http://fontawesome.io/icons/</a> 和bootstrap中的glyphicons <a href="http://v3.bootcss.com/components/#glyphicons">http://v3.bootcss.com/components/#glyphicons</a> 。</p>
-
-<p>关于为什么要转换为Icon Font？CSS-Tricks中有一篇文章详细的对比了SVG和ICON Font，见： <a href="https://css-tricks.com/icon-fonts-vs-svg/">https://css-tricks.com/icon-fonts-vs-svg/</a></p>
-
-<p>简单版，一个最主要的原因必须使用IconFont，因为要兼容IE8。</p>
-
-<p>一个比较有用的gulp插件，可以将SVG文件转化为font字体文件，并自动生成对应的scss文件（包含font-familly和content）。</p>
-
-<p><a href="https://github.com/nfroidure/gulp-iconfont">https://github.com/nfroidure/gulp-iconfont</a></p>
-
-<p>当然，我们也可以使用一些在线工具来将SVG文件转化成字体文件比如： <a href="https://icomoon.io/">https://icomoon.io/</a> 。</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
       <h1 class="entry-title"><a href="/blog/2016/07/02/bash-profile-and-bashrc/">.bash_profile和.bashrc</a></h1>
     
     
@@ -195,6 +115,129 @@ Mac OS X — an exception</p>
 
     </article>
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/06/27/host-jenkins-on-aws/">在AWS上部署Jenkins</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-06-27T20:57:25+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:57 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>注册AWS账号</h2>
+
+<p><a href="https://aws.amazon.com">https://aws.amazon.com</a></p>
+
+<h2>通过信用卡验证</h2>
+
+<p>付款1刀</p>
+
+<h2>选择Region</h2>
+
+<p>美国东部（弗吉尼亚北部） <br/>
+美国西部（俄勒冈） <br/>
+美国西部（加利福尼亚北部） <br/>
+欧洲（爱尔兰） <br/>
+欧洲（法兰克福） <br/>
+亚太区域（新加坡） <br/>
+亚太区域（东京） <br/>
+亚太区域 (首尔) <br/>
+亚太区域（悉尼）<br/>
+南美洲（圣保罗）</p>
+
+<h2>AWS Identity and Access Management (IAM)</h2>
+
+<ul>
+<li>对您 AWS 账户的共享访问权限</li>
+<li>精细权限</li>
+<li>在 Amazon EC2 上运行的应用程序针对 AWS 资源的安全访问权限</li>
+<li>等等</li>
+</ul>
+
+
+<h3>创建用户</h3>
+
+<p><a href="https://console.aws.amazon.com/iam/home#home">https://console.aws.amazon.com/iam/home#home</a></p>
+
+<p>AWS分为根账号用户和IAM用户</p>
+
+<p>在账户中创建与组织中的用户对应的各IAM用户，而不是与他人共享您的根账户凭证。IAM用户不是单独的账户；它们是您账户中的用户。每个用户都可以有自己的密码以用于访问AWS管理控制台。您还可以为每个用户创建单独的访问密钥，以便用户可以发出编程请求以使用账户中的资源。</p>
+
+<p>可以将IAM用户组织为IAM组，然后将策略附加到组。这种情况下，各用户仍有自己的凭证，但是组中的所有用户都具有附加到组的权限。</p>
+
+<p>1.我创建了一个Administrators的组，并赋予AdministratorAccess权限。 <br/>
+2.创建一个用户，用户名：someuser，勾选：为每个用户生成访问密钥，用户需要访问密钥，以确保向 AWS 服务 API 提交安全的 REST 或查询协议请求。<br/>
+3.给用户分配用户组 <br/>
+4.设置用户的安全证书管理，即创建用户名密码访问权限和第二验证策略 <br/>
+5.下载用户密码安全凭证</p>
+
+<p>要使用AWS管理控制台的用户必须通过特定于您账户的登录页面登录到您的AWS账户。您需要为您的用户提供他们用于访问登录页面的URL地址。凭证中包含URL： <a href="https://My_AWS_Account_ID.signin.aws.amazon.com/console/">https://My_AWS_Account_ID.signin.aws.amazon.com/console/</a></p>
+
+<h3>创建EC2实例（我等穷人只能用免费的）</h3>
+
+<p>Amazon Elastic Compute Cloud (Amazon EC2) 在 Amazon Web Services (AWS) 云中提供可扩展的计算容量。使用 Amazon EC2 可避免前期的硬件投入，因此您能够快速开发和部署应用程序。通过使用 Amazon EC2，您可以根据自身需要启动任意数量的虚拟服务器、配置安全和网络以及管理存储。Amazon EC2 允许您根据需要进行缩放以应对需求变化或流行高峰，降低流量预测需求。</p>
+
+<p>1.用新用户登录： <a href="https://My_AWS_Account_ID.signin.aws.amazon.com/console/">https://My_AWS_Account_ID.signin.aws.amazon.com/console/</a> <br/>
+2.创建一个EC2实例<br/>
+3.选择一个Amazon系统映像（AMI），我选择Ubuntu的免费版 <br/>
+4.选择一个实例类型（计算资源），免费版只有1G内存，实在不够用 <br/>
+5.配置实例详细信息（我采用默认配置） <br/>
+6.选择存储大小，最大免费30G <br/>
+7.标签实例（我留空了） <br/>
+8.配置安全组，这里要注意了，只要配置SSH和TCP的8080端口（jenkins用） <br/>
+9.下载SSH证书</p>
+
+<p>SSH证书是用于SSH登录服务器的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>ssh -i somepem.pem user@serveraddress
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>安装Jenkins</h2>
+
+<p>SSH登录到服务器上，然后运行下面的脚本：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget -q -O - https://jenkins-ci.org/debian/jenkins-ci.org.key <span class="p">|</span> sudo apt-key add -
+</span><span class='line'>sudo sh -c <span class="s1">&#39;echo deb http://pkg.jenkins-ci.org/debian-stable binary/ &gt; /etc/apt/sources.list.d/jenkins.list&#39;</span>
+</span><span class='line'>sudo apt-get update
+</span><span class='line'>sudo apt-get install jenkins
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>注意jenkins默认是8080端口，这就是上面安全组要配置的TCP的8080端口。</p>
+
+<p>然后，可以通过ip地址+8080端口。</p>
+
+<p>参考资料：  <br/>
+1. <a href="http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/concepts.html">http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/concepts.html</a>  <br/>
+2. <a href="http://docs.aws.amazon.com/zh_cn/IAM/latest/UserGuide/introduction.html">http://docs.aws.amazon.com/zh_cn/IAM/latest/UserGuide/introduction.html</a> <br/>
+3. <a href="http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/AMIs.html">http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/AMIs.html</a> <br/>
+4. <a href="https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins+on+Ubuntu">https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins+on+Ubuntu</a> <br/>
+5. <a href="http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html">http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
   <div class="pagination">
     
       <a class="prev" href="/posts/3">&larr; Older</a>
@@ -224,10 +267,6 @@ Mac OS X — an exception</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2016/08/27/legulegu-ui/">【创业维艰】写在乐咕乐股网-新版UI上线之后</a>
-      </li>
-    
-      <li class="post">
         <a href="/blog/2016/08/21/css-for-software-engineers-for-css-developers/">CSS和软件工程中的设计原则</a>
       </li>
     
@@ -241,6 +280,10 @@ Mac OS X — an exception</p>
     
       <li class="post">
         <a href="/blog/2016/06/27/host-jenkins-on-aws/">在AWS上部署Jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/13/I-want-to-talk-about-https-too/">我也想来谈谈HTTPS</a>
       </li>
     
   </ul>
