@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="上一次，讲到了如何如何手动编译Java，简单的介绍打Jar包（提示：在classpath的基础上，一定将包的目录结构打进去）。Jar包的目的，将编译过的class文件有效合理的组装起来，方便管理和使用。这一次，滕老板继续跟我们讲解了如何打War包。 在本篇文章中，将分别介绍War包和Ear包（ &hellip;">
+  <meta name="description" content="Web Service是一种独立的、低耦合的Web服务，它由几个核心技术组成：XML、XSD、WSDL、SOAP、UDDI。我们根据这些知识点，来一个个的学习。 XML 呵呵，这个太简单了，这个没什么好谈的，跳过。 XSD XSD（XML Schema Definition）是DTD（ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,711 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/05/11/spring-web-service-by-example/">Spring Web Service by Example</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-05-11T17:05:00+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>5:05 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Web Service是一种独立的、低耦合的Web服务，它由几个核心技术组成：XML、XSD、WSDL、SOAP、UDDI。我们根据这些知识点，来一个个的学习。</p>
+
+<h2><strong>XML</strong></h2>
+
+<p>呵呵，这个太简单了，这个没什么好谈的，跳过。</p>
+
+<h2><strong>XSD</strong></h2>
+
+<p>XSD（XML Schema Definition）是DTD（Document Type Definition）的替代品，作用是定义XML文档的合法构建模块。</p>
+
+<p>它能够做的事情有很多：</p>
+
+<ol>
+<li>定义可出现在文档中的元素</li>
+<li>定义可出现在文档中的属性</li>
+<li>定义哪个元素是子元素</li>
+<li>定义子元素的次序</li>
+<li>定义子元素的数目</li>
+<li>定义元素是否为空，或者是否可包含文本</li>
+<li>定义元素和属性的数据类型</li>
+<li>定义元素和属性的默认值以及固定值</li>
+</ol>
+
+
+<p>&hellip;.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;xs:schema</span> <span class="na">xmlns:xs=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema&quot;</span>
+</span><span class='line'>           <span class="na">targetNamespace=</span><span class="s">&quot;http://benweizhu.github.io&quot;</span>
+</span><span class='line'>           <span class="na">elementFormDefault=</span><span class="s">&quot;qualified&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;SearchBookRequest&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;xs:complexType&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;xs:sequence&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;author&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span> <span class="na">minOccurs=</span><span class="s">&quot;0&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/xs:sequence&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/xs:complexType&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/xs:element&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;SearchBookResponse&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;xs:complexType&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;xs:sequence&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;id&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:int&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/xs:sequence&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/xs:complexType&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/xs:element&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/xs:schema&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们来分析一下这个schema的含义：</p>
+
+<p>（1）xmlns:xs= &ldquo;<a href="http://www.w3.org/2001/XMLSchema">http://www.w3.org/2001/XMLSchema</a>&#8220;，它表示在这个schema中使用的元素，例如element，complexType，sequence等，都来自于命名空间&#8221;<a href="http://www.w3.org/2001/XMLSchema">http://www.w3.org/2001/XMLSchema</a>&#8220;，并且在使用这些元素时，要以xs最为前缀。</p>
+
+<p>（2）targetNamespace= &ldquo;<a href="http://benweizhu.github.io">http://benweizhu.github.io</a>&#8220;，它表示在这个schema中定义的元素，例如SearchBookRequest，name，author等，都是来自于命名空间&#8221;<a href="http://benweizhu.github.io">http://benweizhu.github.io</a>&#8220;。它表示在基于该schema构建XML时，XML中使用的元素来自于该命名空间。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;z:SearchBookRequest</span> <span class="na">xmlns:z=</span><span class="s">&quot;http://benweizhu.github.io&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;z:name&gt;</span>SpringWebService<span class="nt">&lt;/z:name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;z:author&gt;</span>Spring<span class="nt">&lt;/z:author&gt;</span>
+</span><span class='line'><span class="nt">&lt;/z:SearchBookRequest&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>（3）xmlns=&ldquo;<a href="http://benweizhu.github.io">http://benweizhu.github.io</a>&#8220;，指定了一个默认的命名空间，什么意思呢？就是说如果schema中使用的元素，没有xs这样前缀，则都是来自于这个默认的命名空间的。</p>
+
+<p>（4）elementFormDefault=&ldquo;qualified&#8221;，指出任何在XML实例文档所使用的元素，只要在此schema中声明过，就必须被命名空间限定。</p>
+
+<p>（5）&lt;xs:element name=&ldquo;xxx&rdquo; type=&ldquo;yyy&rdquo;/>，此处 xxx 指元素的名称，yyy 指元素的数据类型。XML Schema 拥有很多内建的数据类型。最常用的类型有：</p>
+
+<ul>
+<li> xs:string</li>
+<li> xs:decimal</li>
+<li> xs:integer</li>
+<li> xs:boolean</li>
+<li> xs:date</li>
+<li> xs:time</li>
+</ul>
+
+
+<p>（6）复杂元素，定义复杂元素的方式有两种，例子已经在上面给出，一种是直接在元素内部定义，一种是通过type引用该复杂类型。</p>
+
+<p>（7）属性，element元素包含有很多的属性，例如，minOccurs=&ldquo;0&#8221;，它表示出现最少次数为0，就是说这个元素是optional的，可选的。</p>
+
+<h2><strong>SOAP</strong></h2>
+
+<p>SOAP（Simple Object Access Protocol，简单对象访问协议），是交换数据的一种协议规范，它是一种通信协议，基于XML，用于发送和接受消息，它是真正在WebService的服务端和客户端传送的信息。</p>
+
+<p>SOAP使用应用层协议作为其传输协议。SMTP以及HTTP协议都可以用来传输SOAP消息，但是由于HTTP在如今的因特网结构中工作得很好，特别是在网络防火墙下仍然正常工作，所以被广泛采纳。</p>
+
+<p>SOAP基于XML，所以归根到底，SOAP发送的消息就是一个XML格式的文档消息。</p>
+
+<p>一条SOAP消息的基本结构如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;soap:Envelope</span>
+</span><span class='line'><span class="na">xmlns:soap=</span><span class="s">&quot;http://www.w3.org/2001/12/soap-envelope&quot;</span>
+</span><span class='line'><span class="na">soap:encodingStyle=</span><span class="s">&quot;http://www.w3.org/2001/12/soap-encoding&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="nt">&lt;soap:Header&gt;</span>
+</span><span class='line'>  ...
+</span><span class='line'><span class="nt">&lt;/soap:Header&gt;</span>
+</span><span class='line'><span class="nt">&lt;soap:Body&gt;</span>
+</span><span class='line'>  ...
+</span><span class='line'>  <span class="nt">&lt;soap:Fault&gt;</span>
+</span><span class='line'>    ...
+</span><span class='line'>  <span class="nt">&lt;/soap:Fault&gt;</span>
+</span><span class='line'><span class="nt">&lt;/soap:Body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/soap:Envelope&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>一条SOAP消息包含下列元素：</p>
+
+<ol>
+<li>必需的Envelope元素，它是用来将一个XML文档标识为一条SOAP消息。</li>
+<li>可选的Header元素，包含头部信息</li>
+<li>必需的Body元素，包含所有的调用和响应信息</li>
+<li>可选的Fault元素，提供有关在处理此消息所发生错误的信息</li>
+</ol>
+
+
+<p>所有以上的元素均被声明为，命名空间 <a href="http://www.w3.org/2001/12/soap-envelope">http://www.w3.org/2001/12/soap-envelope</a> 中的元素，以及针对SOAP编码和数据类型的命名空间： <a href="http://www.w3.org/2001/12/soap-encoding">http://www.w3.org/2001/12/soap-encoding</a> 。</p>
+
+<p>关于 xmlns:soap=&ldquo;<a href="http://www.w3.org/2001/12/soap-envelope">http://www.w3.org/2001/12/soap-envelope</a>&rdquo; 应该比较容易理解，在上面的XSD介绍中已经解释过了，用于说明该XML的命名空间，相当于该SOAP的XSD中的targetNamespace。</p>
+
+<p>可选的SOAP Header元素可包含有关SOAP消息的应用程序专用信息（比如认证、支付等）。如果Header元素被提供，则它必须是Envelope元素的第一个子元素。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;soap:Header&gt;</span>
+</span><span class='line'><span class="nt">&lt;m:Trans</span> <span class="na">xmlns:m=</span><span class="s">&quot;http://www.w3school.com.cn/transaction/&quot;</span> <span class="na">soap:mustUnderstand=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>234<span class="nt">&lt;/m:Trans&gt;</span>
+</span><span class='line'><span class="nt">&lt;/soap:Header&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>必需的SOAP Body元素包含打算传送到消息最终端点的实际SOAP消息。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;soap:Body&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;z:SearchBookRequest</span> <span class="na">xmlns:z=</span><span class="s">&quot;http://benweizhu.github.io&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;z:name&gt;</span>SpringWebService<span class="nt">&lt;/z:name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;z:author&gt;</span>Spring<span class="nt">&lt;/z:author&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/z:SearchBookRequest&gt;</span>
+</span><span class='line'><span class="nt">&lt;/soap:Body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>而可选的SOAP Fault元素用于指示错误消息。</p>
+
+<h2><strong>WSDL</strong></h2>
+
+<p>WSDL指网络服务描述语言(Web Services Description Language)，也就是WebService的描述语言。</p>
+
+<p>WSDL是一种使用XML编写的文档。这种文档用于描述某个web service，规定服务的位置，以及此服务提供的操作（或方法）。</p>
+
+<p>一个WSDL文档是由如下几种元素组成：
+元素定义:\<types>, \<message>, \<portType>, \<binding></p>
+
+<p>WSDL类型</p>
+
+<p>\<types>元素定义web service使用的数据类型。为了最大程度的平台中立性，WSDL使用XML Schema语法来定义数据类型。</p>
+
+<p>WSDL消息</p>
+
+<p>\<message>元素定义一个操作的数据元素。每个消息均由一个或多个部件组成。可以把这些部件比作传统编程语言中一个函数调用的参数。</p>
+
+<p>WSDL端口</p>
+
+<p>\<portType>元素是最重要的WSDL元素。它可描述一个web service、可被执行的操作，以及相关的消息。可以把\<portType>元素比作传统编程语言中的一个函数库（或一个模块、或一个类）。</p>
+
+<p>WSDL绑定协议</p>
+
+<p>\<binding> 元素为每个端口定义消息格式和协议细节。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;definitions&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;types&gt;</span>
+</span><span class='line'>        definition of types........
+</span><span class='line'>    <span class="nt">&lt;/types&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;message&gt;</span>
+</span><span class='line'>        definition of a message....
+</span><span class='line'>    <span class="nt">&lt;/message&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;portType&gt;</span>
+</span><span class='line'>        definition of a port.......
+</span><span class='line'>    <span class="nt">&lt;/portType&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;binding&gt;</span>
+</span><span class='line'>        definition of a binding....
+</span><span class='line'>    <span class="nt">&lt;/binding&gt;</span>
+</span><span class='line'><span class="nt">&lt;/definitions&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>这里要说明一点，WSDL是WebService的描述语言，只是用来描述WebService，当客户端想要使用该WebService时，根据这个描述，可以知道该WebService的服务端口有哪些，服务内容有什么。但对于WebService本身的功能没有任何影响，换句话说，如果是你自己写的WebService，提供给自己使用，你根本不需要关心WSDL是什么，因为你知道自己提供的服务内容和端口。</strong></p>
+
+<p>关于这点，我会在后面的Spring WebService代码中证明。</p>
+
+<h2><strong>Spring WebService</strong></h2>
+
+<p>OK，到这里几个重要的概念都谈到了，应该开始正题，如果上面的内容没看懂，特别是WSDL，没关系，接下来，我们根据Spring WebService的例子，来一个个分析。</p>
+
+<h3>Contract First 契约优先</h3>
+
+<p>首先实现WebService的消息通信协议，也就是提供什么样的服务，接收什么消息，返回什么消息。</p>
+
+<p>根据前面的知识：要根据XSD来约束发送和接收的XML长什么样子。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;xs:schema</span> <span class="na">xmlns:xs=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema&quot;</span>
+</span><span class='line'>           <span class="na">targetNamespace=</span><span class="s">&quot;http://benweizhu.github.io&quot;</span>
+</span><span class='line'>           <span class="na">elementFormDefault=</span><span class="s">&quot;qualified&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;SearchBookRequest&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;xs:complexType&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;xs:sequence&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;author&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span> <span class="na">minOccurs=</span><span class="s">&quot;0&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/xs:sequence&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/xs:complexType&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/xs:element&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;SearchBookResponse&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;xs:complexType&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;xs:sequence&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;id&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:int&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/xs:sequence&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/xs:complexType&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/xs:element&gt;</span>
+</span><span class='line'><span class="nt">&lt;/xs:schema&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在这个例子中，我提供了一个图书搜索的服务，传给我书名name和作者author，我返回对应书的id。</p>
+
+<p>根据这个XSD文件，发送出去的请求的XML的应该是长类似下面这个样子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;z:SearchBookRequest</span> <span class="na">xmlns:z=</span><span class="s">&quot;http://benweizhu.github.io&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;z:name&gt;</span>SpringWebService<span class="nt">&lt;/z:name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;z:author&gt;</span>Spring<span class="nt">&lt;/z:author&gt;</span>
+</span><span class='line'><span class="nt">&lt;/z:SearchBookRequest&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>JAXB</h3>
+
+<p>根据这个定义的XSD文件，可以生成对应的Java类文件，这一步很简单，在Eclipse或者IntellIj中都有提供XSD到Java文件的转换插件。你只需要转换一下，就会生成的两个类SearchBookRequest和SearchBookResponse，它们会在下面的Endpoint中被使用。</p>
+
+<h3>Endpoint</h3>
+
+<p>实现Endpoint，也就是，这个请求消息给服务端后，有谁来处理，并返回响应结果。</p>
+
+<p>Spring提供了注解的方式来配置一个Endpoint。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">ws</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">endpoint</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">jaxbgen.SearchBookRequest</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">jaxbgen.SearchBookResponse</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ws.server.endpoint.annotation.Endpoint</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ws.server.endpoint.annotation.PayloadRoot</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ws.server.endpoint.annotation.RequestPayload</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ws.server.endpoint.annotation.ResponsePayload</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Endpoint</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookEndpoint</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@PayloadRoot</span><span class="o">(</span><span class="n">localPart</span> <span class="o">=</span> <span class="s">&quot;SearchBookRequest&quot;</span><span class="o">,</span> <span class="n">namespace</span> <span class="o">=</span> <span class="s">&quot;http://benweizhu.github.io&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="nd">@ResponsePayload</span> <span class="n">SearchBookResponse</span> <span class="nf">searchBook</span><span class="o">(</span><span class="nd">@RequestPayload</span> <span class="n">SearchBookRequest</span> <span class="n">searchBookRequest</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">SearchBookResponse</span> <span class="n">searchBookResponse</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">SearchBookResponse</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">searchBookResponse</span><span class="o">.</span><span class="na">setId</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">searchBookResponse</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>第一个注解@Endpoint不用我解释了，就是说明这个类是一个WebService的Endpoint。
+第二个注解@PayloadRoot里面有两个参数，localPart和namespace，它们分别匹配到XML中的根元素名字和命名空间，也就是说，如果发送过来消息的满足这两个条件，就交给该函数处理。这样就形成了消息到Endpoint的映射。
+第三和第四个注解@RequestPayload和@ResponsePayload就简单了，分别用来指明请求和响应的对象。</p>
+
+<h3>Spring的XML配置</h3>
+
+<p>配置比较简单，提供组件扫描和对Endpoint注解的支持即可。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:sws=</span><span class="s">&quot;http://www.springframework.org/schema/web-services&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
+</span><span class='line'><span class="s">      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd</span>
+</span><span class='line'><span class="s">      http://www.springframework.org/schema/web-services</span>
+</span><span class='line'><span class="s">      http://www.springframework.org/schema/web-services/web-services-2.0.xsd</span>
+</span><span class='line'><span class="s">      http://www.springframework.org/schema/context</span>
+</span><span class='line'><span class="s">      http://www.springframework.org/schema/context/spring-context.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;sws:annotation-driven/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;me.zeph.spring.ws.example&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>web.xml</h3>
+
+<p>最后再来看web.xml怎么配置。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">version=</span><span class="s">&quot;2.4&quot;</span>
+</span><span class='line'>         <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span>
+</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee</span>
+</span><span class='line'><span class="s">         http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;servlet&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>spring-ws<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;servlet-class&gt;</span>org.springframework.ws.transport.http.MessageDispatcherServlet<span class="nt">&lt;/servlet-class&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/servlet&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;servlet-mapping&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>spring-ws<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;url-pattern&gt;</span>/services/*<span class="nt">&lt;/url-pattern&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/servlet-mapping&gt;</span>
+</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>和SpringMVC一样，WebService也需要一个前端的请求分发的Servlet，MessageDispatcherServlet。你可能会想为什么是Servlet？</p>
+
+<p>其实，这点，我在前面已经提到过，WebService的协议是绑定在Soap上面的，而Soap又是以http协议作为应用层协议的载体，发出去的Request固然是http请求。不配置对应Servlet，不配置对应的URL，那应该怎么做呢？</p>
+
+<p>到此为止，一个Spring Web Service的服务端代码就写完了。你肯定会想，说好的WSDL呢？它去哪了？我这里刻意没有配置WSDL，就是要证明WSDL本身对于WebService没有影响，所以WSDL可以不用配。</p>
+
+<p>我们先把WSDL放在一边，先把客户端代码完成。</p>
+
+<h3>Spring WebService Template 客户端</h3>
+
+<p>这里的客户端代码使用Spring提供的WebServiceTemplate完成。</p>
+
+<p>在applicationContext中配置WebServiceTemplate，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
+</span><span class='line'><span class="s">       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;webServiceTemplate&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.ws.client.core.WebServiceTemplate&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;defaultUri&quot;</span> <span class="na">value=</span><span class="s">&quot;http://localhost:8080/spring-ws/services/&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;marshaller&quot;</span> <span class="na">ref=</span><span class="s">&quot;marshaller&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;unmarshaller&quot;</span> <span class="na">ref=</span><span class="s">&quot;marshaller&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;marshaller&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.oxm.jaxb.Jaxb2Marshaller&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;packagesToScan&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;list&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;value&gt;</span>jaxbgen<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/list&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>defaultUri用来说明该Template会向哪个URL发出请求。关于这个URL，因为在web.xml配置时，该MessageServlet是接受spring-ws/services/*的任何请求，而Spring WebService的Endpoint映射并不是根据URL来判断，所以这里你可以写任何满足该模式的URL，例如： <a href="http://localhost:8080/spring-ws/services/ssss">http://localhost:8080/spring-ws/services/ssss</a> 。</p>
+
+<p>Marshaller用于实现XML到Java和Java到XML的转换。在Template需要配置marshaller和unmarshaller，这里它们用的同一个Marshaller对象。</p>
+
+<p>客户端Java代码：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">integration</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">jaxbgen.SearchBookRequest</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">jaxbgen.SearchBookResponse</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.junit.Test</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.junit.runner.RunWith</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.test.context.ContextConfiguration</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.test.context.junit4.SpringJUnit4ClassRunner</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ws.client.core.WebServiceTemplate</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">hamcrest</span><span class="o">.</span><span class="na">CoreMatchers</span><span class="o">.</span><span class="na">is</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">Assert</span><span class="o">.</span><span class="na">assertThat</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@RunWith</span><span class="o">(</span><span class="n">SpringJUnit4ClassRunner</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@ContextConfiguration</span><span class="o">(</span><span class="n">locations</span> <span class="o">=</span> <span class="o">{</span><span class="s">&quot;classpath:applicationContext.xml&quot;</span><span class="o">})</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookClientIntegrationTest</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Autowired</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">WebServiceTemplate</span> <span class="n">webServiceTemplate</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Test</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">shouldGetResponseFromWebService</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="c1">//given</span>
+</span><span class='line'>      <span class="n">SearchBookRequest</span> <span class="n">searchBookRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">SearchBookRequest</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">//when</span>
+</span><span class='line'>      <span class="n">SearchBookResponse</span> <span class="n">searchBookResponse</span> <span class="o">=</span> <span class="o">(</span><span class="n">SearchBookResponse</span><span class="o">)</span> <span class="n">webServiceTemplate</span><span class="o">.</span><span class="na">marshalSendAndReceive</span><span class="o">(</span><span class="n">searchBookRequest</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">//then</span>
+</span><span class='line'>      <span class="n">assertThat</span><span class="o">(</span><span class="n">searchBookResponse</span><span class="o">.</span><span class="na">getId</span><span class="o">(),</span> <span class="n">is</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>OK，到此为止，Spring WebService的服务端和客户端代码完成。</p>
+
+<p>所以，现在我们再回过头来，看看WSDL。</p>
+
+<h3>WSDL</h3>
+
+<h5>Automatic WSDL exposure 自动生成WSDL</h5>
+
+<p>在刚才的Spring XML配置中（/WEB-INF/[servlet-name]-servlet.xml）中加一段XML配置：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;sws:dynamic-wsdl</span> <span class="na">id=</span><span class="s">&quot;book&quot;</span> <span class="na">portTypeName=</span><span class="s">&quot;SearchBookRequest&quot;</span>
+</span><span class='line'>                      <span class="na">locationUri=</span><span class="s">&quot;http://tobereplacedbyws:8080/spring-ws/services/&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;sws:xsd</span> <span class="na">location=</span><span class="s">&quot;classpath:book.xsd&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/sws:dynamic-wsdl&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>要注意位置有两点：</p>
+
+<ol>
+<li>属性id，除了唯一指定一个元素之外，它还有个更重要的作用，是说明该wsdl的名字。当你要访问该wsdl时，访问的url是 <a href="http://localhost:8080/spring-ws/services/book.wsdl">http://localhost:8080/spring-ws/services/book.wsdl</a> 。</li>
+<li>属性locationUri，前面已经看到WSDL跟WebService的功能性服务没有半毛钱关系，所以这里的locationUri属性配置也不会影响到WebService的功能，它只是在你在wsdl中看到的一个字段，用来描述服务端的服务端口（URL）是什么。如果你看上面例子中的locationUri，你会发现不是写的localhost，而是tobereplacedbyws。为什么呢？因为MessageDispatcherServlet提供了一个特性，可以在部署时，根据主机的名字，替换这个位置的内容。如何开启这个特性呢？</li>
+</ol>
+
+
+<p>在web.xml中配置一个initparam即可。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">version=</span><span class="s">&quot;2.4&quot;</span>
+</span><span class='line'>         <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span>
+</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee</span>
+</span><span class='line'><span class="s">         http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;servlet&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>spring-ws<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;servlet-class&gt;</span>org.springframework.ws.transport.http.MessageDispatcherServlet<span class="nt">&lt;/servlet-class&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;init-param&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;param-name&gt;</span>transformWsdlLocations<span class="nt">&lt;/param-name&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;param-value&gt;</span>true<span class="nt">&lt;/param-value&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/init-param&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/servlet&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;servlet-mapping&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>spring-ws<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;url-pattern&gt;</span>/services/*<span class="nt">&lt;/url-pattern&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/servlet-mapping&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个时候，你访问 <a href="http://localhost:8080/spring-ws/services/book.wsdl">http://localhost:8080/spring-ws/services/book.wsdl</a> ，就可以看到对应的WSDL信息，然后你就可以用SoapUI等类似软件去测试你的Webservice。</p>
+
+<p>参考资料：</p>
+
+<p>(1) spring webservice reference</p>
+
+<p>(2) <a href="http://www.w3school.com.cn/ws.asp">http://www.w3school.com.cn/ws.asp</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -208,253 +913,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/04/07/write-java-code-without-ide/">丢掉IDE，回到Java的第一堂课</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-04-07T13:56:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:56 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>最近，《实现领域驱动设计》的译者，ThoughtWorks的<a href="http://www.davenkin.me/">“滕老板”</a>（腾云）给我们上了一堂基础课，就是没有IDE的情况下，去编译和运行用文本编辑器编写的Java代码。</p>
-
-<p>这本应该是基础中的基础，我记得应该是Java第一堂课就应该讲到的东西。但是我们这群用惯了IDE的程序员，在没有了IDE之后，就开始不知所措了。虽然不知道这些知识，对于普通开发似乎是没有影响，但毕竟是Java的重要基础知识，了解这些知识可以帮助你理解IDE帮你做了什么，可以更快速的定位问题。</p>
-
-<p>还是举例子，滕老板的例子：</p>
-
-<p>目录结构</p>
-
-<p>src</p>
-
-<p>&ndash;client</p>
-
-<p>&mdash;-Client.java</p>
-
-<p>&ndash;service</p>
-
-<p>&mdash;-Service.java</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Service</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">run</span><span class="o">(){</span>
-</span><span class='line'>      <span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">String</span><span class="o">(</span><span class="s">&quot;as your service&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">str</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">client</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">service.*</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Client</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[]){</span>
-</span><span class='line'>      <span class="n">Service</span> <span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Service</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">service</span><span class="o">.</span><span class="na">run</span><span class="o">());</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>ok，代码写完了，你知道该怎么运行吗？</p>
-
-<p>命令行：进入到src目录下</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='powershell'><span class='line'><span class="n">javac</span> <span class="n">client</span><span class="p">/</span><span class="n">Client</span><span class="p">.</span><span class="n">java</span>
-</span><span class='line'><span class="n">java</span> <span class="n">client</span><span class="p">.</span><span class="n">Client</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这样就会输出正确结果：as your service。</p>
-
-<p>再来看一下目录结构</p>
-
-<p>src</p>
-
-<p>&ndash;client</p>
-
-<p>&mdash;-Client.java</p>
-
-<p>&mdash;-Client.class</p>
-
-<p>&ndash;service</p>
-
-<p>&mdash;-Service.java</p>
-
-<p>&mdash;-Service.class</p>
-
-<p>我们知道javac命令编译的是.java文件，而java命令运行是.class文件。</p>
-
-<p>但是这里还是有几个疑问：</p>
-
-<p>1.javac client/Client.java时，它怎么知道去哪里找Service类？</p>
-
-<p>2.对于上一个疑问，你的答案可能是import service.*;告诉它去service包下找，那么第二疑问，为什么是import service.*;而不是import src.service.*?</p>
-
-<p>3.第三个疑问和第一个疑问类似，答案也类似，java client.Client，怎么知道去哪里找service.class文件？</p>
-
-<p>面对这三个问题，答案是，要引入两个概念。</p>
-
-<p>sourcepath和classpath。</p>
-
-<p>classpath大家听得比较多，用来告诉JVM或者Java编译器到哪里去寻找用户定义的类和包。</p>
-
-<p>sourcepath和classpath一样，只不过它是用来告诉编译器到哪里去寻找源文件。</p>
-
-<p>在上面的javac和java命令中，既没有显示的指定sourcepath，也没有显示的指定classpath。但是它们都有默认值，就是将当前目录作为各自的路径。</p>
-
-<p>比如：我现在从当前路径src，进入到它的一个子目录中src/sub。</p>
-
-<p>然后我运行：javac ../client/Client.java命令</p>
-
-<p>它提示我找不到Service类。 那是因为当前的sourcepath是src/sub，在这个路径下没有Service.java。我们改一下，显示的设置它sourcepath。</p>
-
-<p>运行命令：javac -sourcepath ../ ../client/Client.java</p>
-
-<p>编译成功。</p>
-
-<p>那么运行呢？</p>
-
-<p>直接在src/sub路径下，运行：java client.Client。能行吗？肯定不行。</p>
-
-<p>Error: Could not find or load main class client.Client</p>
-
-<p>必须要显示的指定它的classpath为上一级目录：</p>
-
-<p>java -classpath ../ client.Client</p>
-
-<p>ok，成功。</p>
-
-<p>现在再来让我们回到刚才的第二个问题。为什么import的不是src.service.* ，因为我们设置它的sourcepath，它就成为一个相对路径。</p>
-
-<p>这不禁让我想到一个问题。package和import到底有什么用？为什么package名字和目录结构一致？</p>
-
-<p>这不是白痴问题吗？</p>
-
-<p>package是作为命名空间，因为不同开发商，开发出来的类库可能会有相同的类名。为了区分，防止冲突，用不同的包名区分。</p>
-
-<p>import是根据你要使用的类，从classpath下找到你要使用的类，并引入到你的类中。</p>
-
-<p>我做了一个实验：</p>
-
-<p>将Service类的package定义，改为service.something，这样包名和目录结构就不一致了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">service</span><span class="o">.</span><span class="na">something</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Service</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">run</span><span class="o">(){</span>
-</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;as your service&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后还是照常编译。</p>
-
-<pre><code>client/Client.java:7: error: cannot access Service
-    Service service = new Service();
-    ^
-    bad source file: ./service/Service.java
-    file does not contain class service.Service
-Please remove or make sure it appears in the correct subdirectory of the sourcepath.
-1 error
-</code></pre>
-
-<p>第四行，bad source file: ./service/Service.java表明他在编译Client.java文件时，通过import找到了该文件，说明import是通过文件结构去找到的。</p>
-
-<p>但是他又说file does not contain class service.Service，说明在这个Service.java中找不到对应的Service类。</p>
-
-<p>为什么呢？因为我的包名是service.something，但是他要找的是service。</p>
-
-<p>所以包的作用是和类的名字组成完整的类名，这里的Service类的全名应该是service.something.Service。但是他去找到的是service.Service。所以它找不到。</p>
-
-<p>那是不是将import改为import service.something.*;就可以呢？</p>
-
-<p>不行，前面说了，import是根据目录结构去找到的，根本就没有service/something这个目录结构，所以不可能找到。</p>
-
-<pre><code>client/Client.java:3: error: package service.something does not exist
-import service.something.*;
-^
-client/Client.java:7: error: cannot find symbol
-    Service service = new Service();
-    ^
-    symbol:   class Service
-    location: class Client
-    client/Client.java:7: error: cannot find symbol
-    Service service = new Service();
-                          ^
-    symbol:   class Service
-    location: class Client
-</code></pre>
-
-<p>你看，第一行：client/Client.java:3: error: package service.something does not exist</p>
-
-<p>回过头来想，这也是为什么，有时候，当同时导入两个不同包中名字相同的类时，其中有一个要用完全限定名。因为类的名字本来就是由包的名字和类的自身名字组成。</p>
-
-<p>总而言之，这堂课的收获还是挺大的，重点要掌握上面提到的两个概念。</p>
-
-<p>课上本来还有一点关于，打jar包和如何引用jar包的内容，以及通过java -d命令，将class文件编译到指定的目录下。</p>
-
-<p>这里我就不多说了，万变不离其宗。</p>
-
-<p>javac -classpath &ldquo;.:service.jar&rdquo; client/Client.java //linux下面是冒号，windows下面是分号</p>
-
-<p>java -classpath &ldquo;.:service.jar&rdquo; client.Client</p>
-
-<p>只不过要注意一点的是，打jar包时，一定要按照package定义的目录结构去打。因为在将jar包加入到classpath时和将一个目录下的class文件加入是一样的，相对路径。</p>
-
-<p>java -d out client/Client.java，会将class文件编译到out目录下，且内部目录结构与包的结构一致。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/41">&larr; Older</a>
@@ -482,6 +940,10 @@ client/Client.java:7: error: cannot find symbol
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/10/27/living-style-guide/">Living Style Guide - 缩小设计和开发的沟通鸿沟</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/08/21/css-for-software-engineers-for-css-developers/">CSS和软件工程中的设计原则</a>
       </li>
     
@@ -495,10 +957,6 @@ client/Client.java:7: error: cannot find symbol
     
       <li class="post">
         <a href="/blog/2016/06/27/host-jenkins-on-aws/">在AWS上部署Jenkins</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/06/13/I-want-to-talk-about-https-too/">我也想来谈谈HTTPS</a>
       </li>
     
   </ul>

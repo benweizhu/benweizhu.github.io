@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在关系型数据库中，表与表之间的关系是通过外键来实现，而其中最常见的关系有两种：一对多和多对多。 在面向对象的世界，对象与对象之间的关系是通过从源对象到目标对象的对象引用实现。关系是一个对象含有的其他对象或者对象的集合，而在关系型数据库中，关系要么通过定义另一张表的外键建立，要么通过中间表建立。 &hellip;">
+  <meta name="description" content="理解DSL（领域特定语言） DSLs come in two main forms: external and internal. An external DSL is a language that&rsquo;s parsed independently of the host general &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,212 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/03/31/deep-into-gradle-in-action-6/">Gradle深入与实战（六）Gradle的背后是什么？</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-03-31T23:20:24+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>11:20 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>理解DSL（领域特定语言）</h2>
+
+<p>DSLs come in two main forms: external and internal. An external DSL is a language that&rsquo;s parsed independently of the host general purpose language: good examples include regular expressions and CSS. External DSLs have a strong tradition in the Unix community. Internal DSLs are a particular form of API in a host general purpose language, often referred to as a fluent interface. &mdash;- Martin Fowler</p>
+
+<p>Martin Fowler将DSL分为两类：外部DSL和内部DSL。外部DSL是一种独立的可解析的语言，举一个最常见的是例子，SQL，它专注于数据库的操作。内部DSL是通用语言所暴露的用来执行特定任务的API，它利用语言本身的特性，将API以特殊的形式（或者格式）暴露出来的。比如，Martin Fowler给出了关于流接口（fluent interface）。</p>
+
+<p>总结一下，外部DSL是一种特定的独立语言，内部DSL是通用语言为实现特殊目的提供的API。</p>
+
+<p>我们可以看下Martin Fowler提供的关于流接口的一个例子。流接口的实现方式同样是通用语言的写法，但相对于连续的调用set方法或者add方法，可读性方面要好很多。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="kt">void</span> <span class="nf">makeFluent</span><span class="o">(</span><span class="n">Customer</span> <span class="n">customer</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">customer</span><span class="o">.</span><span class="na">newOrder</span><span class="o">()</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="mi">6</span><span class="o">,</span> <span class="s">&quot;TAL&quot;</span><span class="o">)</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="s">&quot;HPK&quot;</span><span class="o">).</span><span class="na">skippable</span><span class="o">()</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">with</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">&quot;LGV&quot;</span><span class="o">)</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">priorityRush</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Gradle的DSL</h2>
+
+<p>Gradle为了很好的描述构建，它提供了一套DSL，它是一种内部DSL。这套语言基于Groovy，但增加了一点点的特殊处理，以便在利用Groovy语言特性的之外，让它更像一个构建语言。</p>
+
+<p>所以，Gradle的构建脚本和Groovy之间的关系是大于(>)。换句话说，如果你在Gradle的构建脚本中，写纯粹的Groovy代码是绝对没有问题的，这一点在官方文档的用户手册中也单独拿出一章来说明。</p>
+
+<h2>构建脚本</h2>
+
+<p>我们先暂且不去验证这一点，也不要着急着用Groovy去写一个功能强大且复杂的task，从构建脚本中跳出来，站在一个更高的位置来俯视Gradle。</p>
+
+<p>在我们写Gradle脚本的时候，我们一般会写两种类型的，一种脚本，默认命名是build.gradle，另一种脚本，命名是settings.gradle。它们各自的作用，相信不用我在这里过多的介绍。在Gradle的世界里面，它们都叫做配置脚本。举个很简单的例子，在settings中配置，多项目结构有哪些模块，或者在build.gradle中，配置Java的sourceset。</p>
+
+<p>那可能就有人问了，那在构建脚本中写一个task也算配置吗？我并没有配置什么东西，而是在用语言实实在在的写一系列的动作。这个算配置吗？</p>
+
+<p>我想，这取决于对“配置”这个概念的理解。如果，我只是应用Java插件，写一个sourceset，或者写一个dependencies，这个配置就有点类似，传统意义上理解的“键值对”的配置。</p>
+
+<p>如果涉及到写一个task的时候，我们就要把它想象成“对某一个对象的配置”，想象成一系列的set或者add操作（即便是sourceset，你也应该这么去理解，因为这才是本质）。</p>
+
+<h2>基于Groovy的本质</h2>
+
+<p>在前面介绍DSL概念的时候，我们了解到Gradle是一种内部DSL，是一系列的API，它基于Groovy。Groovy是什么？它是一种面向对象的编程语言，它的核心概念是对象。</p>
+
+<p>Gradle基于Groovy但大于Groovy，它是经过“定制”的Groovy，是经过“定制”的面向对象语言，所以，由始至终，Gradle都离不开对象这个概念。</p>
+
+<p>如果你明白了这个本质，那么就明白了写Gradle脚本，就和写Java代码是一个道理，写Gradle构建脚本就是写代码调用Gradle的API，只不过因为一些特性和特殊处理，让他看上去不太像一个标准的类C的编程语言（我更倾向于说类Java，因为C语言不是面向对象的），那么接下来，你所需要知道的就是Gradle提供的API长啥样。</p>
+
+<h2>Gradle的对象</h2>
+
+<p>既然我们知道了Gradle的本质是经过“定制”的<strong>面向对象</strong>语言（Groovy语言），那么我们就来看看Gradle里面有些什么对象。</p>
+
+<p>如果你有读过Gradle的用户手册，那么，第六章，Build Script Basics，肯定是你必读的一章节，即便你当时看不太明白，只是依葫芦画瓢。现在你可以回过头来看下，该章节在一开始就进入主题，介绍了Gradle中两个的核心概念，project和task。</p>
+
+<p>从组成关系上来看，我们知道，或者文档是这么说的，一个构建是由多个project组成，一个project是由多个task组成，task之间的依赖关系，构成了整个构建的流水线。</p>
+
+<p>对于task的概念相对比较好理解，因为在命令行中，我们通过gradle build，进行Java的构建，这是一个看得见，摸得着的概念。</p>
+
+<p>那project是什么？从你学习Gradle开始，到应用Java插件，实现Java的构建，好像从头到尾都没有直接接触过project这个概念，至少没有像task这样如此真实的接触。我们需要了解它吗？如果你只是依葫芦画瓢，参考Gradle的文档，进行构建的“配置”，那么你不用。</p>
+
+<p>如果你想知道写的那些配置在本质上是什么？那么就有必要。</p>
+
+<h2>Project对象和build.gradle</h2>
+
+<p>为了不深究Gradle的实现原理（就是去读源代码），又要让大家觉得有据可依。我通过引用官方文档的一些描述来帮助大家理解Project对象。</p>
+
+<p>For each project in the build, Gradle creates an object of type Project and associates this Project object with the build script. (Chapter 13. Writing Build Scripts)   <br/>
+构建中的每一个project，Gradle都会创建一个Project对象，并将这个对象与构建脚本相关联。</p>
+
+<p>There is a one-to-one relationship between a Project and a &ldquo;build.gradle&rdquo; file. (Interface Project API)   <br/>
+Project对象与build.gradle是一对一的关系。</p>
+
+<p>First, Gradle scripts are configuration scripts. As the script executes, it configures an object of a particular type. For example, as a build script executes, it configures an object of type Project. This object is called the delegate object of the script. (Gradle Build Language Reference)   <br/>
+Gradle的脚本是配置脚本，当脚本执行时，它是在配置某一个特殊类型的对象。比如一个构建脚本的执行，它就是在配置一个Project类型的对象。这个对象叫做脚本的代理对象。</p>
+
+<p>读完这三句话，应该可以清楚的明白build.gradle的本质，简单的说，build.gradle是对一个Project对象的配置。</p>
+
+<h2>深入理解</h2>
+
+<p>如果你还没明白，你可以仔细考量这三句话。因为这里，我们要进一步深入探讨上个部分引出的另一个概念：代理。</p>
+
+<p>这个概念并不来自于Gradle，如果你熟悉Groovy，你肯定会立刻想到这是Groovy中很重要的一个概念。</p>
+
+<p>在Groovy中，Object对象提供了一个重要的方法with，这个方法在JavaScript中也是存在的。with方法可以在一个闭包内辅助实现委托调用，在with的作用域内调用的任何方法，都被定向到该上下文对象上，这样就去掉了对该实例的多余引用，举个例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kt">def</span> <span class="n">list</span> <span class="o">=</span> <span class="o">[</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">]</span>
+</span><span class='line'><span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
+</span><span class='line'><span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span>
+</span><span class='line'><span class="n">println</span><span class="o">(</span><span class="n">list</span><span class="o">.</span><span class="na">size</span><span class="o">())</span>
+</span><span class='line'><span class="n">println</span><span class="o">(</span><span class="n">list</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="mi">2</span><span class="o">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">def</span> <span class="n">listWith</span> <span class="o">=</span> <span class="o">[</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">]</span>
+</span><span class='line'><span class="n">listWith</span><span class="o">.</span><span class="na">with</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">add</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span>
+</span><span class='line'>  <span class="n">add</span><span class="o">(</span><span class="mi">4</span><span class="o">)</span>
+</span><span class='line'>  <span class="n">println</span><span class="o">(</span><span class="n">size</span><span class="o">())</span>
+</span><span class='line'>  <span class="n">println</span><span class="o">(</span><span class="n">contains</span><span class="o">(</span><span class="mi">2</span><span class="o">))</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在with中，省去了对 list对象的引用。</p>
+
+<p>而build.gradle和project对象，虽然从解析的角度不一定是通过with方式实现，但是它们之间就是这样的一个关系。</p>
+
+<p>闭包内的内容就是build.gradle对project对象的操作。</p>
+
+<p>这里我引用Gradle用户手册第十三章的内容来进一步说明，</p>
+
+<p>Any method you call in your build script which is not defined in the build script, is delegated to the Project object.
+Any property you access in your build script, which is not defined in the build script, is delegated to the Project object.（Chapter 13. Writing Build Scripts）</p>
+
+<h2>通过现象看本质</h2>
+
+<p>我们从理论上讲了这么多关于Gradle本质的东西，而且好像还有点道理，但我们还是要验证一下，透过现象来看本质。通过实践，进一步加强我们的理解。</p>
+
+<h4>一个小小的task</h4>
+
+<p>举个例子，我们在build.gradle中，写一个简单的task</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">helloWorld</span> <span class="o">&lt;&lt;</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">println</span> <span class="s1">&#39;helloWorld&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果你熟悉Groovy，并且知道它是针对project为上下文的一段代码，你会怎么看上面这段代码。是不是会有几个疑问？</p>
+
+<p>问题一：是否有一个project的方法叫做task？答案：是，Project.task(String name)，返回一个Task对象。</p>
+
+<p>问题二：helloWorld是一个参数吗？答案：是，它被解析为一个String类型的实参变量</p>
+
+<p>问题三：符号“&lt;&lt;”是什么意思？答案：Groovy的强大特性，操作符重载。Task.leftShift(Closure action)，用来给task的action列表中添加一个action。</p>
+
+<p>如果我用Groovy的写法，把它写成下面这样，是否就更好理解一些呢？</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span><span class="o">(</span><span class="s2">&quot;helloWorld&quot;</span><span class="o">).</span><span class="na">leftShift</span><span class="o">({</span>
+</span><span class='line'>    <span class="n">println</span> <span class="s1">&#39;hello world&#39;</span>
+</span><span class='line'><span class="o">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>总结</h2>
+
+<p>当我们透过现象看到本质之后，你对Gradle的理解是不是不再是冷冰冰的闭包配置。是不是觉得Gradle其实没有那么神秘，不需要为Gradle中的奇怪的DSL感到困惑，它只是个API，读下API文档就好了。</p>
+
+<p>最后总结，Gradle is Groovy but more than Groovy。</p>
+
+<p>参考资料：</p>
+
+<p>1.<a href="http://gradle.org/docs/current/userguide/writing_build_scripts.html">http://gradle.org/docs/current/userguide/writing_build_scripts.html</a>  <br/>
+2.<a href="http://gradle.org/docs/current/javadoc/">http://gradle.org/docs/current/javadoc/</a>   <br/>
+3.<a href="http://docs.groovy-lang.org/latest/html/documentation/index.html#_delegation_strategy">http://docs.groovy-lang.org/latest/html/documentation/index.html#_delegation_strategy</a>   <br/>
+4.Groovy程序设计</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -287,250 +493,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/03/15/deep-into-gradle-in-action-5/">Gradle深入与实战（五）自定义插件</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-03-15T14:18:10+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:18 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>利用Gradle做构建，必然逃不掉Gradle的插件的使用，即便是最简单的Java或Groovy的应用都需要使用Java插件或者Groovy插件。</p>
-
-<p>Gradle插件的作用就是将会被重复利用的逻辑打包，这样就可以在不同的项目中重复的使用。比如在上一节中实现的集成测试任务，就可以打包到插件中，然后在其他的工程中使用，而不需要重复的写相同的任务。</p>
-
-<p><strong>Gradle提供了三种写插件的方式：</strong></p>
-
-<p>1.直接在build.gradle文件中写插件，然后直接使用，不好的地方很明显，不能在该build.gradle脚本之外的位置（其他脚本或者工程）中使用。</p>
-
-<p>2.将插件写在项目的rootProjectDir/buildSrc/src/main/groovy包下，Gradle会负责编译和放置到classpath，虽然可以多个gradle脚本中使用，但是不能在其他工程中使用。</p>
-
-<p>3.一个独立的插件工程，很明显，这是最常见的实现方式，因为可以被任何脚本或者工程使用。</p>
-
-<p>为了节省时间，我们直接进入到最常见的实现方式：<strong>实现一个独立的插件工程</strong>。</p>
-
-<h2>这是一个Groovy工程</h2>
-
-<p>我们知道，Gradle项目是基于Groovy语言开发的，所以插件功能必然是一个Groovy工程，构建创建一个build.gradle文件。</p>
-
-<figure class='code'><figcaption><span>build.gradle </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;groovy&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="nf">gradleApi</span><span class="o">()</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="nf">localGroovy</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">task</span> <span class="nf">wrapper</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Wrapper</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">gradleVersion</span> <span class="o">=</span> <span class="s1">&#39;1.11&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>按照Groovy插件推荐的目录结构建立好下面结构的目录，你可以忽略java那一级</p>
-
-<p>src/main/java     <br/>
-src/main/resources   <br/>
-src/main/groovy  <br/>
-src/test/java   <br/>
-src/test/resources        <br/>
-src/test/groovy</p>
-
-<h2>利用Plugin接口实现插件</h2>
-
-<p>然后，我们写一个Groovy类，让它实现Plugin接口，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugin</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.gradle.extension.HelloExtension</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.gradle.api.Plugin</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.gradle.api.Project</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">class</span> <span class="nc">HelloPlugin</span> <span class="kd">implements</span> <span class="n">Plugin</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kt">void</span> <span class="nf">apply</span><span class="o">(</span><span class="n">Project</span> <span class="n">project</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">project</span><span class="o">.</span><span class="na">task</span><span class="o">(</span><span class="s1">&#39;hello&#39;</span><span class="o">)</span> <span class="o">&lt;&lt;</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">println</span> <span class="s1">&#39;hello plugin&#39;</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里，我们通过project的task方法实现了一个名字是hello的task，里面打印了一句话。这个任务很简单，现在我们来增加一点点复杂度。记不记得大部分插件在使用之后，除了提供一些列的task，还提供了许多的closure（闭包），可以通过这些闭包传递一些参数进去。那么，这是怎么是实现的呢？很简单，利用project提供的扩展。</p>
-
-<h2>扩展的使用</h2>
-
-<p>定义一个名字是HelloExtension的Groovy类（名字其实无所谓叫什么，而且居然不需要实现任何的接口）：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">extension</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">class</span> <span class="nc">HelloExtension</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">String</span> <span class="n">message</span><span class="o">;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>改变一些插件的实现：</p>
-
-<figure class='code'><figcaption><span>build.gradle </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">gradle</span><span class="o">.</span><span class="na">plugin</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.gradle.extension.HelloExtension</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.gradle.api.Plugin</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.gradle.api.Project</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">class</span> <span class="nc">HelloPlugin</span> <span class="kd">implements</span> <span class="n">Plugin</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kt">void</span> <span class="nf">apply</span><span class="o">(</span><span class="n">Project</span> <span class="n">project</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">project</span><span class="o">.</span><span class="na">extensions</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s1">&#39;hello&#39;</span><span class="o">,</span> <span class="n">HelloExtension</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">project</span><span class="o">.</span><span class="na">task</span><span class="o">(</span><span class="s1">&#39;hello&#39;</span><span class="o">)</span> <span class="o">&lt;&lt;</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">println</span> <span class="n">project</span><span class="o">.</span><span class="na">hello</span><span class="o">.</span><span class="na">message</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>project.extensions.add(&lsquo;hello&rsquo;, HelloExtension)，这段代码将HelloExtension添加到project的extensions中，于是task就可以通过project.hello.message来获取。是不是很简单？</p>
-
-<h2>告诉别人这是个插件：插件id</h2>
-
-<p>那么，功能部分都写完了，怎么样让其他构件脚本知道这是一个插件能？配置META-INF。</p>
-
-<p>在resources目录下建立这样一个目录结构：/resources/META-INF/gradle-plugins</p>
-
-<p>然后在这里建立一个名字是me.zeph.hello.properties的Property文件，文件里的内容是：</p>
-
-<figure class='code'><figcaption><span>me.zeph.hello.properties </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="na">implementation-class</span><span class="o">=</span><span class="s">me.zeph.gradle.plugin.HelloPlugin</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个Property文件的命名并不是随意定义的，名字的作用是定义该插件的id，什么意思？说白了就是apply时使用的名字。如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;me.zeph.hello&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>至于里面的内容，我就不解释了，一眼就看明白了。</p>
-
-<h2>使用生成的插件</h2>
-
-<p>到这里，一个独立的插件工程就完成了，实验一把！！</p>
-
-<p>运行gredlew clean assemble，将生成的jar文件，拷贝到其他的项目目录中（这里没有upload到仓库，所以直接文件形式引入依赖）。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">classpath</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="s1">&#39;libs&#39;</span><span class="o">,</span> <span class="nl">include:</span> <span class="s1">&#39;*.jar&#39;</span><span class="o">)</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;me.zeph.hello&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">hello</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;hello gradle plugin&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后运行gradlew hello，就可以看到hello任务的执行。</p>
-
-<p>总结，其实实现一个Gradle的独立插件工程，从建立工程的角度还是比较简单的，关键在如何通过Groovy实现插件，已经理解插件的api。</p>
-
-<p>参考资料：</p>
-
-<p>1.<a href="https://gradle.org/docs/current/userguide/custom_plugins.html">https://gradle.org/docs/current/userguide/custom_plugins.html</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/27">&larr; Older</a>
@@ -558,6 +520,10 @@ src/test/groovy</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/10/27/living-style-guide/">Living Style Guide - 缩小设计和开发的沟通鸿沟</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/08/21/css-for-software-engineers-for-css-developers/">CSS和软件工程中的设计原则</a>
       </li>
     
@@ -571,10 +537,6 @@ src/test/groovy</p>
     
       <li class="post">
         <a href="/blog/2016/06/27/host-jenkins-on-aws/">在AWS上部署Jenkins</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/06/13/I-want-to-talk-about-https-too/">我也想来谈谈HTTPS</a>
       </li>
     
   </ul>

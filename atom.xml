@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-09-18T22:15:43+08:00</updated>
+  <updated>2016-10-27T12:38:40+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,143 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Living Style Guide - 缩小设计和开发的沟通鸿沟]]></title>
+    <link href="http://benweizhu.github.io/blog/2016/10/27/living-style-guide/"/>
+    <updated>2016-10-27T10:04:27+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2016/10/27/living-style-guide</id>
+    <content type="html"><![CDATA[<p>本文作者：朱本威，杨松</p>
+
+<h3>什么是Style Guide（风格指南）？</h3>
+
+<p>如果你做过Web开发，我打赌你肯定听说过“风格指南”!</p>
+
+<p>风格指南是什么？它是一系列关于书写和设计标准的文档，比如一些常见的标准有：字体，颜色，Logo，间距等等。</p>
+
+<p>风格指南最早出自于印刷行业，比如：出版社就是风格指南的常见用户。</p>
+
+<p style="text-align: center;">
+  <img src="http://benweizhu.github.io/images/style-guide/duzhe99.png" width="500" title="1999年的《读者》" alt="Alt text">
+  <img src="http://benweizhu.github.io/images/style-guide/duzhe2016.png" width="294" title="2016年的《读者》" alt="Alt text">
+</p>
+
+
+<p style="text-align: center;">从1999年到2016年，《读者》的封面风格都没有改变过</p>
+
+
+<p>好的品牌，通常都有一个非常棒的风格指南，无论是哪个行业，比如：KFC。我们也将KFC的这种风格指南成为VI（Visual Identity，企业视觉设计）。</p>
+
+<p style="text-align: center;">
+  <img src="http://benweizhu.github.io/images/style-guide/KFC.png" width="500" title="KFC Style Guide" alt="Alt text">
+</p>
+
+
+<p style="text-align: center;">KFC老爷爷大家都认识</p>
+
+
+<p>对于我们的WEB开发，也需要风格指南，目的是保证最终的交付产物和最初设计的一致性，打造出一致的核心用户体验。</p>
+
+<p style="text-align: center;">
+  <img src="http://benweizhu.github.io/images/style-guide/optus.png" width="500" title="OPUTS Style Guide" alt="Alt text">
+</p>
+
+
+<p style="text-align: center;">Optus澳大利亚电讯公司</p>
+
+
+<h3>风格指南过去的工作方式</h3>
+
+<p>在过去，一种常用的工作方式，设计与开发是分离开了。设计师在这儿，前端工程师在那儿，中间有一条无形的巨大的鸿沟。</p>
+
+<p>唯一的沟通渠道就是这样一个PDF材料。设计师最开始把PDF给你，然后和工程师各自为阵开始忙自己的，打死不相往来。</p>
+
+<p>沟通不及时就不说了，有时候设计还要埋怨你，说你的实现怎么和他最初的设计不一样。</p>
+
+<p>每一个工程师都应该都会有一段被设计师逼着改实现的经历，也许有的设计师们根本不理解我们修复IE问题时的痛苦，也不一定明白PDF文档沟通的效率是有限的。</p>
+
+<p>“我怎么能知道点击每一个按钮时候的行为呢？”</p>
+
+<p>答案是我根本不知道，等我看完了一百页文档，还不如你直接给我解释来得简单直接。</p>
+
+<p style="text-align: center;">
+  <img src="http://benweizhu.github.io/images/style-guide/ui-dev.png" width="500" title="UX 和 UIDev" alt="Alt text">
+</p>
+
+
+<p style="text-align: center;">UX，UI Dev和Backend Dev</p>
+
+
+<p>而每一次修改都需要很长的反馈周期，中间浪费了不少时间。</p>
+
+<p>然而，当第二版，第三版，第四版来的时候，我的PDF和PSD文件已经堆积成山，我也不清楚哪一个才是最新的版本，没有版本管理工具，即便有，这种二进制文件也很难立刻查看它和上一个版本的区别在哪。</p>
+
+<p>而且我相信大部分像我一样没有强迫症的人，一定是文件下载或者拷贝随意放置在桌面或者什么位置，然后常常根据时间排序去找最新的。久而久之，就不知道在哪了，然后又找设计师要一版。</p>
+
+<p>经历了以上种种的痛点之后，我们是怎么做的？</p>
+
+<h3>Living Style Guide</h3>
+
+<p style="text-align: center;">
+  <img src="http://benweizhu.github.io/images/style-guide/living-style-guide-logo.png" width="500" title="UX 和 UIDev" alt="Alt text">
+</p>
+
+
+<p>我们忍受不了这种不够敏捷的工作方式，尝试着用新的方式去解决这个问题，我们构建一个Living Style Guide。它是一个在线站点，同时也是一种工作方式，一种实践。我们尝试通过这种实践去解决这个问题。</p>
+
+<p><strong>Living Style Guide和Style Guide的区别：</strong></p>
+
+<p>一个直观的变化就是，曾经的PDF文档，代码化了。比如，最开始只存在于PDF文件中的调色板，字体，在网站上就可以直接查看，而不用担心是否过期，找不到等等。</p>
+
+<p>同时，也是一种工作方式的改变，我们的设计师与工程师需要更加紧密地工作在一起了。让Living Style Guide成了一个钮带，连接着设计师与工程师。</p>
+
+<p>设计看到的文档即代码，开发人员看到的代码即文档。不会出现设计师所认为的设计和实际开发出来的结果不一致的情况，我们做到Single source of truth(唯一真实来源)。同时，你看到的是动态，可交互的一系列组件。不需要考虑怎么用文档去描述一种行为，你所看到的就包含自身行为。</p>
+
+<p>敏捷宣言中有这样一句话：工作的软件 高于 详尽的文档，Living Style Guide在努力实现这一点，尝试将设计与前端的闭环缩小。</p>
+
+<h3>聊聊工程师们关心的干货</h3>
+
+<p><strong>选择合适的技术栈</strong></p>
+
+<p>技术栈的选择还是要回归到项目需求上。我们从大的方向上考虑了这么几点：组件化，数据驱动，易定制和可测试。</p>
+
+<p>Living Style Guide是一个供设计师和前端开发工程师使用的平台，并可以将开发的内容打包使用在其他不同的Web应用平台，对通用性和易用性都有较高的要求，我们没有做一个大而全的框架，而是想要做到以组件为单位，灵活发布，并能灵活使用在各种平台。</p>
+
+<p style="text-align: center;">
+  <img src="http://benweizhu.github.io/images/style-guide/tech-stack.png" width="500" title="我们的技术栈" alt="Alt text">
+</p>
+
+
+<p style="text-align: center;">我们的技术栈</p>
+
+
+<p>上面这张图涵盖了我们大部分的技术栈内容，具体内容我就不单独介绍了。不过，我突然想起来前段时间有一篇非常火的文章《在2016年学JavaScript是一种什么样的体验?》，它写的就是我们这个feel。</p>
+
+<p><strong>关于代码组织结构方式</strong></p>
+
+<p>组件化是我们的核心价值，所以在代码结构上，我们将“自包含”属性作为一个很重要的特性。每一个组件包含了它自己所需要的相关文件：测试文件（单元测试，功能测试），样式文件（Sass），组件和文档，而公共的部分，我们抽离到其他位置，从而尽量做到高内聚，低耦合，同时提高代码重用性。</p>
+
+<p style="text-align: center;">
+  <img src="http://benweizhu.github.io/images/style-guide/folder-structure.png" width="300" title="代码组织结构" alt="Alt text">
+</p>
+
+
+<p style="text-align: center;">我们项目的代码组织结构</p>
+
+
+<p><strong>需要注意的点</strong></p>
+
+<p>组件化的好处是相互隔离，又可被重用。实现组件化一定要需要合理的分类和管理好组件，比如，区分业务组件和通用组件，保证被重用的组件拥有足够的可扩展性。</p>
+
+<p><strong>最后</strong></p>
+
+<p>Living Style Guide是我们在缩小设计与开发沟通鸿沟的一种尝试，努力将闭环缩小，以提高效率，降低成本，这是一种实践，也是设计师和工程师工作方式的改变。</p>
+
+<p>参考资料： <br/>
+1. <a href="https://asinthecity.com/2011/11/10/the-difference-between-a-ux-designer-and-ui-developer/">https://asinthecity.com/2011/11/10/the-difference-between-a-ux-designer-and-ui-developer/</a> <br/>
+2. 敏捷宣言（ <a href="http://agilemanifesto.org/iso/zhchs/">http://agilemanifesto.org/iso/zhchs/</a> ）</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[CSS和软件工程中的设计原则]]></title>
@@ -315,6 +452,12 @@ Mac OS X — an exception</p>
 
 <p>这也是本文的重点，介绍HTTPS（SSL层）背后的基本原理和概念，涉及到的概念：密码学基础知识-加密算法，数字证书，CA中心等。</p>
 
+<p><strong>加密算法</strong></p>
+
+<p>加密算法严格来说术语编码学（密码编码学），编码是信息从一种形式或格式转换为另一种形式的过程。解码，是编码的逆过程（对应密码学中的解密）。</p>
+
+<p><img src="http://benweizhu.github.io/images/jiami.gif" title="加密算法" alt="Alt text" /></p>
+
 <p><strong>对称加密算法</strong></p>
 
 <p><img src="http://benweizhu.github.io/images/symmetric-encryption-algorithms.gif" title="对称加密算法" alt="Alt text" /></p>
@@ -329,7 +472,7 @@ Mac OS X — an exception</p>
 
 <p><strong>非对称加密算法（加密和签名）（又一堆概念和解释）</strong></p>
 
-<p>非对称加密算法需要两个密钥：公开密钥（publickey）和私有密钥（privatekey）。公开密钥与私有密钥是一对，如果用公开密钥对数据进行加密，只有用对应的私有密钥才能解密；如果用私有密钥对数据进行加密，那么只有用对应的公开密钥才能解密。因为加密和解密使用的是两个不同的密钥，所以这种算法叫作非对称加密算法。 非对称加密算法实现机密信息交换的基本过程是：甲方生成一对密钥并将其中的一把作为公用密钥向其它方公开；得到该公用密钥的乙方使用该密钥对机密信息进行加密后再发送给甲方；甲方再用自己保存的另一把专用密钥对加密后的信息进行解密。</p>
+<p>非对称加密算法需要两个密钥：公开密钥（public key）和私有密钥（private key）。公开密钥与私有密钥是一对，如果用公开密钥对数据进行加密，只有用对应的私有密钥才能解密；如果用私有密钥对数据进行加密，那么只有用对应的公开密钥才能解密。因为加密和解密使用的是两个不同的密钥，所以这种算法叫作非对称加密算法。 非对称加密算法实现机密信息交换的基本过程是：甲方生成一对密钥并将其中的一把作为公用密钥向其它方公开；得到该公用密钥的乙方使用该密钥对机密信息进行加密后再发送给甲方；甲方再用自己保存的另一把专用密钥对加密后的信息进行解密。</p>
 
 <p>另一方面，甲方可以使用乙方的私钥对机密信息进行签名后再发送给乙方；乙方再用自己的公钥对数据进行验签。</p>
 
@@ -3176,240 +3319,6 @@ Radium： <a href="https://github.com/FormidableLabs/radium">https://github.com/
 
 <p>参考资料： <br/>
 1. <a href="https://facebook.github.io/react/index.html">https://facebook.github.io/react/index.html</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[译 Merging vs Rebasing（未完成）]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/11/17/merging-vs-rebasing-translation/"/>
-    <updated>2015-11-17T21:58:52+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/11/17/merging-vs-rebasing-translation</id>
-    <content type="html"><![CDATA[<p>原文地址：<a href="https://www.atlassian.com/git/tutorials/merging-vs-rebasing">https://www.atlassian.com/git/tutorials/merging-vs-rebasing</a></p>
-
-<p>git rebase命令对于初学git的人就是像是一种巫术，应该远离之，但是实际上如果使用适当，会让你的git生活变得更轻松。在本文中，我将会比较git rebase和相关的git merge命令，鉴别出在git工作流所有使用git rebase的可能性。</p>
-
-<h3>基本概念</h3>
-
-<p>理解git rebase的第一件事情就是它和git merge是解决相同的问题。两个命令都是设计出来将一个分支上的代码变化和另一个分支上的代码变化进行集成-只是他们的做法不同。</p>
-
-<p>考虑这样的场景，当你开始在专注于在某一个分支上进行一个新的feature（特性）开发时，另外一个团队在master分支上进行了新的提交。这导致一个forked的历史，这对于任何属性Git作为团队合作工作的人都是比较清楚的。</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/01.svg" alt="Alt text" /></p>
-
-<p>现在，假设在master分支上新提交的代码和你正在开发的特性相关。为了将这些新提交的代码吸收/包含（incorporate，在这里就翻译成合并，避免混淆），你有两个选择：merging（合并）和rebasing（复位基底/复基）。</p>
-
-<h3>Merge选项</h3>
-
-<p>最简单的选择是将master分支合并（merge）到正在开发的特性分支上，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
-</span><span class='line'>git merge master
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>或者，你可以将他们压缩成一行：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git merge master feature
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这样就是在特性分支上创建了一个新的“merge commit”，他讲两个分支上的历史绑在了一起，就像下面你看到的分支结构：
-<img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/02.svg" alt="Alt text" /></p>
-
-<p>合并（merge）是很好的，因为他是一个非破坏性的操作。当前存在的分支是无论如何都不会改变的。这样就避免了所有因为rebase导致的坑（pitfall）。</p>
-
-<p>另外一方面，这样意味着，在每次你吸收/包含（incorprate）特性分支会有外部（extraneous）来的合并提交。如果master分支比较活跃，这样机会污染你的特性分支的历史记录。当然也有减轻该问题影响的的高级git log选项，但是他就让其他开发人员很难理解项目的历史。</p>
-
-<h3>Rebase选项</h3>
-
-<p>作为merge的另一种选择，又可以将特性分支rebase到master分支，通过下面的命令：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
-</span><span class='line'>git rebase master
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>他将整个特性分支移动到了master分支的末梢（tip），有效的吸收/包含（incorprate）所有的提交到master分支。但是，和merge不同，rebase通过给原始分支上每一次提交创建全新的提交，从而重写了项目的历史。</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/03.svg" alt="Alt text" /></p>
-
-<p>Rebase的主要好处是你会得到一个更为清晰的项目历史。首先，它消除了所有git merge所需要的不必要的merge提交（merge commit）。其次，正如你在上面那张图中看到的，rebase也产生一个完美的线性项目历史-你可以从特性的末端一路查看到项目的开始而没有任何的fork。这样，使得你更容易使用像git log， git bisect和gitk来浏览项目（原文字面含义：在项目中导航（navigate））。</p>
-
-<p>但是，为了这样淳朴的提交历史，有两点权衡/交易（trade-off，翻译为妥协更合适）：安全性和可追溯性（traceability）。如果你不遵循rebase的黄金准则，重写项目历史可能会给你的合作工作流带来潜在的悲惨结局。还有一点，虽然没有那么重要，rebase会丢失merge commit所提供的上下文-你无法看到上游的代码变化是合适包含（incorprate）到特性分支上的。</p>
-
-<h3>Interactive Rebasing</h3>
-
-<p>Interactive rebasing gives you the opportunity to alter commits as they are moved to the new branch. This is even more powerful than an automated rebase, since it offers complete control over the branch’s commit history. Typically, this is used to clean up a messy history before merging a feature branch into master.</p>
-
-<p>To begin an interactive rebasing session, pass the i option to the git rebase command:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
-</span><span class='line'>git rebase -i master
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This will open a text editor listing all of the commits that are about to be moved:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pick 33d5b7a Message <span class="k">for</span> commit <span class="c">#1</span>
-</span><span class='line'>pick 9480b3d Message <span class="k">for</span> commit <span class="c">#2</span>
-</span><span class='line'>pick 5c67e61 Message <span class="k">for</span> commit <span class="c">#3</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This listing defines exactly what the branch will look like after the rebase is performed. By changing the pick command and/or re-ordering the entries, you can make the branch’s history look like whatever you want. For example, if the 2nd commit fixes a small problem in the 1st commit, you can condense them into a single commit with the fixup command:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>pick 33d5b7a Message <span class="k">for</span> commit <span class="c">#1</span>
-</span><span class='line'>fixup 9480b3d Message <span class="k">for</span> commit <span class="c">#2</span>
-</span><span class='line'>pick 5c67e61 Message <span class="k">for</span> commit <span class="c">#3</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>When you save and close the file, Git will perform the rebase according to your instructions, resulting in project history that looks like the following:</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/04.svg" alt="Alt text" /></p>
-
-<p>Eliminating insignificant commits like this makes your feature’s history much easier to understand. This is something that git merge simply cannot do.</p>
-
-<p>Rebase的黄金准则</p>
-
-<p>一旦你理解了什么是rebase，最重要的就是学会合适不要用它。git rebase的黄金准则就是不要在公共的分支上使用。</p>
-
-<p>比如，想象一下如果你将master分支rebase到特性分支：</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/05.svg" alt="Alt text" /></p>
-
-<p>这个rebase会将所有在master上的提交移动到feature分支的末端。问题是这还只是在你自己的仓库中发生了。所有其他的开发人员仍然工作在原来的master分支上。因为rebase导致了新的提交，Git会认为你的master分支的历史和其他人的偏离。</p>
-
-<p>唯一同步两个master分支的办法就是将他们合并（merge）回去，导致一个额外的合并提交（merge commit），和两个一系列的提交的，这两个一系列提交的代码改变是相同的（一个是原始master分支上的，一个是你rebased的分支上的）。不用说，这是非常让人困惑的情况。</p>
-
-<p>所以，在你开始做rebase的时候，永远问你自己一下，“是否有人也在用这个分支”，如果回答是，那么把你手移开键盘，开始思考一种非破坏性的方式来做改变(e.g., the git revert command，这个位置没搞懂)。</p>
-
-<p>否则，你就可以安全的重写历史。</p>
-
-<p>Force-Pushing</p>
-
-<p>如果你想要rebased过的master分支push到远程服务器，Git就会阻止你这么做，因为他和远程的master分支是冲突的。但是，你可以强制push，通过 &ndash;force标志，比如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Be very careful with this command!</span>
-</span><span class='line'>git push --force
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这样会重写远程master的分支来匹配在你仓库rebased过得master分支，这会让团队中的其他成员非常困惑。所以，只有当你非常清楚你要做什么的时候，你才可以非常小心的使用。</p>
-
-<p>一种情况下，你应该使用force-pushing，就是在你push一个私有特性分支到远程仓库后，你执行一个本地清理。这就是像是在说“哎呀，我不是真的想要push特性分支的原始版本。就用当前这一个吧”，而且，很重要的是，没有其他人在原来的特性分支上工作。</p>
-
-<h2>工作流指导</h2>
-
-<p>Rebase可以根据你的团队或多或少的包含到现有的Git工作流中。在本节，我们将看看rebase在一个特性开发的不同阶段所提供的好处。</p>
-
-<p>在任何工作流中启用git rebase的第一步就是为每一个特性创建单独的分支。这将提供你必备的分支结构来安全的使用rebase：</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/06.svg" alt="Alt text" /></p>
-
-<h2>清理本地</h2>
-
-<p>将rebase包含到工作流中最好的办法之一就是清理本地，同步特性。通过周期性的执行一个interactive（交互性的）rebase，你可以保证在你的特性开发中的每次提交都是专注和有意义的（focused and meaningful）。这就让你在写你的代码的时候，不用担心变成被独立的提交 - 你可以在这样的事情发生之后，修好它。</p>
-
-<p>当调用git rebase，对于新的base，你有两个选项：特性的父分支（比如：父分支），或者是特性分支的更早提交。我们在之前的Interactive Rebasing部分看到了第一种选项的例子。当你仅仅需要修复上几次提交的时候，第二个选项也是不错的选择。比如，下面的命令进行了一个只有最后三次提交提交的interactive rebase。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
-</span><span class='line'>git rebase -i HEAD~3
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>通过指定HEAD~3新的base，你并没有真的移动你的分支，交互性的重写了跟在它后面三次提交。注意这并不会将上游的改变包含到特性分支。</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/07.svg" alt="Alt text" /></p>
-
-<p>如果你想要用这种方法重写整个特性，git merge-base命令可以用来找到特性分支原来的base。下面的命令将返回原来base的提交ID，你可以将它传递给git rebase：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git merge-base feature master
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>interactive rebasing是向你的工作流中引入git rebase的最好方法。其他开发人员能够看到的，只有你的完成的产品，这样可以有非常干净，容易理解的特性分支历史。</p>
-
-<p>但是，还是要说，这仅仅能够用在私有的特性分支上。如果你和其他开发人员工作在同一个特性分支上，那么这个分支就是共有的，那么你就不允许重写它的历史。</p>
-
-<p>没有任何git合并方式来清除带有interactive rebase的本地提交。</p>
-
-<h3>Incorporating Upstream Changes Into a Feature</h3>
-
-<p>In the Conceptual Overview section, we saw how a feature branch can incorporate upstream changes from master using either git merge or git rebase. Merging is a safe option that preserves the entire history of your repository, while rebasing creates a linear history by moving your feature branch onto the tip of master.</p>
-
-<p>This use of git rebase is similar to a local cleanup (and can be performed simultaneously), but in the process it incorporates those upstream commits from master.</p>
-
-<p>Keep in mind that it’s perfectly legal to rebase onto a remote branch instead of master. This can happen when collaborating on the same feature with another developer and you need to incorporate their changes into your repository.</p>
-
-<p>For example, if you and another developer named John added commits to the feature branch, your repository might look like the following after fetching the remote feature branch from John’s repository:</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/08.svg" alt="Alt text" /></p>
-
-<p>You can resolve this fork the exact same way as you integrate upstream changes from master: either merge your local feature with john/feature, or rebase your local feature onto the tip of john/feature.</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/09.svg" alt="Alt text" /></p>
-
-<p>Note that this rebase doesn’t violate the Golden Rule of Rebasing because only your local feature commits are being moved—everything before that is untouched. This is like saying, “add my changes to what John has already done.” In most circumstances, this is more intuitive than synchronizing with the remote branch via a merge commit.</p>
-
-<p>By default, the git pull command performs a merge, but you can force it to integrate the remote branch with a rebase by passing it the &ndash;rebase option.</p>
-
-<h3>Reviewing a Feature With a Pull Request</h3>
-
-<p>If you use pull requests as part of your code review process, you need to avoid using git rebase after creating the pull request. As soon as you make the pull request, other developers will be looking at your commits, which means that it’s a public branch. Re-writing its history will make it impossible for Git and your teammates to track any follow-up commits added to the feature.</p>
-
-<p>Any changes from other developers need to be incorporated with git merge instead of git rebase.</p>
-
-<p>For this reason, it’s usually a good idea to clean up your code with an interactive rebase before submitting your pull request.</p>
-
-<h3>Integrating an Approved Feature</h3>
-
-<p>After a feature has been approved by your team, you have the option of rebasing the feature onto the tip of the master branch before using git merge to integrate the feature into the main code base.</p>
-
-<p>This is a similar situation to incorporating upstream changes into a feature branch, but since you’re not allowed to re-write commits in the master branch, you have to eventually use git merge to integrate the feature. However, by performing a rebase before the merge, you’re assured that the merge will be fast-forwarded, resulting in a perfectly linear history. This also gives you the chance to squash any follow-up commits added during a pull request.</p>
-
-<p><img src="https://www.atlassian.com/git/images/tutorials/advanced/merging-vs-rebasing/10.svg" alt="Alt text" /></p>
-
-<p>If you’re not entirely comfortable with git rebase, you can always perform the rebase in a temporary branch. That way, if you accidentally mess up your feature’s history, you can check out the original branch and try again. For example:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git checkout feature
-</span><span class='line'>git checkout -b temporary-branch
-</span><span class='line'>git rebase -i master
-</span><span class='line'><span class="c"># [Clean up the history]</span>
-</span><span class='line'>git checkout master
-</span><span class='line'>git merge temporary-branch
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Summary</h3>
-
-<p>And that’s all you really need to know to start rebasing your branches. If you would prefer a clean, linear history free of unnecessary merge commits, you should reach for git rebase instead of git merge when integrating changes from another branch.</p>
-
-<p>On the other hand, if you want to preserve the complete history of your project and avoid the risk of re-writing public commits, you can stick with git merge. Either option is perfectly valid, but at least now you have the option of leveraging the benefits of git rebase.</p>
 ]]></content>
   </entry>
   
