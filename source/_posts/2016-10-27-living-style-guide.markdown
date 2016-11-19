@@ -110,6 +110,8 @@ Living Style Guide是一个供设计师和前端开发工程师使用的平台�
 
 Living Style Guide是我们在缩小设计与开发沟通鸿沟的一种尝试，努力将闭环缩小，以提高效率，降低成本，这是一种实践，也是设计师和工程师工作方式的改变。
 
+转载请注明： http://benweizhu.github.io/blog/2016/10/27/living-style-guide/
+
 参考资料：   
 1. https://asinthecity.com/2011/11/10/the-difference-between-a-ux-designer-and-ui-developer/   
 2. 敏捷宣言（ http://agilemanifesto.org/iso/zhchs/ ）
