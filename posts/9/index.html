@@ -9,7 +9,20 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在JavaScript中，对象是一系列的键值对，ECMA-262把对象（object）定义为“属性的无序集合，每个属性存放一个原始值、对象或函数”。 JavaScript是面向对象的语言（而且比C++/Java更加的面向对象），因为所有东西都是对象，包括函数，但是在JavaScript没有类的概念 &hellip;">
+  <meta name="description" content="在JavaScript中，随着函数使用场合的不同，this的值会发生变化。但是有一个总的原则，那就是this指的是，调用该函数的那个对象。this关键字在Javascript中和执行环境，而非声明环境有关。 举个例子： 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+var &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +77,279 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/01/01/javascript-this/">JavaScript渐入佳境 - This指针</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-01-01T19:04:16+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>7:04 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在JavaScript中，随着函数使用场合的不同，this的值会发生变化。但是有一个总的原则，那就是this指的是，调用该函数的那个对象。this关键字在Javascript中和执行环境，而非声明环境有关。</p>
+
+<p>举个例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">someone</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">showName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">other</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Tom&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">showName</span><span class="o">:</span> <span class="nx">someone</span><span class="p">.</span><span class="nx">showName</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">other</span><span class="p">.</span><span class="nx">showName</span><span class="p">();</span><span class="err">　　</span><span class="c1">//Tom</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里其实应该好理解，other的showName属性指向了someone的showName所声明的函数，他等价于：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">other</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Tom&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">showName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">other</span><span class="p">.</span><span class="nx">showName</span><span class="p">();</span><span class="err">　　</span><span class="c1">//Tom</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>所以this指针理所当然的指向other自己。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;Tom&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Bob</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">show</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">show</span> <span class="o">=</span> <span class="nx">Bob</span><span class="p">.</span><span class="nx">show</span><span class="p">;</span>
+</span><span class='line'><span class="nx">show</span><span class="p">();</span><span class="err">　　</span><span class="c1">//Tom</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面这个show为什么显示Tom，它的执行对象是什么？Window对象。</p>
+
+<p>Window对象是所有客户端JavaScript特性和API的主要接入点。它表示Web浏览器的一个窗口，并且可以用标示符window（小写）来引用。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">window</span>
+</span><span class='line'><span class="nx">$</span> <span class="nx">Window</span> <span class="p">{</span><span class="nx">external</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nx">chrome</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nb">document</span><span class="o">:</span> <span class="nb">document</span><span class="p">,</span> <span class="err">\</span><span class="nx">_ASYNC_START</span><span class="o">:</span> <span class="mi">1451649155228</span><span class="p">,</span> <span class="err">\</span><span class="nx">_chrome_37_fix</span><span class="o">:</span> <span class="kc">undefined</span><span class="err">…</span><span class="p">}</span>
+</span><span class='line'><span class="nx">Window</span>
+</span><span class='line'><span class="nx">$</span> <span class="kd">function</span> <span class="nx">Window</span><span class="p">()</span> <span class="p">{</span> <span class="p">[</span><span class="kr">native</span> <span class="nx">code</span><span class="p">]</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Window对象定义了一些属性，比如，指代Location对象(location)的location属性。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">location</span> <span class="o">===</span> <span class="nx">location</span>
+</span><span class='line'><span class="nx">$</span> <span class="kc">true</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Window对象还定义了一些方法，比如alert()和setTimeout()，使用时，我们都没有显示的使用window属性。Window对象是全局对象，处于作用域链的顶部，它的属性和方法实际上全是全局变量和全局函数。
+通过window变量可以引用到Window对象本身，但是如果要使用全局窗口对象的属性，并不需要使用window。</p>
+
+<p>我们常说，JavaScript很容易就创建一个全局变量或者全局函数。比如，直接var a_global_variable = &lsquo;a global variable&#8217;。它不仅使全局变量，它还是window的一个属性。如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">a_global_variable</span> <span class="o">=</span> <span class="s1">&#39;a global variable&#39;</span>
+</span><span class='line'><span class="nx">a_global_variable</span>
+</span><span class='line'><span class="nx">$</span> <span class="s2">&quot;a global variable&quot;</span>
+</span><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">goodtest</span>
+</span><span class='line'><span class="nx">$</span> <span class="s2">&quot;a global variable&quot;</span>
+</span><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">a_global_variable</span> <span class="o">===</span> <span class="nx">a_global_variable</span>
+</span><span class='line'><span class="nx">$</span> <span class="kc">true</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>为什么在Window下？head/全局对象/顶层对象</h3>
+
+<p>JavaScript代码本身必须包含在对象内部。在Web浏览器环境中编写JavaScript代码时，JavaScript被包含在Window对象内，并在其内部执行。这个Window对象被认为是“head对象”。JavaScript的所有实现都需要使用一种head对象。</p>
+
+<p>head对象是由JavaScript在幕后创建，用于封装用户用自定义代码，并容纳JavaScript预定义的原生代码。JavaScript将用户自定义代码放入head对象中来执行。在编写JavaScript代码时，它将被编写在head对象的上下文中。</p>
+
+<p>换一种解释：</p>
+
+<p>JavaScript的所有对象都存在于一个运行环境之中，这个运行环境本身也是对象，称为“顶层对象”。这就是说，JavaScript的所有对象，都是“顶层对象”的下属。不同的运行环境有不同的“顶层对象”，在浏览器环境中，这个顶层对象就是Window对象。</p>
+
+<p>所有浏览器环境的全局变量，都是Window对象的属性。可以把Window理解成JavaScript Context 上下文环境。</p>
+
+<p>理解了setTimeout是Window的属性之后，理解下面这段代码应该比较容易了：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;Bob&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">nameObj</span> <span class="o">=</span><span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span> <span class="o">:</span> <span class="s2">&quot;Tom&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">showName</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span><span class="c1">//此时this指向的是window  </span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">waitShowName</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">setTimeout</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">showName</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span><span class="c1">//这里的this指向的是nameObj.showName</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="nx">nameObj</span><span class="p">.</span><span class="nx">waitShowName</span><span class="p">();</span><span class="c1">// Bob</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>和下面这段代码相似</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;Bob&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>    <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'><span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>new关键字</h2>
+
+<p>new关键字指向创建的对象，在上一篇文章中已经介绍的很清楚了。 <a href="http://benweizhu.github.io/blog/2015/12/31/javascript-contructor-new-prototype/">http://benweizhu.github.io/blog/2015/12/31/javascript-contructor-new-prototype/</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Person</span><span class="p">(</span><span class="nx">name</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span> <span class="c1">//这个this指向用该构造函数构造的新对象，这个例子是Bob对象</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">show</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>    <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Bob</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">Bob</span><span class="p">.</span><span class="nx">show</span><span class="p">();</span>        <span class="c1">//Bob</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>apply和call改变this指向的对象</h2>
+
+<p>apply和call能够强制改变函数执行时的当前对象，让this指向其他对象。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;window&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">someone</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">showName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">other</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Tom&quot;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">someone</span><span class="p">.</span><span class="nx">showName</span><span class="p">();</span>   <span class="c1">//Bob</span>
+</span><span class='line'><span class="nx">someone</span><span class="p">.</span><span class="nx">showName</span><span class="p">.</span><span class="nx">apply</span><span class="p">();</span>    <span class="c1">//window</span>
+</span><span class='line'><span class="nx">someone</span><span class="p">.</span><span class="nx">showName</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">other</span><span class="p">);</span>    <span class="c1">//Tom</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料：  <br/>
+1.<a href="http://www.cnblogs.com/justany/archive/2012/11/01/the_keyword_this_in_javascript.html">http://www.cnblogs.com/justany/archive/2012/11/01/the_keyword_this_in_javascript.html</a>  <br/>
+2.JavaScript启示录  <br/>
+3.<a href="http://blog.csdn.net/zoutongyuan/article/details/29355021">http://blog.csdn.net/zoutongyuan/article/details/29355021</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -496,358 +782,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/12/13/react-on-es6-plus-translation/">翻译 React on ES6+</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-12-13T10:32:12+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:32 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>原文地址： <a href="http://babeljs.io/blog/2015/06/07/react-on-es6-plus/">http://babeljs.io/blog/2015/06/07/react-on-es6-plus/</a></p>
-
-<h3>文章翻译有些不准确，敬请见谅</h3>
-
-<p>当我们正在从内到外的重新设计Instagram Web的时候，我们非常享受使用许多ES6+的特性来编写React组件。这让我有机会去说明这些新的语言特性可以改变你写React应用的方式，让它变得更简单也更有趣。</p>
-
-<h2>Classes</h2>
-
-<p>到目前为止，最明显的变化就是当我们选择使用ES6+中的类定义语法时，如何来编写React组件。相对于使用React.createClass方法来定义一个组件，我们可以使用真正的ES6类来继承React.Component：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">class</span> <span class="nx">Photo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">img</span> <span class="nx">alt</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">caption</span><span class="p">}</span> <span class="nx">src</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">src</span><span class="p">}</span> <span class="o">/&gt;</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>立马，你就会注意到一个微妙的不同 - 当定义类时，使用一个更加简洁的语法：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// The ES5 way</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Photo</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">handleDoubleTap</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span> <span class="err">…</span> <span class="p">},</span>
-</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="err">…</span> <span class="p">},</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'><span class="c1">// The ES6+ way</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">Photo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">handleDoubleTap</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span> <span class="err">…</span> <span class="p">}</span>
-</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span> <span class="err">…</span> <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>很明显，我们丢掉了两个括号和一个分号，而且每一个方法声明忽略了一个冒号，一个function关键字和一个逗号。</p>
-
-<p>当使用新的类语法时，所有的生命周期方法（除了一个）都可以像你所期望的那样定义。类的构造函数现在的角色，之前是由componentWillMount来扮演：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// The ES5 way</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">EmbedModal</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">componentWillMount</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="err">…</span> <span class="p">},</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'><span class="c1">// The ES6+ way</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">EmbedModal</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-</span><span class='line'>    <span class="c1">// Operations usually carried out in componentWillMount go here</span>
-</span><span class='line'>    <span class="c1">// 所有componentWillMount的操作都放在这里</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>属性初始化</h2>
-
-<p>在ES6+的类世界，属性类型和默认值都是作为类自己的静态属性。同样，Component的状态初始化可以使用ES7的属性初始化：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// The ES5 way</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Video</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">getDefaultProps</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">autoPlay</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">maxLoops</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">loopsRemaining</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">maxLoops</span><span class="p">,</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">propTypes</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">autoPlay</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">bool</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">maxLoops</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">number</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">posterFrameSrc</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">videoSrc</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'><span class="c1">// The ES6+ way</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">Video</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kr">static</span> <span class="nx">defaultProps</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">autoPlay</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">maxLoops</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="kr">static</span> <span class="nx">propTypes</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">autoPlay</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">bool</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">maxLoops</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">number</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">posterFrameSrc</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">videoSrc</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">loopsRemaining</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">maxLoops</span><span class="p">,</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>ES7属性初始化操作在类的构造函数中，这里指向的是类实例的构造，所以state的初始化可以设置为依赖于this.props。值得注意的是，我们不在需要，针对getter方法，定义prop的默认值，和初始化state对象。</p>
-
-<h2>箭头函数</h2>
-
-<p>React.createClass方法用来在组件实例方法上执行一些额外的绑定工作来保证，在他们里面，this关键字可以被考虑指向组件的实例。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Autobinding, brought to you by React.createClass</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">PostInfo</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">handleOptionsButtonClick</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// Here, &#39;this&#39; refers to the component instance.</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">showOptionsModal</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>既然我们不使用React.createClass方法了，当我们用ES6+的类语法定义组件时，似乎我们就需要在我们想要这些行为时，手动的绑定实例方法：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Manually bind, wherever you need to</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">PostInfo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-</span><span class='line'>    <span class="c1">// Manually bind this method to the component instance...</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">handleOptionsButtonClick</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">handleOptionsButtonClick</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="nx">handleOptionsButtonClick</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// ...to ensure that &#39;this&#39; refers to the component instance here.</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">showOptionsModal</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>幸运的是，通过结合两个ES6+的特性 - 箭头方法和属性初始化 - 选择性的绑定到组件实例变得轻而易举：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">class</span> <span class="nx">PostInfo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">handleOptionsButtonClick</span> <span class="o">=</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">showOptionsModal</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The body of ES6 arrow functions share the same lexical this as the code that surrounds them, which gets us the desired result because of the way that ES7 property initializers are scoped. Peek under the hood to see why this works.</p>
-
-<h2>动态属性名和模板字符串</h2>
-
-<p>对对象字面量的一个增强是，拥有给一个衍生而来的属性名赋值的能力。以前，我们可能需要像下面这样做来设置state对象：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">Form</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">onChange</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">inputName</span><span class="p">,</span> <span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">stateToSet</span> <span class="o">=</span> <span class="p">{};</span>
-</span><span class='line'>    <span class="nx">stateToSet</span><span class="p">[</span><span class="nx">inputName</span> <span class="o">+</span> <span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">stateToSet</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>现在，我们可以构建那些属性名由JavaScript表达式在运行时决定的对象。这里，我们用模板字符串来决定将哪个属性设置到state上：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">class</span> <span class="nx">Form</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">onChange</span><span class="p">(</span><span class="nx">inputName</span><span class="p">,</span> <span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
-</span><span class='line'>      <span class="p">[</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">inputName</span><span class="p">}</span><span class="nx">Value</span><span class="err">`</span><span class="p">]</span><span class="o">:</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">,</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>析构和JSX扩展属性（spread attributes)</h2>
-
-<p>Often when composing components, we might want to pass down most of a parent component&rsquo;s props to a child component, but not all of them. In combining ES6+ destructuring with JSX spread attributes, this becomes possible without ceremony:
-常常当我们组合组件时，我们也许想要将父组件的大部分属性传递到子组件中，但是并不是全部。结合ES6+的destructuring和JSX spread attributes，这变成可能且不太复杂：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">class</span> <span class="nx">AutoloadingPostsGrid</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">className</span><span class="p">,</span>
-</span><span class='line'>      <span class="p">...</span><span class="nx">others</span><span class="p">,</span>  <span class="c1">// contains all properties of this.props except for className</span>
-</span><span class='line'>    <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">(</span>
-</span><span class='line'>      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">className</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">PostsGrid</span> <span class="p">{...</span><span class="nx">others</span><span class="p">}</span> <span class="o">/&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleLoadMoreClick</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Load</span> <span class="nx">more</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
-</span><span class='line'>      <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>    <span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>我们可以将JSX扩展属性和正常的属性相结合，利用简单地优先级规则来实现复写和默认值指定。下面这个元素会获得className “override”，即便className属性已经在this.props中定义：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="p">{...</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">}</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="err">…</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个元素会正常的拥有className “base”，除非在this.props中存在一个className属性复写了它：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;base&quot;</span> <span class="p">{...</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="err">…</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/10">&larr; Older</a>
@@ -875,6 +809,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/11/19/style-guide-driven-development/">风格指南驱动开发</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/10/27/living-style-guide/">Living Style Guide - 缩小设计和开发的沟通鸿沟</a>
       </li>
     
@@ -888,10 +826,6 @@
     
       <li class="post">
         <a href="/blog/2016/07/02/bash-profile-and-bashrc/">.bash_profile和.bashrc</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/06/27/host-jenkins-on-aws/">在AWS上部署Jenkins</a>
       </li>
     
   </ul>

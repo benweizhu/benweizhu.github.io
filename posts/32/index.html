@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="过滤器，按照一般的理解是，按照某个标准（或者阈值），将输入的内容中不满足要求的排除，得到最后的满足要求的输出。 但过滤器还有一个更宽泛的理解，就是数据变换处理器。 在AngularJS中，过滤器就是一个数据变换函数，将输入的数据进行处理，得到对应输出结果。 AngularJS内置过滤器 &hellip;">
+  <meta name="description" content="传统的Web应用，以Java栈为例，无论是纯Servlet还是MVC框架，比如，SpringMVC，Struts。在页面上的导航都比较简单，只需要在浏览器地址栏输入URL，一个URL用来指向服务器上一个单一的物理资源（页面文件）。当页面加载后，就可以点击链接跳转到其他资源， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,232 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/01/23/yes-angularjs-8/">开始！AngularJS!（八）- 路由</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-23T22:18:10+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>10:18 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>传统的Web应用，以Java栈为例，无论是纯Servlet还是MVC框架，比如，SpringMVC，Struts。在页面上的导航都比较简单，只需要在浏览器地址栏输入URL，一个URL用来指向服务器上一个单一的物理资源（页面文件）。当页面加载后，就可以点击链接跳转到其他资源，或者使用前进后退按钮跳转到已访问的页面。</p>
+
+<p>通过修改DOM，动态生成页面的Web应用改变了这一现状，因为对页面内容的改变是直接对页面DOM元素的修改，而不是向服务器发出请求。于是，前进后退按钮在这种情况受到了影响。</p>
+
+<h2>URL</h2>
+
+<p>那么，对于单页应用，如何能够修改浏览器的URL，让浏览器可以前进后退，但是又不会向服务器发出请求？</p>
+
+<h3>HashBang URL</h3>
+
+<p>通过修改URL定制中#符号后面的部分，而不会触发当前页面重新加载。比如， <a href="http://localhost:3000/#/user/123">http://localhost:3000/#/user/123</a> ，浏览器会选取URL中#号后面的差异部分来提供前进后退。</p>
+
+<h3>另一种方式，HTML5的historyAPI</h3>
+
+<p>这里首先要说明浏览器的前进和后退都依赖于浏览器的history堆栈（window.history对象），保证浏览器history堆栈的记录正确，前进后退的按钮就可以正常工作。HTML5中的history正好提供了方法来将URL推送到浏览器的history堆栈。然后只要监听window.onpopstate事件就可以修改应用的状态。</p>
+
+<p>但是当直接在服务器上输入URL时，还是会向服务器发送请求，这个时候还需要在服务器端做些事情，让服务器始终返回应用首页。所以这种方式会相对麻烦一些。</p>
+
+<p>当看到#号，你可能会想到另一个东西，HTML中的锚点，定位页面的位置。在HashBang方式下，需要借助AngularJS的一个服务$anchorScroll以及两个#来实现锚点。比如 <a href="http://localhost:3000/#/user/123#name">http://localhost:3000/#/user/123#name</a></p>
+
+<h2>使用AngularJS的路由服务</h2>
+
+<p>AngularJS内置了$route服务来处理Web应用的路由，并通过ng-view指令来显示匹配路由的内容，看下面的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;routeApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;#/admin&quot;</span><span class="nt">&gt;</span>admin<span class="nt">&lt;/a&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-view</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>被插入的模板，动态渲染部分</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;adminController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>   I am admin.
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;routeApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngRoute&#39;</span><span class="p">])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$routeProvider</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/admin&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/admin/admin.html&#39;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;adminController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里引入了.config方法，需要穿插介绍一点知识：模块的生命周期。AngularJS将模块的生命周期分为两个阶段，配置阶段和运行阶段。其中模块的.config方法可以用来注册一些需要在模块加载时候执行的动作或者进行的配置，比如这里的路由配置。</p>
+
+<p>AngularJS的路由服务在angular-route.js中，所以首先需要引入它，然后引入子模块ngRoute，在config方法中注入$routeProvider服务，然后剩下的就很清楚了，和Java技术栈中道理一样，URL和资源文件的Mapping。</p>
+
+<p>ng-view指令可以通过当前匹配的路由找到要显示的内容。</p>
+
+<h3>URL查询参数</h3>
+
+<p><a href="http://localhost:3000/#/user?id=123">http://localhost:3000/#/user?id=123</a> 或者 <a href="http://localhost:3000/#/user/123">http://localhost:3000/#/user/123</a></p>
+
+<p>几乎所有Web应用，遇到这样的URL是太平常的事情了，那么这种动态的URL应该怎么匹配呢？在AngularJS中，URL中任何以冒号（:）开头的字符串都会作为通配符。无论是这里的$routeProvider.when(/user/id=:userid)还是之后会介绍的与后端restful api通信的$resource服务在定义URL的时候。</p>
+
+<p>那么如何在controller中获取该参数呢？$routeParams服务。我们可以在controller中注入该服务，看下面的例子。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;routeApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngRoute&#39;</span><span class="p">])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$routeProvider</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/user/:userid&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/user/user.html&#39;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;userController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope, &#39;</span><span class="nx">$routeParams</span><span class="err">&#39;</span><span class="p">,</span>
+</span><span class='line'>       <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$routeParams</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">$scope</span><span class="p">.</span><span class="nx">userid</span> <span class="o">=</span> <span class="nx">$routeParams</span><span class="p">.</span><span class="nx">userid</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>多个控制器重用模块</h3>
+
+<p>在上面的例子中，url对应的页面文件是这样的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;adminController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>   I am admin.
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>模板的作用域固定为adminController的，如果不同路由下的其他controller也想用该模块，那么就得重新建一个新的html文件。</p>
+
+<p>还有一种办法，就是将controller的声明放在路由的定义中。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div&gt;</span>
+</span><span class='line'>   I am admin.
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;routeApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngRoute&#39;</span><span class="p">])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$routeProvider</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/admin&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/admin/adminOrSuperUser.html&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;adminController&#39;</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/superUser&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;pages/admin/adminOrSuperUser.html&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;superUserController&#39;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;adminController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">])</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;superUserController&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样多个控制器就可以使用相同的模板。</p>
+
+<h3>指定默认路由</h3>
+
+<p>就和编程语言中的switch一样，在$routeProvider还提供了otherwise方法来设置默认路由，很明显它只能是一个，一般的做法是通过redirectTo属性，跳转到一个已有的路由上。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">config</span><span class="p">([</span><span class="s1">&#39;$routeProvider&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$routeProvider</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">$routeProvider</span><span class="p">.</span><span class="nx">otherwise</span><span class="p">({</span><span class="nx">redirectTo</span><span class="o">:</span> <span class="s1">&#39;/home&#39;</span><span class="p">});</span>
+</span><span class='line'><span class="p">}]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>下一节，学习通过$Resource与后端restful的API通信。</p>
+
+<p>参考资料：</p>
+
+<ol>
+<li>精通AngularJS</li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -251,313 +477,6 @@ orderBy：此排序过滤器根据给定的条件对数组中的元素进行排�
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/01/15/bower-to-install-dependencies/">用Bower做JavaScript类库依赖管理</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-01-15T19:29:54+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:29 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>使用Grunt做JavaScript的构建，npm为它解决了最大的问题，插件（提供各种各样的任务）。但是如果你是做前端的Web应用，那么就还需要很多东西，比如，MVX框架，JavaScript工具类库等，这些东西，我们在构建中称为依赖。而这时，我们就要借助另一个工具，<strong>Bower</strong>。</p>
-
-<p>Bower做的事情：</p>
-
-<p><em>“Bower works by fetching and installing packages from all over, taking care of hunting, finding, downloading, and saving the stuff you’re looking for.” &mdash; Bower</em></p>
-
-<p>而且，Bower针对前端应用做了优化。它拥有扁平的依赖关系树，对于每个包之请求一个版本，将页面加载的内容减到最低。</p>
-
-<h2>如何使用</h2>
-
-<h3>安装</h3>
-
-<p>Bower处在NodeJs的生态圈里，它是Node的一个模块（包）。所以安装方法和普通node包安装方法一样。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">npm</span> <span class="n">install</span> <span class="o">-</span><span class="n">g</span> <span class="n">bower</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>其实，我也在纠结是安装在全局还是本地，网上众说风云。</p>
-
-<h3>命令工具</h3>
-
-<p>bower下载下来之后，你会发现它和grunt cli很像，除了模块部分，还有命令文件，因为它还是一个命令行工具。</p>
-
-<p>使用bower install安装需要的依赖：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># registered package</span>
-</span><span class='line'><span class="err">$</span> <span class="n">bower</span> <span class="n">install</span> <span class="n">jquery</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># GitHub shorthand</span>
-</span><span class='line'><span class="err">$</span> <span class="n">bower</span> <span class="n">install</span> <span class="n">desandro</span><span class="o">/</span><span class="n">masonry</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Git endpoint</span>
-</span><span class='line'><span class="err">$</span> <span class="n">bower</span> <span class="n">install</span> <span class="n">git</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">user</span><span class="o">/</span><span class="n">package</span><span class="o">.</span><span class="n">git</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># URL</span>
-</span><span class='line'><span class="err">$</span> <span class="n">bower</span> <span class="n">install</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">script</span><span class="o">.</span><span class="n">js</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>bower.json</h3>
-
-<p>就和node一样，node有一个package.json来存储模块相关的信息，包括依赖。</p>
-
-<p>bower也有自己的一个json文件，bower.json，通过命令bower init，可以在bower的提示下，完成对bower.json的填写。当运行bower init命令后，bower会询问你下面这些问题，来帮助你完成bower.json文件的初始化：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="err">?</span> <span class="n">name</span><span class="p">:</span> <span class="p">(</span><span class="n">hello_grunt</span><span class="p">)</span>
-</span><span class='line'><span class="err">?</span> <span class="n">version</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="o">.</span><span class="mi">0</span><span class="p">)</span>
-</span><span class='line'><span class="err">?</span> <span class="n">description</span><span class="p">:</span> <span class="n">hello</span>
-</span><span class='line'><span class="err">?</span> <span class="n">main</span> <span class="nb">file</span><span class="p">:</span>
-</span><span class='line'><span class="err">?</span> <span class="n">what</span> <span class="n">types</span> <span class="n">of</span> <span class="n">modules</span> <span class="n">does</span> <span class="n">this</span> <span class="n">package</span> <span class="n">expose</span><span class="err">?</span><span class="p">:</span> <span class="p">(</span><span class="n">Press</span> <span class="o">&lt;</span><span class="n">space</span><span class="o">&gt;</span> <span class="n">to</span> <span class="n">select</span><span class="p">)</span>
-</span><span class='line'><span class="err">❯◯</span> <span class="n">amd</span>
-</span><span class='line'> <span class="err">◯</span> <span class="n">es6</span>
-</span><span class='line'> <span class="err">◯</span> <span class="nb">globals</span>
-</span><span class='line'> <span class="err">◯</span> <span class="n">node</span>
-</span><span class='line'> <span class="err">◯</span> <span class="n">yui</span>
-</span><span class='line'><span class="err">?</span> <span class="n">keywords</span><span class="p">:</span> <span class="n">hello</span>
-</span><span class='line'><span class="err">?</span> <span class="n">authors</span><span class="p">:</span> <span class="p">(</span><span class="n">benweizhu</span> <span class="o">&lt;</span><span class="n">xxxx</span><span class="nd">@gmail.com</span><span class="o">&gt;</span><span class="p">)</span>
-</span><span class='line'><span class="err">?</span> <span class="n">license</span><span class="p">:</span> <span class="p">(</span><span class="n">MIT</span><span class="p">)</span>
-</span><span class='line'><span class="err">?</span> <span class="n">homepage</span><span class="p">:</span>
-</span><span class='line'><span class="err">?</span> <span class="nb">set</span> <span class="n">currently</span> <span class="n">installed</span> <span class="n">components</span> <span class="k">as</span> <span class="n">dependencies</span><span class="err">?</span><span class="p">:</span> <span class="p">(</span><span class="n">Y</span><span class="o">/</span><span class="n">n</span><span class="p">)</span>
-</span><span class='line'><span class="err">?</span> <span class="n">add</span> <span class="n">commonly</span> <span class="n">ignored</span> <span class="n">files</span> <span class="n">to</span> <span class="n">ignore</span> <span class="nb">list</span><span class="err">?</span><span class="p">:</span>
-</span><span class='line'><span class="err">?</span> <span class="n">would</span> <span class="n">you</span> <span class="n">like</span> <span class="n">to</span> <span class="n">mark</span> <span class="n">this</span> <span class="n">package</span> <span class="k">as</span> <span class="n">private</span> <span class="n">which</span> <span class="n">prevents</span> <span class="n">it</span> <span class="kn">from</span> <span class="nn">being</span> <span class="nn">accidentally</span>
-</span><span class='line'><span class="n">published</span> <span class="n">to</span> <span class="n">the</span> <span class="n">registry</span><span class="err">?</span><span class="p">:</span> <span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="n">N</span><span class="p">)</span> <span class="n">Y</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="n">name</span><span class="p">:</span> <span class="s">&#39;hello_grunt&#39;</span><span class="p">,</span>
-</span><span class='line'>  <span class="n">version</span><span class="p">:</span> <span class="s">&#39;0.0.0&#39;</span><span class="p">,</span>
-</span><span class='line'>  <span class="n">authors</span><span class="p">:</span> <span class="p">[</span>
-</span><span class='line'>    <span class="s">&#39;benweizhu &lt;xxxx@gmail.com&gt;&#39;</span>
-</span><span class='line'>  <span class="p">],</span>
-</span><span class='line'>  <span class="n">description</span><span class="p">:</span> <span class="s">&#39;hello&#39;</span><span class="p">,</span>
-</span><span class='line'>  <span class="n">moduleType</span><span class="p">:</span> <span class="p">[</span>
-</span><span class='line'>    <span class="s">&#39;node&#39;</span>
-</span><span class='line'>  <span class="p">],</span>
-</span><span class='line'>  <span class="n">keywords</span><span class="p">:</span> <span class="p">[</span>
-</span><span class='line'>    <span class="s">&#39;hello&#39;</span>
-</span><span class='line'>  <span class="p">],</span>
-</span><span class='line'>  <span class="n">license</span><span class="p">:</span> <span class="s">&#39;MIT&#39;</span><span class="p">,</span>
-</span><span class='line'>  <span class="n">private</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
-</span><span class='line'>  <span class="n">ignore</span><span class="p">:</span> <span class="p">[</span>
-</span><span class='line'>    <span class="s">&#39;**/.*&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s">&#39;node_modules&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s">&#39;bower_components&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s">&#39;test&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s">&#39;tests&#39;</span>
-</span><span class='line'>  <span class="p">],</span>
-</span><span class='line'>  <span class="n">dependencies</span><span class="p">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">angularjs</span><span class="p">:</span> <span class="s">&#39;~1.3.8&#39;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="err">?</span> <span class="n">Looks</span> <span class="n">good</span><span class="err">?</span><span class="p">:</span> <span class="p">(</span><span class="n">Y</span><span class="o">/</span><span class="n">n</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>bower.json中要填写的信息包括：</p>
-
-<p>1.<strong>name (required):</strong> The name of your package; please see Register section for how to name your package.  <br/>
-2.<strong>version: </strong>A semantic version number (see semver).  <br/>
-3.<strong>main string or array: </strong>The primary acting files necessary to use your package. <br/>
-4.<strong>ignore array:</strong> An array of paths not needed in production that you want Bower to ignore when installing your package.  <br/>
-5.<strong>keywords array of string: </strong>(recommended) helps make your package easier to discover. <br/>
-6.<strong>dependencies hash:</strong> Packages your package depends upon in production. Note that you can specify ranges of versions for your dependencies. <br/>
-7.<strong>devDependencies hash:</strong> Development dependencies. <br/>
-8.<strong>private boolean: </strong>Set to true if you want to keep the package private and do not want to register the package in the future.</p>
-
-<h3>安装并存储到bower.json</h3>
-
-<p>就和Grunt一样，bower也允许你将依赖下载下来，并存储到bower.json文件中</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">bower</span> <span class="n">install</span> <span class="n">angularjs</span> <span class="o">--</span><span class="n">save</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>bower中的有用命令</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">bower</span> <span class="nb">list</span>        <span class="o">--</span><span class="err">列出本地的包和可能的更新</span>
-</span><span class='line'><span class="n">bower</span> <span class="n">cache</span> <span class="n">clean</span> <span class="o">--</span><span class="err">清除</span><span class="n">bower</span><span class="err">的依赖缓存</span>
-</span><span class='line'><span class="n">bower</span> <span class="n">cache</span> <span class="nb">list</span>  <span class="o">--</span><span class="err">列出</span><span class="n">bower</span><span class="err">的依赖缓存</span>
-</span><span class='line'><span class="n">bower</span> <span class="n">update</span>      <span class="o">--</span><span class="err">根据</span><span class="n">bower</span><span class="o">.</span><span class="n">json</span><span class="err">的内容将安装的包升级到最新版本</span>
-</span><span class='line'><span class="n">bower</span> <span class="n">install</span>     <span class="o">--</span><span class="err">安装</span><span class="n">bower</span><span class="o">.</span><span class="n">json</span><span class="err">中定义的依赖包</span>
-</span><span class='line'><span class="n">bower</span> <span class="n">uninstall</span>   <span class="o">--</span><span class="err">卸载已安装的依赖包</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>更多内容，请查看：<a href="http://bower.io/docs/api/">http://bower.io/docs/api/</a></p>
-
-<h3>将bower和grunt集成</h3>
-
-<p>目前，github上面有很多grunt的插件可以将bower集成到grunt中。你可以去 <a href="https://www.npmjs.com/">https://www.npmjs.com/</a> 上搜索bower和grunt的关键字。</p>
-
-<p>我这里使用的是：grunt-bower-task</p>
-
-<p>安装很简单：npm install grunt-bower-task &ndash;save-dev</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;relations-front-end&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nt">&quot;devDependencies&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nt">&quot;grunt&quot;</span><span class="p">:</span> <span class="s2">&quot;~0.4.5&quot;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nt">&quot;grunt-bower-task&quot;</span><span class="p">:</span> <span class="s2">&quot;^0.4.0&quot;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nt">&quot;grunt-contrib-jshint&quot;</span><span class="p">:</span> <span class="s2">&quot;~0.4.0&quot;</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nt">&quot;scripts&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nt">&quot;test&quot;</span><span class="p">:</span> <span class="s2">&quot;grunt&quot;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">grunt</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">initConfig</span><span class="p">({</span>
-</span><span class='line'>        <span class="nx">jshint</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">files</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;Gruntfile.js&#39;</span><span class="p">,</span> <span class="s1">&#39;src/**/*.js&#39;</span><span class="p">,</span> <span class="s1">&#39;test/**/*.js&#39;</span><span class="p">,</span> <span class="s1">&#39;!src/js/libs/**/*.js&#39;</span><span class="p">]</span>
-</span><span class='line'>        <span class="p">},</span>
-</span><span class='line'>        <span class="nx">bower</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">install</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nx">options</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>                    <span class="nx">targetDir</span><span class="o">:</span> <span class="s1">&#39;./src/js/libs&#39;</span>
-</span><span class='line'>                <span class="p">}</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">&#39;grunt-bower-task&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">&#39;grunt-contrib-jshint&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;bower:install&#39;</span><span class="p">,</span> <span class="s1">&#39;jshint&#39;</span><span class="p">]);</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>targetDir: &lsquo;./src/js/libs&#8217;的作用是告诉task将bower下载的目标文件拷贝一份到哪个路径下</p>
-
-<p>请参考：<a href="http://bower.io/docs/tools/">http://bower.io/docs/tools/</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/33">&larr; Older</a>
@@ -585,6 +504,10 @@ orderBy：此排序过滤器根据给定的条件对数组中的元素进行排�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/11/19/style-guide-driven-development/">风格指南驱动开发</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/10/27/living-style-guide/">Living Style Guide - 缩小设计和开发的沟通鸿沟</a>
       </li>
     
@@ -598,10 +521,6 @@ orderBy：此排序过滤器根据给定的条件对数组中的元素进行排�
     
       <li class="post">
         <a href="/blog/2016/07/02/bash-profile-and-bashrc/">.bash_profile和.bashrc</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/06/27/host-jenkins-on-aws/">在AWS上部署Jenkins</a>
       </li>
     
   </ul>

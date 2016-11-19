@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="Angular测试基础：module和inject 先来最简单的样例代码，Controller端代码 1
+  <meta name="description" content="上周做项目的时候遇到的关于实现审计日志方式的问题，这里记录一下。 假设你的数据库是这样设计的： 1
 2
 3
 4
@@ -17,7 +17,9 @@
 6
 7
 8
-angular.module(&#39;angularGruntExampleApp&#39;) .controller(&#39;MainCtrl&#39;, &hellip;">
+9
+10
+{ &quot;Customer&quot;: { &quot;id&quot;: 1, &quot;name&quot;: &quot;benwei&quot &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +74,193 @@ angular.module(&#39;angularGruntExampleApp&#39;) .controller(&#39;MainCtrl&#39;,
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/05/30/issue-happened-when-entity-inheritance-meet-preinsert-and-preupdate/">当Entity继承遇到Hibernate的@PrePersist和@PreUpdate</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-05-30T17:03:04+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>5:03 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>上周做项目的时候遇到的关于实现审计日志方式的问题，这里记录一下。</p>
+
+<p>假设你的数据库是这样设计的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;Customer&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;benwei&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nt">&quot;AdvancedCustomer&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;customerId&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;level&quot;</span><span class="p">:</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>一个Customer表和一个AdvancedCustomer表，AdvancedCustomer表中含有CustomerId作为外键。</p>
+
+<p>在Java中的Entity实现是这样的：AdvancedCustomer继承自Customer，父类定义的继承策略是Joind。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="nd">@Table</span>
+</span><span class='line'><span class="nd">@Inheritance</span><span class="o">(</span><span class="n">Strategy</span><span class="o">=</span><span class="n">InheritanceType</span><span class="o">.</span><span class="na">JOINED</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Customer</span> <span class="o">{</span>
+</span><span class='line'>  
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="nd">@Table</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AdvancedCustomer</span> <span class="kd">extends</span> <span class="n">Customer</span> <span class="o">{</span>
+</span><span class='line'>  
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Joind策略的含义是：A strategy in which fields that are specific to a subclass are mapped to a separate table than the fields that are common to the parent class, and a join is performed to instantiate the subclass.</p>
+
+<p>通用的属性定义在父类中表，特殊的属性映射到另一个独立的表。</p>
+
+<p>此时，你想要给应用添加一个审计功能。</p>
+
+<p>你给Customer表添加LastModifiedBy和LastModifiedDate两个字段。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;Customer&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;benwei&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;lastModifiedBy&quot;</span><span class="p">:</span> <span class="s2">&quot;benwei&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;lastModifiedDate&quot;</span><span class="p">:</span> <span class="s2">&quot;21/6/2015 23:01:11&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nt">&quot;AdvancedCustomer&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;customerId&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;level&quot;</span><span class="p">:</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>做法是使用EntityListener，在Listener中使用Hibernate的@PrePersist和@PreUpdate来监听事件的发生。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AuditListener</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@PrePersist</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">prePersist</span><span class="o">(</span><span class="n">Object</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">if</span><span class="o">(</span><span class="n">entity</span> <span class="n">instanceOf</span> <span class="n">AdvancedCustomer</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="o">((</span><span class="n">AdvancedCustomer</span><span class="o">)</span><span class="n">entity</span><span class="o">).</span><span class="na">setLastModifiedDate</span><span class="o">(</span><span class="n">Datetime</span><span class="o">.</span><span class="na">now</span><span class="o">());</span>  
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@PreUpdate</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">preUpdate</span><span class="o">(</span><span class="n">Object</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="o">...</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="nd">@Table</span>
+</span><span class='line'><span class="nd">@EntityListeners</span><span class="o">([</span><span class="n">AuditListener</span><span class="o">.</span><span class="na">class</span><span class="o">])</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AdvancedCustomer</span> <span class="kd">extends</span> <span class="n">Customer</span> <span class="o">{</span>
+</span><span class='line'>  
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>问题来了，这个prePersist或者preUpdate方法会在什么时候触发呢？当修改AdvancedCustomer中的任意变量时，比如name，level，都会触发prePersist或者preUpdate。</h3>
+
+<p>但是，你到数据库中去查看审计事件变化时会发现，当创建一个新的Customer，或者更新Customer的名字字段都没有问题。</p>
+
+<p>当update子类中的变量level的时候，lastModifiedDate并没有发生变化。这是为什么？</p>
+
+<h3>要找到原因，必须打开showSql属性，来查看Hibernate到底产生的SQL语句是什么。</h3>
+
+<p>你会发现，当修改level变量时，Hibernate只产生了一条update语句来更新AdvancedCustomer这张表。而创建Customer会同时更新AdvancedCustomer和Customer两张表，更新name字段，会更新Customer这张表。</p>
+
+<p>也就是说，在PreUpdate触发之前，Hibernate在策略上已经决定了只更新AdvancedCustomer。即便之后改变了Customer中的lastModifiedDate，也没有改变它的行为。这里并不是说PreUpdate没有起到作用，而是Hibernate之决定更新一张表，至于更新什么内容，要等到PreUpdate之后决定（这一点可以从更新name时，lastModifiedDate发生了改变来证明）。</p>
+
+<h2>如何解决：</h2>
+
+<p>目前，我们没有完美的解决方案可以在仍然使用PreUpdate的情况下，保证审计信息更新正确。</p>
+
+<p>出现这个问题的主要原因是因为我们的实现受到框架实现机制的限制。</p>
+
+<p>所以，我们改变了实现的策略，既然受到框架本身实现策略的限制，我们就脱离框架，在还未计入框架管理范围之内，就将审计信息写入Entity内，那么可行的一种方式就是AOP。在触发Hibernate的save方法之前，将审计信息写入Entity。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -232,179 +421,6 @@ angular.module(&#39;angularGruntExampleApp&#39;) .controller(&#39;MainCtrl&#39;,
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/04/18/angularjs-resolve-and-promise-q/">Promise/Q和AngularJS中的resolve</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-04-18T10:02:50+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:02 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>JavaScript是一种单线程的语言。这意味着运行一个有较长处理时间的代码A，会阻塞所有其他代码的执行，直到该代码A执行完。UI元素无响应，动画暂停，其他代码都不能运行。</p>
-
-<p>解决这个问题的办法就是尽量避免同步执行。一种解决办法就是让这种需要较长处理时间的代码后执行。在JavaScript中，所有类似这样的操作都是通过回调函数实现。比如，JavaScript的事件处理器，当事件触发时，才被调用。</p>
-
-<p>异步编程会让代码变得复杂难懂，许多JavaScript的API严重依赖于回调函数，这样就导致了回调的嵌套。比如，下面的ajax调用：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ajax</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">url</span><span class="o">:</span> <span class="nx">url1</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">ajax</span><span class="p">({</span>
-</span><span class='line'>            <span class="nx">url</span><span class="o">:</span> <span class="nx">url2</span><span class="p">,</span>
-</span><span class='line'>            <span class="nx">data</span><span class="o">:</span> <span class="nx">data</span><span class="p">,</span>
-</span><span class='line'>            <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
-</span><span class='line'>        <span class="p">});</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果上面的代码，再进行一次回调就更难以阅读了。</p>
-
-<p>为了解决这个问题，许多JavaScript库（jQuery，AngularJS）提供了一个Promise对象来让异步编程模式同步化。看下面的一个例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">myWebService</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;http://www.example.com&quot;</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">myDb</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;data successfully saved&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;an error occurred while saving:&#39;</span><span class="p">);</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">dir</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>myWebService.get(&ldquo;<a href="http://www.example.com">http://www.example.com</a>&rdquo;)返回一个promise对象。该promise对象提供一个重要的方法then，并接受一个或者两个回调函数（success callback，failure callback）。</p>
-
-<p>重点是，then方法调用之后，会再次返回一个promise对象，该promise对象是什么，取决于回调函数返回什么，还是什么都不返回。这样，你就可以将多层回调通过链接方式连接起来。这样就可以用同步化的方式来进行异步化编程。</p>
-
-<p>在AngularJS中，通常使用$resource服务来进行restful的Ajax请求，所以对应需要success callback和failure callback。看下面的例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/user/:userId&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">userId</span><span class="o">:</span><span class="s1">&#39;@id&#39;</span><span class="p">});</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span><span class="nx">userId</span><span class="o">:</span><span class="mi">123</span><span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">user</span><span class="p">.</span><span class="nx">abc</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Calling these methods invoke an $http with the specified http method, destination and parameters. When the data is returned from the server then the object is an instance of the resource class.</p>
-
-<p>调用resource上的get方法，会触发一个$http请求，当请求数据从服务器端回来时，它是resource类的是一个实例。该实例有一个很重要的属性$promise，该属性返回给你对应的promise对象。于是上面那段通过回调方式编写的代码，就可以用同步的方式编写，如下。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/user/:userId&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">userId</span><span class="o">:</span><span class="s1">&#39;@id&#39;</span><span class="p">});</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">userPromise</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span><span class="nx">userId</span><span class="o">:</span><span class="mi">123</span><span class="p">}).</span><span class="nx">$promise</span><span class="p">;</span>
-</span><span class='line'><span class="nx">userPromise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">user</span><span class="p">.</span><span class="nx">abc</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>理解这部分后，我们进行下一个话题：Angular的resolve。</p>
-
-<p>在AngularJS路由进入一个页面时，对应的Controller可能会进行一些异步调用，比如，去服务器端获取一些需要在页面现实的数据。这种异步调用可能会花费较长的时间，这样就很可能导致页面抖动，页面在渲染完成后，现实数据还没有返回，甚至页面显示不正确。</p>
-
-<p>为了解决这个问题，angular的路由提供了一个重要的属性resolve，允许在进入页面之前，进行一些必要的数据准备，然后将准备好的数据注入到Controller中，如下。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;views/main.html&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;mainCtrl&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">user</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>          <span class="k">return</span> <span class="p">{</span><span class="nx">name</span><span class="o">:</span><span class="s1">&#39;benweizhu&#39;</span><span class="p">};</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>resolve提供了一个重要的特性，如果返回的是一个promise对象，那么路由会等到这个promise对象resolve（成功或者失败的）后，再初始化Controller。这样，我们就可以在Controller初始化前，进行一些异步调用，比如resource的Ajax请求，这样就可以防止页面都会，或者渲染错误。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;views/main.html&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;mainCtrl&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">user</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>          <span class="k">return</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span><span class="nx">userId</span><span class="o">:</span><span class="mi">123</span><span class="p">}).</span><span class="nx">$promise</span><span class="p">;</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料：  <br/>
-1.AngularJS官方网站 <br/>
-2.<a href="http://andyshora.com/promises-angularjs-explained-as-cartoon.html">http://andyshora.com/promises-angularjs-explained-as-cartoon.html</a>   <br/>
-3.<a href="https://thinkster.io/a-better-way-to-learn-angularjs/promises">https://thinkster.io/a-better-way-to-learn-angularjs/promises</a>   <br/>
-4.<a href="https://msdn.microsoft.com/en-us/library/windows/apps/hh700330.aspx">https://msdn.microsoft.com/en-us/library/windows/apps/hh700330.aspx</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/26">&larr; Older</a>
@@ -432,6 +448,10 @@ angular.module(&#39;angularGruntExampleApp&#39;) .controller(&#39;MainCtrl&#39;,
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/11/19/style-guide-driven-development/">风格指南驱动开发</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/10/27/living-style-guide/">Living Style Guide - 缩小设计和开发的沟通鸿沟</a>
       </li>
     
@@ -445,10 +465,6 @@ angular.module(&#39;angularGruntExampleApp&#39;) .controller(&#39;MainCtrl&#39;,
     
       <li class="post">
         <a href="/blog/2016/07/02/bash-profile-and-bashrc/">.bash_profile和.bashrc</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/06/27/host-jenkins-on-aws/">在AWS上部署Jenkins</a>
       </li>
     
   </ul>
