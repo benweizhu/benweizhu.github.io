@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-11-19T22:49:29+08:00</updated>
+  <updated>2016-11-19T22:59:53+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -48,7 +48,7 @@
 
 <p>它是一种前端开发和团队工作方式的实践。</p>
 
-<p>那么，如何实践？如何做到上面这些尝试？其实，只需要两点：组件化的设计和动态风格指南。</p>
+<p>而实践的方式，就是做到以下两点：组件化的设计和动态风格指南。</p>
 
 <h3>组件化的设计 - 我的眼里一切都可以是组件</h3>
 
