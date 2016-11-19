@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-11-19T23:04:54+08:00</updated>
+  <updated>2016-11-19T23:07:38+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -148,7 +148,7 @@
 
 <p>在TDD和BDD中，通过测试，驱动我们编写刚好满足测试和满足需求的实现，而测试反过来成为保护伞，在我们通过重构提升代码质量的同时，保证功能的安全性。</p>
 
-<p>那么，“风格指南驱动开发”到底驱动了什么？也许，它驱动着我们去重新使用已有的组件（代码），也驱动着我们（开发，UX，BA）进行更加频繁的沟通，它驱动着BA（业务分析）书写更加合理的Story，也驱动开发进行更加合理的代码和资源的管理。</p>
+<p>那么，“风格指南驱动开发”到底驱动了什么？也许，它驱动着我们尽最大可能去重新使用已有的组件（代码）和设计更通用的组件，也驱动着我们（开发，UX，BA）进行更加频繁的沟通，它驱动着BA（业务分析）书写更加合理的Story，也驱动开发进行更加合理的代码和资源的管理。</p>
 
 <p>如果转载本文，请注明转载地址： <a href="http://benweizhu.github.io/blog/2016/11/19/style-guide-driven-development/">http://benweizhu.github.io/blog/2016/11/19/style-guide-driven-development/</a></p>
 ]]></content>
