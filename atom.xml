@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2016-11-20T21:50:32+08:00</updated>
+  <updated>2017-01-17T22:05:36+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,217 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[一步一步做React(一) - Hello React]]></title>
+    <link href="http://benweizhu.github.io/blog/2017/01/17/react-step-by-step-1/"/>
+    <updated>2017-01-17T21:08:15+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2017/01/17/react-step-by-step-1</id>
+    <content type="html"><![CDATA[<p>什么都不说，先照着做</p>
+
+<h4>安装合适的node版本和包管理工具Yarn</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>node -version v6.9.4(用nvm)
+</span><span class='line'>
+</span><span class='line'>brew update（如果是mac的）
+</span><span class='line'>
+</span><span class='line'>brew install yarn</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="https://yarnpkg.com/en/docs/install">https://yarnpkg.com/en/docs/install</a></p>
+
+<h4>安装webpack</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add --dev webpack</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>安装babel</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add --dev babel-core babel-loader babel-preset-es2015 babel-preset-react</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>安装React</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add react react-dom</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>创建和编辑.babelrc</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>touch .babelrc   
+</span><span class='line'>vim .babelrc  </span></code></pre></td></tr></table></div></figure>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{
+</span><span class='line'>  "presets" : ["es2015", "react"]
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>创建和编辑webpack.config.js</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>touch webpack.config.js
+</span><span class='line'>vim webpack.config.js</span></code></pre></td></tr></table></div></figure>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>var webpack = require('webpack');
+</span><span class='line'>var path = require('path');
+</span><span class='line'>
+</span><span class='line'>var BUILD_DIR = path.resolve(__dirname, 'public');
+</span><span class='line'>var APP_DIR = path.resolve(__dirname, 'src');
+</span><span class='line'>
+</span><span class='line'>var config = {
+</span><span class='line'>  entry: APP_DIR + '/index.jsx',
+</span><span class='line'>  output: {
+</span><span class='line'>      path: BUILD_DIR,
+</span><span class='line'>      filename: 'bundle.js'
+</span><span class='line'>  },
+</span><span class='line'>  module: {
+</span><span class='line'>      loaders: [
+</span><span class='line'>          {
+</span><span class='line'>              test: /\.jsx?/,
+</span><span class='line'>              include: APP_DIR,
+</span><span class='line'>              loader: 'babel'
+</span><span class='line'>          }
+</span><span class='line'>      ]
+</span><span class='line'>  }
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>module.exports = config;</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>创建和编辑src/index.jsx</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mkdir src
+</span><span class='line'>cd src
+</span><span class='line'>touch index.jsx
+</span><span class='line'>vim index.jsx</span></code></pre></td></tr></table></div></figure>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import React from 'react';
+</span><span class='line'>import {render} from 'react-dom';
+</span><span class='line'>
+</span><span class='line'>class App extends React.Component {
+</span><span class='line'>  render () {
+</span><span class='line'>      return &lt;p&gt; Hello React!&lt;/p&gt;;
+</span><span class='line'>  }
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>render(&lt;App/&gt;, document.getElementById('app'));</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>在html中引用</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd src
+</span><span class='line'>touch index.html
+</span><span class='line'>vim index.html</span></code></pre></td></tr></table></div></figure>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;!doctype html&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;html lang="zh"&gt;
+</span><span class='line'>&lt;head&gt;
+</span><span class='line'>    &lt;!-- The first thing in any HTML file should be the charset --&gt;
+</span><span class='line'>    &lt;meta charset="utf-8"&gt;
+</span><span class='line'>    &lt;!-- Make the page mobile compatible --&gt;
+</span><span class='line'>    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+</span><span class='line'>    &lt;meta name="mobile-web-app-capable" content="yes"&gt;
+</span><span class='line'>    &lt;title&gt;17High&lt;/title&gt;
+</span><span class='line'>&lt;/head&gt;
+</span><span class='line'>&lt;body&gt;
+</span><span class='line'>&lt;div id="app"/&gt;
+</span><span class='line'>&lt;!-- Display a message if JS has been disabled on the browser. --&gt;
+</span><span class='line'>&lt;noscript&gt;If you're seeing this message, that means &lt;strong&gt;JavaScript has been disabled on your browser&lt;/strong&gt;, please &lt;strong&gt;enable JS&lt;/strong&gt; to make this app work.&lt;/noscript&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;script src="../public/bundle.js" type="text/javascript"&gt;&lt;/script&gt;
+</span><span class='line'>&lt;/body&gt;
+</span><span class='line'>&lt;/html&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>运行webpack命令，生成打包文件bundle.js</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./node_modules/.bin/webpack -d
+</span><span class='line'>./node_modules/.bin/webpack -d --watch //监听文件变化</span></code></pre></td></tr></table></div></figure>
+
+
+<p>打开index.html看效果</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[你听说过“风格指南驱动开发”吗？]]></title>
@@ -2937,391 +3148,6 @@ cache配置 - 背后的cache存储在哪里，从哪里读取</p>
 </span><span class='line'><span class="o">&lt;</span><span class="err">/div&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[鱼和熊掌的故事 - CSS Modules还是BEM]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/12/05/css-modules-or-bem/"/>
-    <updated>2015-12-05T11:39:48+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/12/05/css-modules-or-bem</id>
-    <content type="html"><![CDATA[<p>首先还是最基础的两个问题：什么是BEM？什么是CSS Modules？</p>
-
-<h2>BEM(Block Element Modifer)</h2>
-
-<p><a href="https://en.bem.info/">https://en.bem.info/</a></p>
-
-<p><img src="http://segmentfault.com/img/bVbN4T" alt="Alt text" /></p>
-
-<p>BEM的意思就是块（block）、元素（element）、修饰符（modifier），是由Yandex团队提出的一种<strong>前端命名方法论</strong>。这种巧妙的命名方法让你的CSS类对其他开发者来说更加透明而且更有意义。BEM命名约定更加严格，而且包含更多的信息，它们用于一个团队开发一个耗时的大项目。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.block</span><span class="p">{}</span>
-</span><span class='line'><span class="nc">.block__element</span><span class="p">{}</span>
-</span><span class='line'><span class="nc">.block--modifier</span><span class="p">{}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>.block 代表了更高级别的抽象或组件。 <br/>
-.block__element 代表.block的后代，用于形成一个完整的.block的整体。 <br/>
-.block&ndash;modifier代表.block的不同状态或不同版本。  <br/>
-.block__element&ndash;modifier代表.element的不同状态或不同版本。</p>
-
-<p>我们用一个搜索栏为例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;form</span> <span class="na">class=</span><span class="s">&quot;site-search full&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">class=</span><span class="s">&quot;field&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;Submit&quot;</span> <span class="na">value =</span><span class="s">&quot;Search&quot;</span> <span class="na">class=</span><span class="s">&quot;button&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;/form&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面的这个CSS类名真是太不精确了，比如field，并不能告诉我们足够的信息。尽管我们可以用它们来完成工作，但它们确实非常含糊不清。用BEM记号法就会是下面这个样子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;form</span> <span class="na">class=</span><span class="s">&quot;site-search site-search--full&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">class=</span><span class="s">&quot;site-search__field&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;Submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Search&quot;</span> <span class="na">class=</span><span class="s">&quot;site-search__button&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;/form&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>我们能清晰地看到有个叫.site-search的块，它的内部是一个叫.site-search__field的元素。并且.site-search还有另外一种形态叫.site-search&ndash;full。如果搜索栏还有验证，那么它还有一个error状态，可以用site-search__field&ndash;error。</p>
-
-<p>虽然上面是个简单地例子，但相信你已经可以看到BEM带来的好处是命名独立，有意义，且可以清晰的表示模块结构。</p>
-
-<p>BEM（或BEM的变体）是一个非常有用，强大，简单的命名约定，以至于让你的前端代码更容易阅读和理解，更容易协作，更容易控制，更加健壮和明确而且更加严密。</p>
-
-<h2>CSS Modules</h2>
-
-<p>在React中，我们以Web Component的方式实现应用。组件（Component）的概念中有一个很重要特性：完整和自包含，而对于一个完整的Web Component，包含HTML，JAVASCRIPT和CSS。</p>
-
-<p>React通过JSX实现了在JavaScript中写HTML，但是还缺少一个重要的元素：CSS。</p>
-
-<p>在2014年11月的NationJS上Christopher Chedeau谈到了“CSS in JS”的话题。给许多人带了思想上的一个冲击，也让React实现完整Web Component带来的曙光。</p>
-
-<p>现在，已经有了三种最新的，最明智和最可行的实现React样式的方式。</p>
-
-<p>React Style： <a href="https://github.com/js-next/react-style">https://github.com/js-next/react-style</a>   <br/>
-JSX Style： <a href="https://github.com/petehunt/jsxstyle">https://github.com/petehunt/jsxstyle</a>   <br/>
-Radium： <a href="https://github.com/FormidableLabs/radium">https://github.com/FormidableLabs/radium</a></p>
-
-<h4>一般情况下，如果项目中有大量的CSS，会出现什么问题？如图</h4>
-
-<p><img src="http://glenmaddern.com/assets/images/7_problems_css.jpg" alt="Alt text" /></p>
-
-<p>Christopher指出，如果你将样式都挪到JavaScript中，这些问题都有很好地解决方案，这点说的没错，但是会引入复杂度，以及不太习惯的CSS使用方式。CSS Modules团队觉得可以让CSS还是保持以前的样子，但是构建时，以style-in-JS的方式实现。</p>
-
-<p>CSS Modules的项目地址： <a href="https://github.com/css-modules/css-modules">https://github.com/css-modules/css-modules</a></p>
-
-<h3>默认就是局部命名空间</h3>
-
-<p>在CSS Modules中每个文件都是独立编译，你可以使用更为简单地类命名方式，而不用担心它会污染全局。</p>
-
-<p>我们以不同状态的Button为例，在没有CSS Modules的情况下，你可能会以Suit/BEM的方式来写CSS。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="c">/* components/submit-button.css \*/</span>
-</span><span class='line'><span class="nc">.Button</span> <span class="p">{</span> <span class="c">/* all styles for Normal \*/</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.Button--disabled</span> <span class="p">{</span> <span class="c">/* overrides for Disabled \*/</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.Button--error</span> <span class="p">{</span> <span class="c">/* overrides for Error \*/</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.Button--in-progress</span> <span class="p">{</span> <span class="c">/* overrides for In Progress \*/</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;Button Button--in-progress&quot;</span><span class="nt">&gt;</span>Processing...<span class="nt">&lt;/button&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>使用CSS Modules的方式，你就可以用下面这种方式来写：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="c">/* components/submit-button.css \*/</span>
-</span><span class='line'><span class="nc">.normal</span> <span class="p">{</span> <span class="c">/* all styles for Normal \*/</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.disabled</span> <span class="p">{</span> <span class="c">/* all styles for Disabled \*/</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.error</span> <span class="p">{</span> <span class="c">/* all styles for Error \*/</span> <span class="p">}</span>
-</span><span class='line'><span class="nc">.inProgress</span> <span class="p">{</span> <span class="c">/* all styles for In Progress \*/</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>你应该发现，class的前缀button没有了，为什么？因为这个css文件的名字已经叫做submit-button.css，CSS Modules已经知道它的前缀，不需要再次定义了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/* components/submit-button.js \*/</span>
-</span><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./submit-button.css&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="nx">buttonElem</span><span class="p">.</span><span class="nx">outerHTML</span> <span class="o">=</span> <span class="err">`</span><span class="o">&lt;</span><span class="nx">button</span> <span class="kr">class</span><span class="o">=</span><span class="nx">$</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">normal</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Submit</span><span class="o">&lt;</span><span class="err">/button&gt;`</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>以JavaScript的方式使用CSS。</p>
-
-<p>然后，你再看看生成的最终页面的样子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;components_submit_button__normal__abc5436&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  Processing...
-</span><span class='line'><span class="nt">&lt;/button&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>最终生成的class的名字是Component Name + Class Name + Base64，保证了层次结构和唯一性。</p>
-
-<h2>鱼和熊掌的问题</h2>
-
-<p>对比一下BEM和CSS Modules，它们最终的目的都是给你带来独立，唯一和有意义的类命名。CSS Modules允许你以变量的方式将class获取并使用到元素上，并且省略了类名中Component Name前缀（也就是BEM中的B）。</p>
-
-<p>在React中，Component一般会由多个元素组成（除了像Button这样比较简单地组件），就以上面的搜索框为例，在React中以CSS Modules的方式写，就有可能如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./site-search.css&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="c1">//省略React代码</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">full</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">field</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">value</span> <span class="o">=</span><span class="s2">&quot;Search&quot;</span> <span class="kr">class</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">button</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/form&gt;  </span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>对比一下BEM方式</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">from</span> <span class="s1">&#39;./site-search-bem.css&#39;</span><span class="p">;</span><span class="c1">//以BEM方式写的样式表</span>
-</span><span class='line'><span class="c1">//省略React代码</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;site-search site-search--full&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;site-search__field&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Search&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;site-search__button&quot;</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/form&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>CSS Modules好像挺完美的，变量的方式传递class，在JavaScript的语境下似乎更有道理，但从本质上来说，与BEM相比，也就只是省略了Block这一个前缀，在这个看似好像很不错的方案下，有没有存在的问题？</p>
-
-<h2>问题</h2>
-
-<h4>测试</h4>
-
-<p>在React的环境下，会使用Jest框架对组件进行测试，import styles from &lsquo;./site-search.css&rsquo;;这一个语句，并不是JavaScript的标准，只是CSS Modules的实现者，帮助你进行了编译，但Jest并不会编译。</p>
-
-<p>所以这个时候，我们会在Jest的PreProcessor中处理这句话，这样才不会有语法解析错误。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">babel</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./babel-jest&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">process</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="nx">filename</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="sr">/\.(css|scss)$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">filename</span><span class="p">))</span> <span class="p">{</span>
-</span><span class='line'>          <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
-</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>          <span class="k">return</span> <span class="nx">babel</span><span class="p">.</span><span class="nx">process</span><span class="p">(</span><span class="nx">src</span><span class="p">,</span> <span class="nx">filename</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>但与此同时，styles会变成空对象，由于我们使用了变量的方式，在测试中，并不能测试className的改变（因为state改变，去改变className）。相反，BEM因为是纯粹的字符串，所以它使可测试的。</p>
-
-<h2>在React中引入classnames模块</h2>
-
-<p>我们知道，在React中，通过state的改变来决定组件的样式变化，在没有外部力量帮助的情况下，你的代码就会如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/* components/submit-button.jsx \*/</span>
-</span><span class='line'><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./submit-button.css&#39;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">SubmitButton</span> <span class="kr">extends</span> <span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">let</span> <span class="nx">className</span><span class="p">,</span> <span class="nx">text</span> <span class="o">=</span> <span class="s2">&quot;Submit&quot;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">submissionInProgress</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">inProgress</span>
-</span><span class='line'>      <span class="nx">text</span> <span class="o">=</span> <span class="s2">&quot;Processing...&quot;</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nx">errorOccurred</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">error</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">form</span><span class="p">.</span><span class="nx">valid</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">disabled</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">className</span> <span class="o">=</span> <span class="nx">styles</span><span class="p">.</span><span class="nx">normal</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">className</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">text</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个时候，可以引入classnames模块，例子来自classnames样例：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;classnames&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Button</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="c1">// ...</span>
-</span><span class='line'>  <span class="nx">render</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">btnClass</span> <span class="o">=</span> <span class="nx">classNames</span><span class="p">({</span>
-</span><span class='line'>      <span class="s1">&#39;btn&#39;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-</span><span class='line'>      <span class="s1">&#39;btn-pressed&#39;</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span><span class="p">,</span>
-</span><span class='line'>      <span class="s1">&#39;btn-over&#39;</span><span class="o">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isHovered</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">btnClass</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">label</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/button&gt;;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>问题是，classNames中传入的JavaScript对象，不可以用styles.normal作为key，如果要在CSS Modules的环境下，使用classnames，你需要像下面这样写：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./site-search.css&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;classnames&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Button</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="c1">// ...</span>
-</span><span class='line'>  <span class="nx">render</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">btnClass</span> <span class="o">=</span> <span class="nx">classNames</span><span class="p">({</span>
-</span><span class='line'>      <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;btn&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-</span><span class='line'>      <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;btn-pressed&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span><span class="p">,</span>
-</span><span class='line'>      <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;btn-over&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isPressed</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isHovered</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">btnClass</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">label</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/button&gt;;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果你不使用classnames，在使用CSS Modules也是可以用styles[&lsquo;normal&rsquo;]来代替styles.normal。</p>
-
-<h2>无意中的发现，结合CSS Modules和BEM方式</h2>
-
-<p>通过用styles[&lsquo;normal&rsquo;]来代替styles.normal，在定义CSS的类名时，你依旧可以使用你习惯的CSS类命名方式，比如：BEM。上面的搜索框的例子，就可以写成：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">styles</span> <span class="nx">from</span> <span class="s1">&#39;./site-search.css&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="kr">import</span> <span class="nx">classNames</span> <span class="nx">from</span> <span class="s1">&#39;classnames&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="c1">//省略React代码</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">fieldClass</span> <span class="o">=</span> <span class="nx">classNames</span><span class="p">({</span>
-</span><span class='line'>  <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;field&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isError</span><span class="p">,</span>
-</span><span class='line'>  <span class="p">[</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;field__error&#39;</span><span class="p">]]</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isError</span><span class="p">,</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">[</span><span class="nx">full</span><span class="p">]}</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">fieldClass</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Search&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">[</span><span class="s1">&#39;submit&#39;</span><span class="p">]}</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/form&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这种方式，既保证了CSS Modules的使用，也保留了BEM通过三种基本元素来描述组件样式的方式。</p>
-
-<h2>总结</h2>
-
-<p>对比两种实现方式，从本质上来讲，并没有区别，否则它们也不可能结合在一起，但是CSS Modules带来的致命伤害是作为一个变量，并不能直接测试（想要测试，可以让Jest的路径指向已经编译过的JavaScript路径）。而纯粹的BEM因为是字符串可以很好地和classnames结合使用，也可以进行测试，所以在选择上占据了很大的优势。</p>
-
-<p>参考资料：  <br/>
-1.<a href="http://glenmaddern.com/articles/css-modules">http://glenmaddern.com/articles/css-modules</a>  <br/>
-2.<a href="http://segmentfault.com/a/1190000000391762">http://segmentfault.com/a/1190000000391762</a>  <br/>
-3.<a href="https://github.com/css-modules/css-modules">https://github.com/css-modules/css-modules</a>  <br/>
-4.<a href="https://www.npmjs.com/package/classnames">https://www.npmjs.com/package/classnames</a></p>
 ]]></content>
   </entry>
   

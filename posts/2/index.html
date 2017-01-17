@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="原视频： https://vimeo.com/177216958 PPT如下： 作者提到CSS开发过程的很多原则： • DRY/Single Source of Truth • The Single Responsibility Principle • The Separation of &hellip;">
+  <meta name="description" content="本文作者：朱本威，杨松 什么是Style Guide（风格指南）？ 如果你做过Web开发，我打赌你肯定听说过“风格指南”! 风格指南是什么？它是一系列关于书写和设计标准的文档，比如一些常见的标准有：字体，颜色，Logo，间距等等。 风格指南最早出自于印刷行业，比如：出版社就是风格指南的常见用户。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,6 +70,165 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2016/10/27/living-style-guide/">Living Style Guide - 缩小设计和开发的沟通鸿沟</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-10-27T10:04:27+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:04 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>本文作者：朱本威，杨松</p>
+
+<h3>什么是Style Guide（风格指南）？</h3>
+
+<p>如果你做过Web开发，我打赌你肯定听说过“风格指南”!</p>
+
+<p>风格指南是什么？它是一系列关于书写和设计标准的文档，比如一些常见的标准有：字体，颜色，Logo，间距等等。</p>
+
+<p>风格指南最早出自于印刷行业，比如：出版社就是风格指南的常见用户。</p>
+
+<p style="text-align: center;">
+  <img src="/images/style-guide/duzhe99.png" width="500" title="1999年的《读者》" alt="Alt text">
+  <img src="/images/style-guide/duzhe2016.png" width="294" title="2016年的《读者》" alt="Alt text">
+</p>
+
+
+<p style="text-align: center;">从1999年到2016年，《读者》的封面风格都没有改变过</p>
+
+
+<p>好的品牌，通常都有一个非常棒的风格指南，无论是哪个行业，比如：KFC。我们也将KFC的这种风格指南成为VI（Visual Identity，企业视觉设计）。</p>
+
+<p style="text-align: center;">
+  <img src="/images/style-guide/KFC.png" width="500" title="KFC Style Guide" alt="Alt text">
+</p>
+
+
+<p style="text-align: center;">KFC老爷爷大家都认识</p>
+
+
+<p>对于我们的WEB开发，也需要风格指南，目的是保证最终的交付产物和最初设计的一致性，打造出一致的核心用户体验。</p>
+
+<p style="text-align: center;">
+  <img src="/images/style-guide/optus.png" width="500" title="OPUTS Style Guide" alt="Alt text">
+</p>
+
+
+<p style="text-align: center;">Optus澳大利亚电讯公司</p>
+
+
+<h3>风格指南过去的工作方式</h3>
+
+<p>在过去，一种常用的工作方式，设计与开发是分离开了。设计师在这儿，前端工程师在那儿，中间有一条无形的巨大的鸿沟。</p>
+
+<p>唯一的沟通渠道就是这样一个PDF材料。设计师最开始把PDF给你，然后和工程师各自为阵开始忙自己的，打死不相往来。</p>
+
+<p>沟通不及时就不说了，有时候设计还要埋怨你，说你的实现怎么和他最初的设计不一样。</p>
+
+<p>每一个工程师都应该都会有一段被设计师逼着改实现的经历，也许有的设计师们根本不理解我们修复IE问题时的痛苦，也不一定明白PDF文档沟通的效率是有限的。</p>
+
+<p>“我怎么能知道点击每一个按钮时候的行为呢？”</p>
+
+<p>答案是我根本不知道，等我看完了一百页文档，还不如你直接给我解释来得简单直接。</p>
+
+<p style="text-align: center;">
+  <img src="/images/style-guide/ui-dev.png" width="500" title="UX 和 UIDev" alt="Alt text">
+</p>
+
+
+<p style="text-align: center;">UX，UI Dev和Backend Dev</p>
+
+
+<p>而每一次修改都需要很长的反馈周期，中间浪费了不少时间。</p>
+
+<p>然而，当第二版，第三版，第四版来的时候，我的PDF和PSD文件已经堆积成山，我也不清楚哪一个才是最新的版本，没有版本管理工具，即便有，这种二进制文件也很难立刻查看它和上一个版本的区别在哪。</p>
+
+<p>而且我相信大部分像我一样没有强迫症的人，一定是文件下载或者拷贝随意放置在桌面或者什么位置，然后常常根据时间排序去找最新的。久而久之，就不知道在哪了，然后又找设计师要一版。</p>
+
+<p>经历了以上种种的痛点之后，我们是怎么做的？</p>
+
+<h3>Living Style Guide</h3>
+
+<p style="text-align: center;">
+  <img src="/images/style-guide/living-style-guide-logo.png" width="500" title="UX 和 UIDev" alt="Alt text">
+</p>
+
+
+<p>我们忍受不了这种不够敏捷的工作方式，尝试着用新的方式去解决这个问题，我们构建一个Living Style Guide。它是一个在线站点，同时也是一种工作方式，一种实践。我们尝试通过这种实践去解决这个问题。</p>
+
+<p><strong>Living Style Guide和Style Guide的区别：</strong></p>
+
+<p>一个直观的变化就是，曾经的PDF文档，代码化了。比如，最开始只存在于PDF文件中的调色板，字体，在网站上就可以直接查看，而不用担心是否过期，找不到等等。</p>
+
+<p>同时，也是一种工作方式的改变，我们的设计师与工程师需要更加紧密地工作在一起了。让Living Style Guide成了一个钮带，连接着设计师与工程师。</p>
+
+<p>设计看到的文档即代码，开发人员看到的代码即文档。不会出现设计师所认为的设计和实际开发出来的结果不一致的情况，我们做到Single source of truth(唯一真实来源)。同时，你看到的是动态，可交互的一系列组件。不需要考虑怎么用文档去描述一种行为，你所看到的就包含自身行为。</p>
+
+<p>敏捷宣言中有这样一句话：工作的软件 高于 详尽的文档，Living Style Guide在努力实现这一点，尝试将设计与前端的闭环缩小。</p>
+
+<h3>聊聊工程师们关心的干货</h3>
+
+<p><strong>选择合适的技术栈</strong></p>
+
+<p>技术栈的选择还是要回归到项目需求上。我们从大的方向上考虑了这么几点：组件化，数据驱动，易定制和可测试。</p>
+
+<p>Living Style Guide是一个供设计师和前端开发工程师使用的平台，并可以将开发的内容打包使用在其他不同的Web应用平台，对通用性和易用性都有较高的要求，我们没有做一个大而全的框架，而是想要做到以组件为单位，灵活发布，并能灵活使用在各种平台。</p>
+
+<p style="text-align: center;">
+  <img src="/images/style-guide/tech-stack.png" width="500" title="我们的技术栈" alt="Alt text">
+</p>
+
+
+<p style="text-align: center;">我们的技术栈</p>
+
+
+<p>上面这张图涵盖了我们大部分的技术栈内容，具体内容我就不单独介绍了。不过，我突然想起来前段时间有一篇非常火的文章《在2016年学JavaScript是一种什么样的体验?》，它写的就是我们这个feel。</p>
+
+<p><strong>关于代码组织结构方式</strong></p>
+
+<p>组件化是我们的核心价值，所以在代码结构上，我们将“自包含”属性作为一个很重要的特性。每一个组件包含了它自己所需要的相关文件：测试文件（单元测试，功能测试），样式文件（Sass），组件和文档，而公共的部分，我们抽离到其他位置，从而尽量做到高内聚，低耦合，同时提高代码重用性。</p>
+
+<p style="text-align: center;">
+  <img src="/images/style-guide/folder-structure.png" width="300" title="代码组织结构" alt="Alt text">
+</p>
+
+
+<p style="text-align: center;">我们项目的代码组织结构</p>
+
+
+<p><strong>需要注意的点</strong></p>
+
+<p>组件化的好处是相互隔离，又可被重用。实现组件化一定要需要合理的分类和管理好组件，比如，区分业务组件和通用组件，保证被重用的组件拥有足够的可扩展性。</p>
+
+<p><strong>最后</strong></p>
+
+<p>Living Style Guide是我们在缩小设计与开发沟通鸿沟的一种尝试，努力将闭环缩小，以提高效率，降低成本，这是一种实践，也是设计师和工程师工作方式的改变。</p>
+
+<p>转载请注明： <a href="http://benweizhu.github.io/blog/2016/10/27/living-style-guide/">http://benweizhu.github.io/blog/2016/10/27/living-style-guide/</a></p>
+
+<p>参考资料： <br/>
+1. <a href="https://asinthecity.com/2011/11/10/the-difference-between-a-ux-designer-and-ui-developer/">https://asinthecity.com/2011/11/10/the-difference-between-a-ux-designer-and-ui-developer/</a> <br/>
+2. 敏捷宣言（ <a href="http://agilemanifesto.org/iso/zhchs/">http://agilemanifesto.org/iso/zhchs/</a> ）</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2016/08/21/css-for-software-engineers-for-css-developers/">CSS和软件工程中的设计原则</a></h1>
     
     
@@ -115,86 +274,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/07/12/svg-and-icon-font/">SVG和IconFont</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-07-12T15:28:07+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>3:28 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在大型企业中，它们都拥有自己的VI，有自己的设计团队，他们来开发设计一些企业特有的图标和标志。而这些图标一般以矢量图的方式提供给我们。</p>
-
-<p>矢量图，也称为面向对象的图像或绘图图像，在数学上定义为一系列由线连接的点。矢量文件中的图形元素称为对象。每个对象都是一个自成一体的实体，它具有颜色、形状、轮廓、大小和屏幕位置等属性。</p>
-
-<p>SVG（Scalable Vector Graphics）是什么？</p>
-
-<p>大部分人第一次见到它，肯定认为是一种矢量图图形格式，但严格来说它也是一种开放标准的矢量图形语言，是使用XML来描述二维图形和绘图程序的语言，它是一门语言，DSL（领域特定语言）。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; standalone=&quot;no&quot;?&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">&lt;!DOCTYPE svg PUBLIC &quot;-//W3C//DTD SVG 1.1//EN&quot;</span>
-</span><span class='line'><span class="cp">&quot;http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd&quot;&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;svg</span> <span class="na">width=</span><span class="s">&quot;100%&quot;</span> <span class="na">height=</span><span class="s">&quot;100%&quot;</span> <span class="na">version=</span><span class="s">&quot;1.1&quot;</span>
-</span><span class='line'><span class="na">xmlns=</span><span class="s">&quot;http://www.w3.org/2000/svg&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;circle</span> <span class="na">cx=</span><span class="s">&quot;100&quot;</span> <span class="na">cy=</span><span class="s">&quot;50&quot;</span> <span class="na">r=</span><span class="s">&quot;40&quot;</span> <span class="na">stroke=</span><span class="s">&quot;black&quot;</span>
-</span><span class='line'><span class="na">stroke-width=</span><span class="s">&quot;2&quot;</span> <span class="na">fill=</span><span class="s">&quot;red&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/svg&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面这段代码得到的svg矢量图，如下：</p>
-
-<p><img src="https://rawgit.com/benweizhu/5036fcaf39960a28ce9b0aca17a78caa/raw/31797b14c698431c9a6f5435a2f5a28dda2ce1bd/circle.svg" alt="Alt text" /></p>
-
-<p>我们在响应式网页设计的工作中经常用到SVG，因为一般的图片没有办法进行适当的缩放，普通图片的缩放会导致图像的失真，同时，图片的文件大小也可能和你希望的图片不一致（大图被缩小使用，导致图片文件大小仍然很大）。</p>
-
-<p>我相信大部分前端开发工程师都用过IconFont，比如：<a href="http://fontawesome.io/icons/">http://fontawesome.io/icons/</a> 和bootstrap中的glyphicons <a href="http://v3.bootcss.com/components/#glyphicons">http://v3.bootcss.com/components/#glyphicons</a> 。</p>
-
-<p>关于为什么要转换为Icon Font？CSS-Tricks中有一篇文章详细的对比了SVG和ICON Font，见： <a href="https://css-tricks.com/icon-fonts-vs-svg/">https://css-tricks.com/icon-fonts-vs-svg/</a></p>
-
-<p>简单版，一个最主要的原因必须使用IconFont，因为要兼容IE8。</p>
-
-<p>一个比较有用的gulp插件，可以将SVG文件转化为font字体文件，并自动生成对应的scss文件（包含font-familly和content）。</p>
-
-<p><a href="https://github.com/nfroidure/gulp-iconfont">https://github.com/nfroidure/gulp-iconfont</a></p>
-
-<p>当然，我们也可以使用一些在线工具来将SVG文件转化成字体文件比如： <a href="https://icomoon.io/">https://icomoon.io/</a> 。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/3">&larr; Older</a>
@@ -222,6 +301,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
       </li>
     
@@ -235,10 +318,6 @@
     
       <li class="post">
         <a href="/blog/2016/07/12/svg-and-icon-font/">SVG和IconFont</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/07/02/bash-profile-and-bashrc/">.bash_profile和.bashrc</a>
       </li>
     
   </ul>
@@ -298,7 +377,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2016 - ZHU Benwei -
+  Copyright &copy; 2017 - ZHU Benwei -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
