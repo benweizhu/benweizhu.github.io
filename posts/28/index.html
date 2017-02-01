@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="利用Gradle做构建，必然逃不掉Gradle的插件的使用，即便是最简单的Java或Groovy的应用都需要使用Java插件或者Groovy插件。 Gradle插件的作用就是将会被重复利用的逻辑打包，这样就可以在不同的项目中重复的使用。比如在上一节中实现的集成测试任务，就可以打包到插件中， &hellip;">
+  <meta name="description" content="在关系型数据库中，表与表之间的关系是通过外键来实现，而其中最常见的关系有两种：一对多和多对多。 在面向对象的世界，对象与对象之间的关系是通过从源对象到目标对象的对象引用实现。关系是一个对象含有的其他对象或者对象的集合，而在关系型数据库中，关系要么通过定义另一张表的外键建立，要么通过中间表建立。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,228 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/03/21/jpa-many-to-many-relationship/">JPA中的多对多关系</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-03-21T10:44:43+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>10:44 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在关系型数据库中，表与表之间的关系是通过外键来实现，而其中最常见的关系有两种：一对多和多对多。</p>
+
+<p>在面向对象的世界，对象与对象之间的关系是通过从源对象到目标对象的对象引用实现。关系是一个对象含有的其他对象或者对象的集合，而在关系型数据库中，关系要么通过定义另一张表的外键建立，要么通过中间表建立。</p>
+
+<p>在Java或者JPA的世界里，所有的关系都是单向性的，一个源对象保有目标对象的索引，并不能保证目标对象和源对象一样包含源对象的索引。这个关系型数据库就不一样了，在关系型数据库中，表之间的关系通过外键来实现，查询语句通过这个外键，可以进行正向和反向的查询。</p>
+
+<p>ManyToMany多对多关系是关系型数据库中一种非常常见的表关系。</p>
+
+<p>在JPA中，如果要实现ManyToMany关系，常常是利用的一种方式是中间表。所有的ManyToMany关系都需要一个JoinTable，在这个JoinTable中，通过JoinColumns定义了两个外键，一个外键来指向源表的主键，另一个外键指向目标表的主键，通常JoinTable的主键是两个外键的组合。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Employee</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@Id</span>
+</span><span class='line'>  <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="nd">@ManyToMany</span>
+</span><span class='line'>  <span class="nd">@JoinTable</span><span class="o">(</span>
+</span><span class='line'>      <span class="n">name</span><span class="o">=</span><span class="s">&quot;EMP_PROJ&quot;</span><span class="o">,</span>
+</span><span class='line'>      <span class="n">joinColumns</span><span class="o">={</span><span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;EMP_ID&quot;</span><span class="o">,</span> <span class="n">referencedColumnName</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)},</span>
+</span><span class='line'>      <span class="n">inverseJoinColumns</span><span class="o">={</span><span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;PROJ_ID&quot;</span><span class="o">,</span> <span class="n">referencedColumnName</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)})</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="n">projects</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">.....</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>双向ManyToMany</p>
+
+<p>虽然在数据库中ManyToMany总是双向的，但是在对象模型中定义双向关系时，需要定义映射的发起方（管理方）和映射的接收方。发起方需要定义JoinTable，接收方则需要定义mappedBy。如果不使用mappedBy，则Jpa的实现者会认为，这种多对多关系是两个独立定义的关系，就会有重复的两行记录插入到JoinTable中。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Project</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@Id</span>
+</span><span class='line'>  <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="nd">@ManyToMany</span><span class="o">(</span><span class="n">mappedBy</span><span class="o">=</span><span class="s">&quot;projects&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Employee</span><span class="o">&gt;</span> <span class="n">employees</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>双向关系的共同毛病</p>
+
+<p>需要应用程序自己去维护它们（对象）之间的双向关系，否则就不同步（out of sync）。在写set方法或者，多对多关系中的add方法时，需要注意将自己的引用设置到包含的集合对象中。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Employee</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">List</span> <span class="n">phones</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addPhone</span><span class="o">(</span><span class="n">Phone</span> <span class="n">phone</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">phones</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">phone</span><span class="o">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">phone</span><span class="o">.</span><span class="na">getOwner</span><span class="o">()</span> <span class="o">!=</span> <span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">phone</span><span class="o">.</span><span class="na">setOwner</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Phone</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Employee</span> <span class="n">owner</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setOwner</span><span class="o">(</span><span class="n">Employee</span> <span class="n">employee</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">owner</span> <span class="o">=</span> <span class="n">employee</span><span class="o">;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(!</span><span class="n">employee</span><span class="o">.</span><span class="na">getPhones</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="k">this</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">employee</span><span class="o">.</span><span class="na">getPhones</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>多对多关系的管理方的选择</p>
+
+<p>多对多关系的管理方的定义取决于JoinTable的定义方，至于由哪一边作为管理方，取决于业务的关系，所以并不固定。但是必须要理解的时，它们之间建立关系的方式（即谁管理谁）。举个例子，User和Group，这是一个常见的多对多关系，当你将管理方定义在Group这边时，你要做的是将User添加到Group，然后保存Group。而不能将Group添加给User，然后保存User。</p>
+
+<p>应用级联</p>
+
+<p>由某一方来管理对象的操作，需要应用级联属性，来说明是否将级联操作传递到对应的实体类上。如果你在存储一个对象时，该对象关联到另一个对象，而它们之间的关系没有使用级联，则会抛出异常，告诉你，需要先存储关联对象。</p>
+
+<p>级联操作的类型有6种，分别是ALL，PERSIST，MERGE，REMOVE，REFRESH，DETACH。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">enum</span> <span class="n">CascadeType</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade all operations */</span>
+</span><span class='line'>    <span class="n">ALL</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade persist operation */</span>
+</span><span class='line'>    <span class="n">PERSIST</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade merge operation */</span>
+</span><span class='line'>    <span class="n">MERGE</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade remove operation */</span>
+</span><span class='line'>    <span class="n">REMOVE</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Cascade refresh operation */</span>
+</span><span class='line'>    <span class="n">REFRESH</span><span class="o">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Cascade detach operation</span>
+</span><span class='line'><span class="cm">     *</span>
+</span><span class='line'><span class="cm">     * @since Java Persistence 2.0</span>
+</span><span class='line'><span class="cm">     *</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="n">DETACH</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@ManyToMany</span><span class="o">(</span><span class="n">cascade</span> <span class="o">=</span> <span class="n">CascadeType</span><span class="o">.</span><span class="na">ALL</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料：  <br/>
+1.<a href="http://en.wikibooks.org/wiki/Java_Persistence/ManyToMany">http://en.wikibooks.org/wiki/Java_Persistence/ManyToMany</a>   <br/>
+2.<a href="http://stackoverflow.com/questions/4935095/jpa-hibernate-many-to-many-cascading">http://stackoverflow.com/questions/4935095/jpa-hibernate-many-to-many-cascading</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -309,186 +531,6 @@ src/test/groovy</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/03/10/get-started-with-spring-boot-1-quick-start/">用Spring Boot开发Spring项目 快速上手</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-03-10T16:44:18+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>4:44 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Spring Boot是Spring团队提供的全新框架，其设计目的是用来简化新的Spring应用的初始搭建以及开发过程。</p>
-
-<p>Spring Boot的主要目的是：（参考：<a href="https://github.com/spring-projects/spring-boot%EF%BC%89">https://github.com/spring-projects/spring-boot%EF%BC%89</a></p>
-
-<p>1.Provide a radically faster and widely accessible getting started experience for all Spring development  <br/>
-2.Be opinionated out of the box, but get out of the way quickly as requirements start to diverge from the defaults  <br/>
-3.Provide a range of non-functional features that are common to large classes of projects (e.g. embedded servers, security, metrics, health checks, externalized configuration)  <br/>
-4.Absolutely no code generation and no requirement for XML configuration</p>
-
-<p>快速启动Spring的开发，快速响应变化，提供非功能的特性，无需XML配置，这是Spring Boot所带来的优势。</p>
-
-<p>下面通过一个例子，来快速的开发一个基于Spring Boot的Rest应用</p>
-
-<figure class='code'><figcaption><span>build.gradle </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">classpath</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-gradle-plugin:1.2.2.RELEASE&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;spring-boot&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">jar</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">baseName</span> <span class="o">=</span> <span class="s1">&#39;gs-spring-boot&#39;</span>
-</span><span class='line'>    <span class="n">version</span> <span class="o">=</span>  <span class="s1">&#39;0.1.0&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-web&quot;</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">exclude</span> <span class="nl">module:</span> <span class="s2">&quot;spring-boot-starter-tomcat&quot;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-jetty&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">testCompile</span><span class="o">(</span><span class="s2">&quot;junit:junit&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">task</span> <span class="nf">wrapper</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Wrapper</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">gradleVersion</span> <span class="o">=</span> <span class="s1">&#39;1.11&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在Gradle中，应用了Spring Boot Gradle插件，你可以看到dependencies中并没有指定Spring Boot依赖的版本，这是因为已经在插件的定义中已经指定了版本：1.2.2.RELEASE，所以这里就可以省略。（关于省略版本这一点，在之后的文章中会解释）。</p>
-
-<p>而且，依赖spring-boot-starter-web会一站式的帮你将与web开发相关的所有相关依赖下载，而不需要你一个个复制粘贴。这也是所有其他Spring Boot Starter的主要目的。</p>
-
-<figure class='code'><figcaption><span>HelloController.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RestController</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@RestController</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloController</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">hello</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;hello spring boot&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里定义了一个HelloController使用RestController注解，@RestController代表着@Controller和@ResponseBody，可以简化写Restful类型Controller的流程。</p>
-
-<figure class='code'><figcaption><span>Application.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.boot.SpringApplication</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.SpringBootApplication</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@SpringBootApplication</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Application</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">Application</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>最后一步，定义Spring boot应用的main方法，@SpringBootApplication等价于另外三个注解@Configuration，@EnableAutoConfiguration，@ComponentScan。</p>
-
-<p>运行Gradle的命令: gradlew bootRun就可以启动应用程序。</p>
-
-<p>通过Spring Boot创建的Java应用可以直接通过java -jar启动（即便它是Web应用）。也就是说，在这里，首先运行gradle assemble，得到jar文件，然后运行java -jar gs-spring-boot-0.1.0.jar。</p>
-
-<p>参考资料： <br/>
-1.<a href="https://github.com/spring-projects/spring-boot">https://github.com/spring-projects/spring-boot</a> <br/>
-2.<a href="http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#getting-started-first-application">http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#getting-started-first-application</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/29">&larr; Older</a>
@@ -516,6 +558,10 @@ src/test/groovy</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a>
       </li>
     
@@ -529,10 +575,6 @@ src/test/groovy</p>
     
       <li class="post">
         <a href="/blog/2016/08/21/css-for-software-engineers-for-css-developers/">CSS和软件工程中的设计原则</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/07/12/svg-and-icon-font/">SVG和IconFont</a>
       </li>
     
   </ul>

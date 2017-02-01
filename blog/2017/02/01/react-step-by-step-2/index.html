@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>NO END FOR LEARNING</title>
+  <title>一步一步做React(二) - CSS Modules - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2017/02/01/react-step-by-step-2">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -62,15 +62,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a></h1>
+      <h1 class="entry-title">一步一步做React(二) - CSS Modules</h1>
     
     
       <p class="meta">
@@ -86,7 +83,7 @@
   </header>
 
 
-  <div class="entry-content"><p>基于上次的内容 <a href="http://benweizhu.github.io/blog/2017/01/17/react-step-by-step-1/">《一步一步做React(一) - Hello React》</a>，我们继续搭建一个React项目的工程实践 - CSS Modules。</p>
+<div class="entry-content"><p>基于上次的内容 <a href="http://benweizhu.github.io/blog/2017/01/17/react-step-by-step-1/">《一步一步做React(一) - Hello React》</a>，我们继续搭建一个React项目的工程实践 - CSS Modules。</p>
 
 <h3>CSS Modules概念</h3>
 
@@ -287,251 +284,65 @@
 </span></code></pre></td></tr></table></div></figure>
 
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2017-02-01T22:44:09+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2017</span></span> <span class='time'>10:44 pm</span></time>
+      
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2017-01-17T21:08:15+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>9:08 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>什么都不说，先照着做</p>
-
-<h4>安装合适的node版本和包管理工具Yarn</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>node -version v6.9.4(用nvm)
-</span><span class='line'>
-</span><span class='line'>brew update（如果是mac的）
-</span><span class='line'>
-</span><span class='line'>brew install yarn</span></code></pre></td></tr></table></div></figure>
-
-
-<p><a href="https://yarnpkg.com/en/docs/install">https://yarnpkg.com/en/docs/install</a></p>
-
-<h4>安装webpack</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add --dev webpack</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>安装babel</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add --dev babel-core babel-loader babel-preset-es2015 babel-preset-react</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>安装React</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add react react-dom</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>创建和编辑.babelrc</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>touch .babelrc   
-</span><span class='line'>vim .babelrc  </span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>{
-</span><span class='line'>  "presets" : ["es2015", "react"]
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>创建和编辑webpack.config.js</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>touch webpack.config.js
-</span><span class='line'>vim webpack.config.js</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>var webpack = require('webpack');
-</span><span class='line'>var path = require('path');
-</span><span class='line'>
-</span><span class='line'>var BUILD_DIR = path.resolve(__dirname, 'public');
-</span><span class='line'>var APP_DIR = path.resolve(__dirname, 'src');
-</span><span class='line'>
-</span><span class='line'>var config = {
-</span><span class='line'>  entry: APP_DIR + '/index.jsx',
-</span><span class='line'>  output: {
-</span><span class='line'>      path: BUILD_DIR,
-</span><span class='line'>      filename: 'bundle.js'
-</span><span class='line'>  },
-</span><span class='line'>  module: {
-</span><span class='line'>      loaders: [
-</span><span class='line'>          {
-</span><span class='line'>              test: /\.jsx?/,
-</span><span class='line'>              include: APP_DIR,
-</span><span class='line'>              loader: 'babel'
-</span><span class='line'>          }
-</span><span class='line'>      ]
-</span><span class='line'>  }
-</span><span class='line'>};
-</span><span class='line'>
-</span><span class='line'>module.exports = config;</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>创建和编辑src/index.jsx</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mkdir src
-</span><span class='line'>cd src
-</span><span class='line'>touch index.jsx
-</span><span class='line'>vim index.jsx</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>import React from 'react';
-</span><span class='line'>import {render} from 'react-dom';
-</span><span class='line'>
-</span><span class='line'>class App extends React.Component {
-</span><span class='line'>  render () {
-</span><span class='line'>      return &lt;p&gt; Hello React!&lt;/p&gt;;
-</span><span class='line'>  }
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>render(&lt;App/&gt;, document.getElementById('app'));</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>在html中引用</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>cd src
-</span><span class='line'>touch index.html
-</span><span class='line'>vim index.html</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;!doctype html&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;html lang="zh"&gt;
-</span><span class='line'>&lt;head&gt;
-</span><span class='line'>    &lt;!-- The first thing in any HTML file should be the charset --&gt;
-</span><span class='line'>    &lt;meta charset="utf-8"&gt;
-</span><span class='line'>    &lt;!-- Make the page mobile compatible --&gt;
-</span><span class='line'>    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
-</span><span class='line'>    &lt;meta name="mobile-web-app-capable" content="yes"&gt;
-</span><span class='line'>    &lt;title&gt;17High&lt;/title&gt;
-</span><span class='line'>&lt;/head&gt;
-</span><span class='line'>&lt;body&gt;
-</span><span class='line'>&lt;div id="app"/&gt;
-</span><span class='line'>&lt;!-- Display a message if JS has been disabled on the browser. --&gt;
-</span><span class='line'>&lt;noscript&gt;If you're seeing this message, that means &lt;strong&gt;JavaScript has been disabled on your browser&lt;/strong&gt;, please &lt;strong&gt;enable JS&lt;/strong&gt; to make this app work.&lt;/noscript&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;script src="../public/bundle.js" type="text/javascript"&gt;&lt;/script&gt;
-</span><span class='line'>&lt;/body&gt;
-</span><span class='line'>&lt;/html&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>运行webpack命令，生成打包文件bundle.js</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>./node_modules/.bin/webpack -d
-</span><span class='line'>./node_modules/.bin/webpack -d --watch //监听文件变化</span></code></pre></td></tr></table></div></figure>
-
-
-<p>打开index.html看效果</p>
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2017/02/01/react-step-by-step-2/" data-via="" data-counturl="http://benweizhu.github.io/blog/2017/02/01/react-step-by-step-2/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2017/01/17/react-step-by-step-1/" title="Previous Post: 一步一步做React(一) - Hello React">&laquo; 一步一步做React(一) - Hello React</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
 
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/posts/2">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="comments" aria-live="polite"><!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-title="一步一步做React(二) - CSS Modules"></div>
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"benweizhu"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+<!-- Duoshuo Comment END --></div>
+  </section>
+
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -621,6 +432,7 @@
 
   
 </aside>
+
 
     </div>
   </div>

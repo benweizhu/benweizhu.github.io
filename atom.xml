@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2017-01-17T22:05:36+08:00</updated>
+  <updated>2017-02-02T00:47:24+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,214 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[一步一步做React(二) - CSS Modules]]></title>
+    <link href="http://benweizhu.github.io/blog/2017/02/01/react-step-by-step-2/"/>
+    <updated>2017-02-01T22:44:09+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2017/02/01/react-step-by-step-2</id>
+    <content type="html"><![CDATA[<p>基于上次的内容 <a href="http://benweizhu.github.io/blog/2017/01/17/react-step-by-step-1/">《一步一步做React(一) - Hello React》</a>，我们继续搭建一个React项目的工程实践 - CSS Modules。</p>
+
+<h3>CSS Modules概念</h3>
+
+<p>Github文档 - <a href="https://github.com/css-modules/css-modules">CSS Modules</a></p>
+
+<p><strong>CSS Modules — Local Scope 局部作用域</strong></p>
+
+<p>CSS Modules里面最基础也是最重要的概念 - 局部作用域。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.backdrop {}
+</span><span class='line'>.prompt {}
+</span><span class='line'>.pullquote {}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>定义在style.css中的样式都存在于一个组件内的局部作用域，不会污染全局的样式。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import styles from "./style.css"
+</span><span class='line'>
+</span><span class='line'>const Component = props =&gt; {
+</span><span class='line'>  return (
+</span><span class='line'>    &lt;div className={styles.backdrop}&gt;
+</span><span class='line'>      &lt;div className={styles.prompt}&gt;
+</span><span class='line'>      &lt;/div&gt;
+</span><span class='line'>      &lt;div className={styles.pullquote}&gt;
+</span><span class='line'>      &lt;/div&gt;
+</span><span class='line'>   &lt;/div&gt;
+</span><span class='line'>  )
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>怎么解释？如何不会污染全局的样式？答案是唯一的命名。现在，我们先来看是怎么配置的。</p>
+
+<h3>用webpack处理样式</h3>
+
+<p><strong>style-loader | css-loader | sass-loader</strong></p>
+
+<p>给webpack.config.js中的module添加一个新的loaders配置，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>module: {
+</span><span class='line'>  loaders: [
+</span><span class='line'>    {
+</span><span class='line'>      test: /\.jsx?/,
+</span><span class='line'>      include: APP_DIR,
+</span><span class='line'>      loader: 'babel',
+</span><span class='line'>    },
+</span><span class='line'>    {
+</span><span class='line'>      test: /\.scss$/,
+</span><span class='line'>      loaders: ["style", "css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]", "sass"],
+</span><span class='line'>    },
+</span><span class='line'>  ],
+</span><span class='line'>},</span></code></pre></td></tr></table></div></figure>
+
+
+<p>webpack的loader是用来预处理由require()或者import加载文件，比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import styles from "./style.scss"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在上面的webpack配置中，针对*.scss文件，配置了一个loader的管道，顺序是：</p>
+
+<p>sass-loader => css-loader => style-loader</p>
+
+<p>sass-loader顾名思义用来编译SCSS到CSS</p>
+
+<p>css-loader和style-loader用来将样式嵌入到Webpack打包后的JS文件中，从而实现样式的模块化管理。</p>
+
+<p>针对css-loader的配置，你会看到它的格式是如下的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其实，这是webpack loader传递参数的一种方式（URL方式），css-loader的参数表请进入<a href="https://github.com/webpack-contrib/css-loader#options-1">传送门</a>。</p>
+
+<p>localIdentName是用于指定局部className的格式，比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[name]__[local]___[hash:base64:5]
+</span><span class='line'>ComponentName__LocalName___HashCode
+</span><span class='line'>Component__pullquote___SDFe34IIE</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>如何抽离出独立的css文件？Extract Text Plugin</h3>
+
+<p>正如前面所强调的，style-loader和css-loader，将样式嵌入到Webpack打包后的JS文件。</p>
+
+<p>这当然不是最好的方式，我们需要将样式抽离到独立的css文件中，但就是<a href="https://github.com/webpack-contrib/extract-text-webpack-plugin">Extract Text Plugin</a>。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add extract-text-webpack-plugin --dev</span></code></pre></td></tr></table></div></figure>
+
+
+<p>完整的webpack.config.js文件如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const path = require('path');
+</span><span class='line'>const ExtractTextPlugin = require('extract-text-webpack-plugin');
+</span><span class='line'>
+</span><span class='line'>const BUILD_DIR = path.resolve(__dirname, 'public');
+</span><span class='line'>const APP_DIR = path.resolve(__dirname, 'src');
+</span><span class='line'>
+</span><span class='line'>const extractCSS = new ExtractTextPlugin(`${BUILD_DIR}/styles.css`);
+</span><span class='line'>
+</span><span class='line'>const config = {
+</span><span class='line'>  entry: `${APP_DIR}/index.jsx`,
+</span><span class='line'>  output: {
+</span><span class='line'>    path: BUILD_DIR,
+</span><span class='line'>    filename: 'bundle.js',
+</span><span class='line'>  },
+</span><span class='line'>  module: {
+</span><span class='line'>    loaders: [
+</span><span class='line'>      {
+</span><span class='line'>        test: /\.jsx?/,
+</span><span class='line'>        include: APP_DIR,
+</span><span class='line'>        loader: 'babel',
+</span><span class='line'>      },
+</span><span class='line'>      {
+</span><span class='line'>        test: /\.scss$/,
+</span><span class='line'>        loader: extractCSS.extract(['css?minimize&modules&importLoaders=2&localIdentName=[name]__[local]', 'postcss', 'sass']),
+</span><span class='line'>      },
+</span><span class='line'>    ],
+</span><span class='line'>  },
+</span><span class='line'>  resolve: {
+</span><span class='line'>    extensions: ['', '.js', '.jsx'],
+</span><span class='line'>  },
+</span><span class='line'>  plugins: [
+</span><span class='line'>    extractCSS,
+</span><span class='line'>  ],
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>module.exports = config;
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[一步一步做React(一) - Hello React]]></title>
@@ -2816,338 +3024,6 @@ cache配置 - 背后的cache存储在哪里，从哪里读取</p>
 2.<a href="http://www.oschina.net/translate/understanding-javascript-prototypes">http://www.oschina.net/translate/understanding-javascript-prototypes</a>  <br/>
 3.<a href="http://yehudakatz.com/2011/08/12/understanding-prototypes-in-javascript/">http://yehudakatz.com/2011/08/12/understanding-prototypes-in-javascript/</a>  <br/>
 4.JavaScript启示录</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[翻译 React on ES6+]]></title>
-    <link href="http://benweizhu.github.io/blog/2015/12/13/react-on-es6-plus-translation/"/>
-    <updated>2015-12-13T10:32:12+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2015/12/13/react-on-es6-plus-translation</id>
-    <content type="html"><![CDATA[<p>原文地址： <a href="http://babeljs.io/blog/2015/06/07/react-on-es6-plus/">http://babeljs.io/blog/2015/06/07/react-on-es6-plus/</a></p>
-
-<h3>文章翻译有些不准确，敬请见谅</h3>
-
-<p>当我们正在从内到外的重新设计Instagram Web的时候，我们非常享受使用许多ES6+的特性来编写React组件。这让我有机会去说明这些新的语言特性可以改变你写React应用的方式，让它变得更简单也更有趣。</p>
-
-<h2>Classes</h2>
-
-<p>到目前为止，最明显的变化就是当我们选择使用ES6+中的类定义语法时，如何来编写React组件。相对于使用React.createClass方法来定义一个组件，我们可以使用真正的ES6类来继承React.Component：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">class</span> <span class="nx">Photo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">img</span> <span class="nx">alt</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">caption</span><span class="p">}</span> <span class="nx">src</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">src</span><span class="p">}</span> <span class="o">/&gt;</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>立马，你就会注意到一个微妙的不同 - 当定义类时，使用一个更加简洁的语法：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// The ES5 way</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Photo</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">handleDoubleTap</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span> <span class="err">…</span> <span class="p">},</span>
-</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="err">…</span> <span class="p">},</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'><span class="c1">// The ES6+ way</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">Photo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">handleDoubleTap</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span> <span class="err">…</span> <span class="p">}</span>
-</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span> <span class="err">…</span> <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>很明显，我们丢掉了两个括号和一个分号，而且每一个方法声明忽略了一个冒号，一个function关键字和一个逗号。</p>
-
-<p>当使用新的类语法时，所有的生命周期方法（除了一个）都可以像你所期望的那样定义。类的构造函数现在的角色，之前是由componentWillMount来扮演：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// The ES5 way</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">EmbedModal</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">componentWillMount</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="err">…</span> <span class="p">},</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'><span class="c1">// The ES6+ way</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">EmbedModal</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-</span><span class='line'>    <span class="c1">// Operations usually carried out in componentWillMount go here</span>
-</span><span class='line'>    <span class="c1">// 所有componentWillMount的操作都放在这里</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>属性初始化</h2>
-
-<p>在ES6+的类世界，属性类型和默认值都是作为类自己的静态属性。同样，Component的状态初始化可以使用ES7的属性初始化：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// The ES5 way</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Video</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">getDefaultProps</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">autoPlay</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">maxLoops</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">loopsRemaining</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">maxLoops</span><span class="p">,</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">propTypes</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">autoPlay</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">bool</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">maxLoops</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">number</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">posterFrameSrc</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">videoSrc</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'><span class="c1">// The ES6+ way</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">Video</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kr">static</span> <span class="nx">defaultProps</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">autoPlay</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">maxLoops</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="kr">static</span> <span class="nx">propTypes</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">autoPlay</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">bool</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">maxLoops</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">number</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">posterFrameSrc</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">videoSrc</span><span class="o">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">string</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">loopsRemaining</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">maxLoops</span><span class="p">,</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>ES7属性初始化操作在类的构造函数中，这里指向的是类实例的构造，所以state的初始化可以设置为依赖于this.props。值得注意的是，我们不在需要，针对getter方法，定义prop的默认值，和初始化state对象。</p>
-
-<h2>箭头函数</h2>
-
-<p>React.createClass方法用来在组件实例方法上执行一些额外的绑定工作来保证，在他们里面，this关键字可以被考虑指向组件的实例。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Autobinding, brought to you by React.createClass</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">PostInfo</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">handleOptionsButtonClick</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// Here, &#39;this&#39; refers to the component instance.</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">showOptionsModal</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>既然我们不使用React.createClass方法了，当我们用ES6+的类语法定义组件时，似乎我们就需要在我们想要这些行为时，手动的绑定实例方法：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Manually bind, wherever you need to</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">PostInfo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-</span><span class='line'>    <span class="c1">// Manually bind this method to the component instance...</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">handleOptionsButtonClick</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">handleOptionsButtonClick</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="nx">handleOptionsButtonClick</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// ...to ensure that &#39;this&#39; refers to the component instance here.</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">showOptionsModal</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>幸运的是，通过结合两个ES6+的特性 - 箭头方法和属性初始化 - 选择性的绑定到组件实例变得轻而易举：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">class</span> <span class="nx">PostInfo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">handleOptionsButtonClick</span> <span class="o">=</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">showOptionsModal</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The body of ES6 arrow functions share the same lexical this as the code that surrounds them, which gets us the desired result because of the way that ES7 property initializers are scoped. Peek under the hood to see why this works.</p>
-
-<h2>动态属性名和模板字符串</h2>
-
-<p>对对象字面量的一个增强是，拥有给一个衍生而来的属性名赋值的能力。以前，我们可能需要像下面这样做来设置state对象：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">Form</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">onChange</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">inputName</span><span class="p">,</span> <span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">stateToSet</span> <span class="o">=</span> <span class="p">{};</span>
-</span><span class='line'>    <span class="nx">stateToSet</span><span class="p">[</span><span class="nx">inputName</span> <span class="o">+</span> <span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">stateToSet</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>现在，我们可以构建那些属性名由JavaScript表达式在运行时决定的对象。这里，我们用模板字符串来决定将哪个属性设置到state上：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">class</span> <span class="nx">Form</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">onChange</span><span class="p">(</span><span class="nx">inputName</span><span class="p">,</span> <span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
-</span><span class='line'>      <span class="p">[</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">inputName</span><span class="p">}</span><span class="nx">Value</span><span class="err">`</span><span class="p">]</span><span class="o">:</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">,</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>析构和JSX扩展属性（spread attributes)</h2>
-
-<p>Often when composing components, we might want to pass down most of a parent component&rsquo;s props to a child component, but not all of them. In combining ES6+ destructuring with JSX spread attributes, this becomes possible without ceremony:
-常常当我们组合组件时，我们也许想要将父组件的大部分属性传递到子组件中，但是并不是全部。结合ES6+的destructuring和JSX spread attributes，这变成可能且不太复杂：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">class</span> <span class="nx">AutoloadingPostsGrid</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">className</span><span class="p">,</span>
-</span><span class='line'>      <span class="p">...</span><span class="nx">others</span><span class="p">,</span>  <span class="c1">// contains all properties of this.props except for className</span>
-</span><span class='line'>    <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">(</span>
-</span><span class='line'>      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">className</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">PostsGrid</span> <span class="p">{...</span><span class="nx">others</span><span class="p">}</span> <span class="o">/&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleLoadMoreClick</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Load</span> <span class="nx">more</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
-</span><span class='line'>      <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>    <span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>我们可以将JSX扩展属性和正常的属性相结合，利用简单地优先级规则来实现复写和默认值指定。下面这个元素会获得className “override”，即便className属性已经在this.props中定义：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="p">{...</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">}</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;override&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="err">…</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个元素会正常的拥有className “base”，除非在this.props中存在一个className属性复写了它：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;base&quot;</span> <span class="p">{...</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="err">…</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
 ]]></content>
   </entry>
   
