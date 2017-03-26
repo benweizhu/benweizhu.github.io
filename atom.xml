@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2017-03-26T10:33:29+08:00</updated>
+  <updated>2017-03-26T18:49:39+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -165,7 +165,7 @@
 
 <p>不是，一般情况下，不需要针对网站上的所有图片都提供两个版本（非Retina屏幕和Retina屏幕），大部分图片缩放并不会太多的影响用户的体验。</p>
 
-<p>不过有一个需要注意的是，网站的logo，因为logo本身图像大小比较小，在Retina上物理像素放两倍显示就会出现模糊情况，这个时候，你就需要通过媒体查询或者JS操作来替换图片。</p>
+<p>常常需要被处理的图片有：网站的logo、彩色图片图标，因为他们的图像大小都偏小，在Retina上物理像素放两倍显示就会出现模糊情况，这个时候，你就需要通过媒体查询或者JS操作来替换图片。</p>
 
 <p><em>最后：眼睛是心灵的窗户，也是蒙蔽你的一种途径，带上知识的眼镜，将世界看个清楚</em></p>
 
