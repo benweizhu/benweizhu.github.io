@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "前端不止HTML/JS/CSS系列 - Retina屏幕下两倍图"
+title: "前端不止系列 - Retina屏幕下两倍图"
 date: 2017-03-25 16:40:09 +0800
 comments: true
 categories:
