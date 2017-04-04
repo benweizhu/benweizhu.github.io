@@ -5,7 +5,6 @@ date: 2017-04-03 09:47:12 +0800
 comments: true
 categories:
 ---
-
 ####一个图标的生命周期（工作流程）
 
 ![Alt text](/images/svg/icomoon-svg.png =265x "图标的生命周期")
@@ -51,7 +50,7 @@ ThoughtWorks官网Contact with us图标
 
 2.直接使用svg
 
-使用SVG（可缩放矢量图形），W3C标准，最看好的Web端图形解决方案。它能提供如裁剪路径、Alpha通道、滤镜效果等复杂渲染能力，具备传统图片没有的矢量功能，还可以被记事本等阅读器、搜索引擎访问。
+使用SVG（可缩放矢量图形），W3C标准，**最看好的Web端图形解决方案**。它能提供如裁剪路径、Alpha通道、滤镜效果等复杂渲染能力，具备传统图片没有的矢量功能，还可以被记事本等阅读器、搜索引擎访问。
 
 设计师可以轻松的在设计绘图软件（AI，PS）的帮助下导出SVG格式的图标/图片。
 
@@ -65,11 +64,11 @@ Can I use svg?
 
 3.IconFont
 
-IconFont是目前最为流行的图标解决方案，顾名思义，它就是字体文件，你可以用任何一个字体编辑工具打开它。
+IconFont是目前最为流行的图标解决方案，顾名思义，它就是字体文件，你可以用任何一个字体编辑工具打开它，如果你打开某一个查看，你会发现它就是一些路径，这些路径可以用AI，PS，Sketch等软件来绘制。
 
 ![Alt text](/images/svg/font-awesome.png =300x "font awesome")  
 
-IconFont的有点在于能够用CSS控制样式，无限缩放而不失真，支持IE7+，兼顾屏幕阅读器，不够缺点是不能支持彩色图标。获得IconFont的方式也很简单，设计师将图标通过AI/PS转成SVG文件，然后由开发人员通过工具（在线或者本地）转换为IconFont，比如：国外的[icomoon.io][714f8918]，国内的[iconfont.cn][b5df4e92]，开源构建工具插件有[gulp-iconfont][679293f7]等等。
+IconFont的优点在于能够用CSS控制样式，无限缩放而不失真，支持IE7+，兼顾屏幕阅读器，不过缺点是不能支持彩色（一个图标多个颜色）图标。获得IconFont的方式也很简单，设计师将图标通过AI/PS转成SVG文件，然后由开发人员通过工具（在线或者本地）转换为IconFont，比如：国外的[icomoon.io][714f8918]，国内的[iconfont.cn][b5df4e92]，开源构建工具插件有[gulp-iconfont][679293f7]等等。
 
   [714f8918]: https://icomoon.io/ "icomoon.io"
   [b5df4e92]: http://iconfont.cn/ "iconfont.cn"
