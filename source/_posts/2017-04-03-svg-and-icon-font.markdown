@@ -36,7 +36,7 @@ ThoughtWorks官网Contact with us图标
 直接将设计师画好的图标，以PNG格式的图片一个个分离导出，这是最直观的图标打包方式。
 
 ![Alt text](/images/svg/taobao.png =300x "iconfont cn taobao icon")   
-1688DPL中台图标库 
+1688DPL中台图标库
 
 它的优点是：（1）能够使用彩色的图标（2）能够支持大部分浏览器；缺点是：（1）图标大小是固定的（不能根据场景自由缩放）（2）Retina屏幕需要两倍图。
 
@@ -69,4 +69,8 @@ IconFont是目前最为流行的图标解决方案，顾名思义，它就是字
 
 ![Alt text](/images/svg/font-awesome.png =300x "font awesome")  
 
-IconFont能够用CSS控制样式，无限缩放而不失真，支持IE7+，兼顾屏幕阅读器。而获得IconFont的方式也很简单，设计师将图标通过AI/PS转成SVG文件，然后由开发人员通过工具（在线或者本地）转换为IconFont。
+IconFont的有点在于能够用CSS控制样式，无限缩放而不失真，支持IE7+，兼顾屏幕阅读器，不够缺点是不能支持彩色图标。获得IconFont的方式也很简单，设计师将图标通过AI/PS转成SVG文件，然后由开发人员通过工具（在线或者本地）转换为IconFont，比如：国外的[icomoon.io][714f8918]，国内的[iconfont.cn][b5df4e92]，开源构建工具插件有[gulp-iconfont][679293f7]等等。
+
+  [714f8918]: https://icomoon.io/ "icomoon.io"
+  [b5df4e92]: http://iconfont.cn/ "iconfont.cn"
+  [679293f7]: https://github.com/nfroidure/gulp-iconfont "gulp-iconfont"
