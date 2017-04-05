@@ -7,15 +7,13 @@ categories:
 ---
 ####一个图标的生命周期（工作流程）
 
-![Alt text](/images/svg/icomoon-svg.png =265x "图标的生命周期")
+![Alt text](/images/svg/icomoon-svg.png =265x "图标的生命周期")     
+图标库(选择阶段) -> 图标使用（开发阶段）
 
-图标库 -> 图标使用（开发阶段）
-
-![Alt text](/images/svg/ai-ps-svg.png =400x "图标的生命周期")
-
+![Alt text](/images/svg/ai-ps-svg.png =400x "图标的生命周期")     
 图标设计（设计阶段） -> 图标导出（沟通阶段） -> 图标使用（开发阶段）
 
-第一种方式是一般是小公司或者独立开发者的工作流程。而对于大型组织或公司，因为他们拥有更完善的团队和资源，一般是第二种方式，能够获得自主权和建立企业VI（Visual Identity，企业视觉识别）的能力。
+第一种方式是一般是小公司或者独立开发者的工作流程。而对于大型组织或公司，因为拥有更完善的团队和资源，一般是第二种方式，能够获得更多自主权和建立企业VI（Visual Identity，企业视觉识别）的能力。
 
 但无论是哪种方式，都包括两个角色：设计师和Web开发，只是第一种工作方式中，设计师是不可见的。
 
@@ -68,8 +66,65 @@ IconFont是目前最为流行的图标解决方案，顾名思义，它就是字
 
 ![Alt text](/images/svg/font-awesome.png =300x "font awesome")  
 
-IconFont的优点在于能够用CSS控制样式，无限缩放而不失真，支持IE7+，兼顾屏幕阅读器，不过缺点是不能支持彩色（一个图标多个颜色）图标。获得IconFont的方式也很简单，设计师将图标通过AI/PS转成SVG文件，然后由开发人员通过工具（在线或者本地）转换为IconFont，比如：国外的[icomoon.io][714f8918]，国内的[iconfont.cn][b5df4e92]，开源构建工具插件有[gulp-iconfont][679293f7]等等。
+IconFont的优点在于能够用CSS控制样式，无限缩放而不失真，支持IE7+，兼顾屏幕阅读器，不过缺点是不能支持彩色（拥有多种颜色的图标）图标。获得IconFont的方式也很简单，设计师将图标通过AI/PS转成SVG文件，然后由开发人员通过工具（在线或者本地）转换为IconFont，比如：国外的[icomoon.io][714f8918]，国内的[iconfont.cn][b5df4e92]，开源构建工具插件有[gulp-iconfont][679293f7]等等。
 
   [714f8918]: https://icomoon.io/ "icomoon.io"
   [b5df4e92]: http://iconfont.cn/ "iconfont.cn"
   [679293f7]: https://github.com/nfroidure/gulp-iconfont "gulp-iconfont"
+
+####产生适合Web开发的图标
+
+“产生适合Web开发的图标”是我们今天要关注的重点。
+
+1.使用图片的方式
+
+如果开发人员直接使用图片，则相对简单，设计师只需要针对普通屏幕和Retina屏幕准备两套图（单倍图和两倍图）。
+
+以国内某著名的中文小说阅读网站为例，会针对不同的设备使用不同倍数的logo图片，以保证在如Retina屏幕下的清晰度。
+
+{% codeblock lang:css %}
+.logo-wrap .logo a {
+    display: block;
+    width: 219px;
+    height: 52px;
+    background: url(/qd/images/logo.0.2.png) no-repeat;
+}
+
+@media (min--moz-device-pixel-ratio:1.3),(-o-min-device-pixel-ratio: 2.6 / 2),(-webkit-min-device-pixel-ratio:1.3),(min-device-pixel-ratio:1.3),(min-resolution:1.3dppx) {
+  .logo-wrap .logo a {
+      background: url(/qd/images/logo3x.0.2.png) no-repeat;
+      background-repeat: no-repeat;
+      background-size: 217px;
+  }
+}
+{% endcodeblock %}
+
+2.使用SVG
+
+关于转换成SVG，这里就要引荐一下Sara Soueidan在Generate London 2015 Conference上的演讲[《Sara Soueidan: SVG for Web Designers (and Developers)》][2f145803]（YouTube视频需要翻墙），如果不方便，Sara Soueidan有一篇博客[《Tips for Creating and Exporting Better SVGs for the Web》][13043805]更详细的讲解关于SVG导出的内容，当然，还有一篇国内的翻译文章[《创建和导出SVG的技巧》][8092bc6d]。
+
+  [2f145803]: https://www.youtube.com/watch?v=q4QI9iOeyPo "《Sara Soueidan: SVG for Web Designers (and Developers)》"
+  [13043805]: https://sarasoueidan.com/blog/svg-tips-for-designers/ "《Tips for Creating and Exporting Better SVGs for the Web》"
+  [8092bc6d]: http://www.w3cplus.com/svg/svg-tips-for-designers.html "《创建和导出SVG的技巧》"
+
+不过，我觉得看视频更直观，顺便领略一下这位优秀的 **阿拉伯女性前端开发工程师（兼自由作家和演讲人）** 的风采。
+
+博客和视频中谈到了多个点导出SVG需要注意的地方，篇幅限制，举两个常见的情况：
+
+**（1）选择适合绘画的画板**。
+
+你有在网页上嵌入过SVG吗，给它指定一个高度和宽度，然后发现它其实比你指定的尺寸要小？开发人员常常会遇到这样的问题。
+
+大多数情况下，这是因为SVG视窗中有一定大小的白色空白的空间。视窗是按照你在样式表中指定的尺寸显示的，但是它里面有额外的空白——在图形周围——使得你的图片看起来好像“缩水”了，因为这块空白是占空间的，在视窗里面。为了避免这种情况，你需要确保你的画板是刚刚好放下里面的图像的，不要大太多。
+
+画板的尺寸就是导出的SVG的视窗的尺寸，所有画板上的空白都会最终变成视窗中的白色空白。
+
+![Alt text](/images/svg/fit-artboard.png =400x "fit artboard")  
+
+**（2）选择合适的导出选项**
+![Alt text](/images/svg/export-options.png =400x "保存")     
+上面的图片中展示的选项是推荐的生成适合Web使用的SVG的。如果你不想使用Web字体，可以选择把文本转换成轮廓；AI在输出的时候提供了这样一个选项（Use <textPath> element for Text on Path）
+
+3.IconFont
+
+前面提到IconFont一般是由SVG通过工具转换而来，而如果最终的结果是需要转换成IconFont，则对于导出的SVG有一些特殊要求。前面，我已经介绍了几款IconFont的转换工具，每一款工具都有详细的文档说明SVG的绘制的规则，不过总体来说，就是类似的。
