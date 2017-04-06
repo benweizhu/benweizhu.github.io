@@ -122,10 +122,20 @@ IconFont的优点在于能够用CSS控制样式，无限缩放而不失真，支
 ![Alt text](/images/svg/fit-artboard.png =400x "fit artboard")  
 
 **（2）选择合适的导出选项**
+
 ![Alt text](/images/svg/export-options.png =400x "保存")     
 上面的图片中展示的选项是推荐的生成适合Web使用的SVG的。如果你不想使用Web字体，可以选择把文本转换成轮廓；AI在输出的时候提供了这样一个选项（Use <textPath> element for Text on Path）
 
 **（3）优化SVG**
+
+通常是建议在把SVG从图形编辑器中导出后，再用单独的优化工具来进行优化。比如：删除无用Comments和Metadata，简化代码，简化单个路径等。推荐的第三方工具：[svgomg][ca74c2fc]，AI插件[SVG-NOW][86db84bd]，Sketch插件[Svgo-compressor][bc537040]等，请参考Sara Soueidan的文章[《Useful SVGO[ptimization] Tools》][5046bb9d]。
+
+  [ca74c2fc]: https://jakearchibald.github.io/svgomg/ "svgomg"
+  [86db84bd]: https://github.com/davidderaedt/SVG-NOW "SVG-NOW"
+  [bc537040]: https://github.com/BohemianCoding/svgo-compressor "Svgo-compressor"
+  [5046bb9d]: https://sarasoueidan.com/blog/svgo-tools/ "《Useful SVGO[ptimization] Tools》"
+
+![Alt text](/images/svg/svgomg.png =400x "优化svg")   
 
 3.IconFont
 
