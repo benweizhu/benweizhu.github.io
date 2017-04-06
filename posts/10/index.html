@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="自从Spring 3.1，Spring框架提供了透明式给Spring应用添加缓存。类似于对事物的支持，抽象缓存机制允许一致的方式来实现不同的缓存解决方案，以满足对代码的最小影响。 Spring 4.1后，抽象缓存机制有了重大的改进，包含支持JSR-107注解和更多的定制选项。 Cache vs &hellip;">
+  <meta name="description" content="本文翻译自 http://blog.madewithlove.be/post/webpack-your-bags/ 的部分内容 译者：原文作者很幽默写了许多幽默的语句，但是为了节省时间，我就不翻译那些营养不多的句子，捡核心有用的内容翻译。 什么是webpack？ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,421 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/02/28/webpack-your-bags-translation/">用Webpack构建和打包模块（JS，SCSS，HTML等）基础（译）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-02-28T10:40:36+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:40 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>本文翻译自 <a href="http://blog.madewithlove.be/post/webpack-your-bags/">http://blog.madewithlove.be/post/webpack-your-bags/</a> 的部分内容</p>
+
+<p>译者：原文作者很幽默写了许多幽默的语句，但是为了节省时间，我就不翻译那些营养不多的句子，捡核心有用的内容翻译。</p>
+
+<h2>什么是webpack？</h2>
+
+<p>Webpack是构建系统还是模块bundler。Well，两者都是，但不是说它两件事情都做，而是将两件事情合并在一起，一起做。Webpack没有构建你的assets，然后在单独打包你的模块，而是把assets也当做模块。</p>
+
+<p>更准确的说，它没有构建Sass文件，优化图片，并把它们放在一边后，再打包你的模块，然后把模块放在另一边，相反，你将拥有这些：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">stylesheet</span> <span class="nx">from</span> <span class="s1">&#39;styles/my-styles.scss&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">logo</span> <span class="nx">from</span> <span class="s1">&#39;img/my-logo.svg&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">someTemplate</span> <span class="nx">from</span> <span class="s1">&#39;html/some-template.html&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">stylesheet</span><span class="p">);</span> <span class="c1">// &quot;body{font-size:12px}&quot;</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">logo</span><span class="p">);</span> <span class="c1">// &quot;data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5[...]&quot;</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">someTemplate</span><span class="p">)</span> <span class="c1">// &quot;&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>所有的你的assets都会被当做是一种模块，然后被导入，修改，操作，并最终打包到最后的bundle文件中。</p>
+
+<p>当然为了实现上面说的这些事情，需要在Webpack的配置中注册loader。Loader是一些小的插件，基本上就是说“当你遇到某种类型的文件时，做这个操作”。比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">// When you import a .ts file, parse it with Typescript</span>
+</span><span class='line'>  <span class="nx">test</span><span class="o">:</span> <span class="sr">/\.ts/</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">loader</span><span class="o">:</span> <span class="s1">&#39;typescript&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">// When you encounter images, compress them with image-webpack (wrapper around imagemin)</span>
+</span><span class='line'>  <span class="c1">// and then inline them as data64 URLs</span>
+</span><span class='line'>  <span class="nx">test</span><span class="o">:</span> <span class="sr">/\.(png|jpg|svg)/</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">loaders</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">,</span> <span class="s1">&#39;image-webpack&#39;</span><span class="p">],</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">// When you encounter SCSS files, parse them with node-sass, then pass autoprefixer on them</span>
+</span><span class='line'>  <span class="c1">// then return the results as a string of CSS</span>
+</span><span class='line'>  <span class="nx">test</span><span class="o">:</span> <span class="sr">/\.scss/</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">loaders</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;css&#39;</span><span class="p">,</span> <span class="s1">&#39;autoprefixer&#39;</span><span class="p">,</span> <span class="s1">&#39;sass&#39;</span><span class="p">],</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>最终在食物链的底层，所有的loader都会返回String。这样Webpack会把他们wrap到JavaScript模块中。比如每个Sass文件在被loader给transform之后，它可能看上去像这样：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="s1">&#39;body{font-size:12px}&#39;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>为什么要这样做？</h2>
+
+<p>一旦你知道了Webpack做了什么，第二问题一定是：这样做有什么好处？“Images and CSS? In my JS? What the hell man?”。Well，这样想：长期以来，我们都被告知要将所有的东西都集中到一起，减少我们的HTTP请求。</p>
+
+<p>这样也导致一个不好的情况，今天大部分人都讲所有的assets打包到一个app.js文件中，然后在所有的页面都加载它。这意味着对于任何一个页面在大部分时间都在加载一大堆根本不需要的assets。如果你不这样做，那么你就需要手动的在某个页面加入这些东西，这样会导致要维护一大堆依赖，哪个页面需要这些依赖?</p>
+
+<p>上面两个方法没有一个是正确的或者错误的。Webpack采取了一种折中方式（middleground） - 它不仅仅是构建系统或者打包工具，他是一个顽皮聪明的模块打包系统。一旦被合理配置，他会比你更了解你的技术栈，比你更清楚如何最优化它们。</p>
+
+<h2>简单试用</h2>
+
+<p>我们来创建一个项目，并用Webpack构建/打包它。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="err">$</span> <span class="n">npm</span> <span class="n">init</span>
+</span><span class='line'><span class="err">$</span> <span class="n">npm</span> <span class="n">install</span> <span class="n">jquery</span> <span class="o">--</span><span class="n">save</span>
+</span><span class='line'><span class="err">$</span> <span class="n">npm</span> <span class="n">install</span> <span class="n">webpack</span> <span class="o">--</span><span class="n">save</span><span class="o">-</span><span class="n">dev</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>src/index.js</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">$</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;jquery&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>创建一个webpack.config.js文件。Webpack的配置文件就是JavaScript，但是需要export这个对象。</p>
+
+<p>webpack.config.js</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">entry</span><span class="o">:</span>  <span class="s1">&#39;./src&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">path</span><span class="o">:</span>     <span class="s1">&#39;builds&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">filename</span><span class="o">:</span> <span class="s1">&#39;bundle.js&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里，entry告诉Webpack哪些文件作为应用程序的入口。它们是你的主要文件，是坐落在项目依赖的最顶部。然后，我们告诉它编译，并输出到build目录下的bundle.js中。接着，在index.html中配置引入bundle.js文件。</p>
+
+<p>index.html</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='HTML'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'><span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;h1&gt;</span>My title<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;a&gt;</span>Click me<span class="nt">&lt;/a&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;builds/bundle.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>运行webpack命令，如果一切顺利，你应该看到下面这个信息：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="err">$</span> <span class="n">webpack</span>
+</span><span class='line'><span class="n">Hash</span><span class="p">:</span> <span class="mi">65</span><span class="n">ea4aab7f0755f7fc8e</span>
+</span><span class='line'><span class="n">Version</span><span class="p">:</span> <span class="n">webpack</span> <span class="mf">1.12</span><span class="o">.</span><span class="mi">2</span>
+</span><span class='line'><span class="n">Time</span><span class="p">:</span> <span class="mi">350</span><span class="n">ms</span>
+</span><span class='line'>    <span class="n">Asset</span>    <span class="n">Size</span>  <span class="n">Chunks</span>             <span class="n">Chunk</span> <span class="n">Names</span>
+</span><span class='line'><span class="n">bundle</span><span class="o">.</span><span class="n">js</span>  <span class="mi">257</span> <span class="n">kB</span>       <span class="mi">0</span>  <span class="p">[</span><span class="n">emitted</span><span class="p">]</span>  <span class="n">main</span>
+</span><span class='line'>   <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">./</span><span class="n">src</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">js</span> <span class="mi">53</span> <span class="nb">bytes</span> <span class="p">{</span><span class="mi">0</span><span class="p">}</span> <span class="p">[</span><span class="n">built</span><span class="p">]</span>
+</span><span class='line'>    <span class="o">+</span> <span class="mi">1</span> <span class="n">hidden</span> <span class="n">modules</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里你看到Webpack告诉你在bundle.js文件中包含入口文件(index.js)，已经一个隐藏的模块，jQuery。默认情况下，Webpack会隐藏不属于你的模块。如果你想显示它们，使用&ndash;display-modules标识符。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="err">$</span> <span class="n">webpack</span> <span class="o">--</span><span class="n">display</span><span class="o">-</span><span class="n">modules</span>
+</span><span class='line'><span class="n">bundle</span><span class="o">.</span><span class="n">js</span>  <span class="mi">257</span> <span class="n">kB</span>       <span class="mi">0</span>  <span class="p">[</span><span class="n">emitted</span><span class="p">]</span>  <span class="n">main</span>
+</span><span class='line'>   <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">./</span><span class="n">src</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">js</span> <span class="mi">53</span> <span class="nb">bytes</span> <span class="p">{</span><span class="mi">0</span><span class="p">}</span> <span class="p">[</span><span class="n">built</span><span class="p">]</span>
+</span><span class='line'>   <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">./~/</span><span class="n">jquery</span><span class="o">/</span><span class="n">dist</span><span class="o">/</span><span class="n">jquery</span><span class="o">.</span><span class="n">js</span> <span class="mi">248</span> <span class="n">kB</span> <span class="p">{</span><span class="mi">0</span><span class="p">}</span> <span class="p">[</span><span class="n">built</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>你也可以运行webpack &ndash;watch，他会自动watch你的文件，并在有需要时重新编译。</p>
+
+<h2>配置你的第一个loader</h2>
+
+<p>还记得我们谈到过Webpack可以导入css和html等所有的东西？怎么做到的呢？Well，如果你和最近几年Web Component的步调一致(Angular 2, Vue, React, Polymer, X-Tag, etc.)。也许你已经听说过这个idea，与相互链接庞大的UI不同，Web Component是一系列可维护和自包含的，小的，可重用的UI片段（piece）。为了让组件可以真正的自包含，需要将所有它所需要的东西都打包进去。想象一个按钮组件：有一些HTML代码，需要一些JS代码来让组件可以交互，也许还需要一个样式。如果这些东西只有在需要的时候才被加载，就更好了。</p>
+
+<p>让我们来写一个Button。首先，我假设大部分人现在都更习惯与用ES2015语法，我们来添加第一个loader：Babel。在Webpack中添加添加一个loader，你需要做两件事情：npm install {whatever}-loader，然后在Webpack的配置的module.loaders部分添加该loader。所以：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="err">$</span> <span class="n">npm</span> <span class="n">install</span> <span class="n">babel</span><span class="o">-</span><span class="n">loader</span> <span class="o">--</span><span class="n">save</span><span class="o">-</span><span class="n">dev</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>更新我们的配置：我们想要什么？想要Babel运行所有的以.js结尾的文件，但是Webpack会递归遍历所有的依赖，我们需要Babel避免运行在第三方代码中，比如jQuery，所以需要过滤一下。loader可以有include和exclude规则，可以是字符串，正则，回调等等。在我们的例子中，我们希望Babel仅仅在我们自己的文件上运行，所以我们只需要include我们的源文件目录即可：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">entry</span><span class="o">:</span>  <span class="s1">&#39;./src&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">path</span><span class="o">:</span>     <span class="s1">&#39;builds&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">filename</span><span class="o">:</span> <span class="s1">&#39;bundle.js&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">module</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">loaders</span><span class="o">:</span> <span class="p">[</span>
+</span><span class='line'>            <span class="p">{</span>
+</span><span class='line'>                <span class="nx">test</span><span class="o">:</span>   <span class="sr">/\\.js/</span><span class="p">,</span>
+</span><span class='line'>                <span class="nx">loader</span><span class="o">:</span> <span class="s1">&#39;babel&#39;</span><span class="p">,</span>
+</span><span class='line'>                <span class="nx">include</span><span class="o">:</span> <span class="err">\</span><span class="nx">_</span><span class="err">\</span><span class="nx">_dirname</span> <span class="o">+</span> <span class="s1">&#39;/src&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">],</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在来重写index.js，用ES6的语法。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">import</span> <span class="nx">$</span> <span class="nx">from</span> <span class="s1">&#39;jquery&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>第一个自包含的组件</h2>
+
+<p>现在来写一个小的Button组件，它会包含SCSS样式，HTML模板，和一些行为，所以我们会需要安装一些需要的东西。首先，我们需要Mustache，它是一个轻量级的模板引擎（译者：如果你不知道JavaScript模板引擎，可以查看这篇文章 <a href="http://benweizhu.github.io/blog/2015/10/28/js-template-engine/">http://benweizhu.github.io/blog/2015/10/28/js-template-engine/</a> ），这时我们也需要Sass和HTML的loader。而且，最终需要load的内容会从一个loader流向另一个loader，我们需要一个CSS loader来吹了Sass loader的处理结果，现在一旦我们有了自己的CSS，就有很多方法来处理它们，现在我们会使用一个叫做style-loader的loader，它会取出CSS片段，并把它动态的插入页面。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="err">$</span> <span class="n">npm</span> <span class="n">install</span> <span class="n">mustache</span> <span class="o">--</span><span class="n">save</span>
+</span><span class='line'><span class="err">$</span> <span class="n">npm</span> <span class="n">install</span> <span class="n">css</span><span class="o">-</span><span class="n">loader</span> <span class="n">style</span><span class="o">-</span><span class="n">loader</span> <span class="n">html</span><span class="o">-</span><span class="n">loader</span> <span class="n">sass</span><span class="o">-</span><span class="n">loader</span> <span class="n">node</span><span class="o">-</span><span class="n">sass</span> <span class="o">--</span><span class="n">save</span><span class="o">-</span><span class="n">dev</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在有序的告诉Webpack让load的内容从一个loader流入另一个，我们简单的传入一系列loader，从右到左，用一个!(感叹号)分开。或者你也可以通过一个数组，并使用loaders属性而不是loader属性：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nx">test</span><span class="o">:</span>    <span class="sr">/\.js/</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">loader</span><span class="o">:</span>  <span class="s1">&#39;babel&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">include</span><span class="o">:</span> <span class="err">\</span><span class="nx">_</span><span class="err">\</span><span class="nx">_dirname</span> <span class="o">+</span> <span class="s1">&#39;/src&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nx">test</span><span class="o">:</span>   <span class="sr">/\\.scss/</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">loader</span><span class="o">:</span> <span class="s1">&#39;style!css!sass&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="c1">// Or</span>
+</span><span class='line'>    <span class="nx">loaders</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">,</span> <span class="s1">&#39;css&#39;</span><span class="p">,</span> <span class="s1">&#39;sass&#39;</span><span class="p">],</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nx">test</span><span class="o">:</span>   <span class="sr">/\\.html/</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">loader</span><span class="o">:</span> <span class="s1">&#39;html&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在来写我们的Button组件：</p>
+
+<p>src/Components/Button.scss</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.button</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="nb">tomato</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">color</span><span class="o">:</span> <span class="nb">white</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>src/Components/Button.html</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;a</span> <span class="na">class=</span><span class="s">&quot;button&quot;</span> <span class="na">href=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;&lt;/a&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>src/Components/Button.js</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">$</span> <span class="nx">from</span> <span class="s1">&#39;jquery&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">template</span> <span class="nx">from</span> <span class="s1">&#39;./Button.html&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">Mustache</span> <span class="nx">from</span> <span class="s1">&#39;mustache&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="s1">&#39;./Button.scss&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">Button</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">constructor</span><span class="p">(</span><span class="nx">link</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">link</span> <span class="o">=</span> <span class="nx">link</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">onClick</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">link</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">render</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kr">const</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">node</span><span class="p">).</span><span class="nx">text</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">// Render our button</span>
+</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="nx">node</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span>
+</span><span class='line'>            <span class="nx">Mustache</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">template</span><span class="p">,</span> <span class="p">{</span><span class="nx">text</span><span class="p">})</span>
+</span><span class='line'>        <span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">// Attach our listeners</span>
+</span><span class='line'>        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.button&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">onClick</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>无论何时被导入，在哪个上下文中运行，Button.js是100%自包含的，它会包含所有需要的工具，并正确的渲染，现在我们只需要直接在页面上渲染我们的Button即可。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">Button</span> <span class="nx">from</span> <span class="s1">&#39;./Components/Button&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">button</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Button</span><span class="p">(</span><span class="s1">&#39;google.com&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">button</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考：<a href="http://blog.madewithlove.be/post/webpack-your-bags/">http://blog.madewithlove.be/post/webpack-your-bags/</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -216,279 +631,6 @@ cache配置 - 背后的cache存储在哪里，从哪里读取</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/01/01/javascript-this/">JavaScript渐入佳境 - This指针</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-01-01T19:04:16+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>7:04 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在JavaScript中，随着函数使用场合的不同，this的值会发生变化。但是有一个总的原则，那就是this指的是，调用该函数的那个对象。this关键字在Javascript中和执行环境，而非声明环境有关。</p>
-
-<p>举个例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">someone</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">showName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">other</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Tom&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">showName</span><span class="o">:</span> <span class="nx">someone</span><span class="p">.</span><span class="nx">showName</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">other</span><span class="p">.</span><span class="nx">showName</span><span class="p">();</span><span class="err">　　</span><span class="c1">//Tom</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里其实应该好理解，other的showName属性指向了someone的showName所声明的函数，他等价于：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">other</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Tom&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">showName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">other</span><span class="p">.</span><span class="nx">showName</span><span class="p">();</span><span class="err">　　</span><span class="c1">//Tom</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>所以this指针理所当然的指向other自己。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;Tom&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Bob</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">show</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">show</span> <span class="o">=</span> <span class="nx">Bob</span><span class="p">.</span><span class="nx">show</span><span class="p">;</span>
-</span><span class='line'><span class="nx">show</span><span class="p">();</span><span class="err">　　</span><span class="c1">//Tom</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面这个show为什么显示Tom，它的执行对象是什么？Window对象。</p>
-
-<p>Window对象是所有客户端JavaScript特性和API的主要接入点。它表示Web浏览器的一个窗口，并且可以用标示符window（小写）来引用。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">window</span>
-</span><span class='line'><span class="nx">$</span> <span class="nx">Window</span> <span class="p">{</span><span class="nx">external</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nx">chrome</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nb">document</span><span class="o">:</span> <span class="nb">document</span><span class="p">,</span> <span class="err">\</span><span class="nx">_ASYNC_START</span><span class="o">:</span> <span class="mi">1451649155228</span><span class="p">,</span> <span class="err">\</span><span class="nx">_chrome_37_fix</span><span class="o">:</span> <span class="kc">undefined</span><span class="err">…</span><span class="p">}</span>
-</span><span class='line'><span class="nx">Window</span>
-</span><span class='line'><span class="nx">$</span> <span class="kd">function</span> <span class="nx">Window</span><span class="p">()</span> <span class="p">{</span> <span class="p">[</span><span class="kr">native</span> <span class="nx">code</span><span class="p">]</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Window对象定义了一些属性，比如，指代Location对象(location)的location属性。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">location</span> <span class="o">===</span> <span class="nx">location</span>
-</span><span class='line'><span class="nx">$</span> <span class="kc">true</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Window对象还定义了一些方法，比如alert()和setTimeout()，使用时，我们都没有显示的使用window属性。Window对象是全局对象，处于作用域链的顶部，它的属性和方法实际上全是全局变量和全局函数。
-通过window变量可以引用到Window对象本身，但是如果要使用全局窗口对象的属性，并不需要使用window。</p>
-
-<p>我们常说，JavaScript很容易就创建一个全局变量或者全局函数。比如，直接var a_global_variable = &lsquo;a global variable&#8217;。它不仅使全局变量，它还是window的一个属性。如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">a_global_variable</span> <span class="o">=</span> <span class="s1">&#39;a global variable&#39;</span>
-</span><span class='line'><span class="nx">a_global_variable</span>
-</span><span class='line'><span class="nx">$</span> <span class="s2">&quot;a global variable&quot;</span>
-</span><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">goodtest</span>
-</span><span class='line'><span class="nx">$</span> <span class="s2">&quot;a global variable&quot;</span>
-</span><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">a_global_variable</span> <span class="o">===</span> <span class="nx">a_global_variable</span>
-</span><span class='line'><span class="nx">$</span> <span class="kc">true</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>为什么在Window下？head/全局对象/顶层对象</h3>
-
-<p>JavaScript代码本身必须包含在对象内部。在Web浏览器环境中编写JavaScript代码时，JavaScript被包含在Window对象内，并在其内部执行。这个Window对象被认为是“head对象”。JavaScript的所有实现都需要使用一种head对象。</p>
-
-<p>head对象是由JavaScript在幕后创建，用于封装用户用自定义代码，并容纳JavaScript预定义的原生代码。JavaScript将用户自定义代码放入head对象中来执行。在编写JavaScript代码时，它将被编写在head对象的上下文中。</p>
-
-<p>换一种解释：</p>
-
-<p>JavaScript的所有对象都存在于一个运行环境之中，这个运行环境本身也是对象，称为“顶层对象”。这就是说，JavaScript的所有对象，都是“顶层对象”的下属。不同的运行环境有不同的“顶层对象”，在浏览器环境中，这个顶层对象就是Window对象。</p>
-
-<p>所有浏览器环境的全局变量，都是Window对象的属性。可以把Window理解成JavaScript Context 上下文环境。</p>
-
-<p>理解了setTimeout是Window的属性之后，理解下面这段代码应该比较容易了：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;Bob&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">nameObj</span> <span class="o">=</span><span class="p">{</span>
-</span><span class='line'>    <span class="nx">name</span> <span class="o">:</span> <span class="s2">&quot;Tom&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">showName</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span><span class="c1">//此时this指向的是window  </span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">waitShowName</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>        <span class="nx">setTimeout</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">showName</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span><span class="c1">//这里的this指向的是nameObj.showName</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'><span class="nx">nameObj</span><span class="p">.</span><span class="nx">waitShowName</span><span class="p">();</span><span class="c1">// Bob</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>和下面这段代码相似</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;Bob&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>    <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-</span><span class='line'><span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>new关键字</h2>
-
-<p>new关键字指向创建的对象，在上一篇文章中已经介绍的很清楚了。 <a href="http://benweizhu.github.io/blog/2015/12/31/javascript-contructor-new-prototype/">http://benweizhu.github.io/blog/2015/12/31/javascript-contructor-new-prototype/</a></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Person</span><span class="p">(</span><span class="nx">name</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span> <span class="c1">//这个this指向用该构造函数构造的新对象，这个例子是Bob对象</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">show</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>    <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Bob</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">Bob</span><span class="p">.</span><span class="nx">show</span><span class="p">();</span>        <span class="c1">//Bob</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>apply和call改变this指向的对象</h2>
-
-<p>apply和call能够强制改变函数执行时的当前对象，让this指向其他对象。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;window&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">someone</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">showName</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">other</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Tom&quot;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">someone</span><span class="p">.</span><span class="nx">showName</span><span class="p">();</span>   <span class="c1">//Bob</span>
-</span><span class='line'><span class="nx">someone</span><span class="p">.</span><span class="nx">showName</span><span class="p">.</span><span class="nx">apply</span><span class="p">();</span>    <span class="c1">//window</span>
-</span><span class='line'><span class="nx">someone</span><span class="p">.</span><span class="nx">showName</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">other</span><span class="p">);</span>    <span class="c1">//Tom</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料：  <br/>
-1.<a href="http://www.cnblogs.com/justany/archive/2012/11/01/the_keyword_this_in_javascript.html">http://www.cnblogs.com/justany/archive/2012/11/01/the_keyword_this_in_javascript.html</a>  <br/>
-2.JavaScript启示录  <br/>
-3.<a href="http://blog.csdn.net/zoutongyuan/article/details/29355021">http://blog.csdn.net/zoutongyuan/article/details/29355021</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/11">&larr; Older</a>
@@ -516,7 +658,11 @@ cache配置 - 背后的cache存储在哪里，从哪里读取</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止HTML/JS/CSS系列 - Retina屏幕下两倍图</a>
+        <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
       </li>
     
       <li class="post">
@@ -529,10 +675,6 @@ cache配置 - 背后的cache存储在哪里，从哪里读取</p>
     
       <li class="post">
         <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/10/27/living-style-guide/">Living Style Guide - 缩小设计和开发的沟通鸿沟</a>
       </li>
     
   </ul>

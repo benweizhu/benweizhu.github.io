@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在大型企业中，它们都拥有自己的VI，有自己的设计团队，他们来开发设计一些企业特有的图标和标志。而这些图标一般以矢量图的方式提供给我们。 矢量图，也称为面向对象的图像或绘图图像，在数学上定义为一系列由线连接的点。矢量文件中的图形元素称为对象。每个对象都是一个自成一体的实体，它具有颜色、形状、轮廓、 &hellip;">
+  <meta name="description" content="原视频： https://vimeo.com/177216958 PPT如下： 作者提到CSS开发过程的很多原则： • DRY/Single Source of Truth • The Single Responsibility Principle • The Separation of &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,56 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/08/21/css-for-software-engineers-for-css-developers/">CSS和软件工程中的设计原则</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-08-21T18:10:13+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>6:10 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>原视频： <a href="https://vimeo.com/177216958">https://vimeo.com/177216958</a></p>
+
+<p>PPT如下：</p>
+
+<script async class="speakerdeck-embed" data-id="087e1c8ae1c4452f82ae6fd5e6215a9a" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
+
+
+<p>作者提到CSS开发过程的很多原则：
+  • DRY/Single Source of Truth <br/>
+  • The Single Responsibility Principle <br/>
+  • The Separation of Concerns <br/>
+  • Immutability <br/>
+  • Cylcomatic Complexity <br/>
+  • The Open/Close Principle <br/>
+  • Orthogonality</p>
+
+<p>这些原则在其他软件开发领域应用非常广泛，然而绝大多数人在写CSS的时候却又显得相当随意。
+可以参考一下作者的观点，每一原则他都给出了对应的应用场景。</p>
+
+<p>同时对于非常喜欢写嵌套规则的同学，强烈建议去了解<a href="%E5%9C%88%E5%A4%8D%E6%9D%82%E5%BA%A6">Cylcomatic Complexity</a>，尝试着去减少嵌套，减少以后的维护成本。</p>
+
+<p>个人感觉，作者对于这些设计原则本身的说明，占用了太多的篇幅，并没有告诉你如果要实现这个设计，应该怎么做？但作者讲解了一些反例，并印证它不满足那些原则。我们应该反向思考，我们在css中过于随意的css选择器，定义出scope正确的合理的css。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -145,56 +195,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/07/02/bash-profile-and-bashrc/">.bash_profile和.bashrc</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-07-02T12:54:48+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>12:54 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>做个记录</p>
-
-<p>转载自： <a href="http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html">http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html</a></p>
-
-<p>WHEN working with Linux, Unix, and Mac OS X, I always forget which bash config file to edit when I want to set my PATH and other environmental variables for my shell. Should you edit .bash_profile or .bashrc in your home directory?
-You can put configurations in either file, and you can create either if it doesn’t exist. But why two different files? What is the difference?
-According to the bash man page, .bash_profile is executed for login shells, while .bashrc is executed for interactive non-login shells.</p>
-
-<p><strong>What is a login or non-login shell?</strong></p>
-
-<p>When you login (type username and password) via console, either sitting at the machine, or remotely via ssh: .bash_profile is executed to configure your shell before the initial command prompt.
-But, if you’ve already logged into your machine and open a new terminal window (xterm) inside Gnome or KDE, then .bashrc is executed before the window command prompt. .bashrc is also run when you start a new bash instance by typing /bin/bash in a terminal.
-Why two different files?</p>
-
-<p>Say, you’d like to print some lengthy diagnostic information about your machine each time you login (load average, memory usage, current users, etc). You only want to see it on login, so you only want to place this in your .bash_profile. If you put it in your .bashrc, you’d see it every time you open a new terminal window.
-Mac OS X — an exception</p>
-
-<p>An exception to the terminal window guidelines is Mac OS X’s Terminal.app, which runs a login shell by default for each new terminal window, calling .bash_profile instead of .bashrc. Other GUI terminal emulators may do the same, but most tend not to.</p>
-
-<p>就是注意一点，这里提到Mac会有些不同。</p>
-
-<p>什么时候会用到呢？其实有很多，比如，安装mysql时，希望通过命令访问，就需要把mysql的路径放在path中。又比如，安装nvm时，配置nvm的命令。还有比如希望使用alias命令，添加一些快捷命令，也需要配置。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/5">&larr; Older</a>
@@ -222,7 +222,11 @@ Mac OS X — an exception</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止HTML/JS/CSS系列 - Retina屏幕下两倍图</a>
+        <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
       </li>
     
       <li class="post">
@@ -235,10 +239,6 @@ Mac OS X — an exception</p>
     
       <li class="post">
         <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/10/27/living-style-guide/">Living Style Guide - 缩小设计和开发的沟通鸿沟</a>
       </li>
     
   </ul>

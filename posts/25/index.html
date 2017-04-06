@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="你大概应该知道对于应用的安全性（无论是Web应用还是非Web应用），都包含两个方面“身份认证”（authentication）和“权限认证”（authorization，access-control）。身份认证是确立“访问者”所声称的“当事人”（principal）的一个过程（当事人可以是一个用户 &hellip;">
+  <meta name="description" content="上一章节结尾，我们实现了Spring web security的最小实现，拦截所有url，采用表单登录，用户名和密码采用inMemory方式保存。 你可能在想，这个登录页面从哪里来的，我们并没有直接去实现一个页面。事实上，正是因为我们没有设置登录页面，Spring Security就自动生成了一个 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,185 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/06/14/spring-web-security-2/">Spring Web Security 实战 (二) - 自定义登录页面</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-06-14T15:45:34+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:45 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>上一章节结尾，我们实现了Spring web security的最小实现，拦截所有url，采用表单登录，用户名和密码采用inMemory方式保存。</p>
+
+<p>你可能在想，这个登录页面从哪里来的，我们并没有直接去实现一个页面。事实上，正是因为我们没有设置登录页面，Spring Security就自动生成了一个，该页面是的Spring Security处理登录的标准页面。</p>
+
+<p>不过，我们肯定是不会想要使用Spring Security给我们提供的标准页面，除非项目刚启动，处于demo阶段，否则，肯定采用自定义页面，那么如何做到呢？</p>
+
+<p>在form-login标签提供了一个属性login-page，允许指定用户自定义的登录页面，于是，实现方式如下：</p>
+
+<p>首先定义一个登录页面JSP文件，里面的form表单和标准页面一样：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ taglib prefix=&quot;form&quot; uri=&quot;http://www.springframework.org/tags/form&quot; %&gt;
+</span><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
+</span><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'><span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Spring MVC Security<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'><span class="nt">&lt;/head&gt;</span>
+</span><span class='line'><span class="nt">&lt;body&gt;</span>
+</span><span class='line'><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;/spring-mvc-security/j_spring_security_check&quot;</span> <span class="na">method=</span><span class="s">&quot;POST&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;table&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;tbody&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;tr&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;td&gt;</span>User:<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;td&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;j_username&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;tr&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;td&gt;</span>Password:<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;td&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="na">name=</span><span class="s">&quot;j_password&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;tr&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;td</span> <span class="na">colspan=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;&lt;input</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Login&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/tbody&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/table&gt;</span>
+</span><span class='line'><span class="nt">&lt;/form&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后定义一个对应的RequestMapping：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Controller</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">LoginController</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/login&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">login</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;login&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>最后一步，就是配置http标签的内容，有两点，第一，设置form-login的属性login-page为登录页面的url，第二，设置login页面的访问权限为IS_AUTHENTICATED_ANONYMOUSLY，必须允许匿名用户可以访问，否则怎么登录呢。代码如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;security:http&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;security:intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/login&quot;</span> <span class="na">access=</span><span class="s">&quot;IS_AUTHENTICATED_ANONYMOUSLY&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;security:intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;security:form-login</span> <span class="na">login-page=</span><span class="s">&quot;/login&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;security:logout/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/security:http&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然，你也可以这么写，3.1之后，允许多个http标签的定义。不过这么做，相当于完全绕过Spring Security的filterChain，不在Spring Security相关管理之下。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/css/**&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/login&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span><span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>匿名登录</h2>
+
+<p>你肯定会问，上面那样写和IS_AUTHENTICATED_ANONYMOUSLY有什么区别？这里参考：<a href="http://www.mossle.com/docs/auth/html/ch107-anonymous.html">http://www.mossle.com/docs/auth/html/ch107-anonymous.html</a></p>
+
+<p>”匿名登录，即用户尚未登录系统，系统会为所有未登录的用户分配一个匿名用户，这个用户也拥有自己的权限，不过他是不能访问任何被保护资源的。</p>
+
+<p>设置一个匿名用户的好处是，我们在进行权限判断时，可以保证SecurityContext中永远是存在着一个权限主体的，启用了匿名登录功能之后，我们所需要做的工作就是从SecurityContext中取出权限主体，然后对其拥有的权限进行校验，不需要每次去检验这个权限主体是否为空了。这样做的好处是我们永远认为请求的主体是拥有权限的，即便他没有登录，系统也会自动为他赋予未登录系统角色的权限，这样后面所有的安全组件都只需要在当前权限主体上进行处理，不用一次一次的判断当前权限主体是否存在。这就更容易保证系统中操作的一致性。“</p>
+
+<p>这种一致性，统一了业务层代码的实现，将匿名用户看做是用户的一种类型，只是访问权限不一样而已。关于它们的优缺点 <a href="http://www.mossle.com/docs/auth/html/ch107-anonymous.html">http://www.mossle.com/docs/auth/html/ch107-anonymous.html</a> 的最后一部分有介绍。</p>
+
+<p>设置登录后的跳转页面，form-login还提供了两个属性default-target-url和always-use-default-target。如果用户进入登录页面是因为要访问某个受限制的资源，当用户登录后，就会回到该访问资源，但是如果不是，default-target-url，就起到作用，指定了登录后的跳转页面，它的默认值是“/”。always-use-default-target的含义就很简单了，是否永远跳转，不管用户之前访问的资源。</p>
+
+<h2>处理登出</h2>
+
+<p>因为在xml配置中添加了security:logout，所以Spring Security也默认提供了一个登出URL：“/j_spring_security_logout”。</p>
+
+<h2>获得用户名</h2>
+
+<p>让Spring注入Principal即可</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Controller</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HomeController</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/home&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">home</span><span class="o">(</span><span class="n">Principal</span> <span class="n">principal</span><span class="o">,</span> <span class="n">Model</span> <span class="n">model</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">model</span><span class="o">.</span><span class="na">addAttribute</span><span class="o">(</span><span class="s">&quot;userName&quot;</span><span class="o">,</span> <span class="n">principal</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;home&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料： <br/>
+1.Spring security reference</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -243,163 +422,6 @@ org.springframework.security.provisioning</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/06/11/spring-boot-starter-2/">Spring Boot 深入浅出系列（二） - 用Gradle启动应用</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-06-11T12:56:12+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:56 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在前面介绍的《用Spring Boot开发Spring项目 快速上手》上介绍过：</p>
-
-<p>“通过Spring Boot创建的Java应用可以直接通过java -jar启动（即便它是Web应用）。也就是说，在这里，首先运行gradle assemble，得到jar文件，然后运行java -jar gs-spring-boot-0.1.0.jar。”</p>
-
-<p>但是，我们肯定不能每次这样去启动SpringBoot的应用。好在是，官方提供了与构建相关的插件Spring Boot Gradle plugin，插件中提供了对应的task给你使用：</p>
-
-<h2>Application tasks     </h2>
-
-<p>bootRun - Run the project with support for auto-detecting main class and reloading static resources.  <br/>
-distTar - Bundles the project as a JVM application with libs and OS specific scripts.  <br/>
-distZip - Bundles the project as a JVM application with libs and OS specific scripts.  <br/>
-installApp - Installs the project as a JVM application along with libs and OS specific scripts. <br/>
-run - Runs this project as a JVM application.</p>
-
-<h2>在构建中引入Spring Boot Gradle plugin</h2>
-
-<p>首先，你需要在构建中加入该插件：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">classpath</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-gradle-plugin:1.2.4.RELEASE&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;spring-boot&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>省略依赖的版本号</h2>
-
-<p>SpringBoot插件会注册一个定制的依赖解析策略，允许你省略对依赖版本的配置。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-web&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.thymeleaf:thymeleaf-spring4&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>那么问题来了，这个省略的版本号从哪里来呢？它有Spring Boot Plugin的版本号决定，比如，当前定义的插件是org.springframework.boot:spring-boot-gradle-plugin:1.2.4.RELEASE，版本号是1.2.4，那么对应的spring-boot-starter-web的版本号，也是1.2.4。</p>
-
-<p>当然，如果你想显示的指定版本号也是可以的：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.thymeleaf:thymeleaf-spring4:2.1.1.RELEASE&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>打包可执行的jar包或者war包</h2>
-
-<p>一旦使用了Spring boot插件，它就会用bootRepackage任务改写archive的过程。</p>
-
-<p>你可以在配置选项中指定main class，或者在Manifest添加Main-Class，如果你不指定，它会去搜索含有public static void main(String[] args)方法的类。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">bootRepackage</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mainClass</span> <span class="o">=</span> <span class="s1">&#39;demo.Application&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果你想要打成War包，并部署到外部容器里面，除了要使用war插件，还需要将embedded container的依赖放在providedRuntime里。如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="o">...</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;war&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">war</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">baseName</span> <span class="o">=</span> <span class="s1">&#39;myapp&#39;</span>
-</span><span class='line'>    <span class="n">version</span> <span class="o">=</span>  <span class="s1">&#39;0.5.0&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">jcenter</span><span class="o">()</span>
-</span><span class='line'>    <span class="n">maven</span> <span class="o">{</span> <span class="n">url</span> <span class="s2">&quot;http://repo.spring.io/libs-snapshot&quot;</span> <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">configurations</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">providedRuntime</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-web&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">providedRuntime</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-tomcat&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料： <br/>
-1.<a href="http://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-gradle-plugin.html">http://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-gradle-plugin.html</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/26">&larr; Older</a>
@@ -427,7 +449,11 @@ run - Runs this project as a JVM application.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止HTML/JS/CSS系列 - Retina屏幕下两倍图</a>
+        <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
       </li>
     
       <li class="post">
@@ -440,10 +466,6 @@ run - Runs this project as a JVM application.</p>
     
       <li class="post">
         <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/10/27/living-style-guide/">Living Style Guide - 缩小设计和开发的沟通鸿沟</a>
       </li>
     
   </ul>

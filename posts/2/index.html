@@ -9,12 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="什么都不说，先照着做 安装合适的node版本和包管理工具Yarn 1
-2
-3
-4
-5
-node -version v6.9.4(用nvm) brew update（如果是mac的） brew install yarn https://yarnpkg.com/en/docs/install &hellip;">
+  <meta name="description" content="基于上次的内容 《一步一步做React(一) - Hello React》，我们继续搭建一个React项目的工程实践 - CSS Modules。 CSS Modules概念 Github文档 - CSS Modules CSS Modules — Local Scope 局部作用域 CSS &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -69,6 +64,234 @@ node -version v6.9.4(用nvm) brew update（如果是mac的） brew install yarn 
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-02-01T22:44:09+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2017</span></span> <span class='time'>10:44 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>基于上次的内容 <a href="http://benweizhu.github.io/blog/2017/01/17/react-step-by-step-1/">《一步一步做React(一) - Hello React》</a>，我们继续搭建一个React项目的工程实践 - CSS Modules。</p>
+
+<h3>CSS Modules概念</h3>
+
+<p>Github文档 - <a href="https://github.com/css-modules/css-modules">CSS Modules</a></p>
+
+<p><strong>CSS Modules — Local Scope 局部作用域</strong></p>
+
+<p>CSS Modules里面最基础也是最重要的概念 - 局部作用域。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.backdrop {}
+</span><span class='line'>.prompt {}
+</span><span class='line'>.pullquote {}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>定义在style.css中的样式都存在于一个组件内的局部作用域，不会污染全局的样式。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import styles from "./style.css"
+</span><span class='line'>
+</span><span class='line'>const Component = props =&gt; {
+</span><span class='line'>  return (
+</span><span class='line'>    &lt;div className={styles.backdrop}&gt;
+</span><span class='line'>      &lt;div className={styles.prompt}&gt;
+</span><span class='line'>      &lt;/div&gt;
+</span><span class='line'>      &lt;div className={styles.pullquote}&gt;
+</span><span class='line'>      &lt;/div&gt;
+</span><span class='line'>   &lt;/div&gt;
+</span><span class='line'>  )
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>怎么解释？如何不会污染全局的样式？答案是唯一的命名。现在，我们先来看是怎么配置的。</p>
+
+<h3>用webpack处理样式</h3>
+
+<p><strong>style-loader | css-loader | sass-loader</strong></p>
+
+<p>给webpack.config.js中的module添加一个新的loaders配置，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>module: {
+</span><span class='line'>  loaders: [
+</span><span class='line'>    {
+</span><span class='line'>      test: /\.jsx?/,
+</span><span class='line'>      include: APP_DIR,
+</span><span class='line'>      loader: 'babel',
+</span><span class='line'>    },
+</span><span class='line'>    {
+</span><span class='line'>      test: /\.scss$/,
+</span><span class='line'>      loaders: ["style", "css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]", "sass"],
+</span><span class='line'>    },
+</span><span class='line'>  ],
+</span><span class='line'>},</span></code></pre></td></tr></table></div></figure>
+
+
+<p>webpack的loader是用来预处理由require()或者import加载文件，比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import styles from "./style.scss"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在上面的webpack配置中，针对*.scss文件，配置了一个loader的管道，顺序是：</p>
+
+<p>sass-loader => css-loader => style-loader</p>
+
+<p>sass-loader顾名思义用来编译SCSS到CSS</p>
+
+<p>css-loader和style-loader用来将样式嵌入到Webpack打包后的JS文件中，从而实现样式的模块化管理。</p>
+
+<p>针对css-loader的配置，你会看到它的格式是如下的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其实，这是webpack loader传递参数的一种方式（URL方式），css-loader的参数表请进入<a href="https://github.com/webpack-contrib/css-loader#options-1">传送门</a>。</p>
+
+<p>localIdentName是用于指定局部className的格式，比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[name]__[local]___[hash:base64:5]
+</span><span class='line'>ComponentName__LocalName___HashCode
+</span><span class='line'>Component__pullquote___SDFe34IIE</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>如何抽离出独立的css文件？Extract Text Plugin</h3>
+
+<p>正如前面所强调的，style-loader和css-loader，将样式嵌入到Webpack打包后的JS文件。</p>
+
+<p>这当然不是最好的方式，我们需要将样式抽离到独立的css文件中，但就是<a href="https://github.com/webpack-contrib/extract-text-webpack-plugin">Extract Text Plugin</a>。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add extract-text-webpack-plugin --dev</span></code></pre></td></tr></table></div></figure>
+
+
+<p>完整的webpack.config.js文件如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const path = require('path');
+</span><span class='line'>const ExtractTextPlugin = require('extract-text-webpack-plugin');
+</span><span class='line'>
+</span><span class='line'>const BUILD_DIR = path.resolve(__dirname, 'public');
+</span><span class='line'>const APP_DIR = path.resolve(__dirname, 'src');
+</span><span class='line'>
+</span><span class='line'>const extractCSS = new ExtractTextPlugin(`${BUILD_DIR}/styles.css`);
+</span><span class='line'>
+</span><span class='line'>const config = {
+</span><span class='line'>  entry: `${APP_DIR}/index.jsx`,
+</span><span class='line'>  output: {
+</span><span class='line'>    path: BUILD_DIR,
+</span><span class='line'>    filename: 'bundle.js',
+</span><span class='line'>  },
+</span><span class='line'>  module: {
+</span><span class='line'>    loaders: [
+</span><span class='line'>      {
+</span><span class='line'>        test: /\.jsx?/,
+</span><span class='line'>        include: APP_DIR,
+</span><span class='line'>        loader: 'babel',
+</span><span class='line'>      },
+</span><span class='line'>      {
+</span><span class='line'>        test: /\.scss$/,
+</span><span class='line'>        loader: extractCSS.extract(['css?minimize&modules&importLoaders=2&localIdentName=[name]__[local]', 'postcss', 'sass']),
+</span><span class='line'>      },
+</span><span class='line'>    ],
+</span><span class='line'>  },
+</span><span class='line'>  resolve: {
+</span><span class='line'>    extensions: ['', '.js', '.jsx'],
+</span><span class='line'>  },
+</span><span class='line'>  plugins: [
+</span><span class='line'>    extractCSS,
+</span><span class='line'>  ],
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>module.exports = config;
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -301,167 +524,6 @@ node -version v6.9.4(用nvm) brew update（如果是mac的） brew install yarn 
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-11-19T21:16:37+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:16 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>第一次听说“SGDD”</h3>
-
-<p>我听说过TDD（测试驱动开发），我在软件开发中一致坚持执行</p>
-
-<p>它以其倡导先写测试程序，然后编码实现其功能得名，在开发中，我们带着两顶帽子思考：先戴上实现功能的帽子，在测试的辅助下，快速实现其功能；再戴上重构的帽子，在测试的保护下，通过去除冗余的代码，提高代码质量。</p>
-
-<p>我也听说过BDD（行为驱动开发），我熟练使用Cucumber编写端到端测试</p>
-
-<p>它鼓励软件项目中的开发者、QA和非技术人员或商业参与者之间进行协作，通过用自然语言书写非程序员可读的测试用例，以扩展测试驱动的开发方法。</p>
-
-<p>我头一次听说SGDD（风格指南驱动开发），我蒙蔽了</p>
-
-<p>我打开百度（请不要鄙视我，它毕竟还是“最好的中文搜索引擎”），搜索关键字 - “风格指南驱动开发”，却只看到寥寥的一篇翻译“干货”。收货不多，但能证明了一点，即风格指南驱动开发（SGDD）的思想还没有像TDD和BDD那样在国内得到较为广泛的推广。</p>
-
-<p>本文是一篇我目前所在项目实践的总结，也是对这种新的开发思想的思考。</p>
-
-<h3>“风格指南驱动开发”是什么？</h3>
-
-<p>“风格指南驱动开发”其实是一个相当新的术语，最早在公开场合中谈到这个概念的人应该是Nicole Sullivan，她在2014年9月一次演讲《Components &amp; SGDD》中提出SGDD的概念（Nicole Sullivan目前在NPM这家公司，没错，就是那个NPM，做Product Manager &amp; Design Manager）。</p>
-
-<p>“风格指南驱动开发”尝试着：</p>
-
-<p>1.让UX和前端开发更紧密的工作在一起，将设计与前端开发的工作闭环缩小，更快速的迭代产品原型 <br/>
-2.将UI开发和业务系统分离开，业务系统不仅仅是指后端系统（不仅仅是前后端分离），也包括业务的Web系统 <br/>
-3.让设计文档更加“灵活”，更加及时（up to date），更加一致（single source of truth） <br/>
-4.让前端资源管理更加规范，开发模式更加清晰 <br/>
-5.让整个Web开发周期更加敏捷（Agile）</p>
-
-<p>它是一种前端开发和团队工作方式的实践。</p>
-
-<p>而实践的方式，就是做到以下两点：组件化的设计和动态风格指南。</p>
-
-<h3>组件化的设计 - 我的眼里一切都可以是组件</h3>
-
-<p>大型的Web应用通常都会有大量的JS，CSS和其他资源文件（字体文件，图标，图片），随着页面越来越多，交互越来越复杂，如果没有很好的管理，就会导致资源的冗余，依赖关系复杂度增加，可维护性降低，开发难度增加，这其实是前端开发常见的通病。</p>
-
-<p>如果和后端的开发相比较，比如：Java开发，天生就拥有包管理和类的支持，而根据业务/功能层次来划分，我们拥有了常见的（或者约定俗成）实现层次，如：Controller，Service，Repository，Util，Constant等，同时，我们还会利用框架和语言特性带来的优势，比如，IOC，AOP，注解，继承，接口等，而统统这些能够带来的好处就是职责的单一，模块的高内聚，接口化，可重用，易于测试等等。</p>
-
-<p>对于Web前端开发，由于涉及到的内容较广，又不太可能完全具备后端语言的优秀特性，所以，更加需要开发人员具有优秀的设计和管理的思想，比如：CSS的合理命名，有效的利用CSS预处理器，JavaScript的模块化，利用框架的特性（比如AngularJS的依赖注入，指令等。）等，在这之中，有一个最近开始被大家关注，非常重要的设计和管理思想就是“组件化”。</p>
-
-<p>组件是一个个独立存在的模块，它能够具备一些非常优秀的特性：<strong>单一的职责，资源的高内聚，独立的作用域，可独立的测试，接口的规范化，可重用，可组合等</strong>。这些优秀的特性其实就已经非常接近我们常常在后端语言中描述的特性。</p>
-
-<p style="text-align: center;">
-  <img src="/images/style-guide/folder-structure.png" width="300" title="代码组织结构" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">我们项目的代码组织结构</p>
-
-
-<p>除开开发关注的特性，组件化对于整个软件开发流程也是有益的，合理的组件划分可以合理控制开发闭环，UX可以更快的看到设计实现的原型，提升团队成员沟通频率，BA（业务分析人员）可以方便的根据组件合理的编写Story（故事卡）和Task（比故事更小的任务卡）等等。</p>
-
-<p>而这些让组件化成为“风格指南驱动开发”的必要元素。</p>
-
-<h3>“风格指南驱动开发”中的“风格指南”</h3>
-
-<p>除了组件化，“风格指南驱动开发”还需要另外一个实现驱动开发的基石，也就是它名字中的“风格指南”。</p>
-
-<p>“风格指南”对大家应该不陌生，主要分为两种类型：静态风格指南和动态风格指南。</p>
-
-<p>静态风格指南是我们比较常见的静态设计文档，比如，由设计师提供的PSD/PDF等文件，文档中包含：调色板，字体，按钮，链接等等。</p>
-
-<p style="text-align: center;">
-  <img src="/images/sgdd/static-style-guide.png" width="500" title="Static Style Guide" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">medialoot上的一个样例</p>
-
-
-<p>动态风格指南，也称为Living Style Guide（“活的”风格指南），它是一个包含风格指南的Web站点。当你看到它时，也许你会觉的有点像BootStrap，然而，和BootStrap以及静态风格指南不同，企业开发中的Living Style Guide得到的是:</p>
-
-<p>1.设计在代码实现层面上的最新版本，它包含了展示UI组件交互和行为的Demo以及相应的实现和使用代码等 <br/>
-2.用户是UX，前端开发和BA（业务分析），在UX和BA的眼中看到的文档即最新实现结果，而在前端开发眼中看到的代码即设计 <br/>
-3.文档中看到的实现即是产品实现中最终的一致结果 <br/>
-4.除了基础组件，也具有更加偏重业务的大型组件 <br/>
-5.产生供产品环境使用的最终资源（库）</p>
-
-<p>综合以上不同之处，相信大家可以猜到对于“风格指南驱动开发”来说，它所需要的是后者。</p>
-
-<p style="text-align: center;">
-  <img src="/images/sgdd/living-style-guide.png" width="500" title="Living Style Guide" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">一个Living Style Guide的样例</p>
-
-
-<h3>工作流程 - 如何“驱动开发”？</h3>
-
-<p style="text-align: center;">
-  <img src="/images/sgdd/sgdd-process.png" width="500" title="Style Guide Driven Development Process" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">开发流程</p>
-
-
-<p>也许，你会更加关心“风格指南驱动开发”的整个开发流程，但其实，当你拥有了组件化的思想和“动态的风格指南”，“风格指南驱动开发”的整个过程其实是行云流水的，我简单描述一下：</p>
-
-<p>1.挖掘到新的需求/特性</p>
-
-<p>当新的需求出现时，UX开始进行页面设计，Living Style Guide会作为设计的参考文档，通常情况，设计师会查看已有的调色板，字体，和其他基本元素或组件来组成新的页面布局。在组件化的思想和Living Style Guide的帮助下，BA和设计师都会尝试使用或者扩展现有的组件。</p>
-
-<p>2.抽象成组件</p>
-
-<p>一旦设计完成，BA，UX和开发会开始讨论如何把新的设计细分为独立的组件，哪些是已经存在可以重用的，哪些是新的需用新建或者扩展实现的。Living Style Guide作为桥梁帮助设计与开发进行沟通，促进双方的理解，确保实现的准确性。而抽象出来的组件，帮助BA划分任务和故事（Story），以便更加准确的估算“故事点”。</p>
-
-<p>3.实现和文档化</p>
-
-<p>此时，Living Style Guide是作为一个开发框架和设计试验场（playground）。</p>
-
-<p>作为一个试验场（playground），允许你随时看到每一个开发出来的组件，作为开发框架，允许你快速开发，它和真正的产品实现完全隔离，这种隔离会鼓励你一以更加抽象的方式创建组件，以便于让他们更容易被重用。</p>
-
-<p>Living Style Guide的开发注重组件化的隔离和规范化的开发流程（套路清晰明了），我们常常会开发一些自动化的构建任务来帮助快速初始化一个组件需要的基本内容，只要开发人员对开发所需的前端技术栈有掌握，就能较快速的开发完成相应的组件。</p>
-
-<p>而开发完成的组件在Living Style Guide中立刻变成“活的文档”，可以快速展示各种不同的组件应用场景，提供给UX和BA做审查（review）。</p>
-
-<p>4.组件在产品应用中的热插拔</p>
-
-<p>最后一步，就是将组件应用到真正的产品实现中（该产品代码应该是与Living Style Guide毫无关系的业务代码）。而对于Living Style Guide输出的结果，应该可以任意选择刚好满足需求所需要的组件，拥有足够的灵活性，才能实现它在产品应用代码中的热插拔。</p>
-
-<p>如果还有第5步的话，那就是重复上面的4步，这就是“风格指南驱动开发”的完整流程。</p>
-
-<h3>留在最后的思考 - 它到底驱动了什么？</h3>
-
-<p>作为好奇宝宝的你们和我，当你读完这篇文章，当我写完这篇项目上的实践总结，其实，应该仍然在思考，它到底驱动了什么？</p>
-
-<p>在TDD和BDD中，通过测试，驱动我们编写刚好满足测试和满足需求的实现，而测试反过来成为保护伞，在我们通过重构提升代码质量的同时，保证功能的安全性。</p>
-
-<p>那么，“风格指南驱动开发”到底驱动了什么？也许，它驱动着我们尽最大可能去重新使用已有的组件（代码）和设计更通用的组件，也驱动着我们（开发，UX，BA）进行更加频繁的沟通，它驱动着BA（业务分析）书写更加合理的Story，也驱动开发进行更加合理的代码和资源的管理。</p>
-
-<p>如果转载本文，请注明转载地址： <a href="http://benweizhu.github.io/blog/2016/11/19/style-guide-driven-development/">http://benweizhu.github.io/blog/2016/11/19/style-guide-driven-development/</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/3">&larr; Older</a>
@@ -489,7 +551,11 @@ node -version v6.9.4(用nvm) brew update（如果是mac的） brew install yarn 
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止HTML/JS/CSS系列 - Retina屏幕下两倍图</a>
+        <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
       </li>
     
       <li class="post">
@@ -502,10 +568,6 @@ node -version v6.9.4(用nvm) brew update（如果是mac的） brew install yarn 
     
       <li class="post">
         <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/10/27/living-style-guide/">Living Style Guide - 缩小设计和开发的沟通鸿沟</a>
       </li>
     
   </ul>

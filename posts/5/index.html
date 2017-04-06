@@ -9,8 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="注册AWS账号 https://aws.amazon.com 通过信用卡验证 付款1刀 选择Region 美国东部（弗吉尼亚北部） 美国西部（俄勒冈） 美国西部（加利福尼亚北部） 欧洲（爱尔兰） 欧洲（法兰克福） 亚太区域（新加坡） 亚太区域（东京） 亚太区域 (首尔) 亚太区域（悉尼）
-南美洲（ &hellip;">
+  <meta name="description" content="做个记录 转载自： http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html WHEN working with Linux, Unix, and Mac OS X, I always forget which bash &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +64,56 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/07/02/bash-profile-and-bashrc/">.bash_profile和.bashrc</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-07-02T12:54:48+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>12:54 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>做个记录</p>
+
+<p>转载自： <a href="http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html">http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html</a></p>
+
+<p>WHEN working with Linux, Unix, and Mac OS X, I always forget which bash config file to edit when I want to set my PATH and other environmental variables for my shell. Should you edit .bash_profile or .bashrc in your home directory?
+You can put configurations in either file, and you can create either if it doesn’t exist. But why two different files? What is the difference?
+According to the bash man page, .bash_profile is executed for login shells, while .bashrc is executed for interactive non-login shells.</p>
+
+<p><strong>What is a login or non-login shell?</strong></p>
+
+<p>When you login (type username and password) via console, either sitting at the machine, or remotely via ssh: .bash_profile is executed to configure your shell before the initial command prompt.
+But, if you’ve already logged into your machine and open a new terminal window (xterm) inside Gnome or KDE, then .bashrc is executed before the window command prompt. .bashrc is also run when you start a new bash instance by typing /bin/bash in a terminal.
+Why two different files?</p>
+
+<p>Say, you’d like to print some lengthy diagnostic information about your machine each time you login (load average, memory usage, current users, etc). You only want to see it on login, so you only want to place this in your .bash_profile. If you put it in your .bashrc, you’d see it every time you open a new terminal window.
+Mac OS X — an exception</p>
+
+<p>An exception to the terminal window guidelines is Mac OS X’s Terminal.app, which runs a login shell by default for each new terminal window, calling .bash_profile instead of .bashrc. Other GUI terminal emulators may do the same, but most tend not to.</p>
+
+<p>就是注意一点，这里提到Mac会有些不同。</p>
+
+<p>什么时候会用到呢？其实有很多，比如，安装mysql时，希望通过命令访问，就需要把mysql的路径放在path中。又比如，安装nvm时，配置nvm的命令。还有比如希望使用alias命令，添加一些快捷命令，也需要配置。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -189,307 +238,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/06/13/I-want-to-talk-about-https-too/">我也想来谈谈HTTPS</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-06-13T17:50:10+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>5:50 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>安全越来越被重视</h2>
-
-<p>2014年8月份Google在它的官博上发表<a href="https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html">《HTTPS as a ranking signal》</a>
- 公告已经调整其搜索引擎算法，采用 HTTPS 加密的网站在搜索结果中的排名将会更高，其目标非常简单，就是要鼓励全球网站采用安全度更高的HTTPS以保证访客安全。</p>
-
-<p>同一年（2014年），百度开始对外开放了https的访问，并于3月初正式对全网用户进行了https跳转。对百度自身来说，https能够保护用户体验，减少劫持/隐私泄露对用户的伤害。</p>
-
-<p>2015年，百度开放收录https站点公告。继启用https加密之后，百度搜索再次重磅推出：全面支持https页面直接收录；另外从相关性的角度，百度搜索引擎认为权值相同的站点，采用https协议的页面更加安全，排名上会优先对待。</p>
-
-<h2>为什么说HTTP不安全</h2>
-
-<p>HTTP报文是由一行一行的简单字符串组成的。HTTP报文都是纯文本，不是二进制代码，所以人可以很方便地对其进行读写。</p>
-
-<p>下图显示了一个简单事务所使用的报文：</p>
-
-<p><img src="/images/http-message.png" title="简单文本结构组成的 HTTP 报文" alt="Alt text" /></p>
-
-<p>HTTP传输的内容是明文的，你上网浏览过、提交过的内容，所有在后台工作的人，比如路由器的所有者、网线途径路线的不明意图者、省市运营商、运营商骨干网、跨运营商网关等都能够查看。如果你访问的是国外网站，那么还得加上国际宽带出口、国外运营商等。这串名单可以不断延伸，一直到你对互联网由崇拜转为恐惧。举个例子：</p>
-
-<p><strong>一个简单非https的登录采用POST方法提交包含用户名和密码的表单，会发生什么？</strong></p>
-
-<p><img src="/images/login-example.png" title="简单文本结构组成的 HTTP 报文" alt="Alt text" /></p>
-
-<p>POST表单发出去的信息，<strong>没有做任何的安全性信息置乱（加密编码）</strong>，直接编码为下一层协议(TCP层)需要的内容，所有用户名和密码信息一览无余，任何只要拦截到报文信息的人都可以获取到你的用户名和密码，是不是想一想都觉得恐怖？</p>
-
-<p>互联网巨头Google曾表示，希望互联网HTTPS化、乃至于提出“HTTP = 不安全”口号的原因，过去数年里，我们一直生活在明文时代，上网的所有痕迹都暴露在巨型机构眼中。</p>
-
-<h2>那么，问题来了，怎么样的才是安全的呢？安全的技术需求有哪些才能算安全？</h2>
-
-<p>从信息安全的角度说，网络信息安全与保密的技术特征主要表现在系统的保密性、完整性、真实性、可靠性、可用性、不可抵赖性等。</p>
-
-<p>简单解释其中几条重要的特性:</p>
-
-<p><strong>保密性</strong> 是网络信息不被泄露给非授权的用户、实体或过程，或供其利用的特性。也就是你的用户名和密码不能被除了你和登录系统之外的第三方获取（你告诉别人不算）。 <br/>
-<strong>完整性</strong> 就是网络信息在存储或传输过程中保持不被偶然或蓄意地删除、修改、伪造、乱序、重放、插入等破坏和丢失的特性。 <br/>
-<strong>不可抵赖性</strong> 也称作不可否认性，在网络信息系统的信息交互过程中，确信参与者的真实同一性。即所有参与者都不能否认或抵赖曾经完成的操作和承诺。</p>
-
-<h2>对于包含用户敏感信息的网站需要怎样的安全？</h2>
-
-<p>我们从从实际角度出发，对于一个包含用户敏感信息的网站，我们期望实现HTTP安全技术能够满足至少以下需求：</p>
-
-<ul>
-<li>服务器认证（客户端知道它们是在与真正的而不是伪造的服务器通话）</li>
-<li>客户端认证（服务器知道它们是在与真正的而不是伪造的客户端通话）</li>
-<li>完整性（客户端和服务器的数据不会被修改）</li>
-<li>加密（客户端和服务器的对话是私密的，无需担心被窃听）</li>
-<li>效率（一个运行的足够快的算法，以便低端的客户端和服务器使用）</li>
-<li>普适性（基本上所有的客户端和服务器都支持这个协议）</li>
-<li>管理的可扩展性（在任何地方的任何人都可以立即进行安全通信）</li>
-<li>适应性（能够支持当前最知名的安全方法）</li>
-<li>在社会上的可行性（满足社会的政治文化需要）</li>
-</ul>
-
-
-<h2>HTTPS协议来解决安全性的问题：HTTPS和HTTP的不同 - TLS安全层（会话层）</h2>
-
-<p>超文本传输安全协议（英语：Hypertext Transfer Protocol Secure，HTTPS，也被称为HTTP over TLS，HTTP over SSL或HTTP Secure）是一种网络安全传输协议。</p>
-
-<p>HTTPS开发的主要目的，是提供对网络服务器的认证，保证交换信息的机密性和完整性。该协议由网景公司首创，所有主要的浏览器和服务器都支持此协议。</p>
-
-<p>在计算机网络上，HTTPS经由超文本传输协议进行通信，但利用SSL/TLS來对包进行加密，即所有的HTTP请求和响应数据在发送到网络上之前，都要进行加密。如下图：</p>
-
-<p><img src="/images/https-layer.png" title="HTTPS数据层结构" alt="Alt text" /></p>
-
-<p>很明显，安全操作，即数据编码（加密）和解码（解密）的工作是由SSL一层来完成，而其他的部分和HTTP协议没有太多的不同。下面这张图，更详细的展示了TLS层的里面的结构。</p>
-
-<p><img src="/images/TLS.png" title="TLS层" alt="Alt text" /></p>
-
-<p>SSL层是实现HTTPS的安全性的基石，它是如何做到的呢？我们需要了解SSL层背后基本原理和概念，由于涉及到信息安全和密码学的概念，我尽量用简单的语言和示意图来描述。</p>
-
-<h2>SSL层背后基本原理和概念</h2>
-
-<p>这也是本文的重点，介绍HTTPS（SSL层）背后的基本原理和概念，涉及到的概念：密码学基础知识-加密算法，数字证书，CA中心等。</p>
-
-<p><strong>加密算法</strong></p>
-
-<p>加密算法严格来说术语编码学（密码编码学），编码是信息从一种形式或格式转换为另一种形式的过程。解码，是编码的逆过程（对应密码学中的解密）。</p>
-
-<p><img src="/images/jiami.gif" title="加密算法" alt="Alt text" /></p>
-
-<p><strong>对称加密算法</strong></p>
-
-<p><img src="/images/symmetric-encryption-algorithms.gif" title="对称加密算法" alt="Alt text" /></p>
-
-<p>对称加密算法是应用较早的加密算法，技术成熟。在对称加密算法中，数据发信方将明文（原始数据）和加密密钥一起经过特殊加密算法处理后，使其变成复杂的加密密文发送出去。收信方收到密文后，若想解读原文，则需要使用加密用过的密钥及相同算法的逆算法对密文进行解密，才能使其恢复成可读明文。在对称加密算法中，使用的密钥只有一个，发收信双方都使用这个密钥对数据进行加密和解密，这就要求解密方事先必须知道加密密钥。</p>
-
-<p>目前，比较常用的对称加密算法：DES（不安全），3DES（相对安全），AES（高级对称加密算法，相对安全）。</p>
-
-<p>一旦通信人数增加，秘钥难以管理</p>
-
-<p><img src="/images/key-management.gif" title="秘钥管理难题" alt="Alt text" /></p>
-
-<p><strong>非对称加密算法（加密和签名）（又一堆概念和解释）</strong></p>
-
-<p>非对称加密算法需要两个密钥：公开密钥（public key）和私有密钥（private key）。公开密钥与私有密钥是一对，如果用公开密钥对数据进行加密，只有用对应的私有密钥才能解密；如果用私有密钥对数据进行加密，那么只有用对应的公开密钥才能解密。因为加密和解密使用的是两个不同的密钥，所以这种算法叫作非对称加密算法。 非对称加密算法实现机密信息交换的基本过程是：甲方生成一对密钥并将其中的一把作为公用密钥向其它方公开；得到该公用密钥的乙方使用该密钥对机密信息进行加密后再发送给甲方；甲方再用自己保存的另一把专用密钥对加密后的信息进行解密。</p>
-
-<p>另一方面，甲方可以使用乙方的私钥对机密信息进行签名后再发送给乙方；乙方再用自己的公钥对数据进行验签。</p>
-
-<p><img src="/images/feiduichen.gif" title="非对称加密算法" alt="Alt text" /></p>
-
-<p>而这个使用私钥对信息进行加密，用公钥进行解密的过程，称作数字签名。</p>
-
-<p>PS：签名过程中一般不会直接对原文（明文）信息进行签名，而是先将原文进行Hash运算，得到摘要（Digest），然后在对摘要进行签名，然后将签名信息附属到对原文加密后得到的密文信息中一起发送给对方。这样可以保证机密性（原文加密），不可否认性（签名）和完整性（Hash验证）。</p>
-
-<p>目前，常用的非对称加密算法：RSA（1024/2048位，目前比较流行的），ECC（椭圆曲线加密算法，更前沿的算法，相对RSA，需要的秘钥更短）。</p>
-
-<p><strong>HASH散列函数</strong></p>
-
-<p>散列函数（或散列算法，又称哈希函数，英语：Hash Function）是一种从任何一种数据中创建小的数字“指纹”的方法。散列函数把消息或数据压缩成摘要，使得数据量变小，将数据的格式固定下来。该函数将数据打乱混合，重新创建一个叫做散列值（hash values，hash codes，hash sums，或hashes）的指纹。</p>
-
-<p>所有散列函数都有如下一个基本特性：如果两个散列值是不相同的（根据同一函数），那么这两个散列值的原始输入也是不相同的。这个特性是散列函数具有确定性的结果，具有这种性质的散列函数称为单向散列函数。但另一方面，散列函数的输入和输出不是唯一对应关系的，如果两个散列值相同，两个输入值很可能是相同的，但也可能不同，这种情况称为“哈希碰撞”，这通常是两个不同长度的输入值，刻意计算出相同的输出值。</p>
-
-<p><strong>那么，有一个很重要的问题：加密算法是如何保证数据传输的安全？</strong></p>
-
-<p>利用数学计算的困难性</p>
-
-<p>RSA算法基于一个十分简单的数论事实（这是秘钥部分，算法部分是模运算）：将两个大素数/质数相乘十分容易，但是想要对其乘积进行因式分解却极其困难，因此可以将乘积公开作为加密密钥。 <br/>
-椭圆加密算法（ECC）是一种公钥加密体制，最初由Koblitz和Miller两人于1985年提出，其数学基础是利用椭圆曲线上的有理点构成Abel加法群上椭圆离散对数的计算困难性。</p>
-
-<p>加密算法是公开的，关键在于秘钥</p>
-
-<p>针对加密算法的破解，是在没有密钥的情况下，把明文给还原出来。不过更细的还分为只知道密文的唯密文攻击，知道若干明文密文对的已知明文攻击，能够构造确定明文让对方加密并得到对应密文的选择明文攻击等。</p>
-
-<p>密码学中有柯克霍夫斯基原则，即加密算法的安全性依赖的是密钥的保密而不是算法的保密。</p>
-
-<p>因为，保证秘钥的定期更换是非常重要的。</p>
-
-<p><strong>数字证书，用来实现身份认证和秘钥交换（继续一堆概念和解释）</strong></p>
-
-<p>数字证书是一个经证书授权中心数字签名的包含公开密钥拥有者信息以及公开密钥的文件。最简单的证书包含一个公开密钥、名称以及证书授权中心的数字签名。</p>
-
-<p>数字证书是一种权威性的电子文档，可以由权威公正的第三方机构，即CA（例如中国各地方的CA公司）中心签发的证书，也可以由企业级CA系统进行签发。
-它以数字证书为核心的加密技术(加密传输、数字签名、数字信封等安全技术)可以对网络上传输的信息进行加密和解密、数字签名和签名验证，确保网上传递信息的机密性、完整性及交易的不可抵赖性。使用了数字证书，即使您发送的信息在网上被他人截获，甚至您丢失了个人的账户、密码等信息，仍可以保证您的账户、资金安全。</p>
-
-<p>以X.509证书为例，可以看一下它的关键信息的结构</p>
-
-<table>
-<thead>
-<tr>
-<th> 英文 </th>
-<th> 解释 </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td> Version </td>
-<td> 版本 </td>
-</tr>
-<tr>
-<td> Algorithm ID </td>
-<td> 算法标识 </td>
-</tr>
-<tr>
-<td> Issuer </td>
-<td> 颁发者 </td>
-</tr>
-<tr>
-<td> Validity </td>
-<td> 有效期 </td>
-</tr>
-<tr>
-<td> Subject</td>
-<td> 使用者 </td>
-</tr>
-<tr>
-<td> Subject Public Key Info </td>
-<td> 使用者公钥信息 </td>
-</tr>
-<tr>
-<td> Public Key Algorithm </td>
-<td> 公钥算法 </td>
-</tr>
-<tr>
-<td> Subject Public Key </td>
-<td> 公钥 </td>
-</tr>
-<tr>
-<td> Issuer Unique Identifier (Optional) </td>
-<td> 颁发者唯一标识 </td>
-</tr>
-<tr>
-<td> Subject Unique Identifier (Optional) </td>
-<td> 使用者唯一标识 </td>
-</tr>
-<tr>
-<td> Certificate Signature Algorithm </td>
-<td> 证书签名算法 </td>
-</tr>
-<tr>
-<td> Certificate Signature </td>
-<td> 证书签名 </td>
-</tr>
-</tbody>
-</table>
-
-
-<p><strong>身份认证（我凭什么信任你）</strong></p>
-
-<p>身份认证是建立每一个TLS连接的不可或缺的部分。比如，你有可能和任何一方建立一个加密的通道，包括攻击者，除非我们可以确定通信的服务端是我们可以信任的，否则，所有的加密（保密）工作都没有任何作用。</p>
-
-<p>而身份认证的方式就是通过证书，证书是以数字方式签名的声明，它将公钥的值与持有相应私钥的主体(个人、设备和服务)的身份绑定在一起。通过在证书上签名，CA可以核实与证书上公钥相应的私钥为证书所指定的主体所拥有。</p>
-
-<p><img src="/images/certificate.png" title="certificate" alt="Alt text" /></p>
-
-<p><img src="/images/letsencrpt.png" title="letsencrpt" alt="Alt text" /></p>
-
-<p>以上这些概念会在下面的TLS层引用，如果没看懂，请回头再看看对应概念的含义。</p>
-
-<h2>了解TLS协议</h2>
-
-<p>如上面的那张所示，HTTPS的安全主要靠的是TLS协议层的操作。那么它到底做了什么，来建立一条安全的数据传输通道呢？</p>
-
-<p><strong>TLS握手：安全通道是如何建立的</strong></p>
-
-<p><img src="/images/TLS-handshake-protocol.png" title="TLS握手" alt="Alt text" /></p>
-
-<p>0 ms
-TLS运行在一个可靠的TCP协议上，意味着我们必须首先完成TCP协议的三次握手。</p>
-
-<p>56 ms
-在TCP连接建立完成之后，客户端会以明文的方式发送一系列说明，比如使用的TLS协议版本，客户端所支持的加密算法等。</p>
-
-<p>84 ms
-服务器端拿到TLS协议版本，根据客户端提供的加密算法列表选择一个合适的加密算法，然后将选择的算法连同服务器的证书一起发送到客户端。</p>
-
-<p>112 ms
-假设服务器和客户端协商后，得到一个共同的TLS版本和加密算法，客户端检测服务端的证书，非常满意，客户端就会要么使用RSA加密算法（公钥加密）或者DH秘钥交换协议，得到一个服务器和客户端公用的对称秘钥。</p>
-
-<p>由于历史和商业原因，基于RSA的秘钥交换占据了TLS协议的大片江山：客户端生成一个对称秘钥，使用服务器端证书的公钥加密，然后发送给服务器端，服务器端利用私钥解密得到对称秘钥。</p>
-
-<p>140 ms
-服务器处理由客户端发送的秘钥交换参数，通过验证MAC（Message Authentication Code，消息认证码）来验证消息的完整性，返回一个加密过的“Finished”消息给客户端。</p>
-
-<p>在密码学中，消息认证码（英语：Message authentication code，缩写为MAC），又译为消息鉴别码、文件消息认证码、讯息鉴别码、信息认证码，是经过特定算法后产生的一小段信息，检查某段消息的完整性，以及作身份验证。它可以用来检查在消息传递过程中，其内容是否被更改过，不管更改的原因是来自意外或是蓄意攻击。同时可以作为消息来源的身份验证，确认消息的来源。</p>
-
-<p>消息认证码的算法中，通常会使用使用带密钥的散列函数，或者块密码的带认证工作模式（如CBC）。</p>
-
-<p>168 ms
-客户端用协商得到的堆成秘钥解密“Finished”消息，验证MAC（消息完整性验证），如果一切ok，那么这个加密的通道就建立完成，可以开始数据传输了。</p>
-
-<p>在这之后的通信，采用对称秘钥对数据加密传输，从而保证数据的机密性。</p>
-
-<p>到此为止，我是想要介绍的基本原理的全部内容，但HTTPS得知识点不止如此，还有更多说，现在来点干货！！</p>
-
-<h2>那么，教练，我想用HTTPS</h2>
-
-<p><img src="/images/anxi.jpg" title="安西教练" alt="Alt text" /></p>
-
-<h3>有两点，选择合适的证书和了解服务器的配置方式</h3>
-
-<p><strong>Let’s Encrypt(It’s free, automated, and open.)是一种不错的选择</strong></p>
-
-<p><a href="https://letsencrypt.org/">https://letsencrypt.org/</a></p>
-
-<p>ThoughtWorks2016年4月份最新发布的技术雷达对Let’s Encrypt项目的介绍：</p>
-
-<p>从2015年，12月开始，Let’s Encrypt项目从封闭测试阶段转向公开测试阶段，也就是说用户不再需要收到邀请才能使用它了。Let’s Encrypt为那些寻求网站安全的用户提供了一种简单的方式获取和管理证书。Let’s Encrypt也促使安全和隐私前进了一大步，而这一趋势已经随着ThoughtWorks和我们许多使用其进行证书认证的项目开始了。</p>
-
-<p>Let’s Encrypt发布最新数据，至今该项目已经颁发了超过300万份证书——300万这个数字是在5月8日-9日之间达成的。Let’s Encrypt是为了让HTTP连接做得更加安全的一个项目，所以越多的网站能够加入进来，则整个互联网也会变得更加安全。</p>
-
-<p>关于如何配置服务器来使用证书，请参考我的另外一篇以NGINX为例的博客（全民安全站Let’s Encrypt配置NGINX）： <a href="http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt/">http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt/</a></p>
-
-<p>参考资料： <br/>
-1. HTTP权威指南  <br/>
-2. 《High Performance Browser Networking》Chapter 4. Transport Layer Security (TLS) <br/>
-3. <a href="https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html">https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html</a> <br/>
-4. <a href="http://zhanzhang.baidu.com/wiki/494">http://zhanzhang.baidu.com/wiki/494</a> <br/>
-5. 维基百科 HTTPS，消息认证码，HASH散列函数 <br/>
-6. 百度百科 对称加密，非对称加密，数字证书 <br/>
-7. <a href="https://www.zhihu.com/question/19979490">https://www.zhihu.com/question/19979490</a> <br/>
-8. <a href="http://www.leiphone.com/news/201412/AYbd3Tp7tbbSa0AD.html">http://www.leiphone.com/news/201412/AYbd3Tp7tbbSa0AD.html</a></p>
-
-<p>本文参考大量网络资料，如有发现文中参考资料遗漏，请联系本文作者，我会及时更新</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/6">&larr; Older</a>
@@ -517,7 +265,11 @@ TLS运行在一个可靠的TCP协议上，意味着我们必须首先完成TCP�
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止HTML/JS/CSS系列 - Retina屏幕下两倍图</a>
+        <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
       </li>
     
       <li class="post">
@@ -530,10 +282,6 @@ TLS运行在一个可靠的TCP协议上，意味着我们必须首先完成TCP�
     
       <li class="post">
         <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/10/27/living-style-guide/">Living Style Guide - 缩小设计和开发的沟通鸿沟</a>
       </li>
     
   </ul>
