@@ -101,11 +101,12 @@ IconFont的优点在于能够用CSS控制样式，无限缩放而不失真，支
 
 2.使用SVG
 
-关于转换成SVG，这里就要引荐一下Sara Soueidan在Generate London 2015 Conference上的演讲[《Sara Soueidan: SVG for Web Designers (and Developers)》][2f145803]（YouTube视频需要翻墙），如果不方便，Sara Soueidan有一篇博客[《Tips for Creating and Exporting Better SVGs for the Web》][13043805]更详细的讲解关于SVG导出的内容，当然，还有一篇国内的翻译文章[《创建和导出SVG的技巧》][8092bc6d]。
+关于转换成SVG，这里就要引荐一下Sara Soueidan在Generate London 2015 Conference上的演讲[《Sara Soueidan: SVG for Web Designers (and Developers)》][2f145803]（YouTube视频需要翻墙），如果不方便，Sara Soueidan有一篇博客[《Tips for Creating and Exporting Better SVGs for the Web》][13043805]更详细的讲解关于SVG导出的内容，当然，还有一篇国内的翻译文章[《创建和导出SVG的技巧》][8092bc6d]，最后在推荐一篇Adobe工程师michael chaize写的关于AI导出SVG的文章[《Export SVG for the web with Illustrator CC》][a6335300]。
 
   [2f145803]: https://www.youtube.com/watch?v=q4QI9iOeyPo "《Sara Soueidan: SVG for Web Designers (and Developers)》"
   [13043805]: https://sarasoueidan.com/blog/svg-tips-for-designers/ "《Tips for Creating and Exporting Better SVGs for the Web》"
   [8092bc6d]: http://www.w3cplus.com/svg/svg-tips-for-designers.html "《创建和导出SVG的技巧》"
+  [a6335300]: http://creativedroplets.com/export-svg-for-the-web-with-illustrator-cc/ "《Export SVG for the web with Illustrator CC》"
 
 不过，我觉得看视频更直观，顺便领略一下这位优秀的 **阿拉伯女性前端开发工程师（兼自由作家和演讲人）** 的风采。
 
@@ -124,11 +125,14 @@ IconFont的优点在于能够用CSS控制样式，无限缩放而不失真，支
 **（2）选择合适的导出选项**
 
 ![Alt text](/images/svg/export-options.png =400x "保存")     
-上面的图片中展示的选项是推荐的生成适合Web使用的SVG的。如果你不想使用Web字体，可以选择把文本转换成轮廓；AI在输出的时候提供了这样一个选项（Use <textPath> element for Text on Path）
+上面的图片中展示的选项是推荐的生成适合Web使用的SVG的。如果你不想使用Web字体，可以选择把文本转换成轮廓。
+
+![Alt text](/images/svg/output-fewer.png =400x "output-fewer")  
+如果SVG中包含大量的文字，这个选项output fewer tspan elements可以很大程度降低svg的大小。
 
 **（3）优化SVG**
 
-通常是建议在把SVG从图形编辑器中导出后，再用单独的优化工具来进行优化。比如：删除无用Comments和Metadata，简化代码，简化单个路径等。推荐的第三方工具：[svgomg][ca74c2fc]，AI插件[SVG-NOW][86db84bd]，Sketch插件[Svgo-compressor][bc537040]等，请参考Sara Soueidan的文章[《Useful SVGO[ptimization] Tools》][5046bb9d]。
+通常是建议在把SVG从图形编辑器中导出后，再用单独的优化工具来进行优化。比如：删除无用Comments和Metadata，简化代码，简化单个路径等。推荐的第三方工具：NodeJS工具[svgomg][ca74c2fc]，AI插件[SVG-NOW][86db84bd]，Sketch插件[Svgo-compressor][bc537040]等，请参考Sara Soueidan的文章[《Useful SVGO[ptimization] Tools》][5046bb9d]。
 
   [ca74c2fc]: https://jakearchibald.github.io/svgomg/ "svgomg"
   [86db84bd]: https://github.com/davidderaedt/SVG-NOW "SVG-NOW"
@@ -139,7 +143,22 @@ IconFont的优点在于能够用CSS控制样式，无限缩放而不失真，支
 
 3.IconFont
 
-前面提到IconFont一般是由SVG通过工具转换而来，而如果最终的结果是需要转换成IconFont，则对于导出的SVG有一些特殊要求。前面，我已经介绍了几款IconFont的转换工具，每一款工具都有详细的文档说明SVG的绘制的规则，尽管不尽相同，但有一些基本原则是一致的。
+前面提到IconFont一般是由SVG通过工具转换而来，而如果开发最终需要使用IconFont展示图标，则对于导出的SVG有一些特殊要求。我在本文的前面一小节，已经介绍了几款IconFont的转换工具，每一款工具其实都有详细的文档说明SVG绘制的规则，尽管不尽相同，但有一些基本原则是一致的：
 
-（1）在SVG中直接使用一个图片元素肯定是不行，因为这就不是矢量图了
-（2）文字转换为路径
+（1）将文字转换为路径    
+（2）不可以使用图片（字体只是路径）   
+（3）修剪画板（trimming to art boundaries）（前面已经介绍过）   
+（4）将描边转化为闭合图形   
+（5）简化无用的节点    
+等等
+
+更多关于IconFont的绘画规则，请参考：[Iconfont.cn文档][8d1e0301]，[Icomoon文档][de1f5b96]，[gulp-iconfont文档][ae177e48]，[fontello文档][c0bfea1f]。
+
+  [8d1e0301]: http://iconfont.cn/plus/help/detail?helptype=draw "Iconfont.cn文档"
+  [de1f5b96]: https://icomoon.io/#docs/importing "Icomoon文档"
+  [ae177e48]: https://github.com/nfroidure/gulp-iconfont#preparing-svgs "gulp-iconfont文档"
+  [c0bfea1f]: https://github.com/fontello/fontello/wiki/How-to-use-custom-images "fontello文档"
+
+####尽早的沟通
+
+无论是开发还是设计师，最重要的还是沟通，借用Sara Soueidan的一句“设计师和开发者应该成为好朋友”。
