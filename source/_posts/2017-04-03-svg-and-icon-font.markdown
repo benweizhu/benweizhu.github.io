@@ -122,6 +122,8 @@ IconFont的优点在于能够用CSS控制样式，无限缩放而不失真，支
 
 ![Alt text](/images/svg/fit-artboard.png =400x "fit artboard")  
 
+*对于没有AI工具的开发，可以在下面的SVGGO优化选项中选择“Prefer viewBox to width/height”。*
+
 **（2）选择合适的导出选项**
 
 ![Alt text](/images/svg/export-options.png =400x "保存")     
