@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2017-04-06T22:29:03+08:00</updated>
+  <updated>2017-04-09T10:55:07+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -134,6 +134,8 @@ Can I use svg?</p>
 <p>画板的尺寸就是导出的SVG的视窗的尺寸，所有画板上的空白都会最终变成视窗中的白色空白。</p>
 
 <p><img src="http://benweizhu.github.io/images/svg/fit-artboard.png" width="400" title="fit artboard" alt="Alt text" /></p>
+
+<p><em>对于没有AI工具的开发，可以在下面的SVGGO优化选项中选择“Prefer viewBox to width/height”。</em></p>
 
 <p><strong>（2）选择合适的导出选项</strong></p>
 
