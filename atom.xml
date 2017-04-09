@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2017-04-09T10:55:07+08:00</updated>
+  <updated>2017-04-09T10:58:44+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -135,7 +135,7 @@ Can I use svg?</p>
 
 <p><img src="http://benweizhu.github.io/images/svg/fit-artboard.png" width="400" title="fit artboard" alt="Alt text" /></p>
 
-<p><em>对于没有AI工具的开发，可以在下面的SVGGO优化选项中选择“Prefer viewBox to width/height”。</em></p>
+<p><em>对于没有AI工具的开发，可以在下面的SVGO优化选项中选择“Prefer viewBox to width/height”。</em></p>
 
 <p><strong>（2）选择合适的导出选项</strong></p>
 
