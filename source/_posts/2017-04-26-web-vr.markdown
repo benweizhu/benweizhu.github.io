@@ -29,16 +29,89 @@ VR（Virtual Reality）即虚拟现实，这个作为由美国VPL公司创始人
 
 WebVR更主要的是一种开放标准，目的是能够从浏览器给用户带来VR体验。 --webvr.info
 
-今天最主要的目的就是和大家一起快速的浏览一下这几个github上比较火的开源Web VR技术。
+今天最主要的目的就是和大家一起快速的浏览一下三个github上比较火的开源Web VR技术。
 
 ####Three.js
 
 github: https://github.com/mrdoob/three.js/
 
-光看这个名字，就能深深的感受它，和3d，和VR，和Web有着非比寻常的相关系。Three.js其实不是一个很新的东西，2010年的4月就已经发布了它的第一个版本R1（至今有7年了）。它是一个JavaScript 3D库，提供Canvas，SVG，CSS3D的渲染方式，但更多的是封装了底层的WebGL图形接口，以提供简化、高效的三维图形程序开发。
+光看这个名字，就能深深的感受它，和3d，和VR，和Web有着非比寻常的相关系。Three.js其实不是一个很新的东西，2010年的4月就已经发布了它的第一个开源版本R1（至今有7年了）。它是一个JavaScript 3D库，提供Canvas，SVG，CSS3D的渲染方式，但更多的是封装了底层的WebGL图形接口，以提供简化、高效的三维图形程序开发。
 
 [一个Three.js VR例子][d177a173]（可惜需要兼容性的浏览器，Android的Chrome，HTC Vive，Gear VR等）
 
   [d177a173]: https://threejs.org/examples/webvr_rollercoaster.html "一个Three.js VR例子"
 
 ####A-Frame
+
+github: https://github.com/aframevr/aframe/
+
+A-Frame相对Three.js要更新一些，第一个开源版本发布于2015年12月。它是由Mozilla旗下的VR研究团队MozVR推出的开源框架，A-Frame旨在帮助开发者更轻松的开发在浏览器中运行的高性能响应式的VR体验。
+
+和Three.js不同，A-Frame是纯粹的VR Web框架，而且它与现代Web开发的趋势结合更加紧密，使用Web开发者熟悉的HTML标签来创建WebVR场景，提供自定义的语义化标签，降低学习成本。你只需要仅仅几行代码就可以创建一个VR场景，如下：
+
+```html
+<html>
+  <head>
+    <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-box color="#6173F4" opacity="0.8" depth="2"></a-box>
+      <a-sphere radius="2" src="texture.png" position="1 1 0"></a-sphere>
+      <a-sky color="#ECECEC"></a-sky>
+    </a-scene>
+  </body>
+</html>
+```
+因为A-Frame基于DOM，他可以和现有其他现代Web框架结合。比如：[A-Frame-React][4e8c4462]。
+![](/images/vrweb/a-frame-works-with-everything.jpg)
+
+  [4e8c4462]: https://github.com/aframevr/aframe-react "A-Frame-React"
+
+[A-Blast][21c11875] - Mozilla基于A-Frame研发的VR游戏（请在Wifi环境下打开）。
+
+  [21c11875]: https://aframe.io/a-blast/ "A-Blast"
+
+**超强的场景Inspector工具 - A-Frame Inspector**     
+A-Frame提供一个场景查看工具A-Frame Inspector，可以让你改变场景，操作组件。
+![Inspector工具](/images/vrweb/a-frame-inspector.gif)
+
+####ReactVR
+
+Mozilla都建立了自己的专门的VR团队来专注于A-Frame的研发，你想其他的巨头们就不会蠢蠢欲动，Facebook就是其中一个。
+
+github: https://github.com/facebook/react-vr
+
+一个好消息是React于2017年04月19日正式推出ReactVR（即正式开源），即去年第一次在Twitter上公布React VR项目已过去10个月了。
+
+React的优势在于它已经在广大人民群众中打下坚实的基础，并且拥有了一群忠实的粉丝。从技术角度上谈，React VR使用了一个简化版的OVRUI库，其内部使用的是我们上面已经介绍的Three.js（即通过WebGL来渲染场景）。
+
+{% codeblock lang:javascript %}
+import React from 'react';
+import {AppRegistry, Pano, Text, View} from 'react-vr';
+
+class WelcomeToVR extends React.Component {
+  render() {
+    // Displays "hello" text on top of a loaded 360 panorama image.
+    // Text is 0.8 meters in size and is centered three meters in front of you.
+    return (
+      <View>
+        <Pano source={asset('chess-world.jpg')}/>
+        <Text
+          style={% raw %}{{
+            fontSize: 0.8,
+            layoutOrigin: [0.5, 0.5],
+            transform: [{translate: [0, 0, -3]}],
+          }}{% endraw %}>
+          hello
+        </Text>
+      </View>
+    );
+  }
+};
+
+AppRegistry.registerComponent('WelcomeToVR', () => WelcomeToVR);
+
+{% endcodeblock %}
+
+![](/images/vrweb/hellovr.jpg)
