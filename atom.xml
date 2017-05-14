@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2017-05-14T10:16:48+08:00</updated>
+  <updated>2017-05-14T10:48:58+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[React应用在产品环境代码下性能优化]]></title>
+    <title type="html"><![CDATA[React应用在产品环境下的性能优化]]></title>
     <link href="http://benweizhu.github.io/blog/2017/05/12/react-redux-production-optimisation/"/>
     <updated>2017-05-12T18:21:55+08:00</updated>
     <id>http://benweizhu.github.io/blog/2017/05/12/react-redux-production-optimisation</id>
