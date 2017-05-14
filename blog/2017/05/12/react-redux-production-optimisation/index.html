@@ -402,7 +402,7 @@
 
 <p>除了从产品环境模块架构上优化，Babel也在编译阶段优化React应用性能作出了巨大贡献。</p>
 
-<p>1.transform-react-constant-elements插件</p>
+<p><strong>1.transform-react-constant-elements插件</strong></p>
 
 <p><a href="https://babeljs.io/docs/plugins/transform-react-constant-elements/" title="transform-react-constant-elements">transform-react-constant-elements</a>，自从React0.14版本，我们可以将React元素以及他们的属性对象当做普通的值对象看待。这时候我们就可以重用那些输入是immutable的React元素。</p>
 
@@ -430,7 +430,7 @@
 
 <p>从而减少对React.createElement的调用。</p>
 
-<p>2.transform-react-inline-elements插件</p>
+<p><strong>2.transform-react-inline-elements插件</strong></p>
 
 <p><a href="https://babeljs.io/docs/plugins/transform-react-inline-elements/" title="transform-react-inline-elements">transform-react-inline-elements</a>，自从React0.14版本，可以将React元素内联为对象，Babel将React.createElement方法替换成babelHelpers.jsx来转换元素为对象。</p>
 
@@ -454,13 +454,15 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p><strong>3.其他开源Babel插件</strong></p>
+
 <p>除了以上两个官方插件，在开源世界还有许多其他Babel插件可以优化代码，而且非常实用，这里留给大家自己去探索： <a href="https://github.com/oliviertassinari/babel-plugin-transform-react-remove-prop-types" title="transform-react-remove-prop-types">transform-react-remove-prop-types</a>， <a href="https://github.com/thejameskyle/babel-react-optimize/tree/master/packages/babel-plugin-transform-react-pure-class-to-function" title="transform-react-pure-class-to-function">transform-react-pure-class-to-function</a>， <a href="https://github.com/thejameskyle/babel-react-optimize" title="babel-react-optimize">babel-react-optimize</a>（综合所有优化的插件，此处应该有掌声）</p>
 
 <h2>代码本身的优化</h2>
 
 <p>除了利用工具和构建，以及模块按需加载，来提高产品环境下的代码性能，最最基础的还是开发在平时写代码的需要注意的一些基础原则</p>
 
-<p>1.只导入需要的包</p>
+<p><strong>1.只导入需要的包</strong></p>
 
 <p>比如：lodash，如果你只用到isEqual，那么就不要把整个lodash都引入</p>
 
@@ -469,11 +471,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>2.使用ESLint</p>
+<p><strong>2.使用ESLint</strong></p>
 
 <p>合理的使用ESLint，除了帮助团队指导代码风格，也可以告诉你如何正确的写React应，比如，当组件是纯presentational组件时，就应该使用PureComponent或者纯函数组件，这些eslint都会告诉你。</p>
 
-<p>3.利用React官方的<a href="https://facebook.github.io/react/docs/perf.html" title="Perf工具">Perf工具</a></p>
+<p><strong>3.利用React官方的<a href="https://facebook.github.io/react/docs/perf.html" title="Perf工具">Perf工具</a></strong></p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -488,7 +490,7 @@
 
 <p>使用Gzip压缩倒不是React应用才有的性能优化策略，但还是要提一下，因为确实有用。</p>
 
-<p>1.Nginx服务器端配置</p>
+<p><strong>1.Nginx服务器端配置</strong></p>
 
 <p>我猜测大部分的情况下，都会用Nginx来部署静态资源，斗胆提供一个nginx的gzip配置。</p>
 
@@ -503,7 +505,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>2.手动压缩</p>
+<p><strong>2.手动压缩</strong></p>
 
 <p>另外一种方式，就是我们自己手动压缩Gzip，这样可以减少Nginx编码带来的性能消耗，Webpack插件
 <a href="https://github.com/webpack-contrib/compression-webpack-plugin" title="compression-webpack-plugin">compression-webpack-plugin</a>可以做到。</p>
