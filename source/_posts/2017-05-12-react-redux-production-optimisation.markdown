@@ -226,7 +226,7 @@ export default () => {
 
 除了从产品环境模块架构上优化，Babel也在编译阶段优化React应用性能作出了巨大贡献。
 
-1.transform-react-constant-elements插件
+**1.transform-react-constant-elements插件**
 
 [transform-react-constant-elements][175dea69]，自从React0.14版本，我们可以将React元素以及他们的属性对象当做普通的值对象看待。这时候我们就可以重用那些输入是immutable的React元素。
   [175dea69]: https://babeljs.io/docs/plugins/transform-react-constant-elements/ "transform-react-constant-elements"
@@ -244,7 +244,7 @@ const Hr = () => {
 ```
 从而减少对React.createElement的调用。
 
-2.transform-react-inline-elements插件
+**2.transform-react-inline-elements插件**
 
 [transform-react-inline-elements][bc37bd17]，自从React0.14版本，可以将React元素内联为对象，Babel将React.createElement方法替换成babelHelpers.jsx来转换元素为对象。
 ```javascript
@@ -261,6 +261,8 @@ output:
 
   [bc37bd17]: https://babeljs.io/docs/plugins/transform-react-inline-elements/ "transform-react-inline-elements"
 
+**3.其他开源Babel插件**
+
 除了以上两个官方插件，在开源世界还有许多其他Babel插件可以优化代码，而且非常实用，这里留给大家自己去探索： [transform-react-remove-prop-types][6e3b3780]， [transform-react-pure-class-to-function][0678e86b]， [babel-react-optimize][fa60633b]（综合所有优化的插件，此处应该有掌声）
 
   [6e3b3780]: https://github.com/oliviertassinari/babel-plugin-transform-react-remove-prop-types "transform-react-remove-prop-types"
@@ -271,18 +273,18 @@ output:
 
 除了利用工具和构建，以及模块按需加载，来提高产品环境下的代码性能，最最基础的还是开发在平时写代码的需要注意的一些基础原则
 
-1.只导入需要的包
+**1.只导入需要的包**
 
 比如：lodash，如果你只用到isEqual，那么就不要把整个lodash都引入
 ```
 import isEqual from 'lodash/isEqual';
 ```
 
-2.使用ESLint
+**2.使用ESLint**
 
 合理的使用ESLint，除了帮助团队指导代码风格，也可以告诉你如何正确的写React应，比如，当组件是纯presentational组件时，就应该使用PureComponent或者纯函数组件，这些eslint都会告诉你。
 
-3.利用React官方的[Perf工具][5fc674cc]
+**3.利用React官方的[Perf工具][5fc674cc]**
 
   [5fc674cc]: https://facebook.github.io/react/docs/perf.html "Perf工具"
 
@@ -296,7 +298,7 @@ Perf.stop()
 
 使用Gzip压缩倒不是React应用才有的性能优化策略，但还是要提一下，因为确实有用。
 
-1.Nginx服务器端配置
+**1.Nginx服务器端配置**
 
 我猜测大部分的情况下，都会用Nginx来部署静态资源，斗胆提供一个nginx的gzip配置。
 
@@ -307,7 +309,7 @@ gzip_proxied    no-cache no-store private expired auth;
 gzip_min_length 1000;
 ```
 
-2.手动压缩
+**2.手动压缩**
 
 另外一种方式，就是我们自己手动压缩Gzip，这样可以减少Nginx编码带来的性能消耗，Webpack插件
 [compression-webpack-plugin][797cb956]可以做到。
