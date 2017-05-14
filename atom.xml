@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2017-05-14T10:50:58+08:00</updated>
+  <updated>2017-05-14T10:58:21+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -445,7 +445,7 @@
 
 <p>有人会说，<strong>服务器端渲染如何？</strong> 这个要看情况。服务器端渲染一般主要用来处理首屏渲染性能（注意是首次加载）和搜索引擎爬虫问题。如果你的JS文件特别大，那么服务器端渲染能够，让用户在加载完HTML和CSS之后立刻看到页面。如果不是首次加载，那么其实JS是可以缓存在客户端的，所以即便不用服务器端渲染，之后也不会很慢。</p>
 
-<p>更多关于[是否应该进行服务器端渲染][928721eb]以及<a href="http://redux.js.org/docs/recipes/ServerRendering.html" title="如何进行服务器端渲染">如何进行服务器端渲染</a>？请查看相关文章。</p>
+<p>更多关于<a href="http://andrewhfarmer.com/server-side-render/" title="是否应该进行服务器端渲染">是否应该进行服务器端渲染</a>以及<a href="http://redux.js.org/docs/recipes/ServerRendering.html" title="如何进行服务器端渲染">如何进行服务器端渲染</a>？请查看相关文章。</p>
 
 <p><strong>2.ServiceWork</strong></p>
 
