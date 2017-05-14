@@ -159,6 +159,7 @@ const config = {
 官方提供了7种Devtool，而且有更详细的关于devtool的配置，请详见 [devtool][4d00ee4f]。
   [4d00ee4f]: https://webpack.js.org/configuration/devtool/ "devtool"
 
+
 **3.Node环境变量production**
 
 将redux的中间件和开发环境使用的devtool通过变量分离
@@ -253,12 +254,14 @@ const Hr = () => {
 babelHelpers.jsx(Baz, {
   foo: "bar"
 }, "1");
-```
+
+output:
 {type: Baz,props:{foo:"bar"},key:"1"}
+```
 
   [bc37bd17]: https://babeljs.io/docs/plugins/transform-react-inline-elements/ "transform-react-inline-elements"
 
-除了以上两个官方插件，在开源世界还有许多其他Babel插件可以优化代码，也不再此追溯，留给大家自己去看： [transform-react-remove-prop-types][6e3b3780]， [transform-react-pure-class-to-function][0678e86b]， [babel-react-optimize][fa60633b]（综合所有优化的插件，此处应该有掌声）
+除了以上两个官方插件，在开源世界还有许多其他Babel插件可以优化代码，而且非常实用，这里留给大家自己去探索： [transform-react-remove-prop-types][6e3b3780]， [transform-react-pure-class-to-function][0678e86b]， [babel-react-optimize][fa60633b]（综合所有优化的插件，此处应该有掌声）
 
   [6e3b3780]: https://github.com/oliviertassinari/babel-plugin-transform-react-remove-prop-types "transform-react-remove-prop-types"
   [0678e86b]: https://github.com/thejameskyle/babel-react-optimize/tree/master/packages/babel-plugin-transform-react-pure-class-to-function "transform-react-pure-class-to-function"
@@ -266,7 +269,7 @@ babelHelpers.jsx(Baz, {
 
 ## 代码本身的优化
 
-除了利用工具和构建来提高产品环境下的代码性能，最最基础的还是开发在平时写代码的需要注意的一些基础原则
+除了利用工具和构建，以及模块按需加载，来提高产品环境下的代码性能，最最基础的还是开发在平时写代码的需要注意的一些基础原则
 
 1.只导入需要的包
 
@@ -277,7 +280,7 @@ import isEqual from 'lodash/isEqual';
 
 2.使用ESLint
 
-合理的使用ESLint，除了帮助团队指导代码风格，也可以告诉你如何正确的写React应，比如，当组件是纯presentional组件时，就应该使用PureComponent或者纯函数组件，这些eslint都会告诉你。
+合理的使用ESLint，除了帮助团队指导代码风格，也可以告诉你如何正确的写React应，比如，当组件是纯presentational组件时，就应该使用PureComponent或者纯函数组件，这些eslint都会告诉你。
 
 3.利用React官方的[Perf工具][5fc674cc]
 
@@ -316,6 +319,8 @@ gzip_min_length 1000;
 **1.服务器端渲染如何**
 
 有人会说，**服务器端渲染如何？** 这个要看情况。服务器端渲染一般主要用来处理首屏渲染性能（注意是首次加载）和搜索引擎爬虫问题。如果你的JS文件特别大，那么服务器端渲染能够，让用户在加载完HTML和CSS之后立刻看到页面。如果不是首次加载，那么其实JS是可以缓存在客户端的，所以即便不用服务器端渲染，之后也不会很慢。
+
+相对的缺点是：配置起来比较麻烦，但如果是一劳永逸的事情，还是值得一做的。
 
 更多关于[是否应该进行服务器端渲染][0319f9fe]以及[如何进行服务器端渲染][1fa7be4c]？请查看相关文章。
 
@@ -360,3 +365,13 @@ github: [preload-webpack-plugin][881bf37b]
 文章内容有点长，但我相信这些都是干货是值得一读的，前端产品环境性能优化确实是一个说不完的话题，前端技术更新迭代也没有多少其他计算机技术能够匹敌的，这也对前端开发工程师（全栈开发工程师）的技术敏感度和追求新技术的态度有很高的要求。
 
 作者：Benwei，ThoughtWorks高级咨询师，全栈开发工程师，《实战Gradle》译者
+
+转载原文地址： http://benweizhu.github.io/blog/2017/05/12/react-redux-production-optimisation/
+
+参考文献：    
+1.https://hackernoon.com/optimising-your-application-bundle-size-with-webpack-e85b00bab579    
+2.https://brotzky.co/blog/code-splitting-react-router-webpack-2/    
+3.http://www.jianshu.com/p/f4054b2dcc6e    
+4.http://2ality.com/2015/12/webpack-tree-shaking.html    
+5.https://hackernoon.com/how-i-built-a-super-fast-uber-clone-for-mobile-web-863680d2100f    
+6.http://andrewhfarmer.com/server-side-render/
