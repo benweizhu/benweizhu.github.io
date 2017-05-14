@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://benweizhu.github.io/blog/2017/05/12/react-redux-production-optimisation/</loc>
+<lastmod>2017-05-12T18:21:55+08:00</lastmod>
+</url>
+<url>
+<loc>http://benweizhu.github.io/blog/2017/04/26/web-vr/</loc>
+<lastmod>2017-04-26T21:25:15+08:00</lastmod>
+</url>
+<url>
+<loc>http://benweizhu.github.io/blog/2017/04/26/web-debug/</loc>
+<lastmod>2017-04-26T21:18:54+08:00</lastmod>
+</url>
+<url>
+<loc>http://benweizhu.github.io/blog/2017/04/15/website-effecient/</loc>
+<lastmod>2017-04-15T18:58:04+08:00</lastmod>
+</url>
+<url>
 <loc>http://benweizhu.github.io/blog/2017/04/03/svg-and-icon-font/</loc>
 <lastmod>2017-04-03T09:47:12+08:00</lastmod>
 </url>

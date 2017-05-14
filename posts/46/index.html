@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="批处理应用（Batch Application）主要是在没有人工干预的情况下处理大量数据。比如，不同系统之间数据文件的导入和导出，数据的计算，定期生成财务报告等等。 Spring Batch是一个轻量级的，复杂的Batch框架，能够让你开发针对企业级系统日常操作的Batch应用。 Spring &hellip;">
+  <meta name="description" content="REST是Roy Fielding在他的2000年博士论文《Architectural Styles and the Design of Network-based Software Architectures》中提出的概念，全称是Representational State Transfer。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/03/08/spring-batch-job-by-example/">一起学学Spring Batch（一）</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/04/06/spring-restful-web-service-by-example/">Spring Restful Web Service by Example</a></h1>
     
     
       <p class="meta">
@@ -79,392 +79,44 @@
 
 
 
-<time class='entry-date' datetime='2014-03-08T17:52:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>5:52 pm</span></time>
+<time class='entry-date' datetime='2014-04-06T12:06:00+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>12:06 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>批处理应用（Batch Application）主要是在没有人工干预的情况下处理大量数据。比如，不同系统之间数据文件的导入和导出，数据的计算，定期生成财务报告等等。</p>
+  <div class="entry-content"><p>REST是<a href="http://en.wikipedia.org/wiki/Roy_Fielding">Roy Fielding</a>在他的2000年博士论文《Architectural Styles and the Design of Network-based Software Architectures》中提出的概念，全称是Representational State Transfer。</p>
 
-<p>Spring Batch是一个轻量级的，复杂的Batch框架，能够让你开发针对企业级系统日常操作的Batch应用。</p>
+<p>Roy Fielding是互联网一个极为重要的人物，他是HTTP协议（1.0版和1.1版）的主要设计者，Apache服务器软件的作者之一，Apache基金会的第一任主席。</p>
 
-<p><strong>Spring Batch提供的有用特性：</strong></p>
+<p>他在他的论文中提到一点：“网络研究主要关注系统之间通信行为的细节、如何改进特定通信机制的表现，常常忽视了一个事实，那就是<strong>改变应用程序的互动风格比改变互动协议，对整体表现有更大的影响</strong>。”。</p>
 
-<ol>
-<li>Spring框架中的基础，依赖注入，切面编程，企业级别的支持</li>
-<li>面向批处理的运行时，有效的驱动批处理应用的流程</li>
-<li>有效处理数据，以最佳策略读写数据</li>
-<li>可用的现成组件，提供能够定位到不同批处理场景的组件</li>
-</ol>
+<p>REST是个名字，加上ful之后，变成了形容词“具有REST风格的”。</p>
 
+<p>在看过一些资料之后，我觉的REST越来越火的主要原因之一，就是想在的互联网应用已经不仅仅是内容的资源，还包括计算资源。而资源的消费者也不仅仅是浏览器（人在消费），还有其他应用（应用程序在消费），所以资源的表现形式在变化。</p>
 
-<p>Spring框架以轻量级容器闻名，提供配置方式来完成应用程序组件的组装。</p>
+<h2><strong>Web Service</strong></h2>
 
-<p>Spring Batch对Spring框架进行了扩展，提供了专用的xml的命名空间来配置批处理的过程。</p>
+<p>Web Service是一种服务导向架构的技术，通过标准的Web协议提供服务，目的是保证不同平台的应用服务可以互操作。而它的技术通常是根据SOAP协议进行传递XML格式消息。而基于Java的主流WEB服务开发框架往往需要通过WSDL生成客户端的源代码。</p>
 
-<p><strong>有效处理数据</strong></p>
+<p>PS：这里没有任何想要对比基于SOAP和基于REST的Web Service的区别或者优缺点的意思。</p>
 
-<p>以一种经典场景为例：从一个数据系统读取数据存储到另一个数据系统中。如果一次将整个数据系统中的数据读入到内存，JVM随时可能Out of Memory。当然将所有数据读入到内存肯定不是最好的办法。</p>
+<h2><strong>Restful Web Service</strong></h2>
 
-<p>Spring Batch使用一种更加有效的办法，叫做Chunk Processing（块处理方式）：以数据流的方式读取输入的源数据，并处理一定数量（这一块）的记录，并写入到对应的组件。</p>
+<p>Restful Web Service又称为Restful Web API。Rest本身其实不是一种技术，而是一种风格，它基于HTTP协议，具有统一的URL资源，通过HTTP协议提供的方法来表示对数据的操作，资源的表现形式多样化，具体表现形式由资源的消费者决定等等。</p>
 
-<p>这个块的大小可以改变，所以仍然可以让批处理一条一条的处理数据。</p>
+<p>说了这么多，还是回到标题，如何实现？</p>
 
-<p><strong>Ready-to-use Component</strong></p>
+<p>如果你的项目采用Spring开发，那么Spring提供了一套基于Spring MVC的Restful方案，可以非常方便的通过Controller提供想要的Web Service，又可以通过RestTemplate实现客户端对Web Service操作。</p>
 
-<p>Spring Batch提供了基础设施来执行块处理，并代理I/O到专用的组件，并命名为reader和writer。</p>
+<p>PS：本例子是针对Spring 3.2以后，3.1版本有所不同。</p>
 
-<p>Spring为一些通用的批处理场景提供可用的组件，这些组件可以让你更加专注于业务逻辑。</p>
+<p>首先来实现一个基于Controller的Restful Web Service：</p>
 
-<p>Spring Batch对reader和writer场景的支持技术。</p>
+<p>首先是Domain，这个很简单一个Car类，包含名字和价格。</p>
 
-<table>
-<thead>
-<tr>
-<th>数据类型     </th>
-<th> 技术格式</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Database </td>
-<td> JDBC</td>
-</tr>
-<tr>
-<td>Database </td>
-<td> Hibernate</td>
-</tr>
-<tr>
-<td>Database </td>
-<td> JPA</td>
-</tr>
-<tr>
-<td>Database </td>
-<td> iBatis</td>
-</tr>
-<tr>
-<td>File </td>
-<td> Flatfile</td>
-</tr>
-<tr>
-<td>File </td>
-<td> XML</td>
-</tr>
-</tbody>
-</table>
-
-
-<p>当然Spring Batch支持的不止这些技术。当然如果没有你需要的实现，你也可以自己是实现对应的组件。</p>
-
-<p><strong>Spring Batch不是Scheduler</strong></p>
-
-<p>Spring Batch可以驱动批处理流程但是不会提供启动它们的支持，特别是基于时间的启动。Spring Batch一般会讲这些工作代理给其他Scheduler工具，例如Quartz或者Cron。</p>
-
-<p><strong>下面是一个Spring Batch Job的Hello World Example</strong></p>
-
-<figure class='code'><figcaption><span>build.gradle </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'> <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'> <span class="n">compile</span> <span class="s1">&#39;org.springframework.batch:spring-batch-core:2.2.5.RELEASE&#39;</span>
-</span><span class='line'> <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-context:3.2.8.RELEASE&#39;</span>
-</span><span class='line'> <span class="n">testCompile</span> <span class="nl">group:</span> <span class="s1">&#39;junit&#39;</span><span class="o">,</span> <span class="nl">name:</span> <span class="s1">&#39;junit&#39;</span><span class="o">,</span> <span class="nl">version:</span> <span class="s1">&#39;4.+&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在这里定义一个具体的task。</p>
-
-<figure class='code'><figcaption><span>tasklet.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">tasklet</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.StepContribution</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.scope.context.ChunkContext</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.step.tasklet.Tasklet</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.repeat.RepeatStatus</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">repeat</span><span class="o">.</span><span class="na">RepeatStatus</span><span class="o">.</span><span class="na">FINISHED</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloTasklet</span> <span class="kd">implements</span> <span class="n">Tasklet</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">RepeatStatus</span> <span class="nf">execute</span><span class="o">(</span><span class="n">StepContribution</span> <span class="n">contribution</span><span class="o">,</span> <span class="n">ChunkContext</span> <span class="n">chunkContext</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hello Spring Batch!&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">FINISHED</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>beans.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:batch=</span><span class="s">&quot;http://www.springframework.org/schema/batch&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;transactionManager&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.support.transaction.ResourcelessTransactionManager&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jobRepository&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;transactionManager&quot;</span> <span class="na">ref=</span><span class="s">&quot;transactionManager&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>   <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jobLauncher&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.core.launch.support.SimpleJobLauncher&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;jobRepository&quot;</span> <span class="na">ref=</span><span class="s">&quot;jobRepository&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>   <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在xml中配置一个具体batch job，这里只有一步，那就是执行上面定义的task。</p>
-
-<figure class='code'><figcaption><span>batch-job.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:batch=</span><span class="s">&quot;http://www.springframework.org/schema/batch&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;import</span> <span class="na">resource=</span><span class="s">&quot;spring-batch-beans.xml&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;helloTasklet&quot;</span> <span class="na">class=</span><span class="s">&quot;me.zeph.spring.batch.tasklet.HelloTasklet&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;batch:job</span> <span class="na">id=</span><span class="s">&quot;helloJob&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;batch:step</span> <span class="na">id=</span><span class="s">&quot;helloStep&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;batch:tasklet</span> <span class="na">ref=</span><span class="s">&quot;helloTasklet&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/batch:step&gt;</span>
-</span><span class='line'>   <span class="nt">&lt;/batch:job&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在main函数中，通过JobLauncher来运行一个Job。</p>
-
-<figure class='code'><figcaption><span>main.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">tasklet</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.Job</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.JobExecution</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.JobParameters</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.launch.JobLauncher</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.ApplicationContext</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.support.ClassPathXmlApplicationContext</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">TaskletRunner</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">String</span><span class="o">[]</span> <span class="n">configLocations</span> <span class="o">=</span> <span class="o">{</span><span class="s">&quot;spring-batch-beans.xml&quot;</span><span class="o">,</span> <span class="s">&quot;spring-batch-jobs.xml&quot;</span><span class="o">};</span>
-</span><span class='line'>      <span class="n">ApplicationContext</span> <span class="n">applicationContext</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ClassPathXmlApplicationContext</span><span class="o">(</span><span class="n">configLocations</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">JobLauncher</span> <span class="n">jobLauncher</span> <span class="o">=</span> <span class="n">applicationContext</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">JobLauncher</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">Job</span> <span class="n">job</span> <span class="o">=</span> <span class="n">applicationContext</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">Job</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">JobExecution</span> <span class="n">jobExecution</span> <span class="o">=</span> <span class="n">jobLauncher</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">job</span><span class="o">,</span> <span class="k">new</span> <span class="nf">JobParameters</span><span class="o">());</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;JOB EXECUTION STATUS:&quot;</span> <span class="o">+</span> <span class="n">jobExecution</span><span class="o">.</span><span class="na">getExitStatus</span><span class="o">().</span><span class="na">getExitCode</span><span class="o">());</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/02/23/spring-aop-by-example/">Spring AOP by Example</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-02-23T16:08:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2014</span></span> <span class='time'>4:08 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>OOP编程中以对象为核心，系统软件是由相互依赖、相互协作的对象组成。对象在程序中被抽象为类，它们拥有一组属性和行为。类与类之间可以通过继承和组合实现分层和协作，它可以将具有相同属性或者相同功能的代码抽象到一个分明的层次，从而有效的管理代码，降低复杂度。</p>
-
-<p>但随着业务复杂度的增加，客户不断提出新的需求。有些特定的需求虽然可以采用OOP解决，但却不是最好的方式，说的直观一点，并不是最节省代码编写工作量的。</p>
-
-<p>例如：假设你有一个图形类Graphic，它里面有很多的set方法。新的需求是在每一次set之后，就直接将结果绘画出来（假设你有一个方法Canvas.paint()）。普通的做法是在set方法的末尾，添加一行调用paint()方法的代码。如果该Graphic类中只有两三个set方法，那到没什么问题，但是如果它有100个呢？（有点极限）而且如果你添加了一个新的set方法，还要记住不能忘记添加paint()方法调用。</p>
-
-<p>AOP（aspect-oriented programming，面向方面/切面编程）能够很好的解决这个问题，你只需要告诉它，在每一个set方法之后，调用一次paint()方法。</p>
-
-<p>AOP能够很好地来处理一些具有横切性质的系统级服务，如事务管理、安全检查、日志服务等。</p>
-
-<p><strong>AOP中的一些概念</strong>：</p>
-
-<p>切面（Aspect）：一个关注点的模块化，该关注点会横切多个对象。在Spring AOP中有两种方式定义一个Aspect，通过在xml中配置，或者在Java类中使用@AspectJ的注解。</p>
-
-<p>连接点（Joint point）：在程序执行过程中某个特定的点，比如某个方法调用的时候或者异常处理的时候。在Spring AOP中，一个连接点通常表示一个方法的执行。</p>
-
-<p>通知（Advice）：在切面（Aspect）的某个特定的连接点（Joint point）上执行的动作。通知的类型有很多种，例如：“before”和“after”等等。</p>
-
-<p>切入点（Point cut）：匹配连接点（Joint point）的断言（匹配连接点的公式）。通知（Advice）会和一个切入点（Point cut）表达式关联，并在满足这个切入点（Point cut）的连接点（Joint point）上运行。切入点如何和连接点匹配是AOP的核心。</p>
-
-<p>在Spring AOP中的术语实在是太多了，往往其实不太让人好理解，也成为我们学习的绊脚石。</p>
-
-<p>这里尝试用简单的话总结：</p>
-
-<p><strong>通知就是要执行的动作，连接点就是程序中某个要插入动作（通知）的特定点，可能在该特定点之前插入（before），可能在它之后插入（after），或者在它抛出异常后插入（after throwing），切入点定义了如何找到该连接点的匹配模式，它们组合在一起，定义一个完整的切面。</strong></p>
-
-<p>这里主要关注的如何使用Spring AOP，关于实现的方式，这里简单的提一下：</p>
-
-<p>AOP实现的方式有三种：<strong>静态代理，JDK动态代理，CGLib动态里</strong>。Spring AOP采用的是动态代理方式实现AOP。</p>
-
-<p>如果深入了解可以参考：<a href="http://developer.51cto.com/art/201309/410861_all.htm">http://developer.51cto.com/art/201309/410861_all.htm</a></p>
-
-<p>通过Spring编写AOP代码方式有两种：<strong>1.通过@AspectJ的注解实现。2.通过在XML中配置</strong></p>
-
-<p>这里看一个通过XML配置方式实现AOP的例子：</p>
-
-<figure class='code'><figcaption><span>build.gradle </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'> <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'> <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-context:3.2.8.RELEASE&#39;</span>
-</span><span class='line'> <span class="n">compile</span> <span class="s1">&#39;org.aspectj:aspectjweaver:1.7.4&#39;</span>
-</span><span class='line'> <span class="n">testCompile</span> <span class="nl">group:</span> <span class="s1">&#39;junit&#39;</span><span class="o">,</span> <span class="nl">name:</span> <span class="s1">&#39;junit&#39;</span><span class="o">,</span> <span class="nl">version:</span> <span class="s1">&#39;4.+&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里需要添加aspectjweaver的依赖，否则会报class not found的异常。</p>
-
-<figure class='code'><figcaption><span>HelloTransaction.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -486,83 +138,36 @@
 <span class='line-number'>20</span>
 <span class='line-number'>21</span>
 <span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">aop</span><span class="o">.</span><span class="na">beans</span><span class="o">;</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">restful</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">model</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Car</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">int</span> <span class="n">price</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="nd">@Component</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloTransaction</span> <span class="o">{</span>
-</span><span class='line'>  
-</span><span class='line'>   <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">flag</span><span class="o">;</span>
-</span><span class='line'>  
-</span><span class='line'>   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setFlag</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">flag</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">flag</span> <span class="o">=</span> <span class="n">flag</span><span class="o">;</span>
-</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">startTransaction</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">process</span><span class="o">());</span>
-</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>   <span class="kd">private</span> <span class="n">String</span> <span class="nf">process</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">flag</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>          <span class="k">return</span> <span class="s">&quot;start transaction&quot;</span><span class="o">;</span>
-</span><span class='line'>      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-</span><span class='line'>          <span class="k">throw</span> <span class="k">new</span> <span class="nf">Exception</span><span class="o">(</span><span class="s">&quot;transaction exception&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPrice</span><span class="o">(</span><span class="kt">int</span> <span class="n">price</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">price</span> <span class="o">=</span> <span class="n">price</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
 </span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getPrice</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">price</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这里定义了“连接点类”，要被插入动作或者要被增强的类。</p>
+<p>然后是Controller，按照普通写RequestMapping一样方式，但这里返回的是Domain对象。
+这里有两个位置不同，一个是注解@ResponseBody用来说明返回的结果是HttpResponse的body部分。
+另一个参数produces用来说明，这里只接受Http请求中head里说明了Accept类型是Application/Json。</p>
 
-<figure class='code'><figcaption><span>TransactionLogger.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">aop</span><span class="o">.</span><span class="na">aspect</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">TransactionLogger</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">beforeTransaction</span><span class="o">(){</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;before transaction&quot;</span><span class="o">);</span>
-</span><span class='line'>   <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterTransaction</span><span class="o">(){</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;after transaction&quot;</span><span class="o">);</span>
-</span><span class='line'>   <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">transactionThrowException</span><span class="o">(){</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;transaction throw exception&quot;</span><span class="o">);</span>
-</span><span class='line'>   <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>“通知类”，定义了要在连接点执行的动作。</p>
-
-<figure class='code'><figcaption><span>bean.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -589,55 +194,558 @@
 <span class='line-number'>25</span>
 <span class='line-number'>26</span>
 <span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">restful</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.restful.demo.model.Car</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.ResponseBody</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">http</span><span class="o">.</span><span class="na">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON_VALUE</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Controller</span>
+</span><span class='line'><span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;car&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CarController</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VIEW_NAME</span> <span class="o">=</span> <span class="s">&quot;car&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getCarByView</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">VIEW_NAME</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">produces</span> <span class="o">=</span> <span class="o">{</span><span class="n">APPLICATION_JSON_VALUE</span><span class="o">})</span>
+</span><span class='line'>  <span class="nd">@ResponseBody</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">Car</span> <span class="nf">getCarByJSON</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nf">getCar</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Car</span> <span class="nf">getCar</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Car</span> <span class="n">car</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Car</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">car</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="s">&quot;BenZ&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">car</span><span class="o">.</span><span class="na">setPrice</span><span class="o">(</span><span class="mi">300000</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">car</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样基本就算完成了，可能有人会问，为什么上面的getCarByView方法没有写produces。其实，我也看到许多网上例子，将返回HTML格式View的方法添加了produces。比如，添加Text/Http等。</p>
+
+<p>为什么这里不加，原因是，我们知道，该方法是提供给浏览器请求，用于返回基于HTML的页面。而对于不同的浏览器而言，发出的HTTP请求的head的是不一样，以Chrome和IE为例。</p>
+
+<p>Chrome发出的head是：“text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8”</p>
+
+<p>IE发出的head是：“*/*”</p>
+
+<p>所以如果添加了produces，那么有可能返回结果不是HTML。我就遇到过，添加了Text/Http之后，在IE中返回给我的是JSON数据，而不是HTML页面。</p>
+
+<p>如果不写，那么就是默认的选择，在不满足其他RequestMapping，会去走默认那条Mapping路线。你可以在RestClient中验证，URL是localhost:8080/spring-restful-demo/car，但是head不同，那么它返回给你的view格式就不同了。</p>
+
+<p>其实，走到这一步，已经就完成了。</p>
+
+<h2><strong>但是如果你在页面上和RestClient上做一个实验，就会发现它远远不止如此！！！</strong></h2>
+
+<p>在浏览器上输入localhost:8080/spring-restful-demo/car.html，会返回给你html页面。</p>
+
+<p>在浏览器上输入localhost:8080/spring-restful-demo/car.json，会返回给你给你json数据。</p>
+
+<p>明明通过浏览器发送请求的Head是Text/Html，为什么会返回给我Json数据。如果通过debug的方式，你会看到确实进入的是getCarByJSON方法。</p>
+
+<p>在<strong>RestClient</strong>去试一把，输入地址，localhost:8080/spring-restful-demo/car.html，设置head为accept=Application/Json，返回给我的是HTMl页面。</p>
+
+<h2><strong>默认规约</strong></h2>
+
+<p>原来Spring在选择映射的时候，有一定的规约，加入了检查条件，URL后缀，URL参数。并且其默认的检查顺序是后缀，参数，最后才是Accept。</p>
+
+<p>也就是，如果你的URL是以HTML结尾，那么无论你的head是什么，Spring都会认为是返回HTML页面，因为你显示的指明了。</p>
+
+<p>对于那些希望显示指明返回类型的应用，Spring的默认规约已经帮助它们实现。</p>
+
+<p>但是如果，我不希望呢？</p>
+
+<p>无论你的后缀还是参数是什么，我都希望Spring根据我head中的accept值来决定。</p>
+
+<h2><strong>Content Negotiation（内容协商）</strong></h2>
+
+<p>这里就要引入另外一个东西：Spring MVC Content Negotiation（内容协商）。</p>
+
+<p>它是用来帮助你定义在返回多种表现形式时，应该遵守的规约，默认我们是不需要定义的，那么它就会像上面所提到的去做。但如果你不想要默认的规则，那么你就需要在Spring的Context中定义这个Bean。</p>
+
+<p>这里用我的demo中的例子，简单说明一下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
 </pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
 </span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
 </span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:aop=</span><span class="s">&quot;http://www.springframework.org/schema/aop&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/aop</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/aop/spring-aop-3.0.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>       <span class="na">xmlns:mvc=</span><span class="s">&quot;http://www.springframework.org/schema/mvc&quot;</span>
+</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
+</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/mvc</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/beans</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/context</span>
+</span><span class='line'><span class="s">                    http://www.springframework.org/schema/context/spring-context-3.2.xsd&quot;</span><span class="nt">&gt;</span>
 </span><span class='line'>
-</span><span class='line'>      <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;helloTransactionSuccess&quot;</span> <span class="na">class=</span><span class="s">&quot;me.zeph.aop.beans.HelloTransaction&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;flag&quot;</span> <span class="na">value=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;me.zeph.spring.restful.demo&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;mvc:annotation-driven</span> <span class="na">content-negotiation-manager=</span><span class="s">&quot;contentNegotiationManager&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;viewResolver&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;viewClass&quot;</span> <span class="na">value=</span><span class="s">&quot;org.springframework.web.servlet.view.JstlView&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;prefix&quot;</span> <span class="na">value=</span><span class="s">&quot;/WEB-INF/view/&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;suffix&quot;</span> <span class="na">value=</span><span class="s">&quot;.jsp&quot;</span><span class="nt">/&gt;</span>
 </span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
 </span><span class='line'>
-</span><span class='line'>      <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;transactionLogger&quot;</span> <span class="na">class=</span><span class="s">&quot;me.zeph.aop.aspect.TransactionLogger&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;contentNegotiationManager&quot;</span>
+</span><span class='line'>          <span class="na">class=</span><span class="s">&quot;org.springframework.web.accept.ContentNegotiationManagerFactoryBean&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;favorPathExtension&quot;</span> <span class="na">value=</span><span class="s">&quot;false&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;favorParameter&quot;</span> <span class="na">value=</span><span class="s">&quot;false&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;defaultContentType&quot;</span> <span class="na">value=</span><span class="s">&quot;text/html&quot;</span> <span class="nt">/&gt;</span>
 </span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
 </span><span class='line'>
-</span><span class='line'>      <span class="nt">&lt;aop:config&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;aop:aspect</span> <span class="na">id=</span><span class="s">&quot;transactionAspect&quot;</span> <span class="na">ref=</span><span class="s">&quot;transactionLogger&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;aop:pointcut</span> <span class="na">id=</span><span class="s">&quot;startTransaction&quot;</span> <span class="na">expression=</span><span class="s">&quot;execution(public * me.zeph.aop.beans.*.startTransaction(..))&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;aop:before</span> <span class="na">pointcut-ref=</span><span class="s">&quot;startTransaction&quot;</span> <span class="na">method=</span><span class="s">&quot;beforeTransaction&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;aop:after-throwing</span> <span class="na">pointcut-ref=</span><span class="s">&quot;startTransaction&quot;</span> <span class="na">method=</span><span class="s">&quot;transactionThrowException&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;aop:after</span> <span class="na">pointcut-ref=</span><span class="s">&quot;startTransaction&quot;</span> <span class="na">method=</span><span class="s">&quot;afterTransaction&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/aop:aspect&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/aop:config&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;restfulTemplate&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.web.client.RestTemplate&quot;</span><span class="nt">/&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="nt">&lt;/beans&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这里重点看定义切面的xml配置文件，首先定义了对应的两个Bean，然后在&lt;aop:config>标签定义中定义切面。在&lt;aop:config>标签下有三种标签：</p>
+<p>在Spring 3.2以后，实现内容协商的bean的名字叫做ContentNegotiationManager，需要通过他的工厂类ContentNegotiationManagerFactoryBean去定义规约。在这里，我修改了三个属性，favorPathExtension，favorParameter和defaultContentType，defaultContentType简单，就是默认的表现内容形式，favorPathExtension表示是否采用路径扩展作为最高优先级的判断，同理favorParameter表示是否采用参数作为第二优先级的判断。这里，我将它们两个都设置为false。即不采用它们作为判断条件。最后，在annotation-driven的标签里，添加属性contentNegotiationManager，说明使用@Controller注解的Controller都采用这种规约。</p>
 
-<p>&lt;aop:pointcut>：用来定义切入点（用来找到连接点的匹配的模式），该切入点可以重用；</p>
+<p>然后，我们再来是测试，在RestClient上，设置请求Url为localhost:8080/spring-restful-demo/car.html，但是呢，将head设为Accept=Applicaiton/Json。你猜结果怎样？乖乖的返回Json数据。</p>
 
-<p>&lt;aop:advisor>：用来定义只有一个通知和一个切入点的切面；</p>
+<p>关于Content Negotiation就说到这里，关于它功能还有很多，以后有机会在补充，那么Web Service就差不多说完了。</p>
 
-<p>&lt;aop:aspect>：用来定义切面，该切面可以包含多个切入点和通知，而且标签内部的通知和切入点定义是无序的；它和advisor的区别就在此，advisor只包含一个通知和一个切入点。</p>
+<h2><strong>RestTemplate实现客户端</strong></h2>
 
-<p>在&lt;aop:aspect>标签下有&lt;aop:pointcut>切入点标签，和一堆通知标签，例如before和after。</p>
+<p>在来看看怎么实现Client端的代码。如果不用Spring，可以通过Apache的HttpClient作为客户端，当然写的代码要多一点。</p>
 
-<p>&lt;aop:aspect>中的ref用于指定“通知类”，指定要添加的行为来自于哪个类。</p>
+<p>如果使用Spring，可以通过Spring提供的RestTemplate，目的应该和Spring的JDBCTemplate类似，帮你封装了具体操作。</p>
 
-<p>&lt;aop:pointcut>中的expression用于定义寻找连接点的匹配模式。</p>
+<p>用起来很简单，我写了另一个Controller来在页面显示调用该Web Service的结果。</p>
 
-<p>&lt;aop:before>等通知标签中的pointcut-ref用于指定要在哪个连接点插入（增强）通知（行为）。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">restful</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.restful.demo.common.URLs</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.spring.restful.demo.model.Car</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.ui.Model</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.client.RestTemplate</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Controller</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DisplayCarController</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VIEW_NAME</span> <span class="o">=</span> <span class="s">&quot;displayCarJson&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">RestTemplate</span> <span class="n">restTemplate</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Autowired</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">DisplayCarController</span><span class="o">(</span><span class="n">RestTemplate</span> <span class="n">restTemplate</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">restTemplate</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">VIEW_NAME</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getCar</span><span class="o">(</span><span class="n">Model</span> <span class="n">model</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">model</span><span class="o">.</span><span class="na">addAttribute</span><span class="o">(</span><span class="s">&quot;car&quot;</span><span class="o">,</span> <span class="n">getCarByJson</span><span class="o">());</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">VIEW_NAME</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Car</span> <span class="nf">getCarByJson</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">getForObject</span><span class="o">(</span><span class="n">URLs</span><span class="o">.</span><span class="na">REST_CAR_URL</span><span class="o">,</span> <span class="n">Car</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>通过AOP，我并不需要改变HelloTransaction.startTransaction()中的业务逻辑代码，就可以给它增加例如，日志，事务管理等功能。</p>
 
-<p>这就是AOP强大的位置。</p>
+<p></p>
+
+<p>如果你需要特定指定请求的Head。可以使用RestTemplate的exchange方法，不过使用起来要麻烦一些。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="n">Car</span> <span class="nf">getCarByJson</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">HttpHeaders</span> <span class="n">headers</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HttpHeaders</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">headers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;accept&quot;</span><span class="o">,</span> <span class="s">&quot;application/json&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">HttpEntity</span> <span class="n">httpEntity</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HttpEntity</span><span class="o">(</span><span class="s">&quot;&quot;</span><span class="o">,</span> <span class="n">headers</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">Car</span><span class="o">&gt;</span> <span class="n">exchange</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">exchange</span><span class="o">(</span><span class="n">URLs</span><span class="o">.</span><span class="na">REST_CAR_URL</span><span class="o">,</span> <span class="n">HttpMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">,</span> <span class="n">httpEntity</span><span class="o">,</span> <span class="n">Car</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">exchange</span><span class="o">.</span><span class="na">getBody</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>不过第二种方式更能说明是指定了具体head来请求哪种资源。</p>
+
+<p>这里使用Spring来发出请求，都是后端的，如果要用前端请求，固然是通过Ajax，不过那是另外一部分内容。</p>
+
+<p>总而言之，在使用Spring Web Service的这个过程当中还是遇到了不少的坑。</p>
+
+<p>首先，你需要知道有Content Negotiation这个东西，其次，不同的Spring版本，默认的规约不同。Spring 3.2和3.1就是一个分水岭，使用的时候要注意你使用的是哪个版本。</p>
+
+<p>参考资料：</p>
+
+<p><a href="https://spring.io/guides/gs/rest-service/">https://spring.io/guides/gs/rest-service/</a></p>
+
+<p><a href="https://spring.io/blog/2013/05/11/content-negotiation-using-spring-mvc">https://spring.io/blog/2013/05/11/content-negotiation-using-spring-mvc</a></p>
+
+<p><a href="http://spring.io/blog/2013/06/03/content-negotiation-using-views/">http://spring.io/blog/2013/06/03/content-negotiation-using-views/</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/29/something-you-need-to-know-about-javascript-2/">JavaScript中你需要了解的基本知识（二）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-29T22:44:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>10:44 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2><strong>表达式</strong></h2>
+
+<p>表达式是一组可以计算出一个数值的有效的代码的集合，是一个单纯的运算过程。</p>
+
+<h2><strong>函数立刻调用</strong></h2>
+
+<p>当你声明类似function foo(){}或var foo = function(){}函数的时候，通过在后面加个括弧就可以实现函数的执行，例如foo()。</p>
+
+<p>在一个表达式后面加上括号()，该表达式会立即执行，但是在一个语句后面加上括号()，是完全不一样的意思，他的只是分组操作符。</p>
+
+<p>我们只需要用大括弧将代码的代码全部括住就行了，因为JavaScript里括弧()里面不能包含语句，所以在这一点上，解析器在解析function关键字的时候，会将相应的代码解析成function表达式，而不是function声明。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">runImmediately</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">getValue</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">}());</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">runImmediately</span><span class="p">.</span><span class="nx">getValue</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>关于函数立即执行有两种写法，(function f(){}())和(function f(){})()，我个人认为第二种更容易理解，加入括号()，语句变成表达式，然后再加一个括号()，表达式执行。但是我看到大部分例子中都倾向于前一种写法，可能更容易说明他是一个整体。</p>
+
+<h2><strong>闭包</strong></h2>
+
+<p>我在这里给出多个解释，因为有时候，我感觉从一种解释中不一定能够获得完全理解。</p>
+
+<p>在计算机科学中，闭包（Closure）是词法闭包（Lexical Closure）的简称，是引用了自由变量的<strong>函数</strong>。这个被引用的自由变量将和这个函数一同存在，<strong>即使已经离开了创造它的环境也不例外</strong>。所以，有另一种说法认为闭包是由函数和与其相关的引用环境组合而成的实体。闭包在运行时可以有多个实例，不同的引用环境和相同的函数组合可以产生不同的实例。&mdash;&mdash;-维基百科</p>
+
+<p>闭包可以用来在一个函数与一组“私有”变量之间建立关联关系。在给定函数被多次调用的过程中，这些私有变量能够保持其持久性。变量的作用域仅限于包含它们的函数，因此无法从其它程序代码部分进行访问。&mdash;&mdash;-维基百科</p>
+
+<p>闭包是能够指向独立自由变量的函数。换句话说，定义在闭包中的函数能够“记住”定义它的环境。&mdash;&mdash;-mozilla社区</p>
+
+<p>闭包是一种特殊的对象。它由两部分构成：函数，以及创建该函数的环境。环境由闭包创建时在作用域中的任何局部变量组成。&mdash;&mdash;-mozilla社区</p>
+
+<p><strong>JavaScript的作用域是让JavaScript拥有闭包特性的根本。</strong></p>
+
+<p>看下面这段代码：</p>
+
+<p>闭包是一个函数和该函数所引用的自由变量组成。在下面的代码中isBigEnough函数和它所引用的自由变量threshold组成了一个闭包。该闭包传递给了list对象的filter函数。filter函数会反复调用这个函数。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">130</span><span class="p">,</span> <span class="mi">44</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">getNumberBigThan</span><span class="p">(</span><span class="nx">list</span><span class="p">,</span><span class="nx">threshold</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">list</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span> <span class="nx">isBigEnough</span><span class="p">(</span><span class="nx">element</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">element</span> <span class="o">&gt;=</span> <span class="nx">threshold</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">filteredList</span> <span class="o">=</span> <span class="nx">getNumberBigThan</span><span class="p">(</span><span class="nx">list</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">filteredList</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面那个例子还不够清楚，再看下面这个：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">f1</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span><span class="err">　　　　</span>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">f2</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">n</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">f2</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">f1</span><span class="p">(</span><span class="mi">999</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">());</span> <span class="c1">// 1000</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">result2</span> <span class="o">=</span> <span class="nx">f1</span><span class="p">(</span><span class="mi">499</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result2</span><span class="p">());</span> <span class="c1">// 500</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>闭包f2由f2函数和它引用的自由变量n组成。在f1运行之后，将f2返回给了result对象。此时运行result就是运行f2，得到结果是1000。说明，闭包f2保留了创建它的环境，变量n并没有在离开函数f1之后被销毁。而且根据创建的环境不同，闭包有不同的实例。
+最后看一个例子，来自：<a href="http://bonsaiden.github.io/JavaScript-Garden/zh/#function.closures">http://bonsaiden.github.io/JavaScript-Garden/zh/#function.closures</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Counter</span><span class="p">(</span><span class="nx">start</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">count</span> <span class="o">=</span> <span class="nx">start</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">increment</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">count</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">count</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="nx">Counter</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</span><span class='line'><span class="nx">foo</span><span class="p">.</span><span class="nx">increment</span><span class="p">();</span>
+</span><span class='line'><span class="nx">foo</span><span class="p">.</span><span class="nx">get</span><span class="p">();</span> <span class="c1">// 5</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里，Counter函数返回两个闭包，函数increment和函数get。这两个函数都维持着对外部作用域Counter的引用，因此总可以访问此作用域内定义的变量count。</p>
+
+<h2><strong>匿名函数立即执行</strong></h2>
+
+<p>我们知道定义函数有两种方式：直接定义和函数表达式（函数字面量）</p>
+
+<p>在定义函数字面量时，我们可以不写函数的名字，通过该在函数对象加上括号来执行该函数。</p>
+
+<p>我们可以在定义该函数字面量时，直接将函数表达式执行。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">funRun</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">c</span><span class="p">;</span>
+</span><span class='line'><span class="p">}());</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">funRun</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果不return任何东西，则funRun为undefined。</p>
+
+<p>通过匿名函数立即执行，可以实现匿名闭包。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">funRun</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'><span class="p">}());</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">funRun</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2><strong>模块化</strong></h2>
+
+<p>JavaScript最讨厌的特性就是它的全局性，随便创建一个方法或者变量，就是全局的，因为它没有像Java或者C++这种语言性上，类方式的模块划分，所以很容易冲突。</p>
+
+<p>那JavaScript为了实现模块化只有借助于实现模式：模块模式。</p>
+
+<p>利用JavaScript的作用域特性，以函数作为模块，利用闭包特性，定义不会污染全局的局部变量和方法（我这描述的有点抽象），直接看怎么写。</p>
+
+<p>通过匿名函数的立即执行返回两个闭包add和sub。这样定义出来的方法add和sub不会暴露到全局中，同时还可以访问在函数内部定义的“私有变量”。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">fact</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">(</span><span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">)</span> <span class="o">*</span> <span class="nx">fact</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">sub</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">(</span><span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">)</span> <span class="o">*</span> <span class="nx">fact</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">add</span><span class="o">:</span> <span class="nx">add</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">sub</span><span class="o">:</span> <span class="nx">sub</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">}());</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">module</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">module</span><span class="p">.</span><span class="nx">sub</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>关于模块化，还更多深入和高级的知识，例如导入全局变量（要用jQuery的时候）等。
+可以查看这边译文。<a href="http://www.oschina.net/translate/javascript-module-pattern-in-depth">http://www.oschina.net/translate/javascript-module-pattern-in-depth</a></p>
 </div>
   
   
@@ -672,23 +780,23 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境代码下性能优化</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
       </li>
     
   </ul>
@@ -719,23 +827,6 @@
     });
   </script>
   <script src="/javascripts/github.js" type="text/javascript"> </script>
-  <div>
-    <h1>Currently Working On</h1>
-    <div>
-      <span>relations-back-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
-    </div>
-    <br/>
-    <div>
-      <span>relations-front-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
-    </div>
-    <br/>
-    <div>
-      <span>gradle-plugin-database</span>
-      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
-    </div>
-  </div>
 </section>
 
 

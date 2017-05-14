@@ -9,7 +9,8 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="Activity是应用的一个组件，它提供用户可以交互的屏幕，例如拨打电话，照相，发邮件，看地图。每一个Activity都会被赋予一个窗户用来绘画用户界面。这个窗口通常会占据整个屏幕，但是也可以比屏幕小和悬浮在其他窗口之上。 一个应用程序通常由多个Activity组成， &hellip;">
+  <meta name="description" content="自从3.0之后，Cordova默认是关闭所有关于设备原生特性功能的，所以我们要通过添加插件来启动原生特性。 这里以Accelerometer（加速度感应器）为例，来学习如何使用设备原生特性。 1.添加插件 首先，需要在工程目录下，通过CLI命令添加插件。 1
+cordova plugin add &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +71,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/01/05/about-android-activity-lifecycle-translate/">About Android Activity LifeCycle(译)</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/01/19/cordova-using-accelerometer/">Cordova探索之旅系列（三）</a></h1>
     
     
       <p class="meta">
@@ -79,146 +80,49 @@
 
 
 
-<time class='entry-date' datetime='2014-01-05T23:22:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>11:22 pm</span></time>
+<time class='entry-date' datetime='2014-01-19T15:39:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>3:39 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="http://developer.android.com/images/activity_lifecycle.png" alt="Jasmine" /></p>
+  <div class="entry-content"><p>自从3.0之后，Cordova默认是关闭所有关于设备原生特性功能的，所以我们要通过添加插件来启动原生特性。</p>
 
-<p>Activity是应用的一个组件，它提供用户可以交互的屏幕，例如拨打电话，照相，发邮件，看地图。每一个Activity都会被赋予一个窗户用来绘画用户界面。这个窗口通常会占据整个屏幕，但是也可以比屏幕小和悬浮在其他窗口之上。</p>
+<p>这里以Accelerometer（加速度感应器）为例，来学习如何使用设备原生特性。</p>
 
-<p>一个应用程序通常由多个Activity组成，它们之间以一种较为松弛的关系联系在一起。例如，一个Activity作为主要的Activity，它会作为程序启动时第一个展现给用户的Activity。每一个Activity能够启动另外一个Activity，以便去执行其他的动作。每一次一个新的Activity启动，前一个Activity就会停止，但是系统会将它保存在一个栈中（“back stack”）。当一个新的Activity启动时，当前的Activity会被压入栈中，并拿走焦点。这个栈遵守“后进先出”原则，所以，当用户在当前Activity完成对应操作，按下返回按钮的时候，它会从栈顶弹出，并销毁，然后前一个Activity恢复。</p>
+<p><strong>1.添加插件</strong></p>
 
-<p>当一个Activity因为另一个新的Activity启动而停止时，系统会通过Activity生命周期中的回调函数通知它这个状态的变化。由于状态的改变，Activity会接受到多个回调函数，无论系统是在create，stop，resume还是destroy，并且每一次回调都提供你一个机会去执行适合这个状态变化的操作。例如，当stop时，你的Activity应该释放任何比较大的对象，例如网络和数据库连接。当Activity恢复时，你应该从新获取必要的资源和恢复之前被打断的操作。状态的转换是Activity生命周期的一部分。</p>
+<p>首先，需要在工程目录下，通过CLI命令添加插件。</p>
 
-<p>通过回调函数去管理Activity的生命周期是实现健壮和灵活应用的关键。Activity的生命周期直接受到其他Activity，Task以及back stack的影响。</p>
-
-<p>一个Activity可以存在于三个状态中：</p>
-
-<p><em>Resumed</em></p>
-
-<p>该状态下，Activity置于屏幕前景，并拥有聚焦，可以把这个状态理解为正在运行。</p>
-
-<p><em>Paused</em></p>
-
-<p>该状态下，另一个Activity正置于屏幕前景并拥有聚焦，但是当前Activity仍然可见。一个暂停的Activity是处于完全存活状态的（Activity对象仍然保有内存，它维持状态和成员信息，并保持与Window Manger的关系），但是如果内存不足时，系统有权利关闭该Activity。</p>
-
-<p><em>Stopped</em></p>
-
-<p>该状态下，该Activity完全被另一个Activity遮挡（该Activity就会进入到背景状态）。进入stopped状态的Activity也是仍然处于存活状态。然而，它对用户是不可见的，同样在系统需要内存的时候，它会被关闭。</p>
-
-<p>如果一个Activity进入paused或者stopped状态，系统可以通过调用finish方法或者终止进程的方式，将Activity从内存中清除。当该Activity从新打开，他必须要重新创建一次。</p>
-
-<p>Activity<strong>完整的生命周期</strong>发生于onCreate()方法和onDestroy()方法之间。Activity应该在onCreate()方法时，设置一些全局状态，例如布局，并且在onDestroy()方法释放所有保持的资源。例如，如果Activity拥有一个线程在后台运行并正在从网络上下载数据，该线程可能是在onCreate()方法中创建的，那么就应该在onDestroy()方法中停止该线程。</p>
-
-<p>Activity的<strong>可见生命周期</strong>发生于onStart()方法和onStop()方法之间。在这段时间，用户可以在屏幕上看见它，并进行交互。例如，onStop()方法被调用发生在当一个新的Activity启动，而当前Activity不在可见时。在这两个方法之间，你可以保有Activity所需要的资源。例如，你可以在onStart()方法调用时，注册一个BroadCartReceiver，让他监控你对UI的操作，并在用户不在看到这个Activity时，在onStop()方法中注销这个BroadCartReceiver。</p>
-
-<p>Activity<strong>前景生命周</strong>发生于onResume()方法和onPause()方法之间。在这段时间中，该Activity处于所有Activity的上方并且拥有用户输入焦点。Activity能够频繁的在前景中出镜和入镜。例如，当设备进入睡眠或者有一个对话框弹出时，在onPause()方法被调用时。因为，这个状态频繁的转变，在这两个方法中的代码要尽量的轻量级，以避免转换太慢，让用户等待。</p>
-
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th>Description</th>
-<th>Killable after?</th>
-<th>Next</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>onCreate()</td>
-<td>当Activity第一次被创建时调用。在这里，你应该做所有关于静态配置的事情-创建View，绑定数据到List等等。这个方法会传入一个Bundle对象，如果Activity中有捕获自身状态，那么它包含了Activity之前的状态。</td>
-<td>No</td>
-<td>onStart()</td>
-</tr>
-<tr>
-<td>onRestart()</td>
-<td> 在Activity停止之后被调用，指明Activity会被重新启动。</td>
-<td>No</td>
-<td>onStart()</td>
-</tr>
-<tr>
-<td>onStart()</td>
-<td>在Activity变成用户可见状态之前调用。如果Activity要变成前景状态，那么onResume()方法会被调用，如果Activity要被隐藏，则onStop()方法会被调用。</td>
-<td>No</td>
-<td>onResume() or onStop()</td>
-</tr>
-<tr>
-<td>onResume()</td>
-<td>在Activity开始与用户交互之前调用。这个时候，Activity会置于栈顶，并伴随着用户输入。</td>
-<td>No</td>
-<td>onPause()</td>
-</tr>
-<tr>
-<td>onPause()</td>
-<td>在系统开始要恢复另一个Activity时被调用。该方法通常被用于提交未保存数据到持久数据中，停止动画和其他会占用CPU资源的操作。并且应该非常迅速的做这些事情，因为下一个Activity只有在当前方法执行完成之后才会恢复。如果Activity回到前端，则onResume()方法跟在onPaused()方法后面，如果对用户不可见，则onStop()方法跟在后面。</td>
-<td>Yes</td>
-<td>onResume() or onStop()</td>
-</tr>
-<tr>
-<td>onStop()</td>
-<td>当Activity对用户不在可见时被调用。onStop()发生的原因是Activity被销毁，或者另一个Activity被恢复并正在覆盖当前Activity。如果紧跟随着的是onRestart()方法，则说明Activity正在恢复与用户的交互。如果跟着的是onDestory()方法，则说明这个Activity要被销毁了。</td>
-<td>Yes</td>
-<td>onRestart() or onDestroy()</td>
-</tr>
-<tr>
-<td>onDestroy()</td>
-<td>在Activity被销毁时调用。这是Activity最后一个会接收到的调用。被调用的原因要么是因为finish()方法在哪个位置调用，或者因为系统因为要保留资源而临时销毁它。可以通过isFinishing()方法来区分两种不同情况。</td>
-<td>Yes</td>
-<td>nothing</td>
-</tr>
-</tbody>
-</table>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin add org.apache.cordova.device-motion
+</span></code></pre></td></tr></table></div></figure>
 
 
-<p>文献参考自：<a href="http://developer.android.com/guide/components/activities.html">http://developer.android.com/guide/components/activities.html</a></p>
-</div>
-  
-  
+<p>通过ls命令，可以查看当前项目下，已经安装的插件。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin ls
+</span></code></pre></td></tr></table></div></figure>
 
 
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/12/21/web-mvc-by-example-with-spring-mvc/">Web MVC by Example</a></h1>
-    
-    
-      <p class="meta">
-        
+<p><strong>2.在config.xml文件中配置该特性</strong></p>
+
+<p>路径：res/xml/config.xml</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;feature</span> <span class="na">name=</span><span class="s">&quot;Accelerometer&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;android-package&quot;</span> <span class="na">value=</span><span class="s">&quot;org.apache.cordova.devicemotion.AccelListener&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/feature&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
+<p>完整配置如下：</p>
 
-
-<time class='entry-date' datetime='2013-12-21T17:03:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>5:03 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>早期的web应用主要是静态页面的浏览。静态页面使用HTML语言来编写，放在服务器上。用户使用浏览器通过HTTP协议请求服务器上的Web页面，服务器上的Web服务器软件接收到用户发送的请求后，读取请求URI所标识的资源，加上消息报头发送给客户端的浏览器；浏览器解析响应中的HTML数据，从而向用户呈现多姿多彩的HTML页面。</p>
-
-<h3><strong>CGI->Servlet->JSP->Model1->Model2</strong></h3>
-
-<p>早期使用的Web服务器扩展机制是CGI，它允许用户调用Web服务器上的CGI程序。CGI的全称是Common Gateway Interface，即公共网关接口。用户通过单击某个链接或者直接在浏览器的地址栏中输入URL来访问CGI程序，Web服务器接收到请求后，发现这个请求是给CGI程序的，于是就启动并运行这个CGI程序，对用户请求进行处理。CGI程序解析请求中的CGI数据，处理数据，并产生一个响应（通常是HTML页面）。这个响应被返回给Web服务器，Web服务器包装这个响应（例如添加消息报头），以HTTP响应的形式发送给Web浏览器。</p>
-
-<p>Java Servlet（<strong>Java服务器小程序Servlet=Server+Applet</strong>）是一个基于Java技术的Web组件，运行在服务器端，由Servlet容器所管理，用于生成动态的内容。Servlet是平台独立的Java类，编写一个Servlet，实际上就是按照Servlet规范编写一个Java类。</p>
-
-<p>Servlet不能独立运行，它必须被部署到Servlet容器（例如：Tomcat）中，由容器来实例化和调用Servlet的方法，Servlet容器在Servlet的生命周期内包容和管理Servlet。</p>
-
-<p>用户通过单击某个链接或者直接在浏览器的地址栏中输入URL来访问Servlet，Web服务器接收到该请求后，并不是将请求直接交给Servlet，而是交给Servlet容器。Servlet容器实例化Servlet，调用Servlet的一个特定方法对请求进行处理，并产生一个响应。这个响应由Servlet容器返回给Web服务器，Web服务器包装这个响应，以HTTP响应的形式发送给Web浏览器。</p>
-
-<p>下面是用servlet编写的get和post请求页面例子：</p>
-
-<figure class='code'><figcaption><span>web.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -234,33 +138,48 @@
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee&quot;</span>
-</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee</span>
-</span><span class='line'><span class="s">        http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot;</span>
-</span><span class='line'>         <span class="na">version=</span><span class="s">&quot;2.5&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;servlet&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;servlet-name&gt;</span>hello<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;servlet-class&gt;</span>me.zeph.springview.demo.HelloWorldServlet<span class="nt">&lt;/servlet-class&gt;</span>
-</span><span class='line'>   <span class="nt">&lt;/servlet&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;servlet-mapping&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;servlet-name&gt;</span>hello<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>       <span class="nt">&lt;url-pattern&gt;</span>/hello<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'>   <span class="nt">&lt;/servlet-mapping&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&#39;1.0&#39; encoding=&#39;utf-8&#39;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;widget</span> <span class="na">id=</span><span class="s">&quot;com.example.hello.HelloWorld&quot;</span> <span class="na">version=</span><span class="s">&quot;0.0.1&quot;</span>
+</span><span class='line'><span class="na">xmlns=</span><span class="s">&quot;http://www.w3.org/ns/widgets&quot;</span> <span class="na">xmlns:cdv=</span><span class="s">&quot;http://cordova.apache.org/ns/1.0&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;name&gt;</span>HelloCordova<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;description&gt;</span>
+</span><span class='line'>        A sample Apache Cordova application that responds to the deviceready event.
+</span><span class='line'>    <span class="nt">&lt;/description&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;author</span> <span class="na">email=</span><span class="s">&quot;dev@cordova.apache.org&quot;</span> <span class="na">href=</span><span class="s">&quot;http://cordova.io&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        Apache Cordova Team
+</span><span class='line'>    <span class="nt">&lt;/author&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;content</span> <span class="na">src=</span><span class="s">&quot;index.html&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;access</span> <span class="na">origin=</span><span class="s">&quot;*&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;feature</span> <span class="na">name=</span><span class="s">&quot;Accelerometer&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">&quot;android-package&quot;</span> <span class="na">value=</span><span class="s">&quot;org.apache.cordova.devicemotion.AccelListener&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/feature&gt;</span>
+</span><span class='line'><span class="nt">&lt;/widget&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>某些插件还需要在Android的AndroidManifest.xml中添加uses-permission</p>
+
+<p>例如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;uses-permission</span> <span class="na">android:name=</span><span class="s">&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;</span> <span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<figure class='code'><figcaption><span>servlet.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>当然，这里不需要！</p>
+
+<p><strong>3.API</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">navigator</span><span class="p">.</span><span class="nx">accelerometer</span><span class="p">.</span><span class="nx">getCurrentAcceleration</span><span class="p">(</span><span class="nx">onSuccess</span><span class="p">,</span> <span class="nx">onError</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>onSuccess和onError是对应的回调函数</p>
+
+<p><strong>4.完整例子</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -289,64 +208,51 @@
 <span class='line-number'>27</span>
 <span class='line-number'>28</span>
 <span class='line-number'>29</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">;</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Acceleration Example<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span> <span class="na">src=</span><span class="s">&quot;cordova.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.ServletException</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServlet</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletRequest</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletResponse</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.io.PrintWriter</span><span class="o">;</span>
+</span><span class='line'>    <span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;deviceready&quot;</span><span class="p">,</span> <span class="nx">onDeviceReady</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
 </span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldServlet</span> <span class="kd">extends</span> <span class="n">HttpServlet</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">resp</span><span class="o">.</span><span class="na">setContentType</span><span class="o">(</span><span class="s">&quot;text/html&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">PrintWriter</span> <span class="n">writer</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="na">getWriter</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;h1&gt;HelloWorld&lt;/h1&gt;&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;form action=&#39;hello&#39; method=&#39;post&#39;&gt;&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;input type=&#39;text&#39; name=&#39;value&#39;&gt;&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;input type=&#39;submit&#39; value=&#39;submit&#39;&gt;&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;&lt;form/&gt;&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">onDeviceReady</span><span class="p">()</span> <span class="p">{</span>
 </span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doPost</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">resp</span><span class="o">.</span><span class="na">setContentType</span><span class="o">(</span><span class="s">&quot;text/html&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">String</span> <span class="n">value</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;value&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">PrintWriter</span> <span class="n">writer</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="na">getWriter</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">writer</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="s">&quot;Hi, &quot;</span> <span class="o">+</span> <span class="n">value</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">getCurrrentAcceleration</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">navigator</span><span class="p">.</span><span class="nx">accelerometer</span><span class="p">.</span><span class="nx">getCurrentAcceleration</span><span class="p">(</span><span class="nx">onSuccess</span><span class="p">,</span> <span class="nx">onError</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">onSuccess</span><span class="p">(</span><span class="nx">acceleration</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Acceleration X: &#39;</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">x</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span>
+</span><span class='line'>              <span class="s1">&#39;Acceleration Y: &#39;</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">y</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span>
+</span><span class='line'>              <span class="s1">&#39;Acceleration Z: &#39;</span> <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">z</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span> <span class="o">+</span>
+</span><span class='line'>              <span class="s1">&#39;Timestamp: &#39;</span>      <span class="o">+</span> <span class="nx">acceleration</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">onError</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;onError!&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;button</span> <span class="na">onClick=</span><span class="s">&quot;getCurrrentAcceleration()&quot;</span><span class="nt">&gt;</span>click<span class="nt">&lt;/button&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这样的web开发流程都在实现一个servlet类的实例。也就是无论是业务逻辑还是前端显示，都是放在Servlet类中来完成，通过实现doGet和doPost的方法，来完成前端参数的获取和视图的渲染。</p>
+<p>如果用Android的原生API，用Java代码来实现相同功能呢，如下：</p>
 
-<p>但这样做的缺点是<strong>表现逻辑、控制逻辑和业务逻辑全部写在了Java类中，导致逻辑有些混乱</strong>。</p>
+<p>Activity</p>
 
-<p>之后，JSP技术出现，它由Sun和许多公司参与共同创建的一种使软件开发者可以响应客户端请求，而动态生成HTML、XML或其他格式文档的Web网页的技术标准。</p>
-
-<p>它以Java语言作为脚本语言的，使Java代码和特定的预定义动作可以嵌入到静态页面中。</p>
-
-<p>Sun这样做提供了非常好的前端显示，<strong>前端开发工程师也可以更好地改善页面体验</strong>，但实际上，它仍然没有解决前端显示和控制逻辑以及业务逻辑的混乱问题。</p>
-
-<p><strong>Servlet是将前端显示放在了Java类中，而JSP是将控制和业务逻辑放在了JSP中。</strong></p>
-
-<p>JSP+JavaBean是纯JSP的增强版被称为Model1。特点是使用&lt;jsp:useBean>标准动作，自动将请求参数封装为JavaBean组件。</p>
-
-<p>这样可以将部分业务逻辑封装到JavaBean中。</p>
-
-<p>Model1的架构中，JSP要负责控制逻辑、表现逻辑和业务对象（JavaBean）的调用，所以实际上仍然不理想。</p>
-
-<p><strong>Model2架构其实可以认为就是我们所说的Web MVC模型，只是控制器采用Servlet、模型采用JavaBean、视图采用JSP</strong>。</p>
-
-<p>下面是一个Model2的例子：</p>
-
-<p>web.xml配置和上面一样配置一个Servlet映射。但是Servlet只负责控制逻辑，不进行前端操作，而是直接将前端渲染分发给jsp页面进行。</p>
-
-<figure class='code'><figcaption><span>HelloWorldServlet.java</span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -387,114 +293,97 @@
 <span class='line-number'>39</span>
 <span class='line-number'>40</span>
 <span class='line-number'>41</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">;</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">android.app.Activity</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.Sensor</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.SensorEvent</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.SensorEventListener</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.hardware.SensorManager</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.view.View</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.shakeshake.R</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.shakeshake.fragment.FireMissilesDialogFragment</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.User</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">android</span><span class="o">.</span><span class="na">hardware</span><span class="o">.</span><span class="na">Sensor</span><span class="o">.</span><span class="na">TYPE_ACCELEROMETER</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">android</span><span class="o">.</span><span class="na">hardware</span><span class="o">.</span><span class="na">SensorManager</span><span class="o">.</span><span class="na">SENSOR_DELAY_NORMAL</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.ServletException</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServlet</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletRequest</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletResponse</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
 </span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorldServlet</span> <span class="kd">extends</span> <span class="n">HttpServlet</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">SensorManager</span> <span class="n">sensorManager</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Sensor</span> <span class="n">sensor</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">AccelerometerListener</span> <span class="n">listener</span><span class="o">;</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">text</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">GET_PATH</span> <span class="o">=</span> <span class="s">&quot;WEB-INF/view/hello-world.jsp&quot;</span><span class="o">;</span>
-</span><span class='line'>   <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">POST_PATH</span> <span class="o">=</span> <span class="s">&quot;WEB-INF/view/hello-world-confirm.jsp&quot;</span><span class="o">;</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">main</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">initSensor</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>   <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
-</span><span class='line'>     <span class="n">req</span><span class="o">.</span><span class="na">getRequestDispatcher</span><span class="o">(</span><span class="n">GET_PATH</span><span class="o">).</span><span class="na">forward</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="n">resp</span><span class="o">);</span>
-</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">initSensor</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">sensorManager</span> <span class="o">=</span> <span class="o">(</span><span class="n">SensorManager</span><span class="o">)</span> <span class="n">getSystemService</span><span class="o">(</span><span class="n">SENSOR_SERVICE</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">sensor</span> <span class="o">=</span> <span class="n">sensorManager</span><span class="o">.</span><span class="na">getDefaultSensor</span><span class="o">(</span><span class="n">TYPE_ACCELEROMETER</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">listener</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">AccelerometerListener</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">sensorManager</span><span class="o">.</span><span class="na">registerListener</span><span class="o">(</span><span class="n">listener</span><span class="o">,</span> <span class="n">sensor</span><span class="o">,</span> <span class="n">SENSOR_DELAY_NORMAL</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>   <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doPost</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
-</span><span class='line'>         <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">getUserFromRequest</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
-</span><span class='line'>     <span class="n">String</span> <span class="n">path</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>     <span class="k">if</span> <span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">validate</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">req</span><span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">&quot;user&quot;</span><span class="o">,</span> <span class="n">user</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">path</span> <span class="o">=</span> <span class="n">POST_PATH</span><span class="o">;</span>
-</span><span class='line'>     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">req</span><span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">&quot;error&quot;</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">path</span> <span class="o">=</span> <span class="n">GET_PATH</span><span class="o">;</span>
-</span><span class='line'>     <span class="o">}</span>
-</span><span class='line'>     <span class="n">req</span><span class="o">.</span><span class="na">getRequestDispatcher</span><span class="o">(</span><span class="n">path</span><span class="o">).</span><span class="na">forward</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="n">resp</span><span class="o">);</span>
-</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onStop</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">onStop</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">sensorManager</span><span class="o">.</span><span class="na">unregisterListener</span><span class="o">(</span><span class="n">listener</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>   <span class="kd">private</span> <span class="n">User</span> <span class="nf">getUserFromRequest</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>     <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">User</span><span class="o">();</span>
-</span><span class='line'>     <span class="n">user</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">req</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">));</span>
-</span><span class='line'>     <span class="n">user</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="n">req</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;password&quot;</span><span class="o">));</span>
-</span><span class='line'>     <span class="k">return</span> <span class="n">user</span><span class="o">;</span>
-</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">sendMessage</span><span class="o">(</span><span class="n">View</span> <span class="n">view</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">FireMissilesDialogFragment</span> <span class="n">fireMissilesDialogFragment</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">FireMissilesDialogFragment</span><span class="o">(</span><span class="n">text</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">fireMissilesDialogFragment</span><span class="o">.</span><span class="na">show</span><span class="o">(</span><span class="n">getFragmentManager</span><span class="o">(),</span> <span class="s">&quot;some tag&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">class</span> <span class="nc">AccelerometerListener</span> <span class="kd">implements</span> <span class="n">SensorEventListener</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nd">@Override</span>
+</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onSensorChanged</span><span class="o">(</span><span class="n">SensorEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">text</span> <span class="o">=</span> <span class="s">&quot;Acceleration X: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">values</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span> <span class="o">+</span>
+</span><span class='line'>                    <span class="s">&quot;Acceleration Y: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">values</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span> <span class="o">+</span>
+</span><span class='line'>                    <span class="s">&quot;Acceleration Z: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">values</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span> <span class="o">+</span>
+</span><span class='line'>                    <span class="s">&quot;Timestamp: \n&quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">timestamp</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span><span class="o">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nd">@Override</span>
+</span><span class='line'>        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAccuracyChanged</span><span class="o">(</span><span class="n">Sensor</span> <span class="n">sensor</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<figure class='code'><figcaption><span>hello-world.jsp</span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ taglib prefix=&quot;c&quot; uri=&quot;http://java.sun.com/jsp/jstl/core&quot; %&gt;
-</span><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>hello world<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;helloWorld&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;name&quot;</span><span class="nt">&gt;</span>name:<span class="nt">&lt;/label&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">id=</span><span class="s">&quot;name&quot;</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;password&quot;</span><span class="nt">&gt;</span>password:<span class="nt">&lt;/label&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="na">id=</span><span class="s">&quot;password&quot;</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;submit&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;c:if</span> <span class="na">test=</span><span class="s">&quot;${error}&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        login failed
-</span><span class='line'>    <span class="nt">&lt;/c:if&gt;</span>
-</span><span class='line'><span class="nt">&lt;/form&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>Dialog</p>
 
-
-<figure class='code'><figcaption><span>hello-world-confirm.jsp</span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>helloWorldConfirm<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'>hi,${user.name}
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>User.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -522,44 +411,196 @@
 <span class='line-number'>26</span>
 <span class='line-number'>27</span>
 <span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">domain</span><span class="o">;</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">android.app.AlertDialog</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.app.Dialog</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.app.DialogFragment</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.content.DialogInterface</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.shakeshake.R</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">NAME</span> <span class="o">=</span> <span class="s">&quot;zeph&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">PASSWORD</span> <span class="o">=</span> <span class="s">&quot;123456&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">password</span><span class="o">;</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FireMissilesDialogFragment</span> <span class="kd">extends</span> <span class="n">DialogFragment</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">text</span><span class="o">;</span>
 </span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">FireMissilesDialogFragment</span><span class="o">(</span><span class="n">String</span> <span class="n">text</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">Dialog</span> <span class="nf">onCreateDialog</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">AlertDialog</span><span class="o">.</span><span class="na">Builder</span> <span class="n">builder</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AlertDialog</span><span class="o">.</span><span class="na">Builder</span><span class="o">(</span><span class="n">getActivity</span><span class="o">());</span>
+</span><span class='line'>        <span class="n">builder</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">setTitle</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">dialog_accelerometer</span><span class="o">)</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">setMessage</span><span class="o">(</span><span class="n">text</span><span class="o">)</span>
+</span><span class='line'>                <span class="o">.</span><span class="na">setNeutralButton</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">ok</span><span class="o">,</span> <span class="k">new</span> <span class="n">DialogInterface</span><span class="o">.</span><span class="na">OnClickListener</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>                    <span class="nd">@Override</span>
+</span><span class='line'>                    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onClick</span><span class="o">(</span><span class="n">DialogInterface</span> <span class="n">dialogInterface</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
 </span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="n">String</span> <span class="nf">getPassword</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">password</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPassword</span><span class="o">(</span><span class="n">String</span> <span class="n">password</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">password</span> <span class="o">=</span> <span class="n">password</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">validate</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">NAME</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">name</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">PASSWORD</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">password</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>                    <span class="o">}</span>
+</span><span class='line'>                <span class="o">});</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">builder</span><span class="o">.</span><span class="na">create</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>总结，Model2模式已经很好的将控制逻辑，业务逻辑和显示逻辑分开，但其中也有些位置还可以进一步改进。</p>
+<p>main.xml</p>
 
-<p>例如：<strong>从参数到业务模型的转换（数据绑定），视图显示技术不容易更换（View解析）。</strong></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;LinearLayout</span> <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span>
+</span><span class='line'>              <span class="na">android:orientation=</span><span class="s">&quot;vertical&quot;</span>
+</span><span class='line'>              <span class="na">android:layout_width=</span><span class="s">&quot;fill_parent&quot;</span>
+</span><span class='line'>              <span class="na">android:layout_height=</span><span class="s">&quot;fill_parent&quot;</span>
+</span><span class='line'>        <span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;Button</span> <span class="na">android:layout_width=</span><span class="s">&quot;fill_parent&quot;</span>
+</span><span class='line'>            <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
+</span><span class='line'>            <span class="na">android:text=</span><span class="s">&quot;@string/click&quot;</span>
+</span><span class='line'>            <span class="na">android:onClick=</span><span class="s">&quot;sendMessage&quot;</span>
+</span><span class='line'>            <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/LinearLayout&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>不过，Web MVC框架替我们解决的了这些问题（流行的Web MVC框架有：Spring MVC，Struts）。</p>
 
-<p>关于Spring MVC框架的使用将留在下一篇介绍。</p>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/01/18/cordova-plugin/">Cordova探索之旅系列（二）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-01-18T15:28:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>3:28 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在Cordova中有一个很重要的概念：<strong>插件</strong>。</p>
+
+<p>插件会提供访问Cordova核心API的接口。</p>
+
+<p>插件是一些附加的代码，它能够提供访问原生组件的接口。一般情况下，你都需要添加一些插件以启动Cordova设备级别的特性。</p>
+
+<p>插件由官方和社区提供，可以在plugins.cordova.io上找到，当然还可以在命令行中去搜索插件。</p>
+
+<p>从3.0之后，Cordova将所有设备的API都作为插件，并默认设置为是不启动的。</p>
+
+<p>那么，如何添加插件呢？两种方式。</p>
+
+<p><strong>第一种是使用CLI命令行。</strong></p>
+
+<p><strong>第二种是使用更低级别的命令行Plugman。</strong></p>
+
+<p>两个的区别在于，Plugman只能一次添加一个平台的插件，而<strong>CLI命令行会添加所有平台的插件</strong>。所以如果你只在单个平台上工作，使用Plugman就显得更合理。</p>
+
+<h3>使用CLI命令行添加插件：</h3>
+
+<p><strong>1.添加插件</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin add org.apache.cordova.camera
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>2.删除插件</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin rm org.apache.cordova.camera
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>3.查看当前已有插件</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin ls
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>4.根据关键字搜索插件</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin search bar code
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>5.社区中会提供很多插件，但是如果它没有注册到registry.cordova.io，你可以通过仓库地址添加</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cordova plugin add https://github.com/apache/cordova-plugin-console.git
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>使用plugman添加插件：</h3>
+
+<p>首先你需要安装plugman</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>npm install -g plugman
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>1.添加一个插件</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>plugman --platform &lt;ios<span class="p">|</span>amazon-fireos<span class="p">|</span>android<span class="p">|</span>blackberry10<span class="p">|</span>wp7<span class="p">|</span>wp8&gt; --project &lt;directory&gt; --plugin &lt;name<span class="p">|</span>url<span class="p">|</span>path&gt; <span class="o">[</span>--plugins_dir &lt;directory&gt;<span class="o">]</span> <span class="o">[</span>--www &lt;directory&gt;<span class="o">]</span> <span class="o">[</span>--variable &lt;name&gt;<span class="o">=</span>&lt;value&gt; <span class="o">[</span>--variable &lt;name&gt;<span class="o">=</span>&lt;value&gt; ...<span class="o">]]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过plugman命令行将一个插件加到一个Cordova工程中。你至少要指定平台信息、Cordova项目位置。</p>
+
+<p><strong>name</strong>：插件的目录名称。它必须是存在于plugins_dirpath路径下或者在Cordova中有注册。</p>
+
+<p><strong>url</strong>：以&#8221;<a href="http://">http://</a>&ldquo;或者&#8221;git://&#8221;开头的url，指向一个合法的git可克隆仓库，仓库中应该包含一个plugin.xml的文件，仓库中的内容可以被拷贝到plugins_dir路径下。</p>
+
+<p><strong>path</strong>：一个指向包含合法插件（包含plugin.xml文件）目录的路径。该路径下的内容可以被拷贝到plugins_dir。
+其他参数：</p>
+
+<p><strong>plugin_dir</strong>：默认是指向<project>/cordova/plugins，当然也可以是任何包含每一个已获取插件的子目录。</p>
+
+<p><strong>www</strong>：默认指向项目的www目录，但是也可以指向Cordova项目的应用web asserts目录。</p>
+
+<p><strong>variable</strong>：允许在安装时指定某些变量，对于某些插件需要API key或者其他用户定义参数是有必要的。</p>
+
+<p>下面是添加电池状态插件的安装命令行</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>plugman -d --platform android --project myProject –plugin org.apache.cordova.battery-status
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>-d或者—debug参数，会帮助你打印出内部调试信息，帮助你跟踪具体信息。</p>
+
+<p><strong>2.删除一个插件</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>plugman --uninstall --platform &lt;ios<span class="p">|</span>amazon-fireos<span class="p">|</span>android<span class="p">|</span>blackberry10<span class="p">|</span>wp7<span class="p">|</span>wp8&gt; --project &lt;directory&gt; --plugin &lt;id&gt; <span class="o">[</span>--www &lt;directory&gt;<span class="o">]</span> <span class="o">[</span>--plugins_dir &lt;directory&gt;<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
 </div>
   
   
@@ -594,23 +635,23 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境代码下性能优化</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
       </li>
     
   </ul>
@@ -641,23 +682,6 @@
     });
   </script>
   <script src="/javascripts/github.js" type="text/javascript"> </script>
-  <div>
-    <h1>Currently Working On</h1>
-    <div>
-      <span>relations-back-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
-    </div>
-    <br/>
-    <div>
-      <span>relations-front-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
-    </div>
-    <br/>
-    <div>
-      <span>gradle-plugin-database</span>
-      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
-    </div>
-  </div>
 </section>
 
 

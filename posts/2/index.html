@@ -9,7 +9,8 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="基于上次的内容 《一步一步做React(一) - Hello React》，我们继续搭建一个React项目的工程实践 - CSS Modules。 CSS Modules概念 Github文档 - CSS Modules CSS Modules — Local Scope 局部作用域 CSS &hellip;">
+  <meta name="description" content="
+">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +71,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a></h1>
+      <h1 class="entry-title"><a href="/blog/2017/04/26/web-debug/">Web Debug</a></h1>
     
     
       <p class="meta">
@@ -79,213 +80,14 @@
 
 
 
-<time class='entry-date' datetime='2017-02-01T22:44:09+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2017</span></span> <span class='time'>10:44 pm</span></time>
+<time class='entry-date' datetime='2017-04-26T21:18:54+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>9:18 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>基于上次的内容 <a href="http://benweizhu.github.io/blog/2017/01/17/react-step-by-step-1/">《一步一步做React(一) - Hello React》</a>，我们继续搭建一个React项目的工程实践 - CSS Modules。</p>
-
-<h3>CSS Modules概念</h3>
-
-<p>Github文档 - <a href="https://github.com/css-modules/css-modules">CSS Modules</a></p>
-
-<p><strong>CSS Modules — Local Scope 局部作用域</strong></p>
-
-<p>CSS Modules里面最基础也是最重要的概念 - 局部作用域。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>.backdrop {}
-</span><span class='line'>.prompt {}
-</span><span class='line'>.pullquote {}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>定义在style.css中的样式都存在于一个组件内的局部作用域，不会污染全局的样式。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>import styles from "./style.css"
-</span><span class='line'>
-</span><span class='line'>const Component = props =&gt; {
-</span><span class='line'>  return (
-</span><span class='line'>    &lt;div className={styles.backdrop}&gt;
-</span><span class='line'>      &lt;div className={styles.prompt}&gt;
-</span><span class='line'>      &lt;/div&gt;
-</span><span class='line'>      &lt;div className={styles.pullquote}&gt;
-</span><span class='line'>      &lt;/div&gt;
-</span><span class='line'>   &lt;/div&gt;
-</span><span class='line'>  )
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>怎么解释？如何不会污染全局的样式？答案是唯一的命名。现在，我们先来看是怎么配置的。</p>
-
-<h3>用webpack处理样式</h3>
-
-<p><strong>style-loader | css-loader | sass-loader</strong></p>
-
-<p>给webpack.config.js中的module添加一个新的loaders配置，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>module: {
-</span><span class='line'>  loaders: [
-</span><span class='line'>    {
-</span><span class='line'>      test: /\.jsx?/,
-</span><span class='line'>      include: APP_DIR,
-</span><span class='line'>      loader: 'babel',
-</span><span class='line'>    },
-</span><span class='line'>    {
-</span><span class='line'>      test: /\.scss$/,
-</span><span class='line'>      loaders: ["style", "css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]", "sass"],
-</span><span class='line'>    },
-</span><span class='line'>  ],
-</span><span class='line'>},</span></code></pre></td></tr></table></div></figure>
-
-
-<p>webpack的loader是用来预处理由require()或者import加载文件，比如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>import styles from "./style.scss"</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在上面的webpack配置中，针对*.scss文件，配置了一个loader的管道，顺序是：</p>
-
-<p>sass-loader => css-loader => style-loader</p>
-
-<p>sass-loader顾名思义用来编译SCSS到CSS</p>
-
-<p>css-loader和style-loader用来将样式嵌入到Webpack打包后的JS文件中，从而实现样式的模块化管理。</p>
-
-<p>针对css-loader的配置，你会看到它的格式是如下的：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]</span></code></pre></td></tr></table></div></figure>
-
-
-<p>其实，这是webpack loader传递参数的一种方式（URL方式），css-loader的参数表请进入<a href="https://github.com/webpack-contrib/css-loader#options-1">传送门</a>。</p>
-
-<p>localIdentName是用于指定局部className的格式，比如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[name]__[local]___[hash:base64:5]
-</span><span class='line'>ComponentName__LocalName___HashCode
-</span><span class='line'>Component__pullquote___SDFe34IIE</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>如何抽离出独立的css文件？Extract Text Plugin</h3>
-
-<p>正如前面所强调的，style-loader和css-loader，将样式嵌入到Webpack打包后的JS文件。</p>
-
-<p>这当然不是最好的方式，我们需要将样式抽离到独立的css文件中，但就是<a href="https://github.com/webpack-contrib/extract-text-webpack-plugin">Extract Text Plugin</a>。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add extract-text-webpack-plugin --dev</span></code></pre></td></tr></table></div></figure>
-
-
-<p>完整的webpack.config.js文件如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>const path = require('path');
-</span><span class='line'>const ExtractTextPlugin = require('extract-text-webpack-plugin');
-</span><span class='line'>
-</span><span class='line'>const BUILD_DIR = path.resolve(__dirname, 'public');
-</span><span class='line'>const APP_DIR = path.resolve(__dirname, 'src');
-</span><span class='line'>
-</span><span class='line'>const extractCSS = new ExtractTextPlugin(`${BUILD_DIR}/styles.css`);
-</span><span class='line'>
-</span><span class='line'>const config = {
-</span><span class='line'>  entry: `${APP_DIR}/index.jsx`,
-</span><span class='line'>  output: {
-</span><span class='line'>    path: BUILD_DIR,
-</span><span class='line'>    filename: 'bundle.js',
-</span><span class='line'>  },
-</span><span class='line'>  module: {
-</span><span class='line'>    loaders: [
-</span><span class='line'>      {
-</span><span class='line'>        test: /\.jsx?/,
-</span><span class='line'>        include: APP_DIR,
-</span><span class='line'>        loader: 'babel',
-</span><span class='line'>      },
-</span><span class='line'>      {
-</span><span class='line'>        test: /\.scss$/,
-</span><span class='line'>        loader: extractCSS.extract(['css?minimize&modules&importLoaders=2&localIdentName=[name]__[local]', 'postcss', 'sass']),
-</span><span class='line'>      },
-</span><span class='line'>    ],
-</span><span class='line'>  },
-</span><span class='line'>  resolve: {
-</span><span class='line'>    extensions: ['', '.js', '.jsx'],
-</span><span class='line'>  },
-</span><span class='line'>  plugins: [
-</span><span class='line'>    extractCSS,
-</span><span class='line'>  ],
-</span><span class='line'>};
-</span><span class='line'>
-</span><span class='line'>module.exports = config;
-</span></code></pre></td></tr></table></div></figure>
-
+  <div class="entry-content">
 </div>
   
   
@@ -298,7 +100,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a></h1>
+      <h1 class="entry-title"><a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a></h1>
     
     
       <p class="meta">
@@ -307,216 +109,18 @@
 
 
 
-<time class='entry-date' datetime='2017-01-17T21:08:15+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>9:08 pm</span></time>
+<time class='entry-date' datetime='2017-04-15T18:58:04+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>6:58 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>什么都不说，先照着做</p>
+  <div class="entry-content"><p>只有10%~20%的最终用户响应时间花在了下载HTML文档上，其余的80%~90%时间花在了下载页面中的所有组件上。   - 性能黄金法则，Steve Souders</p>
 
-<h4>安装合适的node版本和包管理工具Yarn</h4>
+<p><img src="/images/performance/golden-top10.png" width="400" title="前十名网站" alt="Alt text" /></p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>node -version v6.9.4(用nvm)
-</span><span class='line'>
-</span><span class='line'>brew update（如果是mac的）
-</span><span class='line'>
-</span><span class='line'>brew install yarn</span></code></pre></td></tr></table></div></figure>
-
-
-<p><a href="https://yarnpkg.com/en/docs/install">https://yarnpkg.com/en/docs/install</a></p>
-
-<h4>安装webpack</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add --dev webpack</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>安装babel</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add --dev babel-core babel-loader babel-preset-es2015 babel-preset-react</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>安装React</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add react react-dom</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>创建和编辑.babelrc</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>touch .babelrc   
-</span><span class='line'>vim .babelrc  </span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>{
-</span><span class='line'>  "presets" : ["es2015", "react"]
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>创建和编辑webpack.config.js</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>touch webpack.config.js
-</span><span class='line'>vim webpack.config.js</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>var webpack = require('webpack');
-</span><span class='line'>var path = require('path');
-</span><span class='line'>
-</span><span class='line'>var BUILD_DIR = path.resolve(__dirname, 'public');
-</span><span class='line'>var APP_DIR = path.resolve(__dirname, 'src');
-</span><span class='line'>
-</span><span class='line'>var config = {
-</span><span class='line'>  entry: APP_DIR + '/index.jsx',
-</span><span class='line'>  output: {
-</span><span class='line'>      path: BUILD_DIR,
-</span><span class='line'>      filename: 'bundle.js'
-</span><span class='line'>  },
-</span><span class='line'>  module: {
-</span><span class='line'>      loaders: [
-</span><span class='line'>          {
-</span><span class='line'>              test: /\.jsx?/,
-</span><span class='line'>              include: APP_DIR,
-</span><span class='line'>              loader: 'babel'
-</span><span class='line'>          }
-</span><span class='line'>      ]
-</span><span class='line'>  }
-</span><span class='line'>};
-</span><span class='line'>
-</span><span class='line'>module.exports = config;</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>创建和编辑src/index.jsx</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mkdir src
-</span><span class='line'>cd src
-</span><span class='line'>touch index.jsx
-</span><span class='line'>vim index.jsx</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>import React from 'react';
-</span><span class='line'>import {render} from 'react-dom';
-</span><span class='line'>
-</span><span class='line'>class App extends React.Component {
-</span><span class='line'>  render () {
-</span><span class='line'>      return &lt;p&gt; Hello React!&lt;/p&gt;;
-</span><span class='line'>  }
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>render(&lt;App/&gt;, document.getElementById('app'));</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>在html中引用</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>cd src
-</span><span class='line'>touch index.html
-</span><span class='line'>vim index.html</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;!doctype html&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;html lang="zh"&gt;
-</span><span class='line'>&lt;head&gt;
-</span><span class='line'>    &lt;!-- The first thing in any HTML file should be the charset --&gt;
-</span><span class='line'>    &lt;meta charset="utf-8"&gt;
-</span><span class='line'>    &lt;!-- Make the page mobile compatible --&gt;
-</span><span class='line'>    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
-</span><span class='line'>    &lt;meta name="mobile-web-app-capable" content="yes"&gt;
-</span><span class='line'>    &lt;title&gt;17High&lt;/title&gt;
-</span><span class='line'>&lt;/head&gt;
-</span><span class='line'>&lt;body&gt;
-</span><span class='line'>&lt;div id="app"/&gt;
-</span><span class='line'>&lt;!-- Display a message if JS has been disabled on the browser. --&gt;
-</span><span class='line'>&lt;noscript&gt;If you're seeing this message, that means &lt;strong&gt;JavaScript has been disabled on your browser&lt;/strong&gt;, please &lt;strong&gt;enable JS&lt;/strong&gt; to make this app work.&lt;/noscript&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;script src="../public/bundle.js" type="text/javascript"&gt;&lt;/script&gt;
-</span><span class='line'>&lt;/body&gt;
-</span><span class='line'>&lt;/html&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>运行webpack命令，生成打包文件bundle.js</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>./node_modules/.bin/webpack -d
-</span><span class='line'>./node_modules/.bin/webpack -d --watch //监听文件变化</span></code></pre></td></tr></table></div></figure>
-
-
-<p>打开index.html看效果</p>
+<p>性能黄金法则由《高性能网站建站指南》的作者Steve Souders在2007年提出。在2012年，他重新发表了一篇博客<a href="https://www.stevesouders.com/blog/2012/02/10/the-performance-golden-rule/" title="《The Performance Golden Rule》">《The Performance Golden Rule》</a>，分析并统计排名前10，10个在10000排名左右网站的加载时间，并计算了在<a href="http://httparchive.org/index.php" title="HTTP Archive">HTTP Archive</a>上被抓取到的50000个网站的前后端耗时占比，而最终验证了自2007年提出的这个理念的准确性。</p>
 </div>
   
   
@@ -551,23 +155,23 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境代码下性能优化</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
       </li>
     
   </ul>
@@ -598,23 +202,6 @@
     });
   </script>
   <script src="/javascripts/github.js" type="text/javascript"> </script>
-  <div>
-    <h1>Currently Working On</h1>
-    <div>
-      <span>relations-back-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
-    </div>
-    <br/>
-    <div>
-      <span>relations-front-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
-    </div>
-    <br/>
-    <div>
-      <span>gradle-plugin-database</span>
-      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
-    </div>
-  </div>
 </section>
 
 

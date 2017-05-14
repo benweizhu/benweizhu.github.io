@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="使用Nginx服务静态文件的原因很简单：快。 上一篇文章中 http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/ ，我们使用Nginx作为Tomcat服务器的反向代理服务器， &hellip;">
+  <meta name="description" content="做个记录 转载自： http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html WHEN working with Linux, Unix, and Mac OS X, I always forget which bash &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/05/22/nginx-serve-static/">用Nginx服务静态文件</a></h1>
+      <h1 class="entry-title"><a href="/blog/2016/07/02/bash-profile-and-bashrc/">.bash_profile和.bashrc</a></h1>
     
     
       <p class="meta">
@@ -79,95 +79,35 @@
 
 
 
-<time class='entry-date' datetime='2016-05-22T11:58:09+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>11:58 am</span></time>
+<time class='entry-date' datetime='2016-07-02T12:54:48+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>12:54 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>使用Nginx服务静态文件的原因很简单：快。</p>
+  <div class="entry-content"><p>做个记录</p>
 
-<p>上一篇文章中 <a href="http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/</a> ，我们使用Nginx作为Tomcat服务器的反向代理服务器，这样比在Tomcat直接配置80端口更加方便。</p>
+<p>转载自： <a href="http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html">http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html</a></p>
 
-<p>但是，却没有很好的利用Nginx服务器的特点，即 NGINX | High Performance Load Balancer, Web Server, &amp; Reverse等。</p>
+<p>WHEN working with Linux, Unix, and Mac OS X, I always forget which bash config file to edit when I want to set my PATH and other environmental variables for my shell. Should you edit .bash_profile or .bashrc in your home directory?
+You can put configurations in either file, and you can create either if it doesn’t exist. But why two different files? What is the difference?
+According to the bash man page, .bash_profile is executed for login shells, while .bashrc is executed for interactive non-login shells.</p>
 
-<p>我们可以使用Nginx来服务器静态文件，使用Tomcat来处理JSP的动态文件。配置非常简单，分别使用下面两个配置：</p>
+<p><strong>What is a login or non-login shell?</strong></p>
 
-<h2>403错误：添加Nginx访问文案件的权限</h2>
+<p>When you login (type username and password) via console, either sitting at the machine, or remotely via ssh: .bash_profile is executed to configure your shell before the initial command prompt.
+But, if you’ve already logged into your machine and open a new terminal window (xterm) inside Gnome or KDE, then .bashrc is executed before the window command prompt. .bashrc is also run when you start a new bash instance by typing /bin/bash in a terminal.
+Why two different files?</p>
 
-<p>nginx配置中有一个user选项，默认，nginx配置的是nobody。 <a href="http://nginx.org/en/docs/ngx_core_module.html#user">http://nginx.org/en/docs/ngx_core_module.html#user</a></p>
+<p>Say, you’d like to print some lengthy diagnostic information about your machine each time you login (load average, memory usage, current users, etc). You only want to see it on login, so you only want to place this in your .bash_profile. If you put it in your .bashrc, you’d see it every time you open a new terminal window.
+Mac OS X — an exception</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#user  nobody;</span>
-</span><span class='line'>worker_processes  1<span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#error_log  logs/error.log;</span>
-</span><span class='line'><span class="c">#error_log  logs/error.log  notice;</span>
-</span><span class='line'><span class="c">#error_log  logs/error.log  info;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#pid        logs/nginx.pid;</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>An exception to the terminal window guidelines is Mac OS X’s Terminal.app, which runs a login shell by default for each new terminal window, calling .bash_profile instead of .bashrc. Other GUI terminal emulators may do the same, but most tend not to.</p>
 
+<p>就是注意一点，这里提到Mac会有些不同。</p>
 
-<p>需要将它改为可以访问Tomcat服务器上文件的用户和用户组</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>user  yourusername yourusergroup<span class="p">;</span> <span class="c">#比如 benweizhu stuff</span>
-</span><span class='line'>worker_processes  1<span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#error_log  logs/error.log;</span>
-</span><span class='line'><span class="c">#error_log  logs/error.log  notice;</span>
-</span><span class='line'><span class="c">#error_log  logs/error.log  info;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">#pid        logs/nginx.pid;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>404错误：使用Alias来配置Static文件路径</h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>location /static/ <span class="o">{</span>
-</span><span class='line'>  autoindex  on<span class="p">;</span>
-</span><span class='line'>  <span class="nb">alias</span> /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp/static<span class="p">;</span> <span class="c">#完整路径</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Nginx的Wiki推荐使用root字段</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>location /static/ <span class="o">{</span>
-</span><span class='line'>  autoindex  on<span class="p">;</span>
-</span><span class='line'>  root /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp<span class="p">;</span> <span class="c">#完整路径</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料：   <br/>
-1. <a href="https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/">https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/</a>   <br/>
-2. <a href="http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden">http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden</a>   <br/>
-3. <a href="http://stackoverflow.com/questions/1474374/nginx-doesnt-serve-static">http://stackoverflow.com/questions/1474374/nginx-doesnt-serve-static</a></p>
+<p>什么时候会用到呢？其实有很多，比如，安装mysql时，希望通过命令访问，就需要把mysql的路径放在path中。又比如，安装nvm时，配置nvm的命令。还有比如希望使用alias命令，添加一些快捷命令，也需要配置。</p>
 </div>
   
   
@@ -180,7 +120,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">将Nginx作为Tomcat的反向代理服务器</a></h1>
+      <h1 class="entry-title"><a href="/blog/2016/06/27/host-jenkins-on-aws/">在AWS上部署Jenkins</a></h1>
     
     
       <p class="meta">
@@ -189,145 +129,108 @@
 
 
 
-<time class='entry-date' datetime='2016-05-21T21:15:08+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>9:15 pm</span></time>
+<time class='entry-date' datetime='2016-06-27T20:57:25+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:57 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>本例子，以mac作为主机：</p>
+  <div class="entry-content"><h2>注册AWS账号</h2>
 
-<h2>安装Nginx</h2>
+<p><a href="https://aws.amazon.com">https://aws.amazon.com</a></p>
 
-<p>通过HomeBrew安装Nginx。</p>
+<h2>通过信用卡验证</h2>
+
+<p>付款1刀</p>
+
+<h2>选择Region</h2>
+
+<p>美国东部（弗吉尼亚北部） <br/>
+美国西部（俄勒冈） <br/>
+美国西部（加利福尼亚北部） <br/>
+欧洲（爱尔兰） <br/>
+欧洲（法兰克福） <br/>
+亚太区域（新加坡） <br/>
+亚太区域（东京） <br/>
+亚太区域 (首尔) <br/>
+亚太区域（悉尼）<br/>
+南美洲（圣保罗）</p>
+
+<h2>AWS Identity and Access Management (IAM)</h2>
+
+<ul>
+<li>对您 AWS 账户的共享访问权限</li>
+<li>精细权限</li>
+<li>在 Amazon EC2 上运行的应用程序针对 AWS 资源的安全访问权限</li>
+<li>等等</li>
+</ul>
+
+
+<h3>创建用户</h3>
+
+<p><a href="https://console.aws.amazon.com/iam/home#home">https://console.aws.amazon.com/iam/home#home</a></p>
+
+<p>AWS分为根账号用户和IAM用户</p>
+
+<p>在账户中创建与组织中的用户对应的各IAM用户，而不是与他人共享您的根账户凭证。IAM用户不是单独的账户；它们是您账户中的用户。每个用户都可以有自己的密码以用于访问AWS管理控制台。您还可以为每个用户创建单独的访问密钥，以便用户可以发出编程请求以使用账户中的资源。</p>
+
+<p>可以将IAM用户组织为IAM组，然后将策略附加到组。这种情况下，各用户仍有自己的凭证，但是组中的所有用户都具有附加到组的权限。</p>
+
+<p>1.我创建了一个Administrators的组，并赋予AdministratorAccess权限。 <br/>
+2.创建一个用户，用户名：someuser，勾选：为每个用户生成访问密钥，用户需要访问密钥，以确保向 AWS 服务 API 提交安全的 REST 或查询协议请求。<br/>
+3.给用户分配用户组 <br/>
+4.设置用户的安全证书管理，即创建用户名密码访问权限和第二验证策略 <br/>
+5.下载用户密码安全凭证</p>
+
+<p>要使用AWS管理控制台的用户必须通过特定于您账户的登录页面登录到您的AWS账户。您需要为您的用户提供他们用于访问登录页面的URL地址。凭证中包含URL： <a href="https://My_AWS_Account_ID.signin.aws.amazon.com/console/">https://My_AWS_Account_ID.signin.aws.amazon.com/console/</a></p>
+
+<h3>创建EC2实例（我等穷人只能用免费的）</h3>
+
+<p>Amazon Elastic Compute Cloud (Amazon EC2) 在 Amazon Web Services (AWS) 云中提供可扩展的计算容量。使用 Amazon EC2 可避免前期的硬件投入，因此您能够快速开发和部署应用程序。通过使用 Amazon EC2，您可以根据自身需要启动任意数量的虚拟服务器、配置安全和网络以及管理存储。Amazon EC2 允许您根据需要进行缩放以应对需求变化或流行高峰，降低流量预测需求。</p>
+
+<p>1.用新用户登录： <a href="https://My_AWS_Account_ID.signin.aws.amazon.com/console/">https://My_AWS_Account_ID.signin.aws.amazon.com/console/</a> <br/>
+2.创建一个EC2实例<br/>
+3.选择一个Amazon系统映像（AMI），我选择Ubuntu的免费版 <br/>
+4.选择一个实例类型（计算资源），免费版只有1G内存，实在不够用 <br/>
+5.配置实例详细信息（我采用默认配置） <br/>
+6.选择存储大小，最大免费30G <br/>
+7.标签实例（我留空了） <br/>
+8.配置安全组，这里要注意了，只要配置SSH和TCP的8080端口（jenkins用） <br/>
+9.下载SSH证书</p>
+
+<p>SSH证书是用于SSH登录服务器的：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>brew install nginx
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>ssh -i somepem.pem user@serveraddress
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>然后，运行启动nginx。如果启动遇到问题，使用brew doctor查看下，有可能是没有link（brew link nginx），或者没有文件执行权限（chmod去改）。</p>
+<h2>安装Jenkins</h2>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>nginx
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>nginx启动默认是8080端口，所以到 <a href="http://localhost:8080">http://localhost:8080</a> 上测试下。mac上nginx.conf的位置在/usr/local/etc/nginx/nginx.conf，也可以通过brew info nginx查看。
-因为我们要使用80端口，所以需要修改配置，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
-</span><span class='line'>    listen       8080<span class="p">;</span>
-</span><span class='line'>    server_name  localhost<span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c">#access_log  logs/host.access.log  main;</span>
-</span><span class='line'>
-</span><span class='line'>    location / <span class="o">{</span>
-</span><span class='line'>        root   html<span class="p">;</span>
-</span><span class='line'>        index  index.html index.htm<span class="p">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>改为：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
-</span><span class='line'>    listen       80<span class="p">;</span>
-</span><span class='line'>    server_name  localhost<span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c">#access_log  logs/host.access.log  main;</span>
-</span><span class='line'>
-</span><span class='line'>    location / <span class="o">{</span>
-</span><span class='line'>        root   html<span class="p">;</span>
-</span><span class='line'>        index  index.html index.htm<span class="p">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个时候，需要sudo去启动nginx了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>sudo nginx
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>访问 <a href="http://localhost">http://localhost</a> 进行测试，可以看到Nginx的主页。</p>
-
-<h2>安装Tomcat</h2>
-
-<p><a href="https://tomcat.apache.org/download-80.cgi">https://tomcat.apache.org/download-80.cgi</a></p>
-
-<p>运行bin下面的./startup.sh。同样如果没有执行权限，用chmod修改。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>./startup.sh
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>默认是8080，访问 <a href="http://localhost:8080">http://localhost:8080</a> 可以看到Tomcat的主页。</p>
-
-<h2>修改Nginx配置，通过proxy_pass转发80请求到8080</h2>
+<p>SSH登录到服务器上，然后运行下面的脚本：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
-</span><span class='line'>        listen       80<span class="p">;</span>
-</span><span class='line'>        server_name  localhost<span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c">#access_log  logs/host.access.log  main;</span>
-</span><span class='line'>
-</span><span class='line'>        location / <span class="o">{</span>
-</span><span class='line'>            proxy_pass http://127.0.0.1:8080<span class="p">;</span>
-</span><span class='line'>            root   html<span class="p">;</span>
-</span><span class='line'>            index  index.html index.htm<span class="p">;</span>
-</span><span class='line'>        <span class="o">}</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget -q -O - https://jenkins-ci.org/debian/jenkins-ci.org.key <span class="p">|</span> sudo apt-key add -
+</span><span class='line'>sudo sh -c <span class="s1">&#39;echo deb http://pkg.jenkins-ci.org/debian-stable binary/ &gt; /etc/apt/sources.list.d/jenkins.list&#39;</span>
+</span><span class='line'>sudo apt-get update
+</span><span class='line'>sudo apt-get install jenkins
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>此时，重启Nginx服务器:</p>
+<p>注意jenkins默认是8080端口，这就是上面安全组要配置的TCP的8080端口。</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo nginx -s stop
-</span><span class='line'>sudo nginx
-</span></code></pre></td></tr></table></div></figure>
+<p>然后，可以通过ip地址+8080端口。</p>
 
-
-<p>再次访问 <a href="http://localhost">http://localhost</a> 进行测试，就会看到Tomcat的主页了。</p>
-
-<p>参考资料：<br/>
-1. <a href="http://learnaholic.me/2012/10/10/installing-nginx-in-mac-os-x-mountain-lion/">http://learnaholic.me/2012/10/10/installing-nginx-in-mac-os-x-mountain-lion/</a><br/>
-2. <a href="https://devtidbits.com/2015/12/08/nginx-as-a-reverse-proxy-to-apache-tomcat/">https://devtidbits.com/2015/12/08/nginx-as-a-reverse-proxy-to-apache-tomcat/</a></p>
+<p>参考资料：  <br/>
+1. <a href="http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/concepts.html">http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/concepts.html</a>  <br/>
+2. <a href="http://docs.aws.amazon.com/zh_cn/IAM/latest/UserGuide/introduction.html">http://docs.aws.amazon.com/zh_cn/IAM/latest/UserGuide/introduction.html</a> <br/>
+3. <a href="http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/AMIs.html">http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/AMIs.html</a> <br/>
+4. <a href="https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins+on+Ubuntu">https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins+on+Ubuntu</a> <br/>
+5. <a href="http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html">http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html</a></p>
 </div>
   
   
@@ -362,23 +265,23 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境代码下性能优化</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
       </li>
     
   </ul>
@@ -409,23 +312,6 @@
     });
   </script>
   <script src="/javascripts/github.js" type="text/javascript"> </script>
-  <div>
-    <h1>Currently Working On</h1>
-    <div>
-      <span>relations-back-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
-    </div>
-    <br/>
-    <div>
-      <span>relations-front-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
-    </div>
-    <br/>
-    <div>
-      <span>gradle-plugin-database</span>
-      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
-    </div>
-  </div>
 </section>
 
 

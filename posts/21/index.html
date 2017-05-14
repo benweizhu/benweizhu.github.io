@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="Active Record数据库迁移是 Active Record提供的一个功能，按照时间顺序管理数据库模式。使用迁移，无需编写 SQL，使用简单的Ruby DSL就能修改数据表，对数据库的操作和所用的数据库种类无关。 你可以把每个迁移看做数据库的一个修订版本。数据库中一开始什么也没有， &hellip;">
+  <meta name="description" content="JavaScript普通对象 JavaScript中除了数字、字符串、布尔值、null和undefined之外的就是对象了。对象是属性的集合，每个属性都由“名/值对”构成，值可以是原始值，比如数字、字符串，也可以是对象。普通的JavaScript对象就是“命名值”的无序集合。（ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/09/10/active-record-migration/">关于运行Active Record数据迁移</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/10/05/learning-js-well/">学好JavaScript - 初学者忽视和困惑的东西</a></h1>
     
     
       <p class="meta">
@@ -79,90 +79,225 @@
 
 
 
-<time class='entry-date' datetime='2015-09-10T08:51:45+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:51 am</span></time>
+<time class='entry-date' datetime='2015-10-05T10:06:40+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:06 am</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Active Record数据库迁移是 Active Record提供的一个功能，按照时间顺序管理数据库模式。使用迁移，无需编写 SQL，使用简单的Ruby DSL就能修改数据表，对数据库的操作和所用的数据库种类无关。</p>
+  <div class="entry-content"><h3>JavaScript普通对象</h3>
 
-<p>你可以把每个迁移看做数据库的一个修订版本。数据库中一开始什么也没有，各个迁移会添加或删除数据表、字段或记录。Active Record知道如何按照时间线更新数据库，不管数据库现在的模式如何，都能更新到最新结构。同时，Active Record还会更新db/schema.rb文件，匹配最新的数据库结构。</p>
+<p>JavaScript中除了数字、字符串、布尔值、null和undefined之外的就是对象了。对象是属性的集合，每个属性都由“名/值对”构成，值可以是原始值，比如数字、字符串，也可以是对象。普通的JavaScript对象就是“命名值”的无序集合。（JavaScript同样定义了一种特殊对象-数组，表示带编号的值的有序集合）</p>
 
-<h2>db:migrate</h2>
+<h3>可选的分号</h3>
 
-<p>Rails提供了很多Rake任务，用来执行指定的迁移。</p>
+<p>JavaScript使用分号将语句分开。但如果语句各自独占一行，通常可以省略语句之间的分号。是否省略分号是一种风格，对于不知道什么时候可以省略分号的开发，在任何时候都采用分号分割是一种常见风格。</p>
 
-<p>其中最常使用的是rake db:migrate，执行还没执行的迁移中的change或up方法。如果没有未运行的迁移，直接退出。rake db:migrate按照迁移文件名中时间戳顺序执行迁移。</p>
+<h3>强制类型转换和弱类型</h3>
 
-<p>注意，执行db:migrate时还会执行db:schema:dump，更新db/schema.rb文件，匹配数据库的结构。</p>
+<p>如果使用的数据类型和JavaScript所需的数据类型不同，那么它会尽量使这个操作变得有意义，而不是直接报错。</p>
 
-<h2>db:migrate VERSION</h2>
+<p>为完成操作，JavaScript会在背后进行数据类型转换，这被称作强制类型转换。例如，表达式(&lsquo;1&rsquo; > 0)中，字符串‘1’会被转换成数值1，从而导致该表达式的结果为true。</p>
 
-<p>如果指定了版本，Active Record会运行该版本之前的所有迁移。版本就是迁移文件名前的数字部分。例如，要运行 20080906120000 这个迁移，可以执行下面的命令：</p>
+<p>JavaScript被称作弱类型语言，因为值的数据类型是可以变的。其他一些语言则要求指定每个变量的数据类型，这样的语言被称为强类型，比如说Java，C++。</p>
+
+<p>强制类型转换可能会导致代码出现意外情况。因此，当检测两个值是否相等时，推荐使用更加严格的===和!==来取代==和!=，因为严格相等和严格不等会同时检测值及其类型。</p>
+
+<h3>布尔值</h3>
+
+<p>因为存在强制类型转换，JavaScript中的每个值都可以被当做true或者false处理，这就导致了有趣的现象。</p>
+
+<p>任意JavaScript的值都可以转换为布尔值，下面这些值会被转换为false，</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="n">migrate</span> <span class="no">VERSION</span><span class="o">=</span><span class="mi">20080906120000</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kc">undefined</span>
+</span><span class='line'><span class="kc">null</span>
+</span><span class='line'><span class="mi">0</span>
+</span><span class='line'><span class="o">-</span><span class="mi">0</span>
+</span><span class='line'><span class="kc">NaN</span>
+</span><span class='line'><span class="s2">&quot;&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>如果20080906120000比当前的版本高，上面的命令就会执行所有20080906120000之前（包括 20080906120000）的迁移中的change或up方法，但不会运行20080906120000之后的迁移。如果回滚迁移，则会执行 20080906120000之前（不包括20080906120000）的迁移中的down方法。</p>
+<p>所有其他值，包括所有对象（数组）都会转换成true，false和上面6个可以转换成false的值有时称作“假值”，其他值称作“真值”。JavaScript期望使用一个布尔值的时候，假值会被当做false，真值会被当做true。</p>
 
-<h2>db:rollback</h2>
+<h3>null和undefined</h3>
 
-<p>还有一个常用的操作时回滚到之前的迁移。例如，迁移代码写错了，想纠正。我们无须查找迁移的版本号，直接执行下面的命令即可：</p>
+<p>null是JavaScript语言的关键字，它表示一个特殊值，常用来描述“空值”。对null执行typeof运算，结果返回字符串“object”，也就是说，可以将null认为是一个特殊的对象值，含义是“非对象”。但实际上，通常认为null是它自由类型的唯一一个成员，它可以表示数字，字符串和对象是“无值”的。</p>
+
+<p>JavaScript还有第二值来表示值的空缺。用未定义的值表示更深层次的“空值”。它是变量的一种取值，表示变量没有初始化，如果要查询对象属性或者数组元素的值时，返回undefined则说明这个属性或者元素不存在。如果函数没有任何返回值，则返回undefined。</p>
+
+<p>undefined是预定义的全局变量，它和null不一样，它不是关键字，它的值就是“未定义”。</p>
+
+<p>尽管null和undefined是不同的，但它们都表示“值的空缺”，两者往往可以互换。判断相等运算符“==”认为两者是相等的，所以需要使用严格相等运算符“===”来区分它们。</p>
+
+<p>如果你想将它们赋值给变量或者属性，或将它们作为参数传入函数，最佳的选择是使用null。</p>
+
+<h3>检测相等和存在</h3>
+
+<p>因为对象或者数组被视为真值，所以这种方法经常被用来判断页面中的元素是否存在。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="n">rollback</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#main&#39;</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>  
+</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>  
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这个命令会回滚上一次迁移，撤销 change 方法中的操作，或者执行 down 方法。如果想撤销多个迁移，可以使用 STEP 参数：</p>
+<p>由于强制类型转换，严格等于操作符===和严格不等于操作符!==所得结果比==和!=更容易预料。</p>
+
+<p>如果使用==操作，那么下列值被视为相等的：false、0以及&#8217;&lsquo;（空字符串），但在严格的===下，它们是不相等的。</p>
+
+<p>虽然null和undefined都是假值，但它们除了自身之外不等于任何值。同样在使用严格相等时，也是不相等的。</p>
+
+<p>虽然NaN被视为假值，但是它不等于任何值，它升值不等于它自己（因为NaN表示不可定义的数字，两个不可定义的数字是不相同的）。</p>
+
+<h3>短路值</h3>
+
+<p>逻辑操作符是从左向右计算的，当它们获得确定结果时，立刻会发生“短路”（停止运算），但是它们会返回停止运算时的值（不一定是true或者false），这里很有意思。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="n">rollback</span> <span class="no">STEP</span><span class="o">=</span><span class="mi">3</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="o">||</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="c1">// a</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="o">||</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="c1">// c</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="o">||</span><span class="p">{})</span>
+</span><span class='line'><span class="c1">// Object{}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这个命令会撤销前三次迁移。</p>
+<p>逻辑操作符并非总返回true或者false，原因在于：</p>
 
-<h2>db:redo</h2>
+<p>它们会返回停止运算时的值，那个值可能是真值或者假值，但不一定是布尔类型。这种技巧常常被使用于变量赋值和创建对象。</p>
 
-<p>db:migrate:redo 命令可以回滚上一次迁移，然后再次执行迁移。和 db:rollback 一样，如果想重做多次迁移，可以使用 STEP 参数。例如：</p>
+<p>因为这种短路机制，在“或”运算符常常把最可能返回true的放在第一位，在“与”操作符把最可能返回false的放在第一位，或者把最耗时的操作放在最后一位。</p>
+
+<h3>全局对象</h3>
+
+<p>全局对象的属性是全局定义的符号，JavaScript程序可以直接使用。当JavaScript解释器启动时（或者任何Web浏览器加载新页面的时候），它将创建一个新的全局对象，并给它一组定义的初始属性：全局属性，undefined，全局函数，isNaN()，构造函数，Date()，全局对象，Math。</p>
+
+<p>全局对象的初始属性并不是保留字，但它们应该当做保留字来对待。</p>
+
+<p>在代码的最顶级——不在任何函数内的JavaScript代码——可以使用JavaScript关键字this来引用全局对象：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="ss">migrate</span><span class="p">:</span><span class="k">redo</span> <span class="no">STEP</span><span class="o">=</span><span class="mi">3</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kd">var</span> <span class="nx">global</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span> <span class="c1">// 定义一个引用全局对象的全局变量</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这些 Rake 任务的作用和 db:migrate 一样，只是用起来更方便，因为无需查找特定的迁移版本号。</p>
+<p>在客户端JavaScript中，在其表示的浏览器窗口中的所有JavaScript代码中，Window对象充当了全局对象。这个全局对象Window对象有一个属性window引用其自身，它可以代替this来引用全局对象。</p>
 
-<h2>db:migrate:up和db:migrate:down</h2>
-
-<p>如果想执行指定迁移，或者撤销指定迁移，可以使用db:migrate:up和db:migrate:down任务，指定相应的版本号，就会根据需求调用change、up或down方法。例如：</p>
+<p>当初次创建的时候，全局对象定义了JavaScript中所有的预定义全局值。这个特殊对象同样包含了为程序定义的全局值。如果代码声明了一个全局变量，这个全局变量就是对象的一个属性。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="ss">migrate</span><span class="p">:</span><span class="n">up</span> <span class="no">VERSION</span><span class="o">=</span><span class="mi">20080906120000</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">a</span><span class="p">;</span> <span class="c1">//输出&quot;a&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这个命令会执行20080906120000迁移中的change方法或up方法。db:migrate:up 首先会检测指定的迁移是否已经运行，如果Active Record任务已经执行，就不会做任何操作。</p>
+<h3>包装对象</h3>
 
-<h2>修改现有的迁移</h2>
+<p>我们看到字符串也同样具有属性和方法，字符串既然不是对象，为什么它会有属性呢？  <br/>
+只要引用了字符串的属性，JavaScript就会将字符串通过调用new String(&ldquo;some string&rdquo;)的方法转换成对象。</p>
 
-<p>有时编写的迁移中可能有错误，如果已经运行了迁移，不能直接编辑迁移文件再运行迁移。Rails 认为这个迁移已经运行，所以执行 rake db:migrate 任务时什么也不会做。这种情况必须先回滚迁移（例如，执行 rake db:rollback 任务），编辑迁移文件后再执行 rake db:migrate 任务执行改正后的版本。</p>
+<p>同字符串一样，数字和布尔值也具有各自的方法：通过Number()和Boolean()构造函数创建一个临时对象。</p>
 
-<p>一般来说，直接修改现有的迁移不是个好主意。这么做会为你以及你的同事带来额外的工作量，如果这个迁移已经在生产服务器上运行过，还可能带来不必要的麻烦。你应该编写一个新的迁移，做所需的改动。编辑新生成还未纳入版本控制的迁移（或者更宽泛地说，还没有出现在开发设备之外），相对来说是安全的。</p>
+<p>JavaScript会在必要时将包装对象转换成原始值。“==”等于运算符将原始值和其他包装对象视为相等，但“===”全等运算符将它们视为不等。</p>
 
-<h2>在不同的环境中运行迁移</h2>
+<h3>in运算符</h3>
 
-<p>默认情况下，rake db:migrate 任务在 development 环境中执行。要在其他环境中运行迁移，执行命令时可以使用环境变量 RAILS_ENV 指定环境。例如，要在 test 环境中运行迁移，可以执行下面的命令：</p>
+<p>in运算符希望它的左操作数是一个字符串或可以转换为字符串，希望它的右操作数是一个对象。如果右侧的对象拥有一个名为做操作数值的属性名，那么表达式返回true。</p>
 
-<p>$ rake db:migrate RAILS_ENV=test</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">a</span> <span class="o">=</span> <span class="p">{</span><span class="nx">text</span><span class="o">:</span><span class="s2">&quot;hi&quot;</span><span class="p">}</span>
+</span><span class='line'><span class="s2">&quot;text&quot;</span> <span class="k">in</span> <span class="nx">a</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>参考资料：   <br/>
-1.<a href="http://guides.ruby-china.org/active_record_migrations.html">http://guides.ruby-china.org/active_record_migrations.html</a></p>
+
+<p>for/in语句也使用for关键字，但它是和常规的for循环完全不同的一类循环。for/in循环语句的语法如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="k">for</span> <span class="p">(</span><span class="nx">variable</span> <span class="k">in</span> <span class="nx">object</span><span class="p">)</span>
+</span><span class='line'>  <span class="nx">statement</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>variable通常是一个变量名，也可以是一个可以产生左值的表达式或者一个通过var语句声明的变量，总之必须是一个适用于赋值表达式左侧的值。object是一个表达式，这表达式的计算结果是一个对象。</p>
+
+<p>for/in循环则是用来更方便地遍历对象属性成员：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">p</span> <span class="k">in</span> <span class="nx">o</span><span class="p">)</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">o</span><span class="p">[</span><span class="nx">p</span><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在执行for/in语句的过程中，JavaScript解释器首先计算object表达式。如果表达式为null或者undefined，JavaScript解释器将会跳出循环并执行后续的代码。如果表达式等于一个原始值，这个原始值将会转换为与之对应的包装对象。否则，expression本身已经是对象了。JavaScript会依次枚举对象的属性来执行循环。</p>
+
+<h3>&ldquo;use strict&rdquo;</h3>
+
+<p>&ldquo;use strict&#8221;是ECMAScript5引入的一条指令。指令不是语句。</p>
+
+<p>它不含任何语言的关键，指令仅仅是一个包含一个特殊字符串直接量的表达式，对于那些没有实现ECMAScript5的JavaScript解释器来说，它只是一条没有副作用的表达式语句，它什么也没做。</p>
+
+<p>它只能出现在脚本代码的开始或者函数体的开始，任何实体语句之前。但他不必一定要出现在脚本的首行或者函数体首行，因为“use strict”指令之后或者之前都可能有其他字符串直接量表达式语句，并且JavaScript的具体实现可能将它们解析为解释器自有的指令。在脚本或者函数体第一条常规语句之后字符串直接量表达式语句只当做普通表达式语句对待；它们不会当做指令解析，它们也没有任何副作用。</p>
+
+<p>使用“use strict”指令的目的是说明（脚本或函数中）后续的代码将会解析为严格代码。</p>
+
+<p>严格代码以严格模式执行。ECMAScript5中的严格模式是该语言的一个受限制的子集，它修正了语言的重要缺陷，并提供健壮的查错功能和增强的安全机制。</p>
+
+<h3>原型</h3>
+
+<p>每个JavaScript对象（null除外）都和另一个对象相关联。“另一个”对象就是我们熟知的原型，每一个对象都从原型继承属性。</p>
+
+<p>所有通过对象直接量创建的对象都具有同一个原型对象，并可以通过JavaScript代码Object.prototype获得对原型对象的引用。通过关键字new和构造函数调用创建的对象的原型就是构造函数的prototype属性的值。因此，同使用{}创建对象一样，通过new Object()创建的对象也继承自Object.prototype。同样，通过new Array()创建的对象的原型就是Array.prototype，通过new Date()创建的对象的原型就是Date.prototype。</p>
+
+<p>没有原型的对象为数不多，Object.prototype就是其中之一。他不继承任何属性。其他原型对象都是普通对象，普通对象也有原型。所有的内置的构造函数都具有一个继承自Object.prototype的原型。例如，Date.prototype的属性继承自Object.prototype，因此由new Date()创建的Date对象的属性同时继承自Date.prototype和Object.prototype。这就是所谓的“原型链”。</p>
+
+<h3>关联数组</h3>
+
+<p>object.property
+object[&ldquo;property&rdquo;]</p>
+
+<p>第二种语法使用方括号和一个字符串，看起来更像数组，只是这个数组是通过字符串索引而不是数字索引，这种数组就是所说的关联数组。</p>
+
+<p>在C++、Java等强类型语言中，对象只能拥有固定数目的属性，并且这些属性名称必须提前定义好。由于JavaScript是弱类型语言，因此不必遵循这个条规定，在任何对象中程序都可以创建任意数量的属性。但当通过点运算符访问对象的属性时，属性名用一个标识符来表示。标示符必须直接出现在JavaScript程序中，它们不是数据类型，因此程序无法修改它们。</p>
+
+<p>反过来讲，当通过[]来访问对象的属性时，属性名通过字符串来表示。字符串是JavaScript的数据类型，在程序运行时可以修改和创建它们。</p>
+
+<p>for(i = 0; i &lt; 4; i++)
+    addr += customer[&ldquo;address&rdquo; + i];</p>
 </div>
   
   
@@ -175,7 +310,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/09/06/deep-into-spring-aop-1/">Spring AOP 深入了解（一）还给业务逻辑代码一个干净的世界</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/09/27/whenever-plus-capistrano-plus-rbenv/">当whenever遇到capistrano和rbenv - Linux下的cron Job</a></h1>
     
     
       <p class="meta">
@@ -184,73 +319,157 @@
 
 
 
-<time class='entry-date' datetime='2015-09-06T10:49:31+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:49 am</span></time>
+<time class='entry-date' datetime='2015-09-27T11:01:41+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:01 am</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h2>本篇博客系列的目的：</h2>
+  <div class="entry-content"><p>当你遇到这样一个需求：用户订阅了很多信息，服务器需要每周，或者每月给用户发送邮件，告知用户订阅信息的更新内容。你需要怎么做？</p>
 
-<p>之前一直想要实现一个日志类库：<a href="https://github.com/benweizhu/LoggerUtil">https://github.com/benweizhu/LoggerUtil</a></p>
+<p>在RoR的环境下，发送邮件使用Rails Action Mailer。参考资料：<a href="http://guides.ruby-china.org/action_mailer_basics.html">http://guides.ruby-china.org/action_mailer_basics.html</a> 。</p>
 
-<p>用来记录某个方法在调用前，调用后，抛出异常后的一些信息，比如方法名，参数，返回值。还希望可以指定记录的格式以及日志的级别（INFO，DEBUG等）。最关键的是，这个日志类库，必须有通用性和不可以有侵入性，这就导致它必定通过AOP来实现。</p>
+<p>那么如何定时呢？答案是Cron Job。</p>
 
-<p>于是，为了做到这一点，现在我们就来深入的学习一次AOP：</p>
+<p>如果大家谷歌rails cron job，就可以得到答案，一个是关于Cron Job的答案， <a href="http://www.gotealeaf.com/blog/cron-jobs-and-rails">http://www.gotealeaf.com/blog/cron-jobs-and-rails</a> ，一个是whener gem， <a href="https://github.com/javan/whenever">https://github.com/javan/whenever</a> 。</p>
 
-<h2>为什么要AOP</h2>
+<p>Cron是*nux系统中一个基于时间的任务安排软件。通过crontab 命令，我们可以在固定的间隔时间执行指定的系统指令或 shell script脚本。时间间隔的单位可以是分钟、小时、日、月、周及以上的任意组合。</p>
 
-<p>编程语言最终极的目标就是能以更自然、更灵活的语言的方式模拟世界，从原始机器语言到过程语言再到面向对象的语言（OOP）。AOP提供了与OOP不同的另外一种方式来思考软件架构。OOP的模块单元是“类”，而AOP的模块单元“面”（Aspect）。</p>
+<p>更多关于crontab定时任务，可以查看： <a href="http://linuxtools-rst.readthedocs.org/zh_CN/latest/tool/crontab.html">http://linuxtools-rst.readthedocs.org/zh_CN/latest/tool/crontab.html</a></p>
 
-<h4>那么问题来了，什么是“面”？以及什么“面向切面编程”？</h4>
-
-<p>AOP被翻译成“面向方面编程”，“面向切面编程”，所以这里我更倾向于将“面”理解为“切面”（Aspect）。</p>
-
-<p>从字面上理解，“切面”来自几何学，在立体几何中，切面是指用一个平面去截一个几何体（包括圆柱，圆锥，球，棱柱，棱锥、长方体，正方体等等），得到的平面图形。</p>
-
-<p>那什么是“面向切面编程”？就是在该切面上加入一些逻辑操作（可以简单理解为“面向切面的操作”）。举个最常见的例子：</p>
-
-<p>扑克牌的切牌，你可以将“广告牌”切入在任何你想要切入（或插入）的位置（你可以对扑克牌的任何一个切面做切牌操作）。插入的位置就是切面，插入的广告牌就是逻辑操作。</p>
-
-<p>又或者是“斗地主”中，第一把不知道谁是地主，于是将一张牌反插入到牌的中间。本来应该按照顺序发牌，并不能知道谁是地主，但是因为你在某个位置插入了一个特殊操作（将一张牌反插入），因为多了一个逻辑，所以可以知道谁是地主。（或者将广告牌插入中间，也可以知道谁是地主）</p>
-
-<p>这是“面向切面的编程”的最基础理解。</p>
-
-<h3>也许你还是不能理解面向切面编程，最重要是你并不知道为什么需要它，即何时需要它？</h3>
-
-<p>在OO的世界里，我们操作的是对象，创建一个对象并使用对象的属性和方法，而对象有抽象和继承的特性，因此，我们会利用抽象和继承的特性来消除重复的代码。</p>
-
-<p>我们知道，编程语言是从原始机器语言到过程语言再到面向对象的语言，但是即便是OO的世界，我们也逃离不了面向过程的编程方式，代码的每一步操作一定是有顺序的，因为机器解释代码也是按顺序执行的。</p>
-
-<p>代码按照顺序执行无可厚非，遇到重复的代码，我们利用抽象的方式，将重复的部分抽离成一个独立模块（方法或者类），由所有需要的地方重用即可。</p>
-
-<p>但有一种顺序代码，它重复使用在不同的固定位置，它与业务代码无关，通过OO的常用办法并不能消除这种模式的重复，比如：事务管理，性能监控（和控制）。</p>
+<p>关于时间的定义：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">addUser</span><span class="o">(){</span>
-</span><span class='line'>  <span class="n">transactionManager</span><span class="o">.</span><span class="na">beginTransaction</span><span class="o">();</span>
-</span><span class='line'>  <span class="o">..</span>
-</span><span class='line'>  <span class="n">transactionManager</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># +---------------- minute (0 - 59)</span>
+</span><span class='line'><span class="c1"># |  +------------- hour (0 - 23)</span>
+</span><span class='line'><span class="c1"># |  |  +---------- day of month (1 - 31)</span>
+</span><span class='line'><span class="c1"># |  |  |  +------- month (1 - 12)</span>
+</span><span class='line'><span class="c1"># |  |  |  |  +---- day of week (0 - 6) (Sunday=0)</span>
+</span><span class='line'><span class="c1"># |  |  |  |  |</span>
+</span><span class='line'>  <span class="o">*</span>  <span class="o">*</span>  <span class="o">*</span>  <span class="o">*</span>  <span class="o">*</span>  <span class="n">command</span> <span class="n">to</span> <span class="n">be</span> <span class="n">executed</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>我们知道这些重复性的代码逻辑，是可以非常轻松的独立出来，比如，beginTransaction和commit方法，但，我们无法通过抽象的方式来消除这种重复的调用，因为它和业务代码具有关联性，它依附在业务代码的顺序流程中。</p>
+<p>这里，我就不细谈crontab定时任务，大家可以去看上面那个链接。</p>
 
-<p>有人说，可以采用模板方法（设计模式中的一种模式），这样可以消除重复，但也导致所有使用模板方法的类，都要重写模板中的其中一步（某个方法）来实现业务逻辑，重写方法是不能改变方法的名字。这样就给代码的自描述性带来了困难，得不偿失。</p>
+<p>whenever是一个Ruby的gem，它可以提供一个清晰的语法来编写定时任务。</p>
 
-<p>好在AOP希望做得到的就是，将这些分散在各个不同业务逻辑代码中的相同代码，通过切入的方式，将这块具有顺序性关联的逻辑抽离到独立模块，而在逻辑代码中将看不到之前重复的逻辑。</p>
+<p>如果你刚才有停下来看crontab的内容，你会发现crontab任务的语法非常的复杂。</p>
 
-<p>从而，还给业务逻辑代码一个干净的世界。这就是AOP给我们带来的好处。</p>
+<p>whenever的目的就是为了让你以ruby的语法来编写要执行的任务，再由它来生成真正的crontab任务。</p>
 
-<p>参考资料：  <br/>
-1.Spring 3.0就是这么简单  <br/>
-2.<a href="http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/aop.html">http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/aop.html</a></p>
+<p>如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">set</span> <span class="ss">:environment</span><span class="p">,</span> <span class="s2">&quot;staging&quot;</span>
+</span><span class='line'><span class="n">set</span> <span class="ss">:output</span><span class="p">,</span> <span class="p">{</span><span class="ss">:error</span> <span class="o">=&gt;</span> <span class="s2">&quot;log/cron_error_log.log&quot;</span><span class="p">,</span> <span class="ss">:standard</span> <span class="o">=&gt;</span> <span class="s2">&quot;log/cron_log.log&quot;</span><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">weekly_of_day</span> <span class="o">=</span> <span class="ss">:sunday</span> <span class="c1"># every sunday</span>
+</span><span class='line'><span class="n">weekly_of_time</span> <span class="o">=</span> <span class="p">{</span><span class="ss">:at</span> <span class="o">=&gt;</span> <span class="s1">&#39;0:00 am&#39;</span><span class="p">}</span> <span class="c1"># every sunday 0:00am</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">monthly</span> <span class="o">=</span> <span class="s1">&#39;0 0 1 * *&#39;</span> <span class="c1"># monthly 0 0 1 * * (every first day of month at 0:00am)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">quarterly</span> <span class="o">=</span> <span class="s1">&#39;0 0 1 1,4,7,10 *&#39;</span> <span class="c1"># quarterly 0 0 1 1,4,7,10 * (every 3 months at 0:00am start from the first day in january)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">job_type</span> <span class="ss">:rbenv_rake</span><span class="p">,</span> <span class="sx">%Q{export PATH=~/.rbenv/shims:~/.rbenv/bin:/usr/bin:$PATH; eval &quot;$(rbenv init -)&quot;; cd :path &amp;&amp; RAILS_ENV=staging bundle exec rake :task --silent &gt;&gt; log/cron_log.log 2&gt;&gt; log/cron_error_log.log}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">every</span> <span class="n">weekly_of_day</span><span class="p">,</span> <span class="n">weekly_of_time</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">rbenv_rake</span> <span class="s2">&quot;email_notification:send_email_notification_weekly&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">every</span> <span class="n">monthly</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">rbenv_rake</span> <span class="s2">&quot;email_notification:send_email_notification_monthly&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>更多关于如何使用whenever的内容，请查看： <a href="https://github.com/javan/whenever">https://github.com/javan/whenever</a></p>
+
+<p>whenever提供提供了四种job类型，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">job_type</span> <span class="ss">:command</span><span class="p">,</span> <span class="s2">&quot;:task :output&quot;</span>
+</span><span class='line'><span class="n">job_type</span> <span class="ss">:rake</span><span class="p">,</span>    <span class="s2">&quot;cd :path &amp;&amp; :environment_variable=:environment bundle exec rake :task --silent :output&quot;</span>
+</span><span class='line'><span class="n">job_type</span> <span class="ss">:runner</span><span class="p">,</span>  <span class="s2">&quot;cd :path &amp;&amp; bin/rails runner -e :environment &#39;:task&#39; :output&quot;</span>
+</span><span class='line'><span class="n">job_type</span> <span class="ss">:script</span><span class="p">,</span>  <span class="s2">&quot;cd :path &amp;&amp; :environment_variable=:environment bundle exec script/:task :output&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>但是，你在我给的例子中可以看到，我并没有使用其中的任何一个，而是自定义了一个rbenv_rake，这便是接下来的重点。</p>
+
+<p>如果你产品环境的Ruby环境是通过rbenv配置，那么在你使用crontab任务的可能会遇到这个问题。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">/</span><span class="n">spec_set</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">92</span><span class="ss">:in</span> <span class="sb">`block in materialize&#39;: Could not find rake-10.4.2 in any of the sources (Bundler::GemNotFound)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>关于原因，可以查看这个： <a href="http://benscheirman.com/2013/12/using-rbenv-in-cron-jobs/">http://benscheirman.com/2013/12/using-rbenv-in-cron-jobs/</a></p>
+
+<p>Crontab运行在一个受限的环境下，所以.bash_profile的配置方式，并不起作用。需要在每次运行该任务前，重新初始化一次rbenv。</p>
+
+<p>最后一点：</p>
+
+<p>关于whenever和capistrano的集成，其实官方网站上也给出了，但是测试过不起作用，至少我这没起作用，所以我在部署的ruby文件中添加了一个task。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">namespace</span> <span class="ss">:deploy</span> <span class="k">do</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">desc</span> <span class="s2">&quot;Update crontab with whenever&quot;</span>
+</span><span class='line'>  <span class="n">task</span> <span class="ss">:update_cron</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">on</span> <span class="n">roles</span><span class="p">(</span><span class="ss">:app</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">within</span> <span class="n">current_path</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">execute</span> <span class="ss">:bundle</span><span class="p">,</span> <span class="ss">:exec</span><span class="p">,</span> <span class="s2">&quot;whenever --update-crontab </span><span class="si">#{</span><span class="n">fetch</span><span class="p">(</span><span class="ss">:application</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">after</span> <span class="ss">:finishing</span><span class="p">,</span> <span class="s1">&#39;deploy:update_cron&#39;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
 </div>
   
   
@@ -285,23 +504,23 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境代码下性能优化</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
       </li>
     
   </ul>
@@ -332,23 +551,6 @@
     });
   </script>
   <script src="/javascripts/github.js" type="text/javascript"> </script>
-  <div>
-    <h1>Currently Working On</h1>
-    <div>
-      <span>relations-back-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
-    </div>
-    <br/>
-    <div>
-      <span>relations-front-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
-    </div>
-    <br/>
-    <div>
-      <span>gradle-plugin-database</span>
-      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
-    </div>
-  </div>
 </section>
 
 

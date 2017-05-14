@@ -9,11 +9,8 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在AngularJS中，视图是模型在模板中的映射的结果（模型（Model）和视图模型的绑定（View Model））。这意味当模型发生变化时，视图上的绑定内容会对应更新。 模型 看第一个的例子，模型与模板： 1
-2
-3
-4
-&lt;body ng-app&gt; &lt;input type=& &hellip;">
+  <meta name="description" content="不说废话，开始学习AngularJS的依赖注入，如果你对什么是依赖注入还不明白的话，可以看看Martin Fowler的一篇关于依赖注入的文章
+Inversion of Control Containers and the Dependency Injection pattern，这里也有译文。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,7 +71,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/12/25/yes-angularjs-2/">开始！AngularJS!（二）- 入门：视图，模板，模型，控制器和作用域</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/01/04/yes-angularjs-6/">开始！AngularJS!（六）- 依赖注入</a></h1>
     
     
       <p class="meta">
@@ -83,52 +80,30 @@
 
 
 
-<time class='entry-date' datetime='2014-12-25T22:40:58+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>10:40 pm</span></time>
+<time class='entry-date' datetime='2015-01-04T13:24:06+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:24 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>在AngularJS中，视图是模型在模板中的映射的结果（模型（Model）和视图模型的绑定（View Model））。这意味当模型发生变化时，视图上的绑定内容会对应更新。</p>
+  <div class="entry-content"><p>不说废话，开始学习AngularJS的依赖注入，如果你对什么是依赖注入还不明白的话，可以看看Martin Fowler的一篇关于依赖注入的文章
+<a href="http://martinfowler.com/articles/injection.html" title="Inversion of Control Containers and the Dependency Injection pattern">Inversion of Control Containers and the Dependency Injection pattern</a>，这里也有<a href="http://benweizhu.github.io/blog/2013/09/22/inversion-of-control-containers-and-the-dependency-injection-pattern-translate/" title="译文">译文</a>。</p>
 
-<p><strong>模型</strong></p>
+<p>依赖注入就是，在需要此依赖的地方等待被依赖对象注入（传入）进来，而不是通过new关键字去构造，或者去查找某个依赖。</p>
 
-<p>看第一个的例子，模型与模板：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    { {name} }
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/j6b5271r/">http://jsfiddle.net/benweizhu/j6b5271r/</a></p>
-
-<p>在这个例子中，使用了一个HTML本身没有的语法ng-model=&ldquo;name&#8221;，它是AngularJS扩展的HTML语法，叫做ng-model指令，还用到了，AngularJS的数值表达式。</p>
-
-<p>我们知道在大部分传统模板系统中，对模板的渲染都是线性单向的过程：模型和模板混合在一起产生标记的计算结果。当任何模型发生改变后都需要模板重新计算。</p>
-
-<p>在AngularJS中，当输入框中的内容改变时，对应的模型name会发生改变，AngularJS会<strong>检测到模型发生改变</strong>，重新渲染模板中与该模型绑定的视图部分。</p>
-
-<p>这是AngularJS提供的最基本也是最重要的功能之一，<strong>数据的双向绑定</strong>。</p>
-
-<p><strong>控制器</strong></p>
-
-<p>再来第二个例子，模型和控制器：</p>
+<p>看一个AngularJS依赖注入的例子：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;textController&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>         <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;diApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;diController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;alertValue&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">ng-click=</span><span class="s">&quot;alertMe()&quot;</span> <span class="na">value=</span><span class="s">&quot;clickMe&quot;</span> <span class="nt">/&gt;</span>
 </span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
 </span><span class='line'><span class="nt">&lt;/body&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -139,83 +114,36 @@
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">textController</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$scope</span><span class="p">){</span>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span><span class="o">=</span><span class="s2">&quot;benwei&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;diApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;diController&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$window</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">alertMe</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">$window</span><span class="p">.</span><span class="nx">alert</span><span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">alertValue</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">});</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/m5gue0zs/">http://jsfiddle.net/benweizhu/m5gue0zs/</a></p>
+<p>在jsfiddle中查看，<a href="http://jsfiddle.net/n5sknpe9/">http://jsfiddle.net/n5sknpe9/</a></p>
 
-<p>在这里，用到了AngularJS中的另一个指令ng-controller，在这个Controller的范围内，定义了一个模型name，我们通过模板域模型$scope对象得到controller范围内定义的模型name，并赋值。</p>
+<p>在定义控制器diController时，在构造函数中传入一个对象$scope和一个服务$window。$scope将控制器作用域中的模型alertValue传递进来，而$window则提供alert()方法。</p>
 
-<p>在例子中，我们通过$scope对象将模型数据name传递给Controller，从而进行数据的初始化。</p>
+<h3>$inject</h3>
 
-<p>虽然，一般情况下，我们不会用这样的方式去建立controller，但是我们可以清晰的看到，在AngularJS中，一个Controller其实就是JavaScript中的一个函数。所以，Controller可以做事情是很多，它并通过$scope对象与模型关联，从而可以实现对模型的赋值以及其他相关逻辑行为的定义。</p>
-
-<p><strong>作用域</strong></p>
-
-<p>这里你看到了另一个重要对象$scope，<strong>作用域（Scope）是AngularJS的重要概念，它可以看做一种粘合剂，让模板，模型和控制器工作在一起。AngularJS通过作用域，以及模板中包含的信息，数据模型，控制器，让模型和视图保持位置的分离，内容的同步。任何对模型的改变都会反映到视图，任何视图的改变也会映射到模型中。</strong></p>
-
-<p>大部分Web应用都是基于MVC的模式，也衍生出许多中MVC的变种（如MVVM（Model View ViewModel）），但AngularJS宣称自己是MVW（Model View Whatever）。</p>
-
-<p>在本节，最重要的是了解视图，模板，模型，控制器之间的关系，以及对作用域对象$scope有一个基本的了解。我们可以在之后一起去了解一下这个Whatever到底是什么含义。</p>
-
-<p>本节中遇到的概念：</p>
-
-<p>模板(Template) | 带有Angular扩展标记的HTML <br/>
-指令(Directive) | 用于通过自定义属性和元素扩展HTML的行为  <br/>
-模型(Model) | 用于显示给用户并且与用户互动的数据  <br/>
-作用域(Scope) | 用来存储模型(Model)的语境(context)。模型放在这个语境中才能被控制器、指令和表达式等访问到  <br/>
-表达式(Expression) | 模板中可以通过它来访问作用域（Scope）中的变量和函数  <br/>
-视图(View) | 用户看到的内容（即DOM）  <br/>
-数据绑定(Data Binding) | 自动同步模型(Model)中的数据和视图(View)表现 <br/>
-控制器(Controller) | 视图(View)背后的业务逻辑</p>
-
-<p>参考资料：</p>
-
-<p>1.《精通AngularJS》 <br/>
-2.<a href="http://www.ngnice.com/docs/guide/concepts">http://www.ngnice.com/docs/guide/concepts</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/12/19/yes-angularjs-1/">开始！AngularJS!（一）- 刚刚开始</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-12-19T21:54:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:54 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>看这样一个例子：</p>
+<p>用起来看着确实很简单，那么AngularJS是怎么做到的呢？看下面一个例子。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;textLengthLimitController&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;textarea</span> <span class="na">ng-model=</span><span class="s">&quot;text&quot;</span><span class="nt">&gt;&lt;/textarea&gt;</span> <span class="nt">&lt;span&gt;&lt;/span&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">ng-disabled=</span><span class="s">&quot;!hasValidLength()&quot;</span> <span class="na">value=</span><span class="s">&quot;send&quot;</span> <span class="nt">/&gt;</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;diApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;diController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        { {value} }
 </span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
 </span><span class='line'><span class="nt">&lt;/body&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
@@ -236,63 +164,342 @@
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">MAX_LENGTH</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;diApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
 </span><span class='line'>
-</span><span class='line'><span class="kd">function</span> <span class="nx">textLengthLimitController</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">remaining</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">MAX_LENGTH</span> <span class="o">-</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+</span><span class='line'><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;diService&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">getValue</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>            <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">})</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">hasValidLength</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">remaining</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;diController&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">diService</span><span class="p">){</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">diService</span><span class="p">.</span><span class="nx">getValue</span><span class="p">();</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>每个Angular应用都有一个injector对象。这个injector是一个服务定位器，负责创建和查找依赖，当你的app的某处声明需要用到某个依赖时，Angular 会调用这个依赖注入器去查找或是创建你所需要的依赖，然后返回来给你用。</p>
+
+<p>为了看得更清楚，手动的去调injector来获取该依赖，就下面这样做：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;diApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;diService&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">getValue</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>            <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">});</span>
 </span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">injector</span><span class="p">([</span><span class="s1">&#39;diApp&#39;</span><span class="p">,</span> <span class="s1">&#39;ng&#39;</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">diService</span> <span class="o">=</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;diService&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">diService</span><span class="p">.</span><span class="nx">getValue</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>而当你在声明说需要的依赖时，AngularJS帮你做了上面这件事情。</p>
+
+<h3>依赖注解(Annotation)的方式</h3>
+
+<p>那么$inject服务，怎么知道应该将什么依赖注入给你呢？</p>
+
+<p>如果从$inject服务的内部来看，有下面三种方式：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// inferred (only works if code not minified/obfuscated)</span>
+</span><span class='line'><span class="nx">$injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">serviceA</span><span class="p">){});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// annotated</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">explicit</span><span class="p">(</span><span class="nx">serviceA</span><span class="p">)</span> <span class="p">{};</span>
+</span><span class='line'><span class="nx">explicit</span><span class="p">.</span><span class="nx">$inject</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;serviceA&#39;</span><span class="p">];</span>
+</span><span class='line'><span class="nx">$injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">explicit</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// inline</span>
+</span><span class='line'><span class="nx">$injector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">([</span><span class="s1">&#39;serviceA&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">serviceA</span><span class="p">){}]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么，换成在注册控制器或者服务时，对应也是三种方式：</p>
+
+<p>直接指定，最简单的获取依赖的方法是让你的函数的参数名直接使用依赖名，也就是之前的那些例子一样。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">myController</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">myService</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>代码的功能是告诉用户还可输入多少字符，当字符超过限制，将发送按钮灰掉。在jsFiddle里运行该代码，<a href="http://jsfiddle.net/benweizhu/cbcn995m/">http://jsfiddle.net/benweizhu/cbcn995m/</a></p>
+<p>$inject服务的官方例子也说了，这种用法只适合于js不需要压缩和混乱的情况下。</p>
 
-<p>这里做了几件事情：<br/>
-1.定义页面（HTML页面）<br/>
-2.定义期待行为（remaining()和ng-disabled）<br/>
-3.定义行为发生的逻辑（MAX_LENGTH - $scope.text.length和$scope.remaining() >= 0）</p>
+<p>而为了让在压缩版的js代码能中重命名过的参数名能够正确地注入相关的依赖服务。函数需要通过$inject属性进行标注，这个属性是一个存放需要注入的服务的数组。</p>
 
-<p>剩下最复杂的事情：对DOM元素的操作，交给了AngularJS来做。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">myController</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">renamed$scope</span><span class="p">,</span> <span class="nx">renamedMyService</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">myController</span><span class="p">[</span><span class="s1">&#39;$inject&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span> <span class="s1">&#39;myService&#39;</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p><strong>引用AngularJS官方文档对AngularJS的介绍：</strong></p>
 
-<p>“AngularJS是一个开发动态Web应用的框架。它让你可以使用HTML作为模板语言并且可以通过扩展的HTML语法来使应用组件更加清晰和简洁。它的创新之处在于，通过数据绑定和依赖注入减少了大量代码，而这些都在浏览器端通过JavaScript实现，能够和任何服务器端技术完美结合。”</p>
+<p>但是，这种方式是不是看的很累赘。</p>
 
-<p>就像文档介绍的那样，HTML本身是静态文档，是很好的声明式语言，但对于构建动态的web应用，却无能为力。</p>
+<p>还有最后一种方法，<strong>内联（inline）</strong></p>
 
-<p>针对这类问题，通常的解决办法是：通过JavaScript对HTML的DOM结构进行修改。比如，jQuery。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;myApp&#39;</span><span class="p">,[]).</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;myController&#39;</span><span class="p">,[</span><span class="s1">&#39;$scope&#39;</span><span class="p">,</span><span class="s1">&#39;myService&#39;</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">myService</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'><span class="p">}]);</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>而AngularJS另辟蹊径，通过扩展HTML的语法来拉近静态Web和动态Web之间的距离。</p>
 
-<p><strong>&ldquo;Angular是建立在这样的信念之上的：即声明式的代码用在构建用户界面和组装软件组件时更好，而命令式的代码更擅长展现业务逻辑。&rdquo;</strong></p>
+<p>这样是不是好多了，这是AngularJS官方推荐的方法，我之前写的例子，都不算是最佳实践，我们应该参考这种方式去实现自己控制器和服务。</p>
 
-<p>AngularJS将应用逻辑与DOM操作解耦，让开发人员不用去担心去前端视图模型（View Model）改变，从而大大提高代码的可测试性。</p>
+<p>总算，将依赖注入的部分介绍完了，下一节，一起来了解AngularJS为View Model（视图模型）提供的强大的过滤器功能。</p>
 
-<p>AngularJS试图去实现一个完整的前端解决方案：</p>
+<p>参考资料： <br/>
+1.<a href="http://www.ngnice.com/docs/guide/di">http://www.ngnice.com/docs/guide/di</a>  <br/>
+2.<a href="http://www.ngnice.com/docs/api/auto/service/$injector">http://www.ngnice.com/docs/api/auto/service/$injector</a>  <br/>
+3.<a href="http://www.ngnice.com/docs/tutorial/step_05">http://www.ngnice.com/docs/tutorial/step_05</a></p>
+</div>
+  
+  
 
-<p>1.构建一个CRUD应用时可能用到的所有技术：数据绑定、基本模板指令、表单验证、路由、深度链接、组件重用、依赖注入<br/>
-2.可测试性：单元测试、端到端测试、模拟对象（mocks）、测试工具</p>
 
-<p>在一个以用户体验，多平台（Web和移动）为核心的现代应用时代，单页应用以前端+API成为了Web应用的开发的趋势：</p>
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/01/03/yes-angularjs-5/">开始！AngularJS!（五）- 模块化</a></h1>
+    
+    
+      <p class="meta">
+        
 
-<p>1.对于内容的改动不需要加载整个页面 <br/>
-2.对服务器压力很小，消耗更少的带宽，与面向服务的架构更好地结合<br/>
-3.多平台使用相同的API，减少后台逻辑的重复开发</p>
 
-<p>AngularJS给现代Web应用开发带来曙光，让我们一起认认真真学习AngularJS。</p>
 
-<p>参考资料：</p>
 
-<p>1.《精通AngularJS》<br/>
-2.<a href="http://www.ngnice.com/docs/guide/introduction">http://www.ngnice.com/docs/guide/introduction</a> <br/>
-3.<a href="http://www.csdn.net/article/2012-12-10/2812658-Single-Page-Applications">http://www.csdn.net/article/2012-12-10/2812658-Single-Page-Applications</a></p>
+<time class='entry-date' datetime='2015-01-03T10:47:01+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>10:47 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>我们都知道JavaScript很容易就写出全局函数，所以无论是用jQuery还是纯JavaScript，我们都会使用模块化的策略避免写出来的函数污染全局。</p>
+
+<p>而模块化的办法一般都是利用函数对象立即执行。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">feature</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Private variables and functions</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">privateThing</span> <span class="o">=</span> <span class="s2">&quot;secret&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">publicThing</span> <span class="o">=</span> <span class="s2">&quot;not secret&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">changePrivateThing</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">privateThing</span> <span class="o">=</span> <span class="s2">&quot;super secret&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">sayPrivateThing</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">privateThing</span> <span class="p">);</span>
+</span><span class='line'>        <span class="nx">changePrivateThing</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Public API</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">publicThing</span><span class="o">:</span> <span class="nx">publicThing</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">sayPrivateThing</span><span class="o">:</span> <span class="nx">sayPrivateThing</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">})();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">feature</span><span class="p">.</span><span class="nx">publicThing</span><span class="p">;</span> <span class="c1">// &quot;not secret&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Logs &quot;secret&quot; and changes the value of privateThing</span>
+</span><span class='line'><span class="nx">feature</span><span class="p">.</span><span class="nx">sayPrivateThing</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>模块与ng-app指令</h3>
+
+<p>Angular也有模块的概念，但是它不只是为了解决全局函数的问题。</p>
+
+<p>看一个最简单的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">&quot;textApp&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;textController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;textApp&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;textController&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Benwei&#39;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/73kn66kd/">http://jsfiddle.net/benweizhu/73kn66kd/</a></p>
+
+<p>在前面我们已经无数次的看到ng-app指令。它的作用是自动启动一个AngularJS应用，ng-app指令一般指派在应用的根元素上，比如，body或者html标签。在每一个HTML文档中，只能有一个AngularJS应用可以被自动启动，在HTML文档中第一个被找到定义在根元素上的ng-app指令将会作为自动启动的应用。</p>
+
+<p>可以理解它为AngularJS应用启动的触发点。</p>
+
+<p>那我们在js代码中定义的模块和ng-app有什么关系呢？很明显，它是告诉AngularJS应用在启动时加载指定的模块，假设这里ng-app只是放一个纯标签，而不给它赋值。那么它就不知道这里该加载什么模块，于是，它也不认识在模块中定义的textController控制器。</p>
+
+<p>但是，赋值与否和启动一个AngularJS的应用无关：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
+</span><span class='line'>     <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样也是可以启动AngularJS应用，并实现name模型的绑定。</p>
+
+<h3>模块化的目的</h3>
+
+<p>模块化除了像Java中分包，分类那样来划分职责，还带来什么好处呢？（以下摘自官方文档）</p>
+
+<p>整个过程是声明式的，更容易理解<br/>
+在单元测试中，没有必要加载所有模块，这样有利于单元测试的代码书写<br/>
+在场景测试中，额外的模块可以被加载进来，进而重写一些配置，这样有助于实现应用的端到端的测试<br/>
+第三方代码可以很容易被打包成可重用的模块<br/>
+模块可以用任意顺序或并行顺序加载（得益于模块执行的延迟性）</p>
+
+<h3>子模块</h3>
+
+<p>对于大型应用，根据不同职责，建议把它像这样分成多个模块（参考官方文档）：</p>
+
+<p>服务模块<br/>
+指令模块<br/>
+过滤器模块<br/>
+一个应用的模块，依赖于上述的三个模块，而且包含应用的初始化及启动代码</p>
+
+<p><strong>模块依赖</strong></p>
+
+<p>模块声明时可以列出它所需要依赖的其它模块。一个模块依赖某模块，意味着这个被依赖的模块需要在模块被加载之前加载完毕。更具体些，假设模块A依赖于模块B，那么模块A的配置代码块的执行，必须发生在模块B的配置代码块之后；模块A的执行代码块亦同理，也在模块B的执行代码块之后被执行。每个模块只能被加载一次，即使有多个别的模块依赖它。</p>
+
+<p><strong>创建模块，获取模块，如何实现模块的依赖</strong></p>
+
+<p>使用 angular.module(&lsquo;myModule&rsquo;, []) 将创建名为 myModule 的模块并重写已有的同名模块。而使用 angular.module(&lsquo;myModule&rsquo;) 则只会获取已有的模块实例。</p>
+
+<p>你会注意到，创建和获取的区别，在于module函数的第二参数，该参数的作用是定义创建模块时的所依赖的模块（子模块）。</p>
+
+<p>这样做的好处是，不同的服务或者一组服务被放置在不同的可重用模块，那么应用模块只需要声明应用所需要的全部依赖模块即可。</p>
+
+<p>来看一个模块依赖的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;restApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ngResource&#39;</span><span class="p">])</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;personRest&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$resource</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/app/person&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;myApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;restApp&#39;</span><span class="p">])</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;parentsController&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">personRest</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">personRest</span><span class="p">.</span><span class="nx">get</span><span class="p">({},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">person</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">person</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>    <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我需要写一个Rest的客户端模块restApp，需要使用到AngularJS提供的$resource服务，那么首先我需要引入AngularJS的ngResource服务模块，最后在我的应用模块，引入我自己定义的restApp模块然后，我就可以注入我自己定义personRest服务，继而使用它，这是一个典型的模块依赖例子。</p>
+
+<p>本来上一节，说好了要讲解依赖注入，但是我发现先介绍模块和模块化更好，一个是尽快帮助学习写更规范的AngularJS应用，二个也会有助于之后对理解依赖注入。下一节，我们来讨论AngularJS中的依赖注入。</p>
 </div>
   
   
@@ -327,23 +534,23 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境代码下性能优化</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
       </li>
     
   </ul>
@@ -374,23 +581,6 @@
     });
   </script>
   <script src="/javascripts/github.js" type="text/javascript"> </script>
-  <div>
-    <h1>Currently Working On</h1>
-    <div>
-      <span>relations-back-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
-    </div>
-    <br/>
-    <div>
-      <span>relations-front-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
-    </div>
-    <br/>
-    <div>
-      <span>gradle-plugin-database</span>
-      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
-    </div>
-  </div>
 </section>
 
 

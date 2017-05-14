@@ -9,8 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="
-">
+  <meta name="description" content="使用Nginx服务静态文件的原因很简单：快。 上一篇文章中 http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/ ，我们使用Nginx作为Tomcat服务器的反向代理服务器， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -71,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/04/27/what-the-heck-is-javascript-event-loop/">What the Heck Is Javascript Event Loop</a></h1>
+      <h1 class="entry-title"><a href="/blog/2016/05/22/nginx-serve-static/">用Nginx服务静态文件</a></h1>
     
     
       <p class="meta">
@@ -80,14 +79,95 @@
 
 
 
-<time class='entry-date' datetime='2016-04-27T08:41:24+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:41 am</span></time>
+<time class='entry-date' datetime='2016-05-22T11:58:09+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>11:58 am</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><embed src="http://player.youku.com/player.php/sid/XMTU1MzE1NDQ5Mg==/v.swf" allowFullScreen="true" quality="high" width="550" height="450" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash"></embed></p>
+  <div class="entry-content"><p>使用Nginx服务静态文件的原因很简单：快。</p>
+
+<p>上一篇文章中 <a href="http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">http://benweizhu.github.io/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/</a> ，我们使用Nginx作为Tomcat服务器的反向代理服务器，这样比在Tomcat直接配置80端口更加方便。</p>
+
+<p>但是，却没有很好的利用Nginx服务器的特点，即 NGINX | High Performance Load Balancer, Web Server, &amp; Reverse等。</p>
+
+<p>我们可以使用Nginx来服务器静态文件，使用Tomcat来处理JSP的动态文件。配置非常简单，分别使用下面两个配置：</p>
+
+<h2>403错误：添加Nginx访问文案件的权限</h2>
+
+<p>nginx配置中有一个user选项，默认，nginx配置的是nobody。 <a href="http://nginx.org/en/docs/ngx_core_module.html#user">http://nginx.org/en/docs/ngx_core_module.html#user</a></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#user  nobody;</span>
+</span><span class='line'>worker_processes  1<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#error_log  logs/error.log;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  notice;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  info;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#pid        logs/nginx.pid;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>需要将它改为可以访问Tomcat服务器上文件的用户和用户组</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>user  yourusername yourusergroup<span class="p">;</span> <span class="c">#比如 benweizhu stuff</span>
+</span><span class='line'>worker_processes  1<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#error_log  logs/error.log;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  notice;</span>
+</span><span class='line'><span class="c">#error_log  logs/error.log  info;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#pid        logs/nginx.pid;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>404错误：使用Alias来配置Static文件路径</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>location /static/ <span class="o">{</span>
+</span><span class='line'>  autoindex  on<span class="p">;</span>
+</span><span class='line'>  <span class="nb">alias</span> /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp/static<span class="p">;</span> <span class="c">#完整路径</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Nginx的Wiki推荐使用root字段</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>location /static/ <span class="o">{</span>
+</span><span class='line'>  autoindex  on<span class="p">;</span>
+</span><span class='line'>  root /Documents/servers/tomcat/apache-tomcat-8.0.30/webapps/someapp<span class="p">;</span> <span class="c">#完整路径</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考资料：   <br/>
+1. <a href="https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/">https://nu2ruby.wordpress.com/2010/04/13/nginx-getgrnam-presmini-failed/</a>   <br/>
+2. <a href="http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden">http://stackoverflow.com/questions/16808813/nginx-serve-static-file-and-got-403-forbidden</a>   <br/>
+3. <a href="http://stackoverflow.com/questions/1474374/nginx-doesnt-serve-static">http://stackoverflow.com/questions/1474374/nginx-doesnt-serve-static</a></p>
 </div>
   
   
@@ -100,7 +180,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/03/25/when-to-use-in-on-at/">什么时候用on, In和at？</a></h1>
+      <h1 class="entry-title"><a href="/blog/2016/05/21/use-nginx-as-reverse-proxy-for-tomcat/">将Nginx作为Tomcat的反向代理服务器</a></h1>
     
     
       <p class="meta">
@@ -109,14 +189,145 @@
 
 
 
-<time class='entry-date' datetime='2016-03-25T10:49:43+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:49 am</span></time>
+<time class='entry-date' datetime='2016-05-21T21:15:08+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>9:15 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p><img src="/images/when_to_use_in_on_at.png" width="700" title="合适使用 in on at" alt="Alt text" /></p>
+  <div class="entry-content"><p>本例子，以mac作为主机：</p>
+
+<h2>安装Nginx</h2>
+
+<p>通过HomeBrew安装Nginx。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>brew install nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后，运行启动nginx。如果启动遇到问题，使用brew doctor查看下，有可能是没有link（brew link nginx），或者没有文件执行权限（chmod去改）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>nginx启动默认是8080端口，所以到 <a href="http://localhost:8080">http://localhost:8080</a> 上测试下。mac上nginx.conf的位置在/usr/local/etc/nginx/nginx.conf，也可以通过brew info nginx查看。
+因为我们要使用80端口，所以需要修改配置，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
+</span><span class='line'>    listen       8080<span class="p">;</span>
+</span><span class='line'>    server_name  localhost<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">#access_log  logs/host.access.log  main;</span>
+</span><span class='line'>
+</span><span class='line'>    location / <span class="o">{</span>
+</span><span class='line'>        root   html<span class="p">;</span>
+</span><span class='line'>        index  index.html index.htm<span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>改为：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
+</span><span class='line'>    listen       80<span class="p">;</span>
+</span><span class='line'>    server_name  localhost<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">#access_log  logs/host.access.log  main;</span>
+</span><span class='line'>
+</span><span class='line'>    location / <span class="o">{</span>
+</span><span class='line'>        root   html<span class="p">;</span>
+</span><span class='line'>        index  index.html index.htm<span class="p">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个时候，需要sudo去启动nginx了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>sudo nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>访问 <a href="http://localhost">http://localhost</a> 进行测试，可以看到Nginx的主页。</p>
+
+<h2>安装Tomcat</h2>
+
+<p><a href="https://tomcat.apache.org/download-80.cgi">https://tomcat.apache.org/download-80.cgi</a></p>
+
+<p>运行bin下面的./startup.sh。同样如果没有执行权限，用chmod修改。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>./startup.sh
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>默认是8080，访问 <a href="http://localhost:8080">http://localhost:8080</a> 可以看到Tomcat的主页。</p>
+
+<h2>修改Nginx配置，通过proxy_pass转发80请求到8080</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
+</span><span class='line'>        listen       80<span class="p">;</span>
+</span><span class='line'>        server_name  localhost<span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c">#access_log  logs/host.access.log  main;</span>
+</span><span class='line'>
+</span><span class='line'>        location / <span class="o">{</span>
+</span><span class='line'>            proxy_pass http://127.0.0.1:8080<span class="p">;</span>
+</span><span class='line'>            root   html<span class="p">;</span>
+</span><span class='line'>            index  index.html index.htm<span class="p">;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>此时，重启Nginx服务器:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo nginx -s stop
+</span><span class='line'>sudo nginx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>再次访问 <a href="http://localhost">http://localhost</a> 进行测试，就会看到Tomcat的主页了。</p>
+
+<p>参考资料：<br/>
+1. <a href="http://learnaholic.me/2012/10/10/installing-nginx-in-mac-os-x-mountain-lion/">http://learnaholic.me/2012/10/10/installing-nginx-in-mac-os-x-mountain-lion/</a><br/>
+2. <a href="https://devtidbits.com/2015/12/08/nginx-as-a-reverse-proxy-to-apache-tomcat/">https://devtidbits.com/2015/12/08/nginx-as-a-reverse-proxy-to-apache-tomcat/</a></p>
 </div>
   
   
@@ -151,23 +362,23 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境代码下性能优化</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
       </li>
     
   </ul>
@@ -198,23 +409,6 @@
     });
   </script>
   <script src="/javascripts/github.js" type="text/javascript"> </script>
-  <div>
-    <h1>Currently Working On</h1>
-    <div>
-      <span>relations-back-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
-    </div>
-    <br/>
-    <div>
-      <span>relations-front-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
-    </div>
-    <br/>
-    <div>
-      <span>gradle-plugin-database</span>
-      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
-    </div>
-  </div>
 </section>
 
 

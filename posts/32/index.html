@@ -9,10 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="由于本小节，涉及到自定义任务，所以穿插一点自定义任务的知识。 Gradle Task 在前面已经介绍过Gradle和Ant相似，由任务驱动，以任务依赖的方式形成任务链，从而实现构建生命周期。所以，任务是Gradle中一个完整的可执行单元。 如何定义任务： 1
-2
-3
-task hello { &hellip;">
+  <meta name="description" content="Spring Boot是Spring团队提供的全新框架，其设计目的是用来简化新的Spring应用的初始搭建以及开发过程。 Spring Boot的主要目的是：（参考：https://github.com/spring-projects/spring-boot%EF%BC%89 1.Provide &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,7 +70,7 @@ task hello { &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/01/31/deep-into-gradle-in-action-4/">Gradle深入与实战（四）自定义集成测试任务</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/03/10/get-started-with-spring-boot-1-quick-start/">用Spring Boot开发Spring项目 快速上手</a></h1>
     
     
       <p class="meta">
@@ -82,177 +79,28 @@ task hello { &hellip;">
 
 
 
-<time class='entry-date' datetime='2015-01-31T21:47:45+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>9:47 pm</span></time>
+<time class='entry-date' datetime='2015-03-10T16:44:18+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>4:44 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>由于本小节，涉及到自定义任务，所以穿插一点自定义任务的知识。</p>
+  <div class="entry-content"><p>Spring Boot是Spring团队提供的全新框架，其设计目的是用来简化新的Spring应用的初始搭建以及开发过程。</p>
 
-<h2>Gradle Task</h2>
+<p>Spring Boot的主要目的是：（参考：<a href="https://github.com/spring-projects/spring-boot%EF%BC%89">https://github.com/spring-projects/spring-boot%EF%BC%89</a></p>
 
-<p>在前面已经介绍过Gradle和Ant相似，由任务驱动，以任务依赖的方式形成任务链，从而实现构建生命周期。所以，任务是Gradle中一个完整的可执行单元。</p>
+<p>1.Provide a radically faster and widely accessible getting started experience for all Spring development  <br/>
+2.Be opinionated out of the box, but get out of the way quickly as requirements start to diverge from the defaults  <br/>
+3.Provide a range of non-functional features that are common to large classes of projects (e.g. embedded servers, security, metrics, health checks, externalized configuration)  <br/>
+4.Absolutely no code generation and no requirement for XML configuration</p>
 
-<p>如何定义任务：</p>
+<p>快速启动Spring的开发，快速响应变化，提供非功能的特性，无需XML配置，这是Spring Boot所带来的优势。</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">hello</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">println</span> <span class="s1">&#39;hello Gradle&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>下面通过一个例子，来快速的开发一个基于Spring Boot的Rest应用</p>
 
-
-<p>执行该任务，只需要输入命令gradle hello。定义task的方式有很多种：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="n">myTask</span>
-</span><span class='line'><span class="n">task</span> <span class="n">myTask</span> <span class="o">{</span> <span class="n">configure</span> <span class="n">closure</span> <span class="o">}</span>
-</span><span class='line'><span class="n">task</span> <span class="n">myType</span> <span class="o">&lt;&lt;</span> <span class="o">{</span> <span class="n">task</span> <span class="n">action</span> <span class="o">}</span>
-</span><span class='line'><span class="n">task</span> <span class="nf">myTask</span><span class="o">(</span><span class="nl">type:</span> <span class="n">SomeType</span><span class="o">)</span>
-</span><span class='line'><span class="n">task</span> <span class="nf">myTask</span><span class="o">(</span><span class="nl">type:</span> <span class="n">SomeType</span><span class="o">)</span> <span class="o">{</span> <span class="n">configure</span> <span class="n">closure</span> <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>其中有一种定义方式，传入了一个参数type，作用是预定义该task的类型，指定类型之后，在传入的闭包中就可以使用该类型task提供的特殊变量或函数。</p>
-
-<p>比如一个拷贝类型的task</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="nf">copyDocs</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Copy</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">from</span> <span class="s1">&#39;src/main/doc&#39;</span>
-</span><span class='line'>    <span class="n">into</span> <span class="s1">&#39;build/target/doc&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>更过关于Task的内容，在以后的章节中再介绍。</p>
-
-<h2>自定义集成测试任务</h2>
-
-<p><strong>现在我们开始写一个集成测试的task，需求是这样的：</strong></p>
-
-<p>作为一个Java的程序员，我想要将单元测试和集成测试分离</p>
-
-<p>1.我想要 将单元测试全部放在src/test/unit目录中，将集成测试全部放在src/test/intgetaion中   <br/>
-2.我想要 能够单独运行我的集成测试  <br/>
-3.我想要 在运行build命令时，同时跑单元测试和集成测试</p>
-
-<p><strong>根据这样的一个需求，划分几步来做：</strong> <br/>
-1.建立目录  <br/>
-2.目录结构已经和原来的默认规约不同，所以要更改Java插件提供的SourceSet test，来映射单元测试目录结构  <br/>
-3.需要新建一个SourceSet intTest，来映射集成测试目录结构  <br/>
-4.Java插件会给新建的SourceSet intTest定义两个Configuration，分别是intTestCompile和intTestRuntime，那么就需要给这两个分组指定构件内容和依赖  <br/>
-5.定义一个名字叫做integrationTest的测试的task</p>
-
-<p><strong>那么我们从第二步和第三步开始，修改Java插件提供的SourceSet test和新建SourceSet intTest：</strong></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="c1">// 定义一些常量，在其他位置使用</span>
-</span><span class='line'><span class="n">ext</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">unitJavaSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/unit/java&#39;</span>
-</span><span class='line'>    <span class="n">unitResourcesSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/unit/resources&#39;</span>
-</span><span class='line'>    <span class="n">intJavaSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/integration/java&#39;</span>
-</span><span class='line'>    <span class="n">intResourcesSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/integration/resources&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">test</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitJavaSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitResourcesSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">intTest</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intJavaSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intResourcesSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>第三步，给intTestCompile和intTestRuntime指定指定构件内容（产品代码）和依赖</strong></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;junit:junit:4.11&#39;</span>
-</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;org.mockito:mockito-core:1.9.5&#39;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">intTestCompile</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">main</span><span class="o">.</span><span class="na">output</span> <span class="c1">// 将sourceSets.main中的输出class指定到intTestCompile中</span>
-</span><span class='line'>    <span class="n">intTestCompile</span> <span class="n">configurations</span><span class="o">.</span><span class="na">testCompile</span> <span class="c1">// 将configurations.testCompile的依赖拿过来</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>最后一步，定义一个test类型的task，并让check任务依赖于它</strong></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">task</span> <span class="nf">integrationTest</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Test</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">testClassesDir</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">output</span><span class="o">.</span><span class="na">classesDir</span>
-</span><span class='line'>    <span class="n">classpath</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">runtimeClasspath</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">check</span><span class="o">.</span><span class="na">dependsOn</span> <span class="n">integrationTest</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后，你就可以在命令行中运行gradle integrationTest。</p>
-
-<p>完整版本如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>build.gradle </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -285,56 +133,22 @@ task hello { &hellip;">
 <span class='line-number'>31</span>
 <span class='line-number'>32</span>
 <span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">ext</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">unitJavaSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/unit/java&#39;</span>
-</span><span class='line'>    <span class="n">unitResourcesSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/unit/resources&#39;</span>
-</span><span class='line'>    <span class="n">intJavaSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/integration/java&#39;</span>
-</span><span class='line'>    <span class="n">intResourcesSrcDir</span> <span class="o">=</span> <span class="s1">&#39;src/test/integration/resources&#39;</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">classpath</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-gradle-plugin:1.2.2.RELEASE&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'>
-</span><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">test</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitJavaSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">unitResourcesSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">intTest</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intJavaSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="n">intResourcesSrcDir</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;spring-boot&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">jar</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">baseName</span> <span class="o">=</span> <span class="s1">&#39;gs-spring-boot&#39;</span>
+</span><span class='line'>    <span class="n">version</span> <span class="o">=</span>  <span class="s1">&#39;0.1.0&#39;</span>
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
@@ -342,34 +156,88 @@ task hello { &hellip;">
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;junit:junit:4.11&#39;</span>
-</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;org.mockito:mockito-core:1.9.5&#39;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">intTestCompile</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">main</span><span class="o">.</span><span class="na">output</span>
-</span><span class='line'>    <span class="n">intTestCompile</span> <span class="n">configurations</span><span class="o">.</span><span class="na">testCompile</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">task</span> <span class="nf">integrationTest</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Test</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">testClassesDir</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">output</span><span class="o">.</span><span class="na">classesDir</span>
-</span><span class='line'>    <span class="n">classpath</span> <span class="o">=</span> <span class="n">sourceSets</span><span class="o">.</span><span class="na">intTest</span><span class="o">.</span><span class="na">runtimeClasspath</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">check</span><span class="o">.</span><span class="na">dependsOn</span> <span class="n">integrationTest</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">idea</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">module</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">unitJavaSrcDir</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">unitResourcesSrcDir</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">intJavaSrcDir</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">testSourceDirs</span> <span class="o">+=</span> <span class="n">file</span><span class="o">(</span><span class="n">intResourcesSrcDir</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-web&quot;</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">exclude</span> <span class="nl">module:</span> <span class="s2">&quot;spring-boot-starter-tomcat&quot;</span>
 </span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-jetty&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">testCompile</span><span class="o">(</span><span class="s2">&quot;junit:junit&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">task</span> <span class="nf">wrapper</span><span class="o">(</span><span class="nl">type:</span> <span class="n">Wrapper</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">gradleVersion</span> <span class="o">=</span> <span class="s1">&#39;1.11&#39;</span>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>在Gradle中，应用了Spring Boot Gradle插件，你可以看到dependencies中并没有指定Spring Boot依赖的版本，这是因为已经在插件的定义中已经指定了版本：1.2.2.RELEASE，所以这里就可以省略。（关于省略版本这一点，在之后的文章中会解释）。</p>
+
+<p>而且，依赖spring-boot-starter-web会一站式的帮你将与web开发相关的所有相关依赖下载，而不需要你一个个复制粘贴。这也是所有其他Spring Boot Starter的主要目的。</p>
+
+<figure class='code'><figcaption><span>HelloController.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RestController</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@RestController</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloController</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">hello</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;hello spring boot&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里定义了一个HelloController使用RestController注解，@RestController代表着@Controller和@ResponseBody，可以简化写Restful类型Controller的流程。</p>
+
+<figure class='code'><figcaption><span>Application.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.boot.SpringApplication</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.SpringBootApplication</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@SpringBootApplication</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Application</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">Application</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>最后一步，定义Spring boot应用的main方法，@SpringBootApplication等价于另外三个注解@Configuration，@EnableAutoConfiguration，@ComponentScan。</p>
+
+<p>运行Gradle的命令: gradlew bootRun就可以启动应用程序。</p>
+
+<p>通过Spring Boot创建的Java应用可以直接通过java -jar启动（即便它是Web应用）。也就是说，在这里，首先运行gradle assemble，得到jar文件，然后运行java -jar gs-spring-boot-0.1.0.jar。</p>
+
 <p>参考资料： <br/>
-1.Gradle官方文档 <br/>
-2.<a href="http://selimober.com/blog/2014/01/24/separate-unit-and-integration-tests-using-gradle/">http://selimober.com/blog/2014/01/24/separate-unit-and-integration-tests-using-gradle/</a></p>
+1.<a href="https://github.com/spring-projects/spring-boot">https://github.com/spring-projects/spring-boot</a> <br/>
+2.<a href="http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#getting-started-first-application">http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#getting-started-first-application</a></p>
 </div>
   
   
@@ -382,7 +250,7 @@ task hello { &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/01/31/deep-into-gradle-in-action-3/">Gradle深入与实战（三）依赖管理工具</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/02/07/spring-test-and-integration-test/">了解Spring Test对单元测试和集成测试的支持</a></h1>
     
     
       <p class="meta">
@@ -391,114 +259,86 @@ task hello { &hellip;">
 
 
 
-<time class='entry-date' datetime='2015-01-31T18:41:46+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>6:41 pm</span></time>
+<time class='entry-date' datetime='2015-02-07T23:20:45+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:20 pm</span></time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>大部分的项目都不是自包含的，也就是说，需要使用到其他项目的构建结果，比如一些Jar文件。它们作为输入文件，必须存在于项目的ClassPath下，程序才能编译和运行。这些输入文件有一个很表意的名字，叫做依赖。</p>
+  <div class="entry-content"><p>在敏捷开发和测试驱动开发中，自动化测试一直被认为是让软件开发人员能够有信心的进行软件开发的力量源泉。</p>
 
-<p>Gradle允许你告诉它项目的依赖是什么，然后它就会负责找到这些依赖。这些依赖会从Maven或者Ivy的远程仓库下载下来（大部分情况），并缓存在本地的某个路径，这个过程叫做依赖解析。</p>
+<p>所以，软件开发人员不仅要关注写出高质量的产品代码，同时也要关注写出高质量的测试代码。</p>
 
-<p>Maven和Gradle一样也提供了类似的功能，而Ant没有，你只能告诉Ant依赖文件的相对或者绝对路径，让它去加载。</p>
+<p>有些人说，对于开发人员，自动化测试不过是利用Junit，Mockito，Selenium等测试框架写出的另一段程序代码而已。虽然听起来很不爽，但我也不否认这一点，这是事实，但我们也是按照写产品代码的要求来写出高质量的测试代码。</p>
 
-<p>常常一个依赖自己也存在依赖，我们称为传递依赖，依赖管理工具又具有解析传递依赖的能力。</p>
+<p>回到正题，今天的主题是了解Spring对基于Spring开发的单元测试和集成测试的支持。</p>
 
-<h3>Gradle的依赖管理</h3>
+<p>如果你正在使用Spring做开发，那么在写测试代码的时候，无论是单元测试还是集成测试，如果只是用到Junit，Mockito，EasyMock这些测试框架，你一定会发现，它们是不够的。Spring框架的优点就在于，它的策略是试图涵盖Java开发的所有部分，测试也不例外。Spring提供了一套API来支持基于Spring的单元测试和集成测试。下面，我们来看看Spring在测试方面都提供一些什么样的优秀特性。</p>
 
-<p>那么如何在Gradle中定义依赖呢？看个最简单的例子。</p>
+<h2>反射测试工具 org.springframework.test.util.ReflectionTestUtils</h2>
+
+<p>依赖注入是Spring框架提供的最主要的特性之一，在Spring上下文管理范围内，Spring提供三种注入方式，Field注入，构造器注入，Setter注入。我们都知道在写单元测试时，只会关注被测试类本身的逻辑，一般我们都会将类中的依赖进行mock。</p>
+
+<p>在没有Spring提供的反射测试工具的时候，我们一般都倾向于构造器注入，Setter注入的方式，因为这样在写测试代码时候，可以将mock的依赖传入到被测试类。但实际上，在Field上注入更符合Spring风格，或者更容易理解，我需要Spring给我注入这个对象，我就在它上面加一个@Autowired注解。所以构造器注入和Setter注入多少都是为了方便测试，不得已而为之。更有甚者，其实采用的是Field注入，但是为了测试，不得以添加一个setter方法。这就违反了简洁代码的原则，无用的方法，或者只被测试用到方法。</p>
+
+<p>还好，Spring提供的ReflectionTestUtils拯救了我们。它提供这样的一个方法，ReflectionTestUtils.setField()，通过反射的方式将想要的依赖设置到对应的field上。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@param</span> <span class="n">target</span> <span class="n">the</span> <span class="n">target</span> <span class="n">object</span> <span class="n">on</span> <span class="n">which</span> <span class="n">to</span> <span class="n">set</span> <span class="n">the</span> <span class="n">field</span>
+</span><span class='line'><span class="nd">@param</span> <span class="n">name</span> <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">the</span> <span class="n">field</span> <span class="n">to</span> <span class="n">set</span>
+</span><span class='line'><span class="nd">@param</span> <span class="n">value</span> <span class="n">the</span> <span class="n">value</span> <span class="n">to</span> <span class="n">set</span>
 </span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">testCompile</span> <span class="s1">&#39;junit:junit:4.11&#39;</span><span class="c1">// testCompile group: &#39;junit&#39;, name: &#39;junit&#39;, version: &#39;4.11&#39;</span>
-</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="n">ReflectionTestUtils</span><span class="o">.</span><span class="na">setField</span><span class="o">(</span><span class="n">xxService</span><span class="o">,</span> <span class="s">&quot;xxDao&quot;</span><span class="o">,</span> <span class="n">mockedXxDao</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>项目使用了Java的插件，在repositories块中告诉Gradle使用maven的远程仓库作为依赖下载地址，在dependencies块定义了一个junit的依赖，并说明了分组(Maven中的Scope)，后面注释中有一个表意更完整的依赖定义，说明了依赖声明使用的三个坐标group，name，version。</p>
+<h2>Spring MVC测试的Mock对象：MockHttpServletRequest，MockHttpSession等。</h2>
 
-<p>整个看起来是那么的表意，使用过Maven更会觉得是无缝转换，甚至更简洁。</p>
-
-<h3>Dependency configurations 依赖分组</h3>
-
-<p>在Gradle中，依赖都被会分配到某一个具体的configuration中（这里我不倾向于翻译成配置，我觉得布局，或者分组更适合）。Configuration代表着一个或多个构件及构件所需依赖的一个分组。</p>
-
-<p>Java插件已经预定义了一些configuration，比如，compile，runtime，testCompile，testRuntime等。</p>
-
-<p><strong>compile</strong> 放在这个configuration下的依赖是在编译产品代码时所使用的，但它作为一个分组，包含产品代码和编译所需的依赖。  <br/>
-<strong>runtime</strong> 产品代码在运行时需要的依赖，默认，也会包含compile中的依赖。  <br/>
-<strong>testCompile</strong> 编译测试代码时所需要的依赖，默认，被编译的产品代码和产品代码需要的编译依赖也属于该分组。  <br/>
-<strong>testRuntime</strong> 运行测试时需要的依赖。默认，包含compile，runtime和testCompile的分组的构建和依赖。</p>
-
-<p>使用过Maven的都应该知道分组的含义，这里讲解给不明白的同学，依赖之所以要分组，是因为，每个阶段对依赖的需要不一样，最明显的是产品代码和测试代码，比如junit在产品代码中就不需要。</p>
-
-<p>那么，为什么产品代码的编译阶段和运行阶段也分组，一般编译阶段需要的依赖，在运行阶段也需要，但是反过来就不一定了。比如，你通过反射去load一个class，这时该class就不一定需要在编译阶段存在。</p>
-
-<p>一个更常见的例子，做web开发时需要servlet的依赖，但是只是编译阶段，运行时servlet依赖由servlet容器来提供。所以Gradle的War插件也提供了两个configuration，分别是providedCompile和providedRuntime，它们对依赖的使用范围定义和compile以及runtime一致，只不过依赖的Jar包不会被加到War包里面。</p>
-
-<h3>定义SourceSet时，添加的Configuration</h3>
-
-<p>上一节，在介绍Java插件的时候，提到了SourceSet概念。针对每一个新添加的SourceSet，Java插件都会动态的给它添加两个Configuration，分别是sourceSetCompile和sourceSetRuntime。</p>
-
-<p>比如：新添加一个SourceSet，叫做int，那么对应的Configuration是intCompile和intRuntime。</p>
-
-<p>这一特性也正好印证，Java插件是如何识别自定义SourceSet来进行编译和运行。</p>
-
-<h3>依赖的多种定义方式</h3>
-
-<p>除了通过远程仓库和依赖坐标来定义依赖，Gradle还提供了另外两种常用的依赖定义方式，对本地文件的依赖，对某个项目的依赖。</p>
-
-<h4>对文件的依赖</h4>
-
-<p>这种情况看起来是不是很奇葩，都有依赖管理了和Maven仓库了还要什么文件依赖。其实不然，使用这种定义方式，最常见场景是项目构建工具的迁移，从Ant到Gradle。无论任何项目，迁移过程都是小步前进，Gradle提供文件依赖的配置，就是为了解决这些特殊性。</p>
+<p>如果你正在测试Controller，而Controller又恰好对HttpServletRequest和HttpSession有操作，那么Spring提供的MockHttpServletRequest，MockHttpSession就派上用场了。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">runtime</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;libs/a.jar&#39;</span><span class="o">,</span> <span class="s1">&#39;libs/b.jar&#39;</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">runtime</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="s1">&#39;libs&#39;</span><span class="o">,</span> <span class="nl">include:</span> <span class="s1">&#39;*.jar&#39;</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">MockHttpServletRequest</span> <span class="n">mockHttpServletRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">MockHttpServletRequest</span><span class="o">();</span>
+</span><span class='line'><span class="n">MockHttpSession</span> <span class="n">mockHttpSession</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">MockHttpSession</span><span class="o">();</span>
+</span><span class='line'><span class="n">mockHttpSession</span><span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">&quot;username&quot;</span><span class="o">,</span> <span class="s">&quot;user&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">mockHttpServletRequest</span><span class="o">.</span><span class="na">setSession</span><span class="o">(</span><span class="n">mockHttpSession</span><span class="o">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h4>对另一个工程的依赖</h4>
-
-<p>项目中划分子模块是很平常的事情，前端Controller和数据层Dao分离管理就是一个例子，那么在进行前端Controller模块构建时，就需要将数据层模块作为依赖。定义方式如下：</p>
+<p>当然，针对上面这种做法，你采用mockito也是可以实现的，而且代码量也差不多。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="nf">project</span><span class="o">(</span><span class="s1">&#39;:shared&#39;</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">HttpServletRequest</span> <span class="n">mockHttpServletRequest</span> <span class="o">=</span> <span class="n">mock</span><span class="o">(</span><span class="n">HttpServletRequest</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'><span class="n">HttpSession</span> <span class="n">mockHttpSession</span> <span class="o">=</span> <span class="n">mock</span><span class="o">(</span><span class="n">HttpSession</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'><span class="n">when</span><span class="o">(</span><span class="n">mockHttpSession</span><span class="o">.</span><span class="na">getAttribute</span><span class="o">(</span><span class="s">&quot;username&quot;</span><span class="o">)).</span><span class="na">thenReturn</span><span class="o">(</span><span class="s">&quot;user&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">when</span><span class="o">(</span><span class="n">mockHttpServletRequest</span><span class="o">.</span><span class="na">getSession</span><span class="o">()).</span><span class="na">thenReturn</span><span class="o">(</span><span class="n">mockHttpSession</span><span class="o">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>依赖版本冲突</h3>
+<p>但是，如果你的Controller类中，使用了某个静态工具类方法，它对HttpServletRequest和HttpSession做了各种各样的操作，来维护当前用户的某些状态。从本质上，你应该将静态方法mock，但这并不容易实现。于是，你就必须mock HttpServletRequest和HttpSession中各种各样的依赖，来保证静态工具类方法不会抛空指针，而其中这些会抛空指针的操作与你期待的测试的行为无关。最直接的结果就是测试中的mock逻辑会特别的多，关键还不一定正确。</p>
 
-<p>依赖冲突是所以依赖管理中最头痛的问题，这常常出现在传递依赖中。Gradle对解决传递依赖提供了两种策略，使用最新版本或者直接导致构建失败。默认的策略是使用最新版本。虽然这样的策略能够解决一些问题，但是还是不够。常见的一种情况是，NoSuchMethond或者ClassNotFound。这时候，你可能需要一些特殊手段，比如排除不想要的传递依赖。</p>
+<p>Spring的MockHttpServletRequest和MockHttpSession就可以解决这类问题，它默认初始化好大部分HttpServletRequest和HttpSession需要的依赖，所以不会出现空指针问题，也就简化了mock的过程，而其他你期待的返回结果都可以通过setter配置进去。</p>
 
-<h4>排除传递依赖</h4>
+<h2>Spring在集成测试方面的支持</h2>
 
-<p>排除传递依赖有多种原因，远程仓库中不存在，运行时不需要，或者版本冲突。排除传递依赖的方式有两种：1.直接在configuration中排除 2.在具体的某个dependency中排除</p>
+<h3>SpringJUnit4ClassRunner，@ContextConfiguration，@WebAppConfiguration，MockMvc</h3>
+
+<p>SpringJUnit4ClassRunner：它是在Junit下启动Spring集成测试的基础，为Junit提供Spring TestContext Framework所拥有的功能。 <br/>
+@ContextConfiguration：用来决定根据什么样的配置为集成测试加载和配置ApplicationContext。 <br/>
+@WebAppConfiguration：用来声明集成测试加载的ApplicationContext应该是一个WebApplicationContext。  <br/>
+MockMvc：是Spring在服务器端对Spring MVC测试的支持，可以在对Controller的集成测试中，模拟对Controller某个Request的调用，是非常实用的集成测试组件。</p>
+
+<p>看下面一个例子，如何使用上面4个组件来实现Controller的集成测试：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -510,43 +350,135 @@ task hello { &hellip;">
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">configurations</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">.</span><span class="na">exclude</span> <span class="nl">module:</span> <span class="s1">&#39;commons&#39;</span>
-</span><span class='line'>    <span class="n">all</span><span class="o">*.</span><span class="na">exclude</span> <span class="nl">group:</span> <span class="s1">&#39;org.gradle.test.excludes&#39;</span><span class="o">,</span> <span class="nl">module:</span> <span class="s1">&#39;reports&#39;</span>
-</span><span class='line'><span class="o">}</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">...</span>
 </span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.gradle.test.excludes:api:1.0&quot;</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">exclude</span> <span class="nl">module:</span> <span class="s1">&#39;shared&#39;</span>
-</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="nd">@RunWith</span><span class="o">(</span><span class="n">SpringJUnit4ClassRunner</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@ContextConfiguration</span><span class="o">(</span><span class="n">classes</span> <span class="o">=</span> <span class="n">WebContextConfiguration</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@WebAppConfiguration</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">xxxIntegrationTest</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">MockMvc</span> <span class="n">mockMvc</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Autowired</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">WebApplicationContext</span> <span class="n">webApplicationContext</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Before</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">mockMvc</span> <span class="o">=</span> <span class="n">MockMvcBuilders</span><span class="o">.</span><span class="na">webAppContextSetup</span><span class="o">(</span><span class="n">webApplicationContext</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Test</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">shouldReturnKits</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">mockMvc</span><span class="o">.</span><span class="na">perform</span><span class="o">(</span><span class="n">get</span><span class="o">(</span><span class="s">&quot;/form&quot;</span><span class="o">))</span>
+</span><span class='line'>          <span class="o">.</span><span class="na">andExpect</span><span class="o">(</span><span class="n">status</span><span class="o">().</span><span class="na">isOk</span><span class="o">())</span>
+</span><span class='line'>          <span class="o">.</span><span class="na">andExpect</span><span class="o">(</span><span class="n">content</span><span class="o">().</span><span class="na">mimeType</span><span class="o">(</span><span class="s">&quot;text/html&quot;</span><span class="o">))</span>
+</span><span class='line'>          <span class="o">.</span><span class="na">andExpect</span><span class="o">(</span><span class="n">forwardedUrl</span><span class="o">(</span><span class="s">&quot;/WEB-INF/layouts/main.jsp&quot;</span><span class="o">));</span>
+</span><span class='line'>  <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h4>通过命令行查看依赖关系</h4>
+<h3>测试类的事务管理 @TransactionConfiguration，@Transactional，@BeforeTransaction，@AfterTransaction</h3>
 
-<p>当出现依赖冲突时，最主要的还是要分析依赖冲突的原因，Gradle提供了两个任务来帮助你分析依赖关系</p>
+<p>如果你正在对Dao层或者说数据库做集成测试，包括了CRUD所有基本操作的测试，那么你肯定会希望在单个测试运行结束之后，可以将数据库的状态回滚，这样除了可以重复的运行测试，更重要的是不会影响到其他测试，不会弄脏数据。那么，Spring提供的事务管理功能，除了可以实现产品代码中的事务管理，还可以实现测试代码的事务管理。</p>
 
-<p>dependencies - Displays all dependencies declared in root project &lsquo;projectReports&rsquo;. <br/>
-dependencyInsight - Displays the insight into a specific dependency in root project &lsquo;projectReports&rsquo;.</p>
+<p>@TransactionConfiguration是为集成测试提供的类似@EnableTransactionManagement的功能的注解，用来显示的为集成测试指定某个TransactionManager和Rollback策略。但它并不是必须的，如果在Spring的上下文中，只有一个TransactionManager，且bean的名字是transactionManager，并且你认为的默认策略是Rollback，那么就可以不必配置@TransactionConfiguration。</p>
 
-<h5><strong>Tips：输出依赖关系图到文件</strong></h5>
-
-<p>在命令行中直接使用gradle dependencies可以打印出依赖图，但是在命令行中查看始终不太方便，我们可以将结果输出到一个文件中，如下：</p>
+<p>@Transactional就和产品代码中一样，你需要某个测试类具有事务功能，就在该测试类上加上@Transactional注解。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">gradle</span> <span class="n">dependencies</span> <span class="o">&gt;</span> <span class="n">dependencies</span><span class="o">.</span><span class="n">txt</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">...</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@TransactionConfiguration</span><span class="o">(</span><span class="n">transactionManager</span> <span class="o">=</span> <span class="s">&quot;txManager&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@Transactional</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">xxxDaoIntegrationTest</span> <span class="o">{</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>dependencies.txt保存在项目的根目录</p>
+<p>@BeforeTransaction，@AfterTransaction，顾名思义，就是在事务前和事务后做的对应操作。</p>
 
-<p>Gradle的官方文档中关于Gradle的依赖管理的内容还有很多，比如，如何访问需要用户名密码授权的Maven仓库等等。等多内容，可以参考官方文档：<a href="http://gradle.org/docs/current/userguide/dependency_management.html">http://gradle.org/docs/current/userguide/dependency_management.html</a></p>
+<h3>@TestPropertySource，@DirtiesContext</h3>
 
-<p>下一节，利用前三节学到的知识，编写集成测试任务，并单独划分SourceSet。</p>
+<p>@PropertySource用来以声明式的方式将Properties加载到Spring的Environment变量中，@TestPropertySource拥有比@PropertySource更高的优先级，可以用来加载专门为测试提供的Properties。</p>
 
-<p>参考资料： <br/>
-1.Gradle官方文档</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Configuration</span>
+</span><span class='line'><span class="nd">@PropertySource</span><span class="o">(</span><span class="s">&quot;classpath:/com/myco/app.properties&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AppConfig</span> <span class="o">{</span>
+</span><span class='line'>     <span class="nd">@Autowired</span>
+</span><span class='line'>     <span class="n">Environment</span> <span class="n">env</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>     <span class="nd">@Bean</span>
+</span><span class='line'>     <span class="kd">public</span> <span class="n">TestBean</span> <span class="nf">testBean</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>         <span class="n">TestBean</span> <span class="n">testBean</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">TestBean</span><span class="o">();</span>
+</span><span class='line'>         <span class="n">testBean</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">env</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;testbean.name&quot;</span><span class="o">));</span>
+</span><span class='line'>         <span class="k">return</span> <span class="n">testBean</span><span class="o">;</span>
+</span><span class='line'>     <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@ContextConfiguration</span>
+</span><span class='line'><span class="nd">@TestPropertySource</span><span class="o">(</span><span class="s">&quot;/test.properties&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyIntegrationTests</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// class body...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>@DirtiesContext用来说明在某个测试执行之后，会导致Spring Context被污染，比如，修改了某个执行策略，改变了某个单例对象的状态。此时，该Context应该被关闭，之后的测试会使用新的Context。</p>
+
+<p>@DirtiesContext可以被用在测试类上，也可以用在测试方法上，具体行为如下：   <br/>
+* after the current test, when declared at the method level   <br/>
+* after each test method in the current test class, when declared at the class level with class mode set to AFTER_EACH_TEST_METHOD   <br/>
+* after the current test class, when declared at the class level with class mode set to AFTER_CLASS</p>
+
+<p>这里只是介绍一些常用的比较重要的特性，除了以上这些，Spring Test Framework还提供许多其他特性，有效利用它们，可以让你写出方便的进行基于Spring的应用的测试，同时也是保证写出高质量测试的基础。</p>
+
+<p>参考资料：  <br/>
+1.Spring Reference Document, Spring Test</p>
 </div>
   
   
@@ -581,23 +513,23 @@ dependencyInsight - Displays the insight into a specific dependency in root proj
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境代码下性能优化</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a>
       </li>
     
   </ul>
@@ -628,23 +560,6 @@ dependencyInsight - Displays the insight into a specific dependency in root proj
     });
   </script>
   <script src="/javascripts/github.js" type="text/javascript"> </script>
-  <div>
-    <h1>Currently Working On</h1>
-    <div>
-      <span>relations-back-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-back-end.svg?branch=master" style=" vertical-align: middle;margin-left: 11%;">
-    </div>
-    <br/>
-    <div>
-      <span>relations-front-end</span>
-      <img src="https://travis-ci.org/benweizhu/relations-front-end.svg?branch=master" style=" vertical-align: middle;margin-left: 10%;">
-    </div>
-    <br/>
-    <div>
-      <span>gradle-plugin-database</span>
-      <img src="https://travis-ci.org/benweizhu/gradle-plugin-database.svg?branch=master" style=" vertical-align: middle;">
-    </div>
-  </div>
 </section>
 
 
