@@ -442,13 +442,17 @@
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
 </pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">babelHelpers</span><span class="p">.</span><span class="nx">jsx</span><span class="p">(</span><span class="nx">Baz</span><span class="p">,</span> <span class="p">{</span>
 </span><span class='line'>  <span class="nx">foo</span><span class="o">:</span> <span class="s2">&quot;bar&quot;</span>
 </span><span class='line'><span class="p">},</span> <span class="s2">&quot;1&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">output</span><span class="o">:</span>
+</span><span class='line'><span class="p">{</span><span class="nx">type</span><span class="o">:</span> <span class="nx">Baz</span><span class="p">,</span><span class="nx">props</span><span class="o">:</span><span class="p">{</span><span class="nx">foo</span><span class="o">:</span><span class="s2">&quot;bar&quot;</span><span class="p">},</span><span class="nx">key</span><span class="o">:</span><span class="s2">&quot;1&quot;</span><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
-
-<p>{type: Baz,props:{foo:&ldquo;bar&rdquo;},key:&ldquo;1&rdquo;}</p>
 
 <p>除了以上两个官方插件，在开源世界还有许多其他Babel插件可以优化代码，而且非常实用，这里留给大家自己去探索： <a href="https://github.com/oliviertassinari/babel-plugin-transform-react-remove-prop-types" title="transform-react-remove-prop-types">transform-react-remove-prop-types</a>， <a href="https://github.com/thejameskyle/babel-react-optimize/tree/master/packages/babel-plugin-transform-react-pure-class-to-function" title="transform-react-pure-class-to-function">transform-react-pure-class-to-function</a>， <a href="https://github.com/thejameskyle/babel-react-optimize" title="babel-react-optimize">babel-react-optimize</a>（综合所有优化的插件，此处应该有掌声）</p>
 
