@@ -131,6 +131,22 @@ function loadRoute(cb) {
   />
 </Router>
 ```
+Webpack会根据分离点生成对应的JS文件
+
+![](/images/react-production/require-on-demand.jpg =500x)
+
+**4.大文件异步加载**
+
+笔者遇到过这样的需求，采用了某图表库来做地图绘制，但是地图库JS文件或者JSON文件特别的大，即便压缩之后也有400+KB。所以，我将该依赖放在应用（SPA）的首页，并采用了异步加载，这样，首屏加载速度不会依赖于它，而用户从首页到需要使用该地图的部分还存在一些操作过程，所以留存了一些时间来异步加载地图数据。
+
+```
+System.import('./map/china.js').then().catch(errorLoading);
+System.import('./map/world.js').then().catch(errorLoading);
+```
+
+当首页需要的JS加载完成之后，才开始加载：
+
+![](/images/react-production/async-require.gif)
 
 ## 运行webpack -p
 
