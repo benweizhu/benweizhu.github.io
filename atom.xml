@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2017-05-15T10:27:32+08:00</updated>
+  <updated>2017-05-15T10:54:38+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -216,6 +216,10 @@
 </span><span class='line'><span class="nx">System</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">&#39;./map/world.js&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">().</span><span class="k">catch</span><span class="p">(</span><span class="nx">errorLoading</span><span class="p">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+<p>当首页需要的JS加载完成之后，才开始加载：</p>
+
+<p><img src="http://benweizhu.github.io/images/react-production/async-require.gif" alt="" /></p>
 
 <h2>运行webpack -p</h2>
 
