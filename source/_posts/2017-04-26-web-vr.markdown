@@ -21,6 +21,10 @@ VR（Virtual Reality）即虚拟现实，这个作为由美国VPL公司创始人
 
 我们除了作为一个普通的消费者参与到VR的风口中，当真没有别的办法了？[ThoughtWorks技术雷达][dbe4adfd]第16卷（2017年）告诉你，答案就是Web VR。
 
+**什么是Web VR**
+
+{% video https://s3-ap-northeast-1.amazonaws.com/for-benwei-blog/What+is+WebVR.mp4 640 320 https://s3-ap-northeast-1.amazonaws.com/for-benwei-blog/what-is-web-vr.png %}
+
 下面快速的引用一下本期技术雷达对Web VR的描述：
 
   [dbe4adfd]: https://www.thoughtworks.com/radar "ThoughtWorks技术雷达"

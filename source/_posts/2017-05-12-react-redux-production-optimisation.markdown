@@ -340,10 +340,11 @@ gzip_min_length 1000;
 
 相对的缺点是：配置起来比较麻烦，但如果是一劳永逸的事情，还是值得一做的。
 
-更多关于[是否应该进行服务器端渲染][0319f9fe]以及[如何进行服务器端渲染][1fa7be4c]？请查看相关文章。
+更多关于[是否应该进行服务器端渲染][0319f9fe]，[服务器端渲染的好处][5a348bf6] 以及[如何进行服务器端渲染][1fa7be4c]？请查看相关文章。
 
   [1fa7be4c]: http://redux.js.org/docs/recipes/ServerRendering.html "如何进行服务器端渲染"
   [0319f9fe]: http://andrewhfarmer.com/server-side-render/ "是否应该进行服务器端渲染"
+  [5a348bf6]: https://medium.com/walmartlabs/the-benefits-of-server-side-rendering-over-client-side-rendering-5d07ff2cefe8 "服务器端渲染的好处"
 
 **2.ServiceWork**
 
