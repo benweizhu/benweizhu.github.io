@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2017-05-15T10:54:38+08:00</updated>
+  <updated>2017-05-16T13:07:50+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -472,7 +472,7 @@
 
 <p>相对的缺点是：配置起来比较麻烦，但如果是一劳永逸的事情，还是值得一做的。</p>
 
-<p>更多关于<a href="http://andrewhfarmer.com/server-side-render/" title="是否应该进行服务器端渲染">是否应该进行服务器端渲染</a>以及<a href="http://redux.js.org/docs/recipes/ServerRendering.html" title="如何进行服务器端渲染">如何进行服务器端渲染</a>？请查看相关文章。</p>
+<p>更多关于<a href="http://andrewhfarmer.com/server-side-render/" title="是否应该进行服务器端渲染">是否应该进行服务器端渲染</a>，<a href="https://medium.com/walmartlabs/the-benefits-of-server-side-rendering-over-client-side-rendering-5d07ff2cefe8" title="服务器端渲染的好处">服务器端渲染的好处</a> 以及<a href="http://redux.js.org/docs/recipes/ServerRendering.html" title="如何进行服务器端渲染">如何进行服务器端渲染</a>？请查看相关文章。</p>
 
 <p><strong>2.ServiceWork</strong></p>
 
@@ -539,6 +539,10 @@ service worker是一段脚本，与web worker一样，也是在后台运行。
 <p>光羡慕可不行，我要充分发挥自己的能动性为最具程序员群众基础的Web程序员谋福利。</p>
 
 <p>我们除了作为一个普通的消费者参与到VR的风口中，当真没有别的办法了？<a href="https://www.thoughtworks.com/radar" title="ThoughtWorks技术雷达">ThoughtWorks技术雷达</a>第16卷（2017年）告诉你，答案就是Web VR。</p>
+
+<p><strong>什么是Web VR</strong></p>
+
+<p><video width='640' height='320' preload='none' controls poster='https://s3-ap-northeast-1.amazonaws.com/for-benwei-blog/what-is-web-vr.png'><source src='https://s3-ap-northeast-1.amazonaws.com/for-benwei-blog/What+is+WebVR.mp4' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'></video></p>
 
 <p>下面快速的引用一下本期技术雷达对Web VR的描述：</p>
 
