@@ -486,16 +486,21 @@
 
 <p><strong>1.只导入需要的包</strong></p>
 
-<p>比如：lodash，如果你只用到isEqual，那么就不要把整个lodash都引入</p>
+<p>Lodash:</p>
+
+<p>比如：如果你只用到isEqual，那么就不要把整个lodash都引入</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">isEqual</span> <span class="nx">from</span> <span class="s1">&#39;lodash/isEqual&#39;</span><span class="p">;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><strong>2.使用ESLint</strong></p>
+<p>通过<a href="https://github.com/lodash/babel-plugin-lodash" title="babel-plugin-lodash">babel-plugin-lodash</a>和<a href="https://github.com/lodash/lodash-webpack-plugin" title="lodash-webpack-plugin">lodash-webpack-plugin</a>来缩小应用所需要的lodash的模块</p>
 
-<p>合理的使用ESLint，除了帮助团队指导代码风格，也可以告诉你如何正确的写React应，比如，当组件是纯presentational组件时，就应该使用PureComponent或者纯函数组件，这些eslint都会告诉你。</p>
+<p><a href="https://medium.com/making-internets/why-using-chain-is-a-mistake-9bc1f80d51ba" title="用高阶函数Flow来代替Chain">用高阶函数Flow来代替Chain</a>，以避免将整个ladash都加载。</p>
+
+<p><strong>2.使用ESLint</strong>
+合理的使用ESLint，除了帮助团队指导代码风格，也可以告诉你如何正确的写React应，比如，当组件是纯presentational组件时，就应该使用PureComponent或者纯函数组件，这些eslint都会告诉你。</p>
 
 <p><strong>3.利用React官方的<a href="https://facebook.github.io/react/docs/perf.html" title="Perf工具">Perf工具</a></strong></p>
 
