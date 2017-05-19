@@ -291,13 +291,23 @@ output:
 
 **1.只导入需要的包**
 
-比如：lodash，如果你只用到isEqual，那么就不要把整个lodash都引入
+Lodash:
+
+比如：如果你只用到isEqual，那么就不要把整个lodash都引入
 ```
 import isEqual from 'lodash/isEqual';
 ```
+通过[babel-plugin-lodash][33f9adfb]和[lodash-webpack-plugin][5a00bba3]来缩小应用所需要的lodash的模块
+
+  [33f9adfb]: https://github.com/lodash/babel-plugin-lodash "babel-plugin-lodash"
+  [5a00bba3]: https://github.com/lodash/lodash-webpack-plugin "lodash-webpack-plugin"
+
+[用高阶函数Flow来代替Chain][a666627a]，以避免将整个ladash都加载。
+
+  [a666627a]: https://medium.com/making-internets/why-using-chain-is-a-mistake-9bc1f80d51ba "用高阶函数Flow来代替Chain"
+
 
 **2.使用ESLint**
-
 合理的使用ESLint，除了帮助团队指导代码风格，也可以告诉你如何正确的写React应，比如，当组件是纯presentational组件时，就应该使用PureComponent或者纯函数组件，这些eslint都会告诉你。
 
 **3.利用React官方的[Perf工具][5fc674cc]**
