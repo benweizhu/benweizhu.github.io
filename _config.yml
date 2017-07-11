@@ -4,7 +4,7 @@
 
 url: http://benweizhu.github.io
 title: NO END FOR LEARNING
-subtitle: Writing blog if you feel tired 
+subtitle: Writing blog if you feel tired
 motto: 学海无涯 苦写博客
 author: ZHU Benwei
 simple_search: https://www.google.com/search
@@ -92,15 +92,11 @@ delicious_user:
 delicious_count: 3
 
 # Disqus Comments
-disqus_short_name:
-disqus_show_comment_count: false
+disqus_short_name: benweiblog
+disqus_show_comment_count: true
 
 # Google Analytics
 google_analytics_tracking_id:
 
 # Facebook Like
 facebook_like: false
-
-# duoshuo comments
-duoshuo_comments: true
-duoshuo_short_name: benweizhu
