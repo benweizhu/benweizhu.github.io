@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="基本概念 全文搜索提供了一种能力来鉴别的自然语言文档是否满足某个查询语句，并根据与查询语句的相关性来对查询结果排序。最常见的查询就是找到所有包含查询术语（term）的文档，并根据他们的相似性进行排序。 文字查询已经在数据库中存在多年。PostgreSQL有~，~*， &hellip;">
+  <meta name="description" content="本篇博客系列的目的： 之前一直想要实现一个日志类库：https://github.com/benweizhu/LoggerUtil 用来记录某个方法在调用前，调用后，抛出异常后的一些信息，比如方法名，参数，返回值。还希望可以指定记录的格式以及日志的级别（INFO，DEBUG等）。最关键的是， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,6 +70,97 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2015/09/06/deep-into-spring-aop-1/">Spring AOP 深入了解（一）还给业务逻辑代码一个干净的世界</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-09-06T10:49:31+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:49 am</span></time>
+        
+           | <a href="/blog/2015/09/06/deep-into-spring-aop-1/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/09/06/deep-into-spring-aop-1/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>本篇博客系列的目的：</h2>
+
+<p>之前一直想要实现一个日志类库：<a href="https://github.com/benweizhu/LoggerUtil">https://github.com/benweizhu/LoggerUtil</a></p>
+
+<p>用来记录某个方法在调用前，调用后，抛出异常后的一些信息，比如方法名，参数，返回值。还希望可以指定记录的格式以及日志的级别（INFO，DEBUG等）。最关键的是，这个日志类库，必须有通用性和不可以有侵入性，这就导致它必定通过AOP来实现。</p>
+
+<p>于是，为了做到这一点，现在我们就来深入的学习一次AOP：</p>
+
+<h2>为什么要AOP</h2>
+
+<p>编程语言最终极的目标就是能以更自然、更灵活的语言的方式模拟世界，从原始机器语言到过程语言再到面向对象的语言（OOP）。AOP提供了与OOP不同的另外一种方式来思考软件架构。OOP的模块单元是“类”，而AOP的模块单元“面”（Aspect）。</p>
+
+<h4>那么问题来了，什么是“面”？以及什么“面向切面编程”？</h4>
+
+<p>AOP被翻译成“面向方面编程”，“面向切面编程”，所以这里我更倾向于将“面”理解为“切面”（Aspect）。</p>
+
+<p>从字面上理解，“切面”来自几何学，在立体几何中，切面是指用一个平面去截一个几何体（包括圆柱，圆锥，球，棱柱，棱锥、长方体，正方体等等），得到的平面图形。</p>
+
+<p>那什么是“面向切面编程”？就是在该切面上加入一些逻辑操作（可以简单理解为“面向切面的操作”）。举个最常见的例子：</p>
+
+<p>扑克牌的切牌，你可以将“广告牌”切入在任何你想要切入（或插入）的位置（你可以对扑克牌的任何一个切面做切牌操作）。插入的位置就是切面，插入的广告牌就是逻辑操作。</p>
+
+<p>又或者是“斗地主”中，第一把不知道谁是地主，于是将一张牌反插入到牌的中间。本来应该按照顺序发牌，并不能知道谁是地主，但是因为你在某个位置插入了一个特殊操作（将一张牌反插入），因为多了一个逻辑，所以可以知道谁是地主。（或者将广告牌插入中间，也可以知道谁是地主）</p>
+
+<p>这是“面向切面的编程”的最基础理解。</p>
+
+<h3>也许你还是不能理解面向切面编程，最重要是你并不知道为什么需要它，即何时需要它？</h3>
+
+<p>在OO的世界里，我们操作的是对象，创建一个对象并使用对象的属性和方法，而对象有抽象和继承的特性，因此，我们会利用抽象和继承的特性来消除重复的代码。</p>
+
+<p>我们知道，编程语言是从原始机器语言到过程语言再到面向对象的语言，但是即便是OO的世界，我们也逃离不了面向过程的编程方式，代码的每一步操作一定是有顺序的，因为机器解释代码也是按顺序执行的。</p>
+
+<p>代码按照顺序执行无可厚非，遇到重复的代码，我们利用抽象的方式，将重复的部分抽离成一个独立模块（方法或者类），由所有需要的地方重用即可。</p>
+
+<p>但有一种顺序代码，它重复使用在不同的固定位置，它与业务代码无关，通过OO的常用办法并不能消除这种模式的重复，比如：事务管理，性能监控（和控制）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">addUser</span><span class="o">(){</span>
+</span><span class='line'>  <span class="n">transactionManager</span><span class="o">.</span><span class="na">beginTransaction</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">..</span>
+</span><span class='line'>  <span class="n">transactionManager</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们知道这些重复性的代码逻辑，是可以非常轻松的独立出来，比如，beginTransaction和commit方法，但，我们无法通过抽象的方式来消除这种重复的调用，因为它和业务代码具有关联性，它依附在业务代码的顺序流程中。</p>
+
+<p>有人说，可以采用模板方法（设计模式中的一种模式），这样可以消除重复，但也导致所有使用模板方法的类，都要重写模板中的其中一步（某个方法）来实现业务逻辑，重写方法是不能改变方法的名字。这样就给代码的自描述性带来了困难，得不偿失。</p>
+
+<p>好在AOP希望做得到的就是，将这些分散在各个不同业务逻辑代码中的相同代码，通过切入的方式，将这块具有顺序性关联的逻辑抽离到独立模块，而在逻辑代码中将看不到之前重复的逻辑。</p>
+
+<p>从而，还给业务逻辑代码一个干净的世界。这就是AOP给我们带来的好处。</p>
+
+<p>参考资料：  <br/>
+1.Spring 3.0就是这么简单  <br/>
+2.<a href="http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/aop.html">http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/aop.html</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2015/08/09/postgres-full-text-search-1/">如何使用Postgres全文搜索特性（一）</a></h1>
     
     
@@ -80,6 +171,9 @@
 
 
 <time class='entry-date' datetime='2015-08-09T08:24:23+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:24 am</span></time>
+        
+           | <a href="/blog/2015/08/09/postgres-full-text-search-1/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/08/09/postgres-full-text-search-1/">Comments</a>
         
       </p>
     
@@ -277,126 +371,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/08/01/css-selector-basic/">CSS后代选择器以及选择器特殊性</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-08-01T17:46:56+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>5:46 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>常用的重要选择器规则：</h3>
-
-<p>element,element div,p   选择所有 div 元素和所有 p 元素。  <br/>
-element element div p   后代选择器：选择 div 元素内部的所有 p 元素。 <br/>
-element>element div>p   子选择器：选择父元素为 div 元素的所有 p 元素。  <br/>
-element+element div+p   第一个子元素选择器：选择紧接在 div 元素之后的所有 p 元素。</p>
-
-<h3>后代选择器</h3>
-
-<p>后代选择器（descendant selector）又称为包含选择器。后代选择器可以选择作为某元素后代的元素。</p>
-
-<p>我们可以定义后代选择器来创建一些规则，使这些规则在某些文档结构中起作用，而在另外一些结构中不起作用。
-举例来说，如果你希望只对 h1 元素中的 em 元素应用样式，可以这样写：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">h1</span> <span class="nt">em</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span><span class="nb">red</span><span class="p">;}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面这个规则会把作为 h1 元素后代的 em 元素的文本变为 红色。其他 em 文本（如段落或块引用中的 em）则不会被这个规则选中：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;h1&gt;</span>This is a <span class="nt">&lt;em&gt;</span>important<span class="nt">&lt;/em&gt;</span> heading<span class="nt">&lt;/h1&gt;</span>
-</span><span class='line'><span class="nt">&lt;p&gt;</span>This is a <span class="nt">&lt;em&gt;</span>important<span class="nt">&lt;/em&gt;</span> paragraph.<span class="nt">&lt;/p&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在后代选择器中，规则左边的选择器一端包括两个或多个用空格分隔的选择器。选择器之间的空格是一种结合符（combinator）。每个空格结合符可以解释为“&hellip; 在 &hellip; 找到”、“&hellip; 作为 &hellip; 的一部分”、“&hellip; 作为 &hellip; 的后代”，但是要求必须从右向左读选择器。
-因此，h1 em 选择器可以解释为 “作为 h1 元素后代的任何 em 元素”。如果要从左向右读选择器，可以换成以下说法：“包含 em 的所有 h1 会把以下样式应用到该 em”。</p>
-
-<p>关于后代选择器有一个常被忽略的方面，即两个元素之间的层次间隔可以是无限的。例如，如果写作ul em，这个语法就会选择从u1元素继承的所有em元素，而无论em的嵌套层次有多深。</p>
-
-<h3>子选择器</h3>
-
-<p>某些情况下，可能并不想选择一个任意的后代元素，而是希望缩小范围，只选择另一个元素的子元素（不是所有后代元素）。可以使用子结合符，即大于号(>)</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">h1</span> <span class="o">&gt;</span> <span class="nt">strong</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>特殊性</h3>
-
-<p>如果有多个选择器都满足同一个元素，即冲突了，怎么知道哪一个规则更强？</p>
-
-<p>答案在于每个选择器的特殊性。对于每个规则，用户代理会计算选择器的特殊性，并将这个特殊性附加在规则中的各个声明。如果一个元素有两个或者多个冲突的属性声明，那么有最高特殊性的声明就会胜出。</p>
-
-<p>选择器的特殊性由选择器本身的组件确定。特殊性表述为4个部分，0,0,0,0</p>
-
-<p>1.对于选择器中给定的各个ID属性，加 0,1,0,0
-2.对于选择器中给定的各个类元素，属性选择器或伪类，加 0,0,1,0
-3.对于选择器中给定的各个元素和伪元素，加0,0,0,1
-4.结合符和通配选择器对特殊性没有任何贡献</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">h1</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">1</span>
-</span><span class='line'><span class="nt">p</span> <span class="nt">em</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">purple</span><span class="p">;}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">2</span>
-</span><span class='line'><span class="nc">.grape</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">purple</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">0</span>
-</span><span class='line'><span class="o">*</span><span class="nc">.bright</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">yellow</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">0</span>
-</span><span class='line'><span class="nt">p</span><span class="nc">.bright</span> <span class="nt">em</span><span class="nc">.dark</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">maroon</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">2</span><span class="o">,</span><span class="nt">2</span>
-</span><span class='line'><span class="nt">div</span><span class="nf">#sidebar</span> <span class="o">*[</span><span class="nt">href</span><span class="o">]</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">silver</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">1</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>第五条规则强于第二条</p>
-
-<p>0011 > 0001
-0101 > 0017</p>
-
-<p>内联样式的特殊性
-我们已经见过以0开头的特殊性，所以你可能会奇怪为什么会有这些特殊性。一般地，第一个0是为内联样式声明保留的，它比所有其他声明的特殊性都高，内联样式的特殊性是1,0,0,0</p>
-
-<h3>!important 重要性规则</h3>
-
-<p>有时某个声明可能非常重要，超过了所有其他声明。CSS2.1称之为重要声明，并允许在这些声明的结束分号之前插入!important来标识。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">p</span><span class="nc">.dark</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="m">#333</span> <span class="cp">!important</span><span class="p">;</span> <span class="k">background</span><span class="o">:</span> <span class="nb">white</span><span class="p">;}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>必须正确地放置!important，否则声明将无效，它应该总是放在声明的最后，即分号之前。如果一个属性的值包含多个关键字，则必须放在最后一个关键词的后面，比如font：sss,sss !important;</p>
-
-<p>标志位!important的声明并没有特殊的特殊性值，不过要与非重要声明分开考虑。实际上，所有!important声明会分组在一起，重要声明的特殊性冲突会在重要声明内部解决，而不会与非重要声明相混肴。类似的，非重要声明也归为一组，使用特殊性来解决冲突。如果一个重要声明和一个非重要声明冲突，胜出的总是重要声明。</p>
-
-<p>1.《css权威指南》</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/25">&larr; Older</a>
@@ -424,6 +398,10 @@ element+element div+p   第一个子元素选择器：选择紧接在 div 元素
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/07/01/understand-promise/">理解ES6 Promise</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境下的性能优化</a>
       </li>
     
@@ -437,10 +415,6 @@ element+element div+p   第一个子元素选择器：选择紧接在 div 元素
     
       <li class="post">
         <a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a>
       </li>
     
   </ul>
@@ -489,6 +463,19 @@ element+element div+p   第一个子元素选择器：选择紧接在 div 元素
 
 </footer>
   
+
+<script type="text/javascript">
+      var disqus_shortname = 'benweiblog';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
 
 
 
