@@ -123,11 +123,15 @@ import org.apache.tools.ant.filters.* processResources { filter &hellip;">
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
 </pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.apache.tools.ant.filters.*</span>
 </span><span class='line'>
 </span><span class='line'><span class="n">war</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">filter</span> <span class="n">ReplaceTokens</span><span class="o">,</span> <span class="nl">tokens:</span><span class="o">[</span><span class="err">&#39;</span><span class="n">versionDate</span><span class="err">&#39;</span><span class="o">:</span> <span class="s">&quot;${new Date().format(&#39;yyyyMMdd&#39;)}&quot;</span><span class="o">.</span><span class="na">toString</span><span class="o">()]</span>
-</span><span class='line'>    <span class="n">filter</span> <span class="n">ReplaceTokens</span><span class="o">,</span> <span class="nl">tokens:</span><span class="o">[</span><span class="err">&#39;</span><span class="n">copyright</span><span class="err">&#39;</span><span class="o">:</span> <span class="s">&quot;${new Date().format(&#39;yyyy&#39;)}&quot;</span><span class="o">.</span><span class="na">toString</span><span class="o">()]</span>
+</span><span class='line'>    <span class="n">filter</span> <span class="n">ReplaceTokens</span><span class="o">,</span> <span class="nl">tokens:</span> <span class="o">[</span>
+</span><span class='line'>            <span class="err">&#39;</span><span class="n">versionDate</span><span class="err">&#39;</span><span class="o">:</span> <span class="s">&quot;${new Date().format(&#39;yyyyMMdd&#39;)}&quot;</span><span class="o">.</span><span class="na">toString</span><span class="o">(),</span>
+</span><span class='line'>            <span class="err">&#39;</span><span class="n">copyright</span><span class="err">&#39;</span>  <span class="o">:</span> <span class="s">&quot;${new Date().format(&#39;yyyy&#39;)}&quot;</span><span class="o">.</span><span class="na">toString</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">]</span>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
