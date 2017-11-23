@@ -25,8 +25,10 @@ processResources {
 import org.apache.tools.ant.filters.*
 
 war {
-    filter(ReplaceTokens, tokens:['versionDate': "${new Date().format('yyyyMMdd')}".toString()])
-    filter(ReplaceTokens, tokens:['copyright': "${new Date().format('yyyy')}".toString()])
+    filter ReplaceTokens, tokens: [
+            'versionDate': "${new Date().format('yyyyMMdd')}".toString(),
+            'copyright'  : "${new Date().format('yyyy')}".toString()
+    ]
 }
 ```
 
