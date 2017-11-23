@@ -9,7 +9,8 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="只有10%~20%的最终用户响应时间花在了下载HTML文档上，其余的80%~90%时间花在了下载页面中的所有组件上。 - 性能黄金法则，Steve Souders 性能黄金法则由《高性能网站建站指南》的作者Steve Souders在2007年提出。在2012年，他重新发表了一篇博客《The &hellip;">
+  <meta name="description" content="
+">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,6 +71,38 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2017/04/26/web-debug/">Web Debug</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-04-26T21:18:54+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>9:18 pm</span></time>
+        
+           | <a href="/blog/2017/04/26/web-debug/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2017/04/26/web-debug/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a></h1>
     
     
@@ -94,186 +127,6 @@
 <p><img src="/images/performance/golden-top10.png" width="400" title="前十名网站" alt="Alt text" /></p>
 
 <p>性能黄金法则由《高性能网站建站指南》的作者Steve Souders在2007年提出。在2012年，他重新发表了一篇博客<a href="https://www.stevesouders.com/blog/2012/02/10/the-performance-golden-rule/" title="《The Performance Golden Rule》">《The Performance Golden Rule》</a>，分析并统计排名前10，10个在10000排名左右网站的加载时间，并计算了在<a href="http://httparchive.org/index.php" title="HTTP Archive">HTTP Archive</a>上被抓取到的50000个网站的前后端耗时占比，而最终验证了自2007年提出的这个理念的准确性。</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2017/04/03/svg-and-icon-font/">前端不止系列 - 请告诉我，你要什么样的图标</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2017-04-03T09:47:12+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2017</span></span> <span class='time'>9:47 am</span></time>
-        
-           | <a href="/blog/2017/04/03/svg-and-icon-font/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2017/04/03/svg-and-icon-font/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h4>一个图标的生命周期（工作流程）</h4>
-
-<p><img src="/images/svg/icomoon-svg.png" width="265" title="图标的生命周期" alt="Alt text" />   <br/>
-图标库(选择阶段) -> 图标使用（开发阶段）</p>
-
-<p><img src="/images/svg/ai-ps-svg.png" width="400" title="图标的生命周期" alt="Alt text" />   <br/>
-图标设计（设计阶段） -> 图标导出（沟通阶段） -> 图标使用（开发阶段）</p>
-
-<p>第一种方式是一般是小公司或者独立开发者的工作流程。而对于大型组织或公司，因为拥有更完善的团队和资源，一般是第二种方式，能够获得更多自主权和建立企业VI（Visual Identity，企业视觉识别）的能力。</p>
-
-<p>但无论是哪种方式，都包括两个角色：设计师和Web开发，只是第一种工作方式中，设计师是不可见的。</p>
-
-<h4>图标的设计和使用</h4>
-
-<p>设计阶段通常是由不了解Web开发的设计师们来完成的，他们会根据产品的需要，绘画出满足需求的图标。</p>
-
-<p><img src="/images/svg/ThoughtWorksContactUSIcon.jpg" width="400" title="ThoughtWorksContactUSIcon" alt="Alt text" />  <br/>
-ThoughtWorks官网Contact with us图标</p>
-
-<p>然后交给Web开发人员使用，为什么要先介绍图标的使用，而一笔跳过导出过程呢？原因很简单，因为我们需要先知道服务的对象是谁，才知道如何正确的为它服务。</p>
-
-<h5>常见的三种使用图标的方式</h5>
-
-<p>1.使用图片</p>
-
-<p>直接将设计师画好的图标，以PNG格式的图片一个个分离导出，这是最直观的图标打包方式。</p>
-
-<p><img src="/images/svg/taobao.png" width="300" title="iconfont cn taobao icon" alt="Alt text" /> <br/>
-1688DPL中台图标库</p>
-
-<p>它的优点是：（1）能够使用彩色的图标（2）能够支持大部分浏览器；缺点是：（1）图标大小是固定的（不能根据场景自由缩放）（2）Retina屏幕需要两倍图。</p>
-
-<p>开发人员拿到这样的图标，通常会需要先合成为一张图片，以方便制作<a href="https://css-tricks.com/css-sprites/" title="雪碧图">雪碧图</a>，这个过程可以由开发人员自己完成，也可以由设计师（设计师可以根据源文件中心导出一张包含所有图标的PNG文件）。</p>
-
-<p>制作雪碧图的工具有很多，我比较常用的在线雪碧图工具是：<a href="http://www.spritecow.com/" title="Sprite Cow">Sprite Cow</a>，或者NodeJS平台下的构建工具插件，如：<a href="https://github.com/mixtur/webpack-spritesmith" title="webpack-spritesmith">webpack-spritesmith</a>。</p>
-
-<p>2.直接使用svg</p>
-
-<p>使用SVG（可缩放矢量图形），W3C标准，<strong>最看好的Web端图形解决方案</strong>。它能提供如裁剪路径、Alpha通道、滤镜效果等复杂渲染能力，具备传统图片没有的矢量功能，还可以被记事本等阅读器、搜索引擎访问。</p>
-
-<p>设计师可以轻松的在设计绘图软件（AI，PS）的帮助下导出SVG格式的图标/图片。</p>
-
-<p>但目前，国内svg还并没有被非常广泛的使用，原因是它的兼容性，不能够很好的兼容旧的IE版本和一些Android原生浏览器。</p>
-
-<p><img src="/images/svg/svg-support.png" width="400" title="svg support" alt="Alt text" />  <br/>
-Can I use svg?</p>
-
-<p><img src="/images/svg/baidu.jpg" width="400" title="baidu tong ji" alt="Alt text" />    <br/>
-百度2017年前三个月的浏览器使用统计，目前国内还有超过20%的用户仍在使用IE8，9甚至是IE7。</p>
-
-<p>3.IconFont</p>
-
-<p>IconFont是目前最为流行的图标解决方案，顾名思义，它就是字体文件，你可以用任何一个字体编辑工具打开它，如果你打开某一个查看，你会发现它就是一些路径，这些路径可以用AI，PS，Sketch等软件来绘制。</p>
-
-<p><img src="/images/svg/font-awesome.png" width="300" title="font awesome" alt="Alt text" /></p>
-
-<p>IconFont的优点在于能够用CSS控制样式，无限缩放而不失真，支持IE7+，兼顾屏幕阅读器，不过缺点是不能支持彩色（拥有多种颜色的图标）图标。获得IconFont的方式也很简单，设计师将图标通过AI/PS转成SVG文件，然后由开发人员通过工具（在线或者本地）转换为IconFont，比如：国外的<a href="https://icomoon.io/" title="icomoon.io">icomoon.io</a>，国内的<a href="http://iconfont.cn/" title="iconfont.cn">iconfont.cn</a>，开源构建工具插件有<a href="https://github.com/nfroidure/gulp-iconfont" title="gulp-iconfont">gulp-iconfont</a>等等。</p>
-
-<h4>产生适合Web开发的图标</h4>
-
-<p>“产生适合Web开发的图标”是我们今天要关注的重点。</p>
-
-<p>1.使用图片的方式</p>
-
-<p>如果开发人员直接使用图片，则相对简单，设计师只需要针对普通屏幕和Retina屏幕准备两套图（单倍图和两倍图）。</p>
-
-<p>以国内某著名的中文小说阅读网站为例，会针对不同的设备使用不同倍数的logo图片，以保证在如Retina屏幕下的清晰度。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.logo-wrap</span> <span class="nc">.logo</span> <span class="nt">a</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">display</span><span class="o">:</span> <span class="k">block</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">219px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">height</span><span class="o">:</span> <span class="m">52px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">background</span><span class="o">:</span> <span class="sx">url(/qd/images/logo.0.2.png)</span> <span class="k">no-repeat</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">@media</span> <span class="o">(</span><span class="nt">min--moz-device-pixel-ratio</span><span class="nd">:1</span><span class="nc">.3</span><span class="o">),(</span><span class="nt">-o-min-device-pixel-ratio</span><span class="o">:</span> <span class="nt">2</span><span class="nc">.6</span> <span class="o">/</span> <span class="nt">2</span><span class="o">),(</span><span class="nt">-webkit-min-device-pixel-ratio</span><span class="nd">:1</span><span class="nc">.3</span><span class="o">),(</span><span class="nt">min-device-pixel-ratio</span><span class="nd">:1</span><span class="nc">.3</span><span class="o">),(</span><span class="nt">min-resolution</span><span class="nd">:1</span><span class="nc">.3dppx</span><span class="o">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nc">.logo-wrap</span> <span class="nc">.logo</span> <span class="nt">a</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">background</span><span class="o">:</span> <span class="sx">url(/qd/images/logo3x.0.2.png)</span> <span class="k">no-repeat</span><span class="p">;</span>
-</span><span class='line'>      <span class="k">background-repeat</span><span class="o">:</span> <span class="k">no-repeat</span><span class="p">;</span>
-</span><span class='line'>      <span class="k">background</span><span class="o">-</span><span class="k">size</span><span class="o">:</span> <span class="m">217px</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>2.使用SVG</p>
-
-<p>关于转换成SVG，这里就要引荐一下Sara Soueidan在Generate London 2015 Conference上的演讲<a href="https://www.youtube.com/watch?v=q4QI9iOeyPo" title="《Sara Soueidan: SVG for Web Designers (and Developers)》">《Sara Soueidan: SVG for Web Designers (and Developers)》</a>（YouTube视频需要翻墙），如果不方便，Sara Soueidan有一篇博客<a href="https://sarasoueidan.com/blog/svg-tips-for-designers/" title="《Tips for Creating and Exporting Better SVGs for the Web》">《Tips for Creating and Exporting Better SVGs for the Web》</a>更详细的讲解关于SVG导出的内容，当然，还有一篇国内的翻译文章<a href="http://www.w3cplus.com/svg/svg-tips-for-designers.html" title="《创建和导出SVG的技巧》">《创建和导出SVG的技巧》</a>，最后在推荐一篇Adobe工程师michael chaize写的关于AI导出SVG的文章<a href="http://creativedroplets.com/export-svg-for-the-web-with-illustrator-cc/" title="《Export SVG for the web with Illustrator CC》">《Export SVG for the web with Illustrator CC》</a>。</p>
-
-<p>不过，我觉得看视频更直观，顺便领略一下这位优秀的 <strong>阿拉伯女性前端开发工程师（兼自由作家和演讲人）</strong> 的风采。</p>
-
-<p>博客和视频中谈到了多个点导出SVG需要注意的地方，篇幅限制，这里简单描述三个tip：</p>
-
-<p><strong>（1）选择适合绘画的画板</strong>。</p>
-
-<p>你有在网页上嵌入过SVG吗，给它指定一个高度和宽度，然后发现它其实比你指定的尺寸要小？开发人员常常会遇到这样的问题。</p>
-
-<p>大多数情况下，这是因为SVG视窗中有一定大小的白色空白的空间。视窗是按照你在样式表中指定的尺寸显示的，但是它里面有额外的空白——在图形周围——使得你的图片看起来好像“缩水”了，因为这块空白是占空间的，在视窗里面。为了避免这种情况，你需要确保你的画板是刚刚好放下里面的图像的，不要大太多。</p>
-
-<p>画板的尺寸就是导出的SVG的视窗的尺寸，所有画板上的空白都会最终变成视窗中的白色空白。</p>
-
-<p><img src="/images/svg/fit-artboard.png" width="400" title="fit artboard" alt="Alt text" /></p>
-
-<p><em>对于没有AI工具的开发，可以在下面的SVGO优化选项中选择“Prefer viewBox to width/height”。</em></p>
-
-<p><strong>（2）选择合适的导出选项</strong></p>
-
-<p><img src="/images/svg/export-options.png" width="400" title="保存" alt="Alt text" />   <br/>
-上面的图片中展示的选项是推荐的生成适合Web使用的SVG的。如果你不想使用Web字体，可以选择把文本转换成轮廓。</p>
-
-<p><img src="/images/svg/output-fewer.png" width="400" title="output-fewer" alt="Alt text" /><br/>
-如果SVG中包含大量的文字，这个选项output fewer tspan elements可以很大程度降低svg的大小。</p>
-
-<p><strong>（3）优化SVG</strong></p>
-
-<p>通常是建议在把SVG从图形编辑器中导出后，再用单独的优化工具来进行优化。比如：删除无用Comments和Metadata，简化代码，简化单个路径等。推荐的第三方工具：NodeJS工具<a href="https://jakearchibald.github.io/svgomg/" title="svgomg">svgomg</a>，AI插件<a href="https://github.com/davidderaedt/SVG-NOW" title="SVG-NOW">SVG-NOW</a>，Sketch插件<a href="https://github.com/BohemianCoding/svgo-compressor" title="Svgo-compressor">Svgo-compressor</a>等，请参考Sara Soueidan的文章<a href="https://sarasoueidan.com/blog/svgo-tools/" title="《Useful SVGO[ptimization] Tools》">《Useful SVGO[ptimization] Tools》</a>。</p>
-
-<p><img src="/images/svg/svgomg.png" width="400" title="优化svg" alt="Alt text" /></p>
-
-<p>3.IconFont</p>
-
-<p>前面提到IconFont一般是由SVG通过工具转换而来，而如果开发最终需要使用IconFont展示图标，则对于导出的SVG有一些特殊要求。我在本文的前面一小节，已经介绍了几款IconFont的转换工具，每一款工具其实都有详细的文档说明SVG绘制的规则，尽管不尽相同，但有一些基本原则是一致的：</p>
-
-<p>（1）将文字转换为路径  <br/>
-（2）不可以使用图片（字体只是路径） <br/>
-（3）修剪画板（trimming to art boundaries）（前面已经介绍过） <br/>
-（4）将描边转化为闭合图形 <br/>
-（5）简化无用的节点  <br/>
-等等</p>
-
-<p>更多关于IconFont的绘画规则，请参考：<a href="http://iconfont.cn/plus/help/detail?helptype=draw" title="Iconfont.cn文档">Iconfont.cn文档</a>，<a href="https://icomoon.io/#docs/importing" title="Icomoon文档">Icomoon文档</a>，<a href="https://github.com/nfroidure/gulp-iconfont#preparing-svgs" title="gulp-iconfont文档">gulp-iconfont文档</a>，<a href="https://github.com/fontello/fontello/wiki/How-to-use-custom-images" title="fontello文档">fontello文档</a>。</p>
-
-<h4>尽早的沟通</h4>
-
-<p>无论是开发还是设计师，最重要的还是沟通，借用Sara Soueidan的一句“设计师和开发者应该成为好朋友”。</p>
 </div>
   
   
@@ -308,6 +161,10 @@ Can I use svg?</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/11/23/gradle-resource-filtering/">Gradle对资源的过滤处理</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/07/01/understand-promise/">理解ES6 Promise</a>
       </li>
     
@@ -321,10 +178,6 @@ Can I use svg?</p>
     
       <li class="post">
         <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a>
       </li>
     
   </ul>

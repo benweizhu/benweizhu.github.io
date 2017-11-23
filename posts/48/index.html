@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="所有的Batch处理都可以以一种最简单的方式描述，那就是读取大量的数据，然后进行某种方式的计算或者变形，最后输出写入到某个存储系统中。Spring Batch提供了三个简单的接口来帮助执行大量数据的读写，分别是ItemReader、ItmeWriter和ItermProcessor， &hellip;">
+  <meta name="description" content="对于初学JavaScript的人很容易去关注如何快速使用它，而忘记学好一门语言，应该首先掌握的基本知识，我就是这样。但是基础知识才是真正掌握一门语言最关键的部分，特别是JavaScript这个看上去好像和C++、Java相同，但实际上完全不是一回事的语言。 作用域 在编程语言中， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,335 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/22/something-you-need-to-know-about-javascript/">JavaScript中你需要了解的基本知识（一）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-22T14:16:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2014</span></span> <span class='time'>2:16 pm</span></time>
+        
+           | <a href="/blog/2014/03/22/something-you-need-to-know-about-javascript/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2014/03/22/something-you-need-to-know-about-javascript/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>对于初学JavaScript的人很容易去关注如何快速使用它，而忘记学好一门语言，应该首先掌握的基本知识，我就是这样。但是基础知识才是真正掌握一门语言最关键的部分，特别是JavaScript这个看上去好像和C++、Java相同，但实际上完全不是一回事的语言。</p>
+
+<h2><strong>作用域</strong></h2>
+
+<p>在编程语言中，作用域控制着变量与参数的可见性及生命周期，是一个很基本的问题。</p>
+
+<p>但是和类C语言不同，JavaScript没有块级别作用域。</p>
+
+<p>所谓块级作用域，即在一个代码块中定义的所有变量在代码块的外部都是不可见的，定义在代码块中的变量在代码块执行结束后会被释放掉。</p>
+
+<p>Java中print方法中的a肯定是未定义的变量，编译器会标红，因为a是if块中的局部变量。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="o">(</span><span class="kc">true</span><span class="o">){</span>
+</span><span class='line'>      <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">a</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>但是在JavaScript中，a变量就可以被访问。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">if</span><span class="p">(</span><span class="kc">true</span><span class="p">){</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>JavaScript是由函数限定变量的作用域，意味着定义在函数中的参数和变量在函数外部是不可见的，而函数内可以访问函数外部的变量。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">carName</span> <span class="o">=</span> <span class="s1">&#39;byd&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">visitName</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">carName</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">visitName</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>JavaScript允许延迟声明变量，但是对于JavaScript缺少块级别作用域，所以这是个悲剧，推荐的做法是在函数的开头声明所有需要使用的变量。</p>
+
+<h2><strong>词法作用域和作用域链</strong></h2>
+
+<p>JavaScript是一种解释性语言。在解释过程中，JavaScript引擎是严格按照作用域来执行的。JavaScript语法采用的是词法作用域，也就是说JavaScript的变量和函数作用域是在定义时决定的，而不是执行时决定的，由于词法作用域决定于代码结构，所以JavaScript解释器只需要通过静态分析就能确定每个变量、函数的作用域，这种作用域也称为静态作用域。</p>
+
+<p>JavaScript解释器通过作用域链把多个嵌套的作用域串联在一起，并借助这个链条帮助JavaScript解释器检索变量的值。这个作用域链相当于一个索引表，通过编号来存储它们的嵌套关系。当JavaScript解释器检索变量的值，会按照这个索引编号进行快速查找，直到找到全局对象为止，如果没有找到值，则传递一个undefined。</p>
+
+<p>看下面这个比较经典的例子</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">carName</span> <span class="o">=</span> <span class="s1">&#39;byd&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">visitName</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">carName</span><span class="p">);</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">carName</span> <span class="o">=</span> <span class="s1">&#39;bmw&#39;</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">carName</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">visitName</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>第一个输出结果：undefined</p>
+
+<p>第二个输出结果：bmw</p>
+
+<p>原因就是它的作用域由静态分析决定，他在visitName中找到carName。所以当遇到第一个console.log(carName)，它并没有到外层的作用域去寻找。</p>
+
+<h2><strong>全局变量和全局对象</strong></h2>
+
+<p>JavaScript中，在所有函数之外声明的变量为全局变量，而在函数内部声明的变量（通过var关键字）为局部变量。</p>
+
+<p>全局变量在所有的作用域中都是可见的。这样一种特殊的变量，就算不是在JavaScript语言中，也是不受欢迎的。</p>
+
+<p>但是在JavaScript中实在太容易就创建一个全局变量，所以要格外小心。</p>
+
+<p>JavaScript中定义全局变量的方式有三种：</p>
+
+<p>1.在任何函数之外定义一个var语句变量。</p>
+
+<p>2.直接给全局对象添加一个属性，全局对象是全局变量和全局函数的容器。</p>
+
+<p>3.没有使用var关键字声明的变量，它在任何作用域中被使用的时候，都会被当做全局变量（与上面介绍的作用域链相关）。</p>
+
+<p>关于第3种情况：JavaScript有一种特性叫做隐式全局变量，不管一个变量有没有用过，JavaScript解释器反向遍历作用域链来查找该变量的var声明，如果没有找到，解释器则假定该变量是全局变量，如果该变量用于了赋值操作的话，之前如果不存在的话，解释器则会自动创建它。</p>
+
+<p>上面提到了一个全局对象的概念，在Web浏览器中，全局对象的名称是windows。全局对象是预定义的对象，作为JavaScript的全局函数和全局属性的占位符。通过使用全局对象，可以访问所有其他所有预定义的对象（例如，document（浏览器容器下））、函数（例如，parseInt()）和属性。</p>
+
+<p>看下面这个例子，通过三种方式创建全局变量。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">carName</span> <span class="o">=</span> <span class="s1">&#39;byd&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">defineGlobalVariable</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nb">window</span><span class="p">.</span><span class="nx">carPrice</span> <span class="o">=</span> <span class="mi">90000</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">carCount</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">defineGlobalVariable</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">print</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">carName</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">carPrice</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">carCount</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">print</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2><strong>对象</strong></h2>
+
+<p>在JavaScript中，只有对象，一切都是对象。</p>
+
+<p>首先要明确一点，JavaScript是面向对象的语言，但是它与C++、Java的面向对象不同。JavaScript不是基于类的面向对象，而是基于原型的面向对象，在JavaScript中没有类的概念。</p>
+
+<p>在基于类的面向对象中，要创建对象，首先要有类。类是对象的抽象描述。类为它们的实例定义了严格不变的结构（属性）和严格不变的行为（方法）。</p>
+
+<p>在基于原型的面向对象中，是动态可变的对象。他们可以很容易地改变（添加，删除，修改）自己的属性。在对对象的属性赋值的时候，如果某些属性不存在，则创建它并且将赋值与它进行初始化，如果它存在，就更新它。</p>
+
+<p>JavaScript里的对象是无类型的，它是属性的容器，是一系列属性的集合，而每一个属性包含名字和值（键值对）。（是不是有点像Map）</p>
+
+<p>属性的名字和属性的值没有限制，它可以是Number、String、Boolean或者另一个对象或者一个函数。</p>
+
+<p>为什么属性可以是一个函数。原因是在JavaScript中，函数也是对象。</p>
+
+<h2><strong>JavaScripty原生对象</strong></h2>
+
+<p>Object|Number|String|Boolean|Date|Array|RegExp</p>
+
+<p>Function</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">new</span> <span class="nb">Function</span> <span class="p">([</span><span class="nx">arg1</span><span class="p">[,</span> <span class="nx">arg2</span><span class="p">[,</span> <span class="p">...</span> <span class="nx">argN</span><span class="p">]],]</span> <span class="nx">functionBody</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在JavaScript中，一个函数实际上是一个Function对象。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">fn</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Function</span><span class="p">(</span><span class="s2">&quot;arg1&quot;</span><span class="p">,</span> <span class="s2">&quot;arg2&quot;</span><span class="p">,</span> <span class="s2">&quot;return arg1 * arg2;&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">alert</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">));</span><span class="c1">//6</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2><strong>对象字面量</strong></h2>
+
+<p>在JavaScript中创建对象有三种方式：</p>
+
+<p>1.通过Object创建</p>
+
+<p>2.通过自定义对象构造器创建</p>
+
+<p>3.对象字面量</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">audiCar</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Object</span><span class="p">();</span>
+</span><span class='line'><span class="nx">audiCar</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;audi&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">audiCar</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">bmwCar</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">myBmwCar</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">bmwCar</span><span class="p">(</span><span class="s1">&#39;bmw&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">myBmwCar</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//字面量模式</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">bydCar</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;byd&#39;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">bydCar</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>从上面的代码可以看出，字面量写法的一个明显优势是，它的代码更少。</p>
+
+<p>JavaScript中的字面量模式更加简洁、有表现力，而且在定义对象时不容易出错。</p>
+
+<p>如果调用Object()创建对象，解析器需要顺着作用域链从当前作用域开始查找，直到找到全局Object()构造函数为止，如果你在某个域中创建了一个Object()方法就会有问题。</p>
+
+<p>这里有一篇关于JavaScript创建对象的三种方式的介绍，是翻译自JavaScript Pattern。里面有更多关于为什么使用字面量定义对象更好。
+<a href="https://github.com/TooBug/javascript.patterns/blob/master/chapter3.markdown">https://github.com/TooBug/javascript.patterns/blob/master/chapter3.markdown</a></p>
+
+<h2><strong>函数</strong></h2>
+
+<p>因为函数是对象，所以它们可以像任何其他的值一样被使用。函数可以保存在变量、对象和数组（数组也是对象）中。函数可以被当做参数传递给其他函数，函数也可以在返回函数。而且，因为函数是对象，所以函数可以拥有方法。</p>
+
+<h2><strong>函数字面量（函数表达式）</strong></h2>
+
+<p>定义函数有两种常用方法：</p>
+
+<p>1.函数声明</p>
+
+<p>2.函数字面量（函数表达式）</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">getCarName</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">&quot;byd&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">getCarName</span><span class="p">());</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">getCarPrice</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">90000</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">getCarPrice</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这两种写法相差无几，实际项目中都是可行的，我们可能也没有发现什么错误。但是，他们是有区别的，JavaScript解析器对函数声明和函数表达式并不是一视同仁的。</p>
+
+<p>对于函数声明，JavaScript解析器会在预解析阶段优先读取函数声明的代码，以确保函数能够被引用到；而对于函数表达式，只有在执行到相应的语句时才进行解析。</p>
+
+<p>在实际中，具体表现在：当使用函数声明的形式来定义函数时，可将调用放在函数声明之前，而使用函数表达式，这样做的话会报错。如下例：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">runCar</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">runCar</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;run car&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">runTrain</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">runTrain</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;run train&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -496,320 +825,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/03/08/spring-batch-job-by-example/">一起学学Spring Batch（一）</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-03-08T17:52:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>5:52 pm</span></time>
-        
-           | <a href="/blog/2014/03/08/spring-batch-job-by-example/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2014/03/08/spring-batch-job-by-example/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>批处理应用（Batch Application）主要是在没有人工干预的情况下处理大量数据。比如，不同系统之间数据文件的导入和导出，数据的计算，定期生成财务报告等等。</p>
-
-<p>Spring Batch是一个轻量级的，复杂的Batch框架，能够让你开发针对企业级系统日常操作的Batch应用。</p>
-
-<p><strong>Spring Batch提供的有用特性：</strong></p>
-
-<ol>
-<li>Spring框架中的基础，依赖注入，切面编程，企业级别的支持</li>
-<li>面向批处理的运行时，有效的驱动批处理应用的流程</li>
-<li>有效处理数据，以最佳策略读写数据</li>
-<li>可用的现成组件，提供能够定位到不同批处理场景的组件</li>
-</ol>
-
-
-<p>Spring框架以轻量级容器闻名，提供配置方式来完成应用程序组件的组装。</p>
-
-<p>Spring Batch对Spring框架进行了扩展，提供了专用的xml的命名空间来配置批处理的过程。</p>
-
-<p><strong>有效处理数据</strong></p>
-
-<p>以一种经典场景为例：从一个数据系统读取数据存储到另一个数据系统中。如果一次将整个数据系统中的数据读入到内存，JVM随时可能Out of Memory。当然将所有数据读入到内存肯定不是最好的办法。</p>
-
-<p>Spring Batch使用一种更加有效的办法，叫做Chunk Processing（块处理方式）：以数据流的方式读取输入的源数据，并处理一定数量（这一块）的记录，并写入到对应的组件。</p>
-
-<p>这个块的大小可以改变，所以仍然可以让批处理一条一条的处理数据。</p>
-
-<p><strong>Ready-to-use Component</strong></p>
-
-<p>Spring Batch提供了基础设施来执行块处理，并代理I/O到专用的组件，并命名为reader和writer。</p>
-
-<p>Spring为一些通用的批处理场景提供可用的组件，这些组件可以让你更加专注于业务逻辑。</p>
-
-<p>Spring Batch对reader和writer场景的支持技术。</p>
-
-<table>
-<thead>
-<tr>
-<th>数据类型     </th>
-<th> 技术格式</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Database </td>
-<td> JDBC</td>
-</tr>
-<tr>
-<td>Database </td>
-<td> Hibernate</td>
-</tr>
-<tr>
-<td>Database </td>
-<td> JPA</td>
-</tr>
-<tr>
-<td>Database </td>
-<td> iBatis</td>
-</tr>
-<tr>
-<td>File </td>
-<td> Flatfile</td>
-</tr>
-<tr>
-<td>File </td>
-<td> XML</td>
-</tr>
-</tbody>
-</table>
-
-
-<p>当然Spring Batch支持的不止这些技术。当然如果没有你需要的实现，你也可以自己是实现对应的组件。</p>
-
-<p><strong>Spring Batch不是Scheduler</strong></p>
-
-<p>Spring Batch可以驱动批处理流程但是不会提供启动它们的支持，特别是基于时间的启动。Spring Batch一般会讲这些工作代理给其他Scheduler工具，例如Quartz或者Cron。</p>
-
-<p><strong>下面是一个Spring Batch Job的Hello World Example</strong></p>
-
-<figure class='code'><figcaption><span>build.gradle </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'> <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'> <span class="n">compile</span> <span class="s1">&#39;org.springframework.batch:spring-batch-core:2.2.5.RELEASE&#39;</span>
-</span><span class='line'> <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-context:3.2.8.RELEASE&#39;</span>
-</span><span class='line'> <span class="n">testCompile</span> <span class="nl">group:</span> <span class="s1">&#39;junit&#39;</span><span class="o">,</span> <span class="nl">name:</span> <span class="s1">&#39;junit&#39;</span><span class="o">,</span> <span class="nl">version:</span> <span class="s1">&#39;4.+&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在这里定义一个具体的task。</p>
-
-<figure class='code'><figcaption><span>tasklet.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">tasklet</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.StepContribution</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.scope.context.ChunkContext</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.step.tasklet.Tasklet</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.repeat.RepeatStatus</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">repeat</span><span class="o">.</span><span class="na">RepeatStatus</span><span class="o">.</span><span class="na">FINISHED</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloTasklet</span> <span class="kd">implements</span> <span class="n">Tasklet</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">RepeatStatus</span> <span class="nf">execute</span><span class="o">(</span><span class="n">StepContribution</span> <span class="n">contribution</span><span class="o">,</span> <span class="n">ChunkContext</span> <span class="n">chunkContext</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hello Spring Batch!&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">FINISHED</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>beans.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:batch=</span><span class="s">&quot;http://www.springframework.org/schema/batch&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;transactionManager&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.support.transaction.ResourcelessTransactionManager&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jobRepository&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;transactionManager&quot;</span> <span class="na">ref=</span><span class="s">&quot;transactionManager&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>   <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;jobLauncher&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.batch.core.launch.support.SimpleJobLauncher&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;jobRepository&quot;</span> <span class="na">ref=</span><span class="s">&quot;jobRepository&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>   <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在xml中配置一个具体batch job，这里只有一步，那就是执行上面定义的task。</p>
-
-<figure class='code'><figcaption><span>batch-job.xml </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:batch=</span><span class="s">&quot;http://www.springframework.org/schema/batch&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch</span>
-</span><span class='line'><span class="s">           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;import</span> <span class="na">resource=</span><span class="s">&quot;spring-batch-beans.xml&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;helloTasklet&quot;</span> <span class="na">class=</span><span class="s">&quot;me.zeph.spring.batch.tasklet.HelloTasklet&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="nt">&lt;batch:job</span> <span class="na">id=</span><span class="s">&quot;helloJob&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;batch:step</span> <span class="na">id=</span><span class="s">&quot;helloStep&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;batch:tasklet</span> <span class="na">ref=</span><span class="s">&quot;helloTasklet&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/batch:step&gt;</span>
-</span><span class='line'>   <span class="nt">&lt;/batch:job&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在main函数中，通过JobLauncher来运行一个Job。</p>
-
-<figure class='code'><figcaption><span>main.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">spring</span><span class="o">.</span><span class="na">batch</span><span class="o">.</span><span class="na">tasklet</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.Job</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.JobExecution</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.JobParameters</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.batch.core.launch.JobLauncher</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.ApplicationContext</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.support.ClassPathXmlApplicationContext</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">TaskletRunner</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">String</span><span class="o">[]</span> <span class="n">configLocations</span> <span class="o">=</span> <span class="o">{</span><span class="s">&quot;spring-batch-beans.xml&quot;</span><span class="o">,</span> <span class="s">&quot;spring-batch-jobs.xml&quot;</span><span class="o">};</span>
-</span><span class='line'>      <span class="n">ApplicationContext</span> <span class="n">applicationContext</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ClassPathXmlApplicationContext</span><span class="o">(</span><span class="n">configLocations</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">JobLauncher</span> <span class="n">jobLauncher</span> <span class="o">=</span> <span class="n">applicationContext</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">JobLauncher</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">Job</span> <span class="n">job</span> <span class="o">=</span> <span class="n">applicationContext</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">Job</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">JobExecution</span> <span class="n">jobExecution</span> <span class="o">=</span> <span class="n">jobLauncher</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">job</span><span class="o">,</span> <span class="k">new</span> <span class="nf">JobParameters</span><span class="o">());</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;JOB EXECUTION STATUS:&quot;</span> <span class="o">+</span> <span class="n">jobExecution</span><span class="o">.</span><span class="na">getExitStatus</span><span class="o">().</span><span class="na">getExitCode</span><span class="o">());</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/49">&larr; Older</a>
@@ -837,6 +852,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/11/23/gradle-resource-filtering/">Gradle对资源的过滤处理</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/07/01/understand-promise/">理解ES6 Promise</a>
       </li>
     
@@ -850,10 +869,6 @@
     
       <li class="post">
         <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a>
       </li>
     
   </ul>

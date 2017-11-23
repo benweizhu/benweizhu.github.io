@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2017-07-11T10:56:13+08:00</updated>
+  <updated>2017-11-23T13:54:30+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,54 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Gradle对资源的过滤处理]]></title>
+    <link href="http://benweizhu.github.io/blog/2017/11/23/gradle-resource-filtering/"/>
+    <updated>2017-11-23T13:01:08+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2017/11/23/gradle-resource-filtering</id>
+    <content type="html"><![CDATA[<p>两种场景需要动态的处理资源：</p>
+
+<p>1.对resource下的资源进行处理  <br/>
+2.对war包中其他资源，比如：jsp文件进行处理</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.apache.tools.ant.filters.*</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">processResources</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">filter</span> <span class="n">ReplaceTokens</span><span class="o">,</span> <span class="nl">tokens:</span> <span class="o">[</span>
+</span><span class='line'>        <span class="s">&quot;application.version&quot;</span><span class="o">:</span> <span class="n">project</span><span class="o">.</span><span class="na">property</span><span class="o">(</span><span class="s">&quot;application.version&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">]</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.apache.tools.ant.filters.*</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">war</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">filter</span><span class="o">(</span><span class="n">ReplaceTokens</span><span class="o">,</span> <span class="nl">tokens:</span><span class="o">[</span><span class="err">&#39;</span><span class="n">versionDate</span><span class="err">&#39;</span><span class="o">:</span> <span class="s">&quot;${new Date().format(&#39;yyyyMMdd&#39;)}&quot;</span><span class="o">.</span><span class="na">toString</span><span class="o">()])</span>
+</span><span class='line'>    <span class="n">filter</span><span class="o">(</span><span class="n">ReplaceTokens</span><span class="o">,</span> <span class="nl">tokens:</span><span class="o">[</span><span class="err">&#39;</span><span class="n">copyright</span><span class="err">&#39;</span><span class="o">:</span> <span class="s">&quot;${new Date().format(&#39;yyyy&#39;)}&quot;</span><span class="o">.</span><span class="na">toString</span><span class="o">()])</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>比较简单，一眼就看完了，就不多介绍了。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[理解ES6 Promise]]></title>
@@ -3135,65 +3183,6 @@ TLS运行在一个可靠的TCP协议上，意味着我们必须首先完成TCP�
 <p>参考资料：<br/>
 1. <a href="http://learnaholic.me/2012/10/10/installing-nginx-in-mac-os-x-mountain-lion/">http://learnaholic.me/2012/10/10/installing-nginx-in-mac-os-x-mountain-lion/</a><br/>
 2. <a href="https://devtidbits.com/2015/12/08/nginx-as-a-reverse-proxy-to-apache-tomcat/">https://devtidbits.com/2015/12/08/nginx-as-a-reverse-proxy-to-apache-tomcat/</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[JS 改变默认行为 e.preventDefault() e.returnValue e.stopPropagation e.cancelBubble Return False]]></title>
-    <link href="http://benweizhu.github.io/blog/2016/05/02/js-prevent-default/"/>
-    <updated>2016-05-02T09:31:27+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2016/05/02/js-prevent-default</id>
-    <content type="html"><![CDATA[<p>事件对象有一些方法可以改变一个元素的默认行为，以及它的祖先元素如何对这个事件作出响应。</p>
-
-<p>有一些事件，比如点击链接或提交表单，会把用户导向另一个页面。为了阻止这类元素的这种默认行为，比如在用户点击链接或提交表单之后还是停留在当前页面，而不是导向新的页面，可以使用事件对象e的preventDefault()。</p>
-
-<p>IE5~IE8有一个同样功能的属性returnValue，如果将其设置为false，就能达到同样的效果。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
-</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">e</span><span class="p">.</span><span class="nx">returnValue</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>处理完某个元素上的事件之后，可能需要阻止这个事件向其祖先元素继续冒泡传播。这时候，可以使用e.stopPropagation()方法。</p>
-
-<p>IE8或更早的IE版本中，使用拥有同样功能的属性e.cancelBubble，将其设置为true可以达到同样的效果。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">stopPropagation</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">e</span><span class="p">.</span><span class="nx">stopPropagation</span><span class="p">();</span>
-</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">e</span><span class="p">.</span><span class="nx">cancelBubble</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果你想要同时实现，preventDefault和stopPropagation，可以使用return false。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>   <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;href&quot;</span><span class="p">));</span>
-</span><span class='line'>   <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料： <br/>
-1.《JavaScript&amp;jQuery交互式Web前端开发》</p>
 ]]></content>
   </entry>
   

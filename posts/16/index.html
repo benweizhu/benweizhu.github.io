@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="原文地址：https://www.atlassian.com/git/tutorials/merging-vs-rebasing git rebase命令对于初学git的人就是像是一种巫术，应该远离之，但是实际上如果使用适当，会让你的git生活变得更轻松。在本文中，我将会比较git &hellip;">
+  <meta name="description" content="什么是React？ 官方网站上是这么写的： A JAVASCRIPT LIBRARY FOR BUILDING USER INTERFACES React只关心UI，至于怎么路由（route），怎么获取数据（ajax），你可以通过结合其他技术来做。 什么UI，在web中UI指的是HTML和CSS， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,169 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/11/22/ok-react-1/">继续前行！React（一）- 用JavaScript构建Web UI</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-11-22T15:12:52+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2015</span></span> <span class='time'>3:12 pm</span></time>
+        
+           | <a href="/blog/2015/11/22/ok-react-1/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/11/22/ok-react-1/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>什么是React？</h2>
+
+<p>官方网站上是这么写的：</p>
+
+<blockquote><p>A JAVASCRIPT LIBRARY FOR BUILDING USER INTERFACES</p></blockquote>
+
+<p>React只关心UI，至于怎么路由（route），怎么获取数据（ajax），你可以通过结合其他技术来做。</p>
+
+<p>什么UI，在web中UI指的是HTML和CSS，React通过JavaScript的方式来写HTML和CSS，这就是它所说的“构建用户界面的JavaScript类库”。</p>
+
+<h3>用JavaScript绘制UI</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">HelloMessage</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">displayName</span><span class="o">:</span> <span class="s2">&quot;HelloMessage&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;Hello &quot;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">React</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="nx">HelloMessage</span><span class="p">,</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;John&quot;</span> <span class="p">}),</span> <span class="nx">mountNode</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>mountNode是一个在页面上的元素，通过document.getElementByXXX得到。</p>
+
+<p>该代码执行得到的结果如下：</p>
+
+<div data-reactid=".1">
+    <span data-reactid=".1.0">Hello </span><span data-reactid=".1.1">John</span>
+</div>
+
+
+<p>简单地说，就是它找到页面上的mountNode节点，将Hello John插入，其中John来自于动态传入的JSON数据。</p>
+
+<p>根据上面的解释，是否让你联想到了JavaScript模板引擎，对JavaScript模板引擎不了解的，可以看这篇文章： <a href="http://benweizhu.github.io/blog/2015/10/28/js-template-engine/">http://benweizhu.github.io/blog/2015/10/28/js-template-engine/</a> 。</p>
+
+<p>和JavaScript模板引擎相比，上面这种方式通过JavaScript来编写UI代码，可读性相差甚远，于是React提出了JSX的概念 - JavaScript XML，上面的代码就变成如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">HelloMessage</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Hello</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">HelloMessage</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;John&quot;</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nx">mountNode</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>不管你现在了不了解JSX，但是你应该可以看出来，React所指的用JavaScript构建UI的概念。</p>
+
+<p>HelloMessage就像是一个自定义的新标签，在React的概念中，叫做一个组件。</p>
+
+<h3>组件</h3>
+
+<p>React的核心概念是组件，广义的理解组件，组件（Component）是对数据和方法的简单封装，能够独立的实现某一种功能。</p>
+
+<p>组件是一种封装，它应该是自包含的，不需要外界的帮助，即可完成自身相应的功能(多个组件相互合作，也是组件本身可以完成相应功能的前提下实现的)，比如上面代码中的HelloMessage。</p>
+
+<p>有状态的组件（Props和State）：</p>
+
+<p>React不需要你去操作DOM，你只要告诉它，你想要绘制的DOM长什么样？如何去绘制，由它自己来操作。</p>
+
+<p>你只需要根据事件相应来改变组件的状态，当组件状态改变，它会自动重新绘制DOM。</p>
+
+<p>看下面的例子：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">Timer</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span><span class="nx">secondsElapsed</span><span class="o">:</span> <span class="mi">0</span><span class="p">};</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">tick</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">secondsElapsed</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">secondsElapsed</span> <span class="o">+</span> <span class="mi">1</span><span class="p">});</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">interval</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">tick</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">componentWillUnmount</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">clearInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">interval</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Seconds</span> <span class="nx">Elapsed</span><span class="o">:</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">secondsElapsed</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'>    <span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Timer</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nx">mountNode</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>你改变的是组件的状态this.state.secondsElapsed，DOM的绘制由React自己完成，你只是告诉他画成这样。</p>
+
+<p>参考资料： <br/>
+1. <a href="https://facebook.github.io/react/index.html">https://facebook.github.io/react/index.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -322,186 +485,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/11/15/javascript-publish-and-subscribe-pattern/">JavaScript发布订阅模式</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-11-15T11:21:36+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:21 am</span></time>
-        
-           | <a href="/blog/2015/11/15/javascript-publish-and-subscribe-pattern/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/11/15/javascript-publish-and-subscribe-pattern/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>发布者和订阅者的目的就是为了对象之间的解耦，或者更大一点是JavaScript组件之间的解耦。</p>
-
-<blockquote><p>Subscribe/Publish模式使用了一个主题/事件通道，这个通道介于订阅者和发布者之间。该事件系统允许代码定义应用程序的特定事件，该事件可以传递自定义参数，自定义参数包含订阅者所需要的值。其目的是避免订阅者和发布者产生依赖关系。 - 《Javascript设计模式》</p></blockquote>
-
-<p>下面是它的一种实现方式：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">EventBus</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">topics</span><span class="o">:</span> <span class="p">{},</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">subscribe</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">listener</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// create the topic if not yet created</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">])</span> <span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">]</span> <span class="o">=</span> <span class="p">[];</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c1">// add the listener</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="nx">listener</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">publish</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// return if the topic doesn&#39;t exist, or there are no listeners</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">]</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c1">// send the event to all listeners</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">topics</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">listener</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">listener</span><span class="p">(</span><span class="nx">data</span> <span class="o">||</span> <span class="p">{});</span>
-</span><span class='line'>        <span class="p">});</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">EventBus</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="nx">alert</span><span class="p">);</span>
-</span><span class='line'><span class="nx">EventBus</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;Hello World!&#39;</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>订阅者，在EventBus中注册事件/主题，并传递对应事件/主题的回调函数。 <br/>
-发布者，发布对应的事件/主题，并传递需要的回调函数所需要的数据对象。</p>
-
-<p>下面的这个写法，从函数命名上看更倾向于以注册事件和触发事件的方式理解，并且对事件的命名和回调函数的约束更加明确，也就是更鲁邦。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">eventService</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">EventService</span> <span class="o">=</span> <span class="p">{};</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">_listeners</span> <span class="o">=</span> <span class="p">{};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">eventService</span><span class="p">.</span><span class="nx">add</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">func</span> <span class="k">instanceof</span> <span class="nb">Function</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="nx">topic</span> <span class="o">+</span> <span class="s2">&quot; must add a function.&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">])</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">]</span> <span class="o">=</span> <span class="p">[];</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">push</span><span class="p">(</span><span class="nx">func</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">eventService</span><span class="p">.</span><span class="nx">remove</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">])</span> <span class="p">{</span>
-</span><span class='line'>            <span class="kd">var</span> <span class="nx">index</span> <span class="o">=</span> <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">func</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nx">index</span> <span class="o">!==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">splice</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">eventService</span><span class="p">.</span><span class="nx">fire</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">topic</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">listeners</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">topic</span> <span class="o">!==</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="s1">&#39;EventDispatcher&#39;</span><span class="p">,</span> <span class="s1">&#39;First params must be an event type (String)&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">]</span> <span class="o">==</span> <span class="kc">undefined</span><span class="p">)</span>
-</span><span class='line'>            <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="s1">&#39;EventDispatcher&#39;</span><span class="p">,</span> <span class="s1">&#39;No Event Register&#39;</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">_listeners</span><span class="p">[</span><span class="nx">topic</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nx">func</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">});</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">eventService</span><span class="p">;</span>
-</span><span class='line'><span class="p">}.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料：  <br/>
-1.<a href="http://dev.housetrip.com/2014/09/15/decoupling-javascript-apps-using-pub-sub-pattern/">http://dev.housetrip.com/2014/09/15/decoupling-javascript-apps-using-pub-sub-pattern/</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/17">&larr; Older</a>
@@ -529,6 +512,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/11/23/gradle-resource-filtering/">Gradle对资源的过滤处理</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/07/01/understand-promise/">理解ES6 Promise</a>
       </li>
     
@@ -542,10 +529,6 @@
     
       <li class="post">
         <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a>
       </li>
     
   </ul>
