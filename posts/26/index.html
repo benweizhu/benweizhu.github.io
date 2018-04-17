@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="什么是资源？什么是表述？ 就本质而言，任何足够重要并被引用的事物都可以是资源。如果你的用户“想要建立指向它的超文本链接，指出或者反对关于它的断言，获取或者缓存它的表述，共另外的表述引用它的全部或者部分，给它增加注释信息，或者对它执行某些操作”，（源自《万维网的架构》），你都应该将它定义为资源。 &hellip;">
+  <meta name="description" content="基本概念 全文搜索提供了一种能力来鉴别的自然语言文档是否满足某个查询语句，并根据与查询语句的相关性来对查询结果排序。最常见的查询就是找到所有包含查询术语（term）的文档，并根据他们的相似性进行排序。 文字查询已经在数据库中存在多年。PostgreSQL有~，~*， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/07/25/restful-web-api-part-1/">理解设计RESTful API - 资源、表述和HTTP协议语义</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/08/09/postgres-full-text-search-1/">如何使用Postgres全文搜索特性（一）</a></h1>
     
     
       <p class="meta">
@@ -79,82 +79,200 @@
 
 
 
-<time class='entry-date' datetime='2015-07-25T20:39:45+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:39 pm</span></time>
+<time class='entry-date' datetime='2015-08-09T08:24:23+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:24 am</span></time>
         
-           | <a href="/blog/2015/07/25/restful-web-api-part-1/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/07/25/restful-web-api-part-1/">Comments</a>
+           | <a href="/blog/2015/08/09/postgres-full-text-search-1/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/08/09/postgres-full-text-search-1/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h3>什么是资源？什么是表述？</h3>
+  <div class="entry-content"><h2>基本概念</h2>
 
-<p>就本质而言，任何足够重要并被引用的事物都可以是资源。如果你的用户“想要建立指向它的超文本链接，指出或者反对关于它的断言，获取或者缓存它的表述，共另外的表述引用它的全部或者部分，给它增加注释信息，或者对它执行某些操作”，（源自《万维网的架构》），你都应该将它定义为资源。</p>
+<p>全文搜索提供了一种能力来鉴别的自然语言文档是否满足某个查询语句，并根据与查询语句的相关性来对查询结果排序。最常见的查询就是找到所有包含查询术语（term）的文档，并根据他们的相似性进行排序。</p>
 
-<p>每个资源必须拥有URL，在web上，我们使用URL来为每个资源提供一个全球唯一的地址，将一个事物赋以URL，它就会成为一个资源。</p>
+<p>文字查询已经在数据库中存在多年。PostgreSQL有~，~*，LIKE和ILIKE这样的对应文字数据类型的操作符，但它们缺少现代信息系统需要的必要属性：</p>
 
-<p>石榴可以是一个资源，但是你不可能通过互联网传输它，数据库中的一条记录可以是一个资源，并且可以通过互联网传输。</p>
+<p>1.没有语言特性的支持，比如，英语中的单数和复数，用正则表达式是做不到识别复数单词的。<br/>
+2.没有查询结果的相似性的排序。 <br/>
+3.因为没有索引支持，所以会比较慢</p>
 
-<p>当客户端对一个资源发起一个Get请求的时候，服务器会以一种有效的方式提供一个采集了资源信息的文档作为回应。这种资源信息的文档就是一种表述，一种以机器可读的方式对资源当前的状态进行说明。</p>
+<p>全文搜索允许对文档进行预处理，比允许建立索引来提供搜索速度。预处理一般包括：</p>
 
-<h3>资源有多重表述</h3>
+<p>1.将文档解析为符号。这对于解析不同类型的符号非常有用。比如，数字，单词，复杂单词，email，这样它们就可以用不同的方式被处理。原则上，符号类型取决于文档，但是大部分情况，可以使用预定义的类型就足够了。Postgres提供了一个标准的解析器，但也可以建立自定义的解析器。</p>
 
-<p>一个资源可以有多种表述。比如，有的资源可以有整体概括性的表述，也可以有面面俱到的详细表述，又或者可能以JSON格式或者XML格式来表述同一个资源。</p>
+<p>2.将符号转化为分词。一个分词（词位，单词单位）是一个字符串，跟符号相似，但是它被正常化，这样就可以匹配同一个单词的不同形式，比如，正常化允许将大写字母转换为小写，更常见的是英语单词的前缀和后缀（复数单词），这就允许搜索同一个单词的不同形式，而不需要输入该单词的全部可能变形式。（话句话说，符号是文档文本的直接片段，而分词是可以用来索引和搜索的有用单词）。而Postgres实现这种方式的办法就是利用词典，可以提供不同标准的词典，或者自定义的词典来满足不同的需要。</p>
 
-<h3>约束 - HTTP协议语义</h3>
+<p>3.Storing preprocessed documents optimized for searching. For example, each document can be represented as a sorted array of normalized lexemes. Along with the lexemes it is often desirable to store positional information to use for proximity ranking, so that a document that contains a more &ldquo;dense&rdquo; region of query words is assigned a higher rank than one with scattered query words.(这段没看明白)</p>
 
-<p>尽管任何事物都可以成为一个资源，但是客户端并不能随心所欲地对资源进行任意的操作。所能进行的操作是有规定的。在一个RESTful系统里，客户端和服务器端只能通过相互发送遵循预定义协议的消息来进行交互。在Web API的世界里，该协议就是HTTP。</p>
+<h2>文档</h2>
 
-<p>在设计Web API时，严格遵守HTTP协议语义是设计好的API的重要基础。</p>
+<p>上面提到一个很重要的概念，叫做文档（Document）。那么，它的含义是什么？</p>
 
-<h4>GET请求</h4>
+<p>在PostgresSQL的搜索中，文档可以是数据库表中某一行的某一个文字字段（textual field），或者是多个这样的字段的组合，也许他们存储在不同表中，又或者是动态获取到的结果。话句话说，文档是由不同的部分组成，可能并不会作为一个整体存在某一个位置。比如：</p>
 
-<p>客户端通过发送Get请求来获取某个URL所标示的资源的表述。Get被定义为安全的HTTP方法。它仅仅是对信息的一次请求。向服务器发送一条Get请求对资源的影响应该和没有发送一样。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">title</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span>  <span class="n">author</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span>  <span class="n">abstract</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">body</span> <span class="k">AS</span> <span class="n">document</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">mid</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">SELECT</span> <span class="n">m</span><span class="p">.</span><span class="n">title</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">m</span><span class="p">.</span><span class="n">author</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">m</span><span class="p">.</span><span class="n">abstract</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">d</span><span class="p">.</span><span class="n">body</span> <span class="k">AS</span> <span class="n">document</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span> <span class="n">m</span><span class="p">,</span> <span class="n">docs</span> <span class="n">d</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">mid</span> <span class="o">=</span> <span class="n">did</span> <span class="k">AND</span> <span class="n">mid</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span> 
+</span></code></pre></td></tr></table></div></figure>
 
-<h4>DELETE请求</h4>
 
-<p>发送DELETE请求，客户端希望服务器将资源销毁，并且以后再也不会跳到它。当Get请求再次访问一个已经销毁的资源，服务器应该返回错误响应码，比如404（Not Found）。Delete不是一个安全的方法，它会改变资源的状态，但是DELETE方法有另外一个很重要的属性，就是幂等性。当你发送一个DELETE请求后，资源就永久性的消失了，即便之后，再次发送相同的DELETE请求，也许你会收到404的错误码，但是第二次发送后和第一次发送后，资源的状态是一致的，仍然不存在。</p>
+<p>title，author，abstract作为了文档，它们是message的不同字段。</p>
 
-<p>幂等性是一个很重要的特性，因为互联网的不稳定性，假设发送的一个Delete请求，因为连接超时，你并没有收到响应，所以你无法知道发送的Delete请求是否顺利完成，这时你也许会发送第二次Delete请求。幂等性保证了执行两次Delete请求并不会比执行一次Delete请求给资源带来更多的影响。</p>
+<p>还有一种可能，文档以简单文本的方式存储在文件系统中，这样的情况下，数据库中可以存放全文的索引来执行搜索，并使用一些独立的标识符来从文件系统中获取文档。</p>
 
-<h4>POST-to-Append请求</h4>
+<h2>TSVECTOR（分词向量）</h2>
 
-<p>为什么是Post-to-Append而不是Post呢？因为Post方法可以做两件事情，第一件事情就是Post-to-Append，第二件事情叫做overloaded post。我们先看POST-to-Append，向某个资源发送一条Post请求用以在该资源的下一级中创建新的资源，当客户端发送一个POST-to-Append请求时，它会在请求的实体消息体中添加所希望创建的资源的表述信息并发给服务器。Post方法既不安全也不幂等，如果发送多次Post请求，就会创建多个资源。</p>
+<p>以文本搜索为目的，每个文档必须缩减为预处理的tsvector（某种向量）形式，搜索和排名都是在这个可以代表文档的tsvector上执行，文档只是在需要用户需要使用时才去获取，因此，我们常常将tsvector作为一种文档，当然它只是全文文档的一种压缩形式。</p>
 
-<h4>PUT请求</h4>
+<p>PostgreSQL全文搜索是基于匹配操作符@@实现，当一个tsvector（document）匹配一个tsquery（query）时，返回true。至于哪个写在前面，哪个写在后面不重要：</p>
 
-<p>Put请求用于修改资源的状态。客户端一般会通过Get请求获取表述，然后对其进行修改，最后再将修改后的资源表述作为PUT请求的负载数据发送回去。PUT请求也是幂等的，无论发送多少次PUT请求，结果都和第一次发送PUT请求一样。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="s1">&#39;a fat cat sat on a mat and ate a fat rat&#39;</span><span class="p">::</span><span class="n">tsvector</span> <span class="o">@@</span> <span class="s1">&#39;cat &amp; rat&#39;</span><span class="p">::</span><span class="n">tsquery</span><span class="p">;</span>
+</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
+</span><span class='line'><span class="c1">----------</span>
+</span><span class='line'> <span class="n">t</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">SELECT</span> <span class="s1">&#39;fat &amp; cow&#39;</span><span class="p">::</span><span class="n">tsquery</span> <span class="o">@@</span> <span class="s1">&#39;a fat cat sat on a mat and ate a fat rat&#39;</span><span class="p">::</span><span class="n">tsvector</span><span class="p">;</span>
+</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
+</span><span class='line'><span class="c1">----------</span>
+</span><span class='line'> <span class="n">f</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<hr />
 
-<p>以上4种请求，我们最常见也是使用最频繁的请求。接下来要介绍的请求，虽然见的不多，但是当你了解后，你会觉得它非常有用。</p>
+<p>如上面的例子中，一个tsquery不是单纯的文本，tsvector也是一样。一个tsquery包含搜索术语（term），它们是已经做过正常化的分词，并且可能通过AND，OR和NOT操作将多个术语结合。函数to_tsquery和plainto_tsquery可以帮助将用户写的文本转化为适当的tsquery。简单来说，to_tsvector是用来解析和正常化一个文档字符串的。所以，在实际应用中，一个文本搜索匹配应该长如下这样：</p>
 
-<h4>PATCH请求</h4>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;fat cats ate fat rats&#39;</span><span class="p">)</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;fat &amp; rat&#39;</span><span class="p">);</span>
+</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
+</span><span class='line'><span class="c1">----------</span>
+</span><span class='line'> <span class="n">t</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>表述的信息量可能非常大。虽然，我们可以使用PUT请求来修改资源，但是如果只想修改资源状态的部分，或者说很少一部分，才PUT就会造成极大的资源浪费，这对于移动应用所使用的Web API设计是非常重要的。和将完整信息发送过去的PUT方法不同，PATCH方法将一个“diff”的表述放在请求的负载数据中发送给服务器。</p>
 
-<h4>HEAD请求</h4>
+<p>注意，如果写成如下方式将不会成功：</p>
 
-<p>Head方法是和Get方法一样的安全方法。服务器应该和处理Get方法一样除了Head方法，但是Head方法不需要发送实体消息，只需要发送HTTP状态码和报头。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="s1">&#39;fat cats ate fat rats&#39;</span><span class="p">::</span><span class="n">tsvector</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;fat &amp; rat&#39;</span><span class="p">);</span>
+</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
+</span><span class='line'><span class="c1">----------</span>
+</span><span class='line'> <span class="n">f</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<h4>OPTIONS请求</h4>
 
-<p>OPTIONS是HTTP的原生探索机制。一个OPTIONS请求的返回结果包含一个HTTP Allow报头，这个报头展示了这个资源所支持的所有HTTP方法。</p>
+<p>@@操作符也支持文本输入，简单情况下，允许跳过具体的tsvector或者tsquery的转换。使用如下：</p>
 
-<h4>肮脏的Overloaded POST请求</h4>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="n">tsvector</span> <span class="o">@@</span> <span class="n">tsquery</span>
+</span><span class='line'><span class="n">tsquery</span>  <span class="o">@@</span> <span class="n">tsvector</span>
+</span><span class='line'><span class="nb">text</span> <span class="o">@@</span> <span class="n">tsquery</span>
+</span><span class='line'><span class="nb">text</span> <span class="o">@@</span> <span class="nb">text</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>POST不仅仅被用于创建新的资源，在用浏览器上网的时候，POST也被用于传输任何形式的变化，它将PUT、DELETE、PATCH、LINK和UNLINK所有的方法混合成一个方法。</p>
 
-<p>比如，在页面有一个表单对用户的基本信息进行修改，它是一个POST请求，但是从语义上，它更像是一个PUT，但这完全是合法的，任何数据作为POST请求的一部分发出去，不论是出于什么目的，这都是合法的。这导致POST请求没有任何语义。由于重载后的POST请求可以用来完成任何事情，所以这种POST方法既不安全也不幂等。</p>
+<h2>如何在数据库表中进行搜索，并使用索引呢？</h2>
 
-<hr />
+<p>我们是可以再没有索引的情况下做全文搜索的，如下：</p>
 
-<p><strong>好的API不应该依靠文档来维护它的使用方式，就好像是优秀的代码，不需要注释来考诉你它是干什么，合理的协议语义的使用会帮助API实现基本的自我描述，虽然这还远远不够，但它最起码是互联网上大家都遵守的约束。</strong></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">title</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">pgweb</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="s1">&#39;friend&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>参考资料： <br/>
-1. RESTful Web AIPs</p>
+
+<h3>创建索引</h3>
+
+<p>我们可以创建GIN索引来提供文本搜索的速度：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">pgweb_idx</span> <span class="k">ON</span> <span class="n">pgweb</span> <span class="k">USING</span> <span class="n">gin</span><span class="p">(</span><span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">body</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>注意这里使用两个参数的to_tsvector方法。只有文本搜索指定了一个配置名字才能使用在表达式索引中。这是因为索引内容必须不被default_text_search_config所影响。如果它们被影响了，索引内容有可能不一致，因为不同的条目（entries）可以包含有不同配置生成的tsvector，所以没有办法猜测谁是谁。所以也就没办法正确的删除和还原这样是索引。</p>
+
+<p>因为上面使用了两个参数版本的to_tsvector，只有也使用了两参数版本to_tsvector并且配置相同的查询语句才能使用。也就说，WHERE to_tsvector(&lsquo;english&rsquo;, body) @@ &lsquo;a &amp; b&#8217;可以使用索引，WHERE to_tsvector(body) @@ &#8216;a &amp; b&#8217;就不行。</p>
+
+<p>索引可以建立在联合的字段中：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">pgweb_idx</span> <span class="k">ON</span> <span class="n">pgweb</span> <span class="k">USING</span> <span class="n">gin</span><span class="p">(</span><span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">title</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">body</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>在单独的字段创建向量</h3>
+
+<p>另外一种办法就是创建一个单独的tsvector字段来保存to_tsvector的输出，本例中，coalesce用来保证即便有一个字段是null，仍然会生成索引：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">pgweb</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">textsearchable_index_col</span> <span class="n">tsvector</span><span class="p">;</span>
+</span><span class='line'><span class="k">UPDATE</span> <span class="n">pgweb</span> <span class="k">SET</span> <span class="n">textsearchable_index_col</span> <span class="o">=</span>
+</span><span class='line'>     <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">coalesce</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们创建一个GIN索引来加快搜索：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">textsearch_idx</span> <span class="k">ON</span> <span class="n">pgweb</span> <span class="k">USING</span> <span class="n">gin</span><span class="p">(</span><span class="n">textsearchable_index_col</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在可以来执行一个快速的全文搜索：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">title</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">pgweb</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">textsearchable_index_col</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;create &amp; table&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="k">ORDER</span> <span class="k">BY</span> <span class="n">last_mod_date</span> <span class="k">DESC</span>
+</span><span class='line'><span class="k">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当使用独立字段来存储tsvector的结果时，非常有必要创建一个触发器（trigger）来保证tsvector的状态，当title或者body发生改变。</p>
+
+<p>独立列的方式比表达式索引方式好的其中一点是当使用索引查询时，不用在查询语句中指定文本查询的配置。正如上面的例子中，查询语句依赖于default_text_search_config。另外一个优点是，查询更快速，因为它不需要重新执行to_tsvector来验证索引的匹配（特别是使用GiST的时候）。唯一的不同时，这种方式需要占据存储空间。</p>
+
+<p>参考自：<a href="http://www.postgresql.org/docs/9.2/static/textsearch-intro.html">http://www.postgresql.org/docs/9.2/static/textsearch-intro.html</a></p>
 </div>
   
   
@@ -167,7 +285,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/07/13/linux-you-dont-understand-all-these-years/">《Linux就是这个范儿》读书笔记（一） - 理解Linux用户和用户组</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/08/01/css-selector-basic/">CSS后代选择器以及选择器特殊性</a></h1>
     
     
       <p class="meta">
@@ -176,72 +294,108 @@
 
 
 
-<time class='entry-date' datetime='2015-07-13T17:03:21+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>5:03 pm</span></time>
+<time class='entry-date' datetime='2015-08-01T17:46:56+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>5:46 pm</span></time>
         
-           | <a href="/blog/2015/07/13/linux-you-dont-understand-all-these-years/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/07/13/linux-you-dont-understand-all-these-years/">Comments</a>
+           | <a href="/blog/2015/08/01/css-selector-basic/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/08/01/css-selector-basic/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h3>理解什么是多用户多任务分时操作系统</h3>
+  <div class="entry-content"><h3>常用的重要选择器规则：</h3>
 
-<p>“将大型电脑的珍贵时间资源适当的分配到所有使用者身上，让所有使用者都有独占整部机器的感觉，这是当时计算机先驱提出的分时系统的概念。依据这个想法，通用电气、麻省理工学院和贝尔实验室联手启动Multics项目，这是在当时看着最靠谱的分时系统概念。但是由于太“靠谱”了（真正的多用户多任务分时操作系统），在当时的技术条件下去完成它实在是吃力，所以最终的命运很悲惨。但是有两个游戏爱好者，Multics的成员Ken和Dennis为了能够有电脑玩游戏，决定自己给一台闲置的电脑写个操作系统，于是 — 一个实用的多用户多任务分时操作系统就诞生了。” &mdash;-《Linux就是这个范》</p>
+<p>element,element div,p   选择所有 div 元素和所有 p 元素。  <br/>
+element element div p   后代选择器：选择 div 元素内部的所有 p 元素。 <br/>
+element>element div>p   子选择器：选择父元素为 div 元素的所有 p 元素。  <br/>
+element+element div+p   第一个子元素选择器：选择紧接在 div 元素之后的所有 p 元素。</p>
 
-<p>我们所熟知的Windows、Linux、Mac OS X等都是多用户多任务分时操作系统。最显著的特点就是可以让多个人使用同一台电脑而不能互相窥探对方的秘密（多用户）。当你使用电脑时，可以边放音乐，边聊QQ，边浏览网页（多任务）。分时就像之前的定义那样，将电脑的时间资源适当的分配给所有的使用者身上，如果将使用者抽象，它不仅仅代表“人”，可以代表任何使用电脑时间资源的任务，在这样的理解下，分时就成为了多用户和多任务的基础。</p>
+<h3>后代选择器</h3>
 
-<h3>澡堂文化 - 多用户</h3>
+<p>后代选择器（descendant selector）又称为包含选择器。后代选择器可以选择作为某元素后代的元素。</p>
 
-<p>Linux中的用户管理是管理用户的等级和对文件的访问权限。</p>
+<p>我们可以定义后代选择器来创建一些规则，使这些规则在某些文档结构中起作用，而在另外一些结构中不起作用。
+举例来说，如果你希望只对 h1 元素中的 em 元素应用样式，可以这样写：</p>
 
-<p>用户等级只有两个root和非root用户。root用户拥有至高无上的权利，用户名就是root，相当于Windows中的Administrator，但幸运的是root用户只有一个。root用户通过文件严格控制着非root用户的访问权限。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">h1</span> <span class="nt">em</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span><span class="nb">red</span><span class="p">;}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>在《Linux就是这个范》这本书中，作者将这种管理方式形象的描述为“澡堂子模型”。root用户就是澡堂子的服务生，每个来澡堂子的人，服务生都会给分配一个号码牌，就像root用户给非root用户分配账号。每个号码牌上都有一个钥匙，可以打开对应的柜子。</p>
 
-<p>而每个非root用户一般会拥有自己的文件目录（某些不会，它们可能是执行特殊任务的用户，不需要自己的文件目录），目录路径一般是/home/[username]，这就是，每个非root用户的目录就对应着每个来澡堂中的柜子。</p>
+<p>上面这个规则会把作为 h1 元素后代的 em 元素的文本变为 红色。其他 em 文本（如段落或块引用中的 em）则不会被这个规则选中：</p>
 
-<h3>用户权限（不同的职业）</h3>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;h1&gt;</span>This is a <span class="nt">&lt;em&gt;</span>important<span class="nt">&lt;/em&gt;</span> heading<span class="nt">&lt;/h1&gt;</span>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>This is a <span class="nt">&lt;em&gt;</span>important<span class="nt">&lt;/em&gt;</span> paragraph.<span class="nt">&lt;/p&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>在使用Linux的时候，经常会遇到无法对文件读写，或者执行，因为当前登录账号的权限不够。因此，会给予一种错觉，那就是账号分为不同的权限级别，另一个账号可以访问，因为它比当前登录账号权限更高。</p>
 
-<p>但这其实是一种错误的理解，前面已经提到，Linux中用户等级只有两个，root和非root，除了root用户拥有至高无上的权利外，其他用户都是一样的渣渣。</p>
+<p>在后代选择器中，规则左边的选择器一端包括两个或多个用空格分隔的选择器。选择器之间的空格是一种结合符（combinator）。每个空格结合符可以解释为“&hellip; 在 &hellip; 找到”、“&hellip; 作为 &hellip; 的一部分”、“&hellip; 作为 &hellip; 的后代”，但是要求必须从右向左读选择器。
+因此，h1 em 选择器可以解释为 “作为 h1 元素后代的任何 em 元素”。如果要从左向右读选择器，可以换成以下说法：“包含 em 的所有 h1 会把以下样式应用到该 em”。</p>
 
-<p>导致这种错觉的原因，是因为还有一个用户组的概念（职业）。</p>
+<p>关于后代选择器有一个常被忽略的方面，即两个元素之间的层次间隔可以是无限的。例如，如果写作ul em，这个语法就会选择从u1元素继承的所有em元素，而无论em的嵌套层次有多深。</p>
 
-<p>一个用户可以属于多个用户组，就像一个人可以身兼多职一样。由于用户组能够在更高的层面来抽象用户所能够访问文件的数量，因此结合不同的用户组，就能给每个用户构建出独一无二的文件访问列表。</p>
+<h3>子选择器</h3>
 
-<h3>用户和用户组管理</h3>
+<p>某些情况下，可能并不想选择一个任意的后代元素，而是希望缩小范围，只选择另一个元素的子元素（不是所有后代元素）。可以使用子结合符，即大于号(>)</p>
 
-<p>用户和用户组信息分别存放在etc/passwd和etc/group中，Linux系统为用户和用户组文件的CRUD操作提供了一些基本命令，这些命令的作用就是对etc/passwd和etc/group两个文件的文件内容进行增删改，然后，外加一个etc/shadow文件来管理密码，就实现了对用户和用户组的管理。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">h1</span> <span class="o">&gt;</span> <span class="nt">strong</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>关于什么样的命令来管理用户和用户组，这里不做更多介绍，可以参考其他资料。</p>
 
-<h3>神秘的sudo-假借身份</h3>
+<h3>特殊性</h3>
 
-<p>安装软件是使用Linux操作系统最常见的操作。但Linux中的用户除了root就是普通用户，而普通用户的权限非常低，就连向系统中安装软件的权利都没有。很多时候系统管理员为了能够让普通用户具备一点root的特权，就赋给普通用户一个称为sudo的特权。</p>
+<p>如果有多个选择器都满足同一个元素，即冲突了，怎么知道哪一个规则更强？</p>
 
-<p>普通用户一旦拥有sudo的特权，几乎就可以胡作非为，但需要付出一点代价，需要在将要执行的命令前加上sudo作为前缀，同时被系统提示输入当前用户的密码。这样做的好处是防止不怀好意的进行不安全的操作。因为你不是root用户，所以如果有恶意软件要使用sudo进行操作，此时就会被需要输入密码，这种无缘无故需要输入密码的行为一定会被你发现。</p>
+<p>答案在于每个选择器的特殊性。对于每个规则，用户代理会计算选择器的特殊性，并将这个特殊性附加在规则中的各个声明。如果一个元素有两个或者多个冲突的属性声明，那么有最高特殊性的声明就会胜出。</p>
 
-<p>不同的Linux发行版本，可能一般的非root用户不会立即拥有sudo特权。所以这时就需要自己去给某个用户赋予sudo特权，方法是修改/etc/sudoers这个文件。至于文件里的内容长什么样，这里也不过多介绍，可以参考其他资料。</p>
+<p>选择器的特殊性由选择器本身的组件确定。特殊性表述为4个部分，0,0,0,0</p>
 
-<h3>每次都要sudo，好麻烦，干脆su</h3>
+<p>1.对于选择器中给定的各个ID属性，加 0,1,0,0
+2.对于选择器中给定的各个类元素，属性选择器或伪类，加 0,0,1,0
+3.对于选择器中给定的各个元素和伪元素，加0,0,0,1
+4.结合符和通配选择器对特殊性没有任何贡献</p>
 
-<p>要使用sudo特权，必须每次在命令前加上sudo，这样对管理Linux系统不太方便。su命令可以临时切换用户，默认是切换到root用户。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">h1</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">1</span>
+</span><span class='line'><span class="nt">p</span> <span class="nt">em</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">purple</span><span class="p">;}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">2</span>
+</span><span class='line'><span class="nc">.grape</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">purple</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">0</span>
+</span><span class='line'><span class="o">*</span><span class="nc">.bright</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">yellow</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">0</span>
+</span><span class='line'><span class="nt">p</span><span class="nc">.bright</span> <span class="nt">em</span><span class="nc">.dark</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">maroon</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">0</span><span class="o">,</span><span class="nt">2</span><span class="o">,</span><span class="nt">2</span>
+</span><span class='line'><span class="nt">div</span><span class="nf">#sidebar</span> <span class="o">*[</span><span class="nt">href</span><span class="o">]</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="nb">silver</span><span class="p">}</span> <span class="nt">0</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">1</span><span class="o">,</span><span class="nt">1</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>切换用户需要输入目标用户的密码，切换到root用户就需要root用户的密码。</p>
 
-<h3>我是谁和我到底是谁</h3>
+<p>第五条规则强于第二条</p>
 
-<p>要知道当前用户是谁，有三条命令可以用，whoami，who am i和who。第一个命令和后两条命令有本质区别，这里要引入实际用户（UID）和有效用户（EUID）的概念。</p>
+<p>0011 > 0001
+0101 > 0017</p>
 
-<p>实际用户就是指用户登录时所使用的用户，整个登录会话中，实际用户不会改变；有效用户是指当前执行操作的用户，该用户可以通过su切换，决定了权限的高低。</p>
+<p>内联样式的特殊性
+我们已经见过以0开头的特殊性，所以你可能会奇怪为什么会有这些特殊性。一般地，第一个0是为内联样式声明保留的，它比所有其他声明的特殊性都高，内联样式的特殊性是1,0,0,0</p>
 
-<p>whoami查看的是有效用户，而who和who am i可以查看实际用户。</p>
+<h3>!important 重要性规则</h3>
 
-<p>参考资料：  <br/>
-1.Linux就是这个范儿</p>
+<p>有时某个声明可能非常重要，超过了所有其他声明。CSS2.1称之为重要声明，并允许在这些声明的结束分号之前插入!important来标识。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">p</span><span class="nc">.dark</span> <span class="p">{</span><span class="k">color</span><span class="o">:</span> <span class="m">#333</span> <span class="cp">!important</span><span class="p">;</span> <span class="k">background</span><span class="o">:</span> <span class="nb">white</span><span class="p">;}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>必须正确地放置!important，否则声明将无效，它应该总是放在声明的最后，即分号之前。如果一个属性的值包含多个关键字，则必须放在最后一个关键词的后面，比如font：sss,sss !important;</p>
+
+<p>标志位!important的声明并没有特殊的特殊性值，不过要与非重要声明分开考虑。实际上，所有!important声明会分组在一起，重要声明的特殊性冲突会在重要声明内部解决，而不会与非重要声明相混肴。类似的，非重要声明也归为一组，使用特殊性来解决冲突。如果一个重要声明和一个非重要声明冲突，胜出的总是重要声明。</p>
+
+<p>1.《css权威指南》</p>
 </div>
   
   
@@ -276,6 +430,14 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/17/deep-thinking-in-react-1/">React的思考（一）- 官网首页的信息量就挺大</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/01/22/go-cd-aliyun-spring-boot-docker/">如何用GoCD给阿里云的ECS配置Docker环境和部署SpringBoot的Docker应用到</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/11/23/gradle-resource-filtering/">Gradle对资源的过滤处理</a>
       </li>
     
@@ -285,14 +447,6 @@
     
       <li class="post">
         <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境下的性能优化</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
       </li>
     
   </ul>
@@ -335,7 +489,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - ZHU Benwei -
+  Copyright &copy; 2018 - ZHU Benwei -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

@@ -9,7 +9,11 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="Jetty插件 Jetty插件提供两个重要方法：jettyRun和jettyRunWar。 jettyRun会将一个已暴露（解包的）的web应用部署到嵌入式Jetty Web容器中。它不需要将web应用打包成一个war文件，目的是为了节省部署时间。 jettyRunWar正好相反， &hellip;">
+  <meta name="description" content="在AngularJS中，视图是模型在模板中的映射的结果（模型（Model）和视图模型的绑定（View Model））。这意味当模型发生变化时，视图上的绑定内容会对应更新。 模型 看第一个的例子，模型与模板： 1
+2
+3
+4
+&lt;body ng-app&gt; &lt;input type=& &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +74,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">Gradle Jetty和Gradle Watch插件实现热部署</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/12/25/yes-angularjs-2/">开始！AngularJS!（二）- 入门：视图，模板，模型，控制器和作用域</a></h1>
     
     
       <p class="meta">
@@ -79,264 +83,102 @@
 
 
 
-<time class='entry-date' datetime='2014-07-27T14:53:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>2:53 pm</span></time>
+<time class='entry-date' datetime='2014-12-25T22:40:58+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>10:40 pm</span></time>
         
-           | <a href="/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">Comments</a>
+           | <a href="/blog/2014/12/25/yes-angularjs-2/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2014/12/25/yes-angularjs-2/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h2><strong>Jetty插件</strong></h2>
+  <div class="entry-content"><p>在AngularJS中，视图是模型在模板中的映射的结果（模型（Model）和视图模型的绑定（View Model））。这意味当模型发生变化时，视图上的绑定内容会对应更新。</p>
 
-<p>Jetty插件提供两个重要方法：jettyRun和jettyRunWar。</p>
+<p><strong>模型</strong></p>
 
-<p>jettyRun会将一个已暴露（解包的）的web应用部署到嵌入式Jetty Web容器中。它不需要将web应用打包成一个war文件，目的是为了节省部署时间。</p>
+<p>看第一个的例子，模型与模板：</p>
 
-<p>jettyRunWar正好相反，是将一个War包部署到Web容器中。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    { {name} }
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p><strong>jettyRun的好处是，你可以改变静态文件和JSP文件，而不需要重新启动服务器。</strong></p>
 
-<p>但是即便如此，对于日常开发还是不方便，因为开发过程中改动最多的其实是Java文件和资源配置文件，所以真正需要的是<strong>热部署</strong>。</p>
+<p>在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/j6b5271r/">http://jsfiddle.net/benweizhu/j6b5271r/</a></p>
 
-<p>jettyRun的Gradle API文档中有这么一句话：Once started, the web container can be configured to run continuously, scanning for changes in the project and automatically performing a hot redeploy when necessary. This allows the developer to concentrate on coding changes to the project using their IDE of choice and have those changes immediately and transparently reflected in the running web container, eliminating development time that is wasted on rebuilding, reassembling and redeploying.</p>
+<p>在这个例子中，使用了一个HTML本身没有的语法ng-model=&ldquo;name&#8221;，它是AngularJS扩展的HTML语法，叫做ng-model指令，还用到了，AngularJS的数值表达式。</p>
 
-<p>这句话简单总结就是Jetty提供实现热部署的特性，开发人员只需要专注于编写代码，减少重新构建，重新组装和重新部署所浪费的时间。</p>
+<p>我们知道在大部分传统模板系统中，对模板的渲染都是线性单向的过程：模型和模板混合在一起产生标记的计算结果。当任何模型发生改变后都需要模板重新计算。</p>
 
-<p>但问题是，官方文档上写了这句话后，就不了了之了，没有说怎么做。我们都试过，默认配置是不会实现热部署的，那么应该怎么做呢？</p>
+<p>在AngularJS中，当输入框中的内容改变时，对应的模型name会发生改变，AngularJS会<strong>检测到模型发生改变</strong>，重新渲染模板中与该模型绑定的视图部分。</p>
 
-<h3><strong>两个属性：</strong></h3>
+<p>这是AngularJS提供的最基本也是最重要的功能之一，<strong>数据的双向绑定</strong>。</p>
 
-<p><strong>reload</strong>  The reload mode, which is either &ldquo;automatic&rdquo; or &ldquo;manual&rdquo;.</p>
+<p><strong>控制器</strong></p>
 
-<p><strong>scanIntervalSeconds</strong>  The interval in seconds between scanning the web app for file changes. If file changes are detected, the web app is reloaded. Only relevant if reload is set to &ldquo;automatic&rdquo;. Defaults to 0, which disables automatic reloading.</p>
-
-<p>读完上面两段，说明默认scanIntervalSeconds的配置是不支持自动重新载入变化文件的。</p>
-
-<p>试一把，把它改为支持：</p>
+<p>再来第二个例子，模型和控制器：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">jettyRun</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">reload</span> <span class="o">=</span> <span class="s2">&quot;automatic&quot;</span>
-</span><span class='line'>    <span class="n">scanIntervalSeconds</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span class='line'><span class="o">}</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;textController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>         <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>然后运行gradle jettyRun启动jetty容器，修改Java类，然后去页面验证变化，结果是没有变化。为什么？</p>
 
-<p>原来，jetty监听的是build目录下的class文件变化，而不是源代码变化，也就说源代码内容改变了，但class文件没有变化，那么不会自动触发jetty重载变化文件，那么该怎么办？最简单粗暴的解决方案就是另起一个命令行窗口，手动运行一次gradle compileJava命令。</p>
-
-<p>没错，这个方法是行得通的。但仍然不是最好的解决方案。我查了下，到目前为止，官方没有给出正式的解决方案，但是该特性是在GradleWare的To-Do-List上的，预计以后应该会有。</p>
-
-<h2><strong>Gradle Watch</strong></h2>
-
-<p>那么，唯一的办法只有借助第三方的插件来协助Jetty插件，一起实现热部署了，gradle-watch（日本人写的，因为上面的饿提交记录全是日文的）。 <a href="https://github.com/bluepapa32/gradle-watch-plugin">https://github.com/bluepapa32/gradle-watch-plugin</a></p>
-
-<p>gradle watch的作用是监听某种类型的文件的变化，包括添加，删除和修改，然后执行预定义的任务。</p>
-
-<p>使用起来很简单：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">jettyRun</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">reload</span> <span class="o">=</span> <span class="s2">&quot;automatic&quot;</span>
-</span><span class='line'>    <span class="n">scanIntervalSeconds</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">jcenter</span><span class="o">()</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">classpath</span> <span class="s1">&#39;com.bluepapa32:gradle-watch-plugin:0.1.3&#39;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;watch&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">watch</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">files</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;src/main/java&#39;</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;compileJava&#39;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">textController</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$scope</span><span class="p">){</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span><span class="o">=</span><span class="s2">&quot;benwei&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>配置watch闭包，什么文件发生变化后就执行什么任务（好像它没有提供默认配置，所以需要手动显示的配置）。</p>
+<p>在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/m5gue0zs/">http://jsfiddle.net/benweizhu/m5gue0zs/</a></p>
 
-<p>在启动了gradle jettyRun之后，开启另一个窗口运行gradle watch。一次Java文件变化的输出如下：</p>
+<p>在这里，用到了AngularJS中的另一个指令ng-controller，在这个Controller的范围内，定义了一个模型name，我们通过模板域模型$scope对象得到controller范围内定义的模型name，并赋值。</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">:</span><span class="nx">watch</span>
-</span><span class='line'><span class="nx">Starting</span><span class="p">............</span> <span class="nx">OK</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">--------------------------------------------------------------------------------</span>
-</span><span class='line'><span class="nx">Sun</span> <span class="nx">Jul</span> <span class="mi">27</span> <span class="mi">15</span><span class="o">:</span><span class="mi">36</span><span class="o">:</span><span class="mi">51</span> <span class="nx">CST</span> <span class="mi">2014</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">File</span> <span class="s2">&quot;src/main/java/me/zeph/springmvc/jrebel/controller/HelloJRebelController.java&quot;</span> <span class="nx">was</span> <span class="nx">changed</span><span class="p">.</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">-----------------------------------------------------</span>
-</span><span class='line'><span class="o">:</span><span class="nx">compileJava</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">BUILD</span> <span class="nx">SUCCESSFUL</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">Total</span> <span class="nx">time</span><span class="o">:</span> <span class="mf">0.954</span> <span class="nx">secs</span>
-</span><span class='line'><span class="nx">Building</span> <span class="o">&gt;</span> <span class="o">:</span><span class="nx">watch</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>在例子中，我们通过$scope对象将模型数据name传递给Controller，从而进行数据的初始化。</p>
 
+<p>虽然，一般情况下，我们不会用这样的方式去建立controller，但是我们可以清晰的看到，在AngularJS中，一个Controller其实就是JavaScript中的一个函数。所以，Controller可以做事情是很多，它并通过$scope对象与模型关联，从而可以实现对模型的赋值以及其他相关逻辑行为的定义。</p>
 
-<p>可见，成功的更新了Java的class文件到build目录。刷新一次页面，就可以查看变化了。</p>
+<p><strong>作用域</strong></p>
 
-<p>那么对于资源文件呢？比如，我使用了Spring，需要改变Spring的Bean配置文件，同样可以。</p>
+<p>这里你看到了另一个重要对象$scope，<strong>作用域（Scope）是AngularJS的重要概念，它可以看做一种粘合剂，让模板，模型和控制器工作在一起。AngularJS通过作用域，以及模板中包含的信息，数据模型，控制器，让模型和视图保持位置的分离，内容的同步。任何对模型的改变都会反映到视图，任何视图的改变也会映射到模型中。</strong></p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">watch</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">files</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;src/main/java&#39;</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;compileJava&#39;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">files</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="s1">&#39;src/main/resources&#39;</span><span class="o">,</span> <span class="nl">include:</span> <span class="s1">&#39;**/*.xml&#39;</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;processResources&#39;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>大部分Web应用都是基于MVC的模式，也衍生出许多中MVC的变种（如MVVM（Model View ViewModel）），但AngularJS宣称自己是MVW（Model View Whatever）。</p>
 
+<p>在本节，最重要的是了解视图，模板，模型，控制器之间的关系，以及对作用域对象$scope有一个基本的了解。我们可以在之后一起去了解一下这个Whatever到底是什么含义。</p>
 
-<p>输出结果如下：</p>
+<p>本节中遇到的概念：</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">--------------------------------------------------------------------------------</span>
-</span><span class='line'><span class="nx">Sun</span> <span class="nx">Jul</span> <span class="mi">27</span> <span class="mi">15</span><span class="o">:</span><span class="mi">56</span><span class="o">:</span><span class="mi">39</span> <span class="nx">CST</span> <span class="mi">2014</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">File</span> <span class="s2">&quot;src/main/resources/applicationContextService.xml&quot;</span> <span class="nx">was</span> <span class="nx">changed</span><span class="p">.</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">--------------------------------------------------------------------------------</span>
-</span><span class='line'><span class="o">:</span><span class="nx">processResources</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">BUILD</span> <span class="nx">SUCCESSFUL</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">Total</span> <span class="nx">time</span><span class="o">:</span> <span class="mf">0.501</span> <span class="nx">secs</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>是不是很爽，这样是不是就再也不用重启服务器了，开发速度瞬间提升好几万战斗力。</p>
-
-<p>加一句，该插件同样支持properties文件的改变，与XML一样配置。</p>
-
-<p>好吧，就到这里，我觉得热部署也算的上某种自动化开发的一部分，至少他们的目的一样，提升开发效率，得到快速反馈，希望这篇文章对大家有所帮助。</p>
+<p>模板(Template) | 带有Angular扩展标记的HTML <br/>
+指令(Directive) | 用于通过自定义属性和元素扩展HTML的行为  <br/>
+模型(Model) | 用于显示给用户并且与用户互动的数据  <br/>
+作用域(Scope) | 用来存储模型(Model)的语境(context)。模型放在这个语境中才能被控制器、指令和表达式等访问到  <br/>
+表达式(Expression) | 模板中可以通过它来访问作用域（Scope）中的变量和函数  <br/>
+视图(View) | 用户看到的内容（即DOM）  <br/>
+数据绑定(Data Binding) | 自动同步模型(Model)中的数据和视图(View)表现 <br/>
+控制器(Controller) | 视图(View)背后的业务逻辑</p>
 
 <p>参考资料：</p>
 
-<p>1.<a href="http://forums.gradle.org/gradle/topics/hot_deploy_with_jetty_plugins_jettyrun">http://forums.gradle.org/gradle/topics/hot_deploy_with_jetty_plugins_jettyrun</a></p>
-
-<p>2.<a href="http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.jetty.JettyRun.html">http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.jetty.JettyRun.html</a></p>
-
-<p>3.<a href="https://github.com/bluepapa32/gradle-watch-plugin">https://github.com/bluepapa32/gradle-watch-plugin</a></p>
+<p>1.《精通AngularJS》 <br/>
+2.<a href="http://www.ngnice.com/docs/guide/concepts">http://www.ngnice.com/docs/guide/concepts</a></p>
 </div>
   
   
@@ -349,7 +191,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/07/24/the-web-dot-xml-you-need-to-know/">Spring，Gradle，Web.xml和Intellij</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/12/19/yes-angularjs-1/">开始！AngularJS!（一）- 刚刚开始</a></h1>
     
     
       <p class="meta">
@@ -358,25 +200,17 @@
 
 
 
-<time class='entry-date' datetime='2014-07-24T21:38:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:38 pm</span></time>
+<time class='entry-date' datetime='2014-12-19T21:54:00+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:54 pm</span></time>
         
-           | <a href="/blog/2014/07/24/the-web-dot-xml-you-need-to-know/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2014/07/24/the-web-dot-xml-you-need-to-know/">Comments</a>
+           | <a href="/blog/2014/12/19/yes-angularjs-1/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2014/12/19/yes-angularjs-1/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>标题取得不是太好哈，但是看这标题，就知道，这篇文章不是什么高大上的内容。四个看似完全搭不上边的东西，把它们结合在一起使用的时候，对于大部分Java新人来说，却绝对是个头疼的问题。</p>
-
-<p>好，先把问题摆出来，看例子：</p>
-
-<p>我有一个Spring Web MVC的小例子，项目结构是这样的：</p>
-
-<p><img class="center" src="/../images/springgradlewebintellij/project-structure.png"></p>
-
-<p>configuration目录中，配置有一些Spring的Bean，比如Service类，Dao类等等。比如：</p>
+  <div class="entry-content"><p>看这样一个例子：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -384,20 +218,16 @@
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/beans/spring-beans.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;helloService&quot;</span> <span class="na">class=</span><span class="s">&quot;me.zeph.springmvc.service.HelloService&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;textLengthLimitController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;textarea</span> <span class="na">ng-model=</span><span class="s">&quot;text&quot;</span><span class="nt">&gt;&lt;/textarea&gt;</span> <span class="nt">&lt;span&gt;&lt;/span&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">ng-disabled=</span><span class="s">&quot;!hasValidLength()&quot;</span> <span class="na">value=</span><span class="s">&quot;send&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>项目中的xx-servlet.xml很简单，如下：</p>
+
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -412,244 +242,63 @@
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:mvc=</span><span class="s">&quot;http://www.springframework.org/schema/mvc&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans </span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/beans/spring-beans.xsd </span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/context </span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/context/spring-context.xsd </span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/mvc </span>
-</span><span class='line'><span class="s">       http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;</span><span class="nt">&gt;</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">MAX_LENGTH</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;me.zeph.springmvc&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">textLengthLimitController</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;viewResolver&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.web.servlet.view.UrlBasedViewResolver&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;prefix&quot;</span> <span class="na">value=</span><span class="s">&quot;/WEB-INF/view/&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;suffix&quot;</span> <span class="na">value=</span><span class="s">&quot;.jsp&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;viewClass&quot;</span> <span class="na">value=</span><span class="s">&quot;org.springframework.web.servlet.view.JstlView&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">remaining</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">MAX_LENGTH</span> <span class="o">-</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">};</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;mvc:annotation-driven/&gt;</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">hasValidLength</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">remaining</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">};</span>
 </span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>问题是，我应该在怎么写web.xml和build.xml？才能够让它跑起来。</p>
+<p>代码的功能是告诉用户还可输入多少字符，当字符超过限制，将发送按钮灰掉。在jsFiddle里运行该代码，<a href="http://jsfiddle.net/benweizhu/cbcn995m/">http://jsfiddle.net/benweizhu/cbcn995m/</a></p>
 
-<p>大部分进入项目的人，包括我在内，都很少有机会能够在项目开始时就加入，那么你就没有机会参与到项目结构的配置过程中，这样对于大部分人都很难有这方面的经验，除非你去做项目的迁移工作。</p>
+<p>这里做了几件事情：<br/>
+1.定义页面（HTML页面）<br/>
+2.定义期待行为（remaining()和ng-disabled）<br/>
+3.定义行为发生的逻辑（MAX_LENGTH - $scope.text.length和$scope.remaining() >= 0）</p>
 
-<p>最常见的问题就是，跑一个gradle jettyRun，报了一个异常，XXXBean Not Define，然后就不知所措了。</p>
+<p>剩下最复杂的事情：对DOM元素的操作，交给了AngularJS来做。</p>
 
-<p>今天，我们就通过这个很小的例子来了解一下，如何通过Gradle来合理配置Spring的Bean定义文件？</p>
+<p><strong>引用AngularJS官方文档对AngularJS的介绍：</strong></p>
 
-<p>要弄清楚这个内容，你需要有几项基本知识：</p>
+<p>“AngularJS是一个开发动态Web应用的框架。它让你可以使用HTML作为模板语言并且可以通过扩展的HTML语法来使应用组件更加清晰和简洁。它的创新之处在于，通过数据绑定和依赖注入减少了大量代码，而这些都在浏览器端通过JavaScript实现，能够和任何服务器端技术完美结合。”</p>
 
-<p>1.ClassPath<br/>
-2.Gradle的SourceSet<br/>
-3.web.xml中<context-param>的含义<br/>
-4.contextConfigLocation<br/>
-5.ContextLoaderListener<br/>
-6.web.xml中classpath: 符号</p>
+<p>就像文档介绍的那样，HTML本身是静态文档，是很好的声明式语言，但对于构建动态的web应用，却无能为力。</p>
 
-<p>关于前两项：</p>
+<p>针对这类问题，通常的解决办法是：通过JavaScript对HTML的DOM结构进行修改。比如，jQuery。</p>
 
-<p>关于ClassPath的基本知识，可以自学，或者看我的这篇文章：<a href="http://benweizhu.github.io/blog/2014/04/07/write-java-code-without-ide/">http://benweizhu.github.io/blog/2014/04/07/write-java-code-without-ide/</a>     （丢掉IDE，回到Java的第一堂课）</p>
+<p>而AngularJS另辟蹊径，通过扩展HTML的语法来拉近静态Web和动态Web之间的距离。</p>
 
-<p>SourceSet，请阅读<a href="http://www.gradle.org/docs/current/userguide/java_plugin.html">http://www.gradle.org/docs/current/userguide/java_plugin.html</a>  ，基本概念就是，它是Gradle的Java插件引入的一个概念，用于告诉Gradle，项目哪些目录是源文件，需要Gradle在打包的时候将这些文件加入。</p>
+<p><strong>&ldquo;Angular是建立在这样的信念之上的：即声明式的代码用在构建用户界面和组装软件组件时更好，而命令式的代码更擅长展现业务逻辑。&rdquo;</strong></p>
 
-<p>后面的，我们一边看答案，一边了解。</p>
+<p>AngularJS将应用逻辑与DOM操作解耦，让开发人员不用去担心去前端视图模型（View Model）改变，从而大大提高代码的可测试性。</p>
 
-<p>先来看web.xml该怎么写？</p>
+<p>AngularJS试图去实现一个完整的前端解决方案：</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">version=</span><span class="s">&quot;2.4&quot;</span>
-</span><span class='line'>         <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span>
-</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee</span>
-</span><span class='line'><span class="s">        http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;servlet&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>webapp<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-class&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="nt">&lt;/servlet-class&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;load-on-startup&gt;</span>1<span class="nt">&lt;/load-on-startup&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/servlet&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;servlet-mapping&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>webapp<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;url-pattern&gt;</span>/<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/servlet-mapping&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;context-param&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;param-name&gt;</span>contextConfigLocation<span class="nt">&lt;/param-name&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;param-value&gt;</span>
-</span><span class='line'>            classpath:spring/applicationContextService.xml,
-</span><span class='line'>            classpath:spring/applicationContextDao.xml,
-</span><span class='line'>            classpath:spring/applicationContextJMS.xml
-</span><span class='line'>        <span class="nt">&lt;/param-value&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/context-param&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;listener&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;listener-class&gt;</span>org.springframework.web.context.ContextLoaderListener<span class="nt">&lt;/listener-class&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/listener&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>1.构建一个CRUD应用时可能用到的所有技术：数据绑定、基本模板指令、表单验证、路由、深度链接、组件重用、依赖注入<br/>
+2.可测试性：单元测试、端到端测试、模拟对象（mocks）、测试工具</p>
 
+<p>在一个以用户体验，多平台（Web和移动）为核心的现代应用时代，单页应用以前端+API成为了Web应用的开发的趋势：</p>
 
-<p>除了配置servlet，这里还有两项配置，分别是context-param和listener。</p>
+<p>1.对于内容的改动不需要加载整个页面 <br/>
+2.对服务器压力很小，消耗更少的带宽，与面向服务的架构更好地结合<br/>
+3.多平台使用相同的API，减少后台逻辑的重复开发</p>
 
-<p><strong>context-param</strong></p>
-
-<p>web.xml的配置中<context-param>配置作用：（为了不赘述，引用文章，<a href="http://www.cnblogs.com/hzj-/articles/1689836.html">http://www.cnblogs.com/hzj-/articles/1689836.html</a> ）</p>
-
-<p>1.启动一个WEB项目的时候,容器(如:Tomcat)会去读它的配置文件web.xml.读两个节点: &ldquo;listener&rdquo; 和 &ldquo;context-param&rdquo;</p>
-
-<p>2.紧接着,容器创建一个ServletContext(上下文),这个WEB项目所有部分都将共享这个上下文.</p>
-
-<p>3.容器将context-param转化为键值对,并交给ServletContext.</p>
-
-<p>4.容器创建listener中的类实例,即创建监听.</p>
-
-<p>5.在监听中会有contextInitialized(ServletContextEvent args)初始化方法,在这个方法中获得ServletContext = ServletContextEvent.getServletContext();context-param的值 = ServletContext.getInitParameter(&ldquo;context-param的键&rdquo;);</p>
-
-<p>6.得到这个context-param的值之后,你就可以做一些操作了.注意,这个时候你的WEB项目还没有完全启动完成.这个动作会比所有的Servlet都要早.换句话说,这个时候,你对<context-param>中的键值做的操作,将在你的WEB项目完全启动之前被执行.</p>
-
-<p><strong>listener</strong></p>
-
-<p>在这里，ContextLoaderListener的作用是为Servlet初始化Spring的Web应用上下文，而上下文的内容就是上面<context-param>中配置的contextConfigLocation的内容。</p>
-
-<p>你只需要知道他们的作用是什么，如何配置的，不用太深入的知道，Spring到底是怎么使用它们的。</p>
-
-<p>于是，有了这些基本了解之后，再来看怎么写contextConfigLocation的内容，以及为什么这么写？</p>
-
-<p>首先，classpath:spring/applicationContextService.xml是什么意思？它是说在当前应用的classpath下去寻找spring目录下的applicationContextService.xml文件。</p>
-
-<p>就以Web开发为例，web应用程序是以War包的形式存在，它的classpath，就是War中的WEB-INF/class目录。只要你的applicationContextService.xml在war包的class目录下，它就在classpath路径下的。那么针对上例，你需要在打包的时候将applicationContextService.xml放在War包中的WEB-INF/class/spring目录下。</p>
-
-<p>道理很简单吧，那么问题来了，怎么样让Gradle帮我把它打到War包中呢？</p>
-
-<p>答案是自定义SourceSet，告诉Gradle applicationContextService.xml是我的源文件，我希望你帮我打到War包中。</p>
-
-<p>如果你有去了解SourceSet，你应该知道，它有默认的规约，就是遵循Maven的项目布局模式。main/java，main/sources等。</p>
-
-<p>在这个例子里，configuration下所有的东西，我都希望打到war包的classpath下，于是你就需要自定义SourceSet，告诉Gradle，我的源文件在哪个位置。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">sourceSets</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">main</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>            <span class="n">srcDir</span> <span class="s1">&#39;configuration&#39;</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当以上这些你都配置好之后，你可以运行 gradle war命令，打一个war包，然后将它解压缩，看看里面class目录的内容，应该是包含spring/applicationContext**等相关文件。</p>
-
-<p>现在你应该清楚Gradle，Web.xml和Spring是怎么相亲相爱的在一起了吧。</p>
-
-<p><strong>我们再来看一个更有趣的内容，Intellij和它们有什么关系呢？</strong></p>
-
-<p>这是很多初学Java和使用Intellij的人容易犯的错误。</p>
-
-<p>你肯定遇到过这个问题，为什么我的Intellij的xml配置文件中一些路径的配置老是红的，比如classpath:applicationXX.xml，而一些又是好的。</p>
-
-<p>为什么我的配置没有红，而且它可以通过Ctrl + B可以跳转到源文件，但是启动jettyRun的时候还是提示我找不到Bean呢?</p>
-
-<p>那是因为Intellij和你启动Gradle打包和部署一点关系都没有。所以答案就是：没有关系。</p>
-
-<p>之所以会红，是因为，xml文件所在目录，你并没有在Intellij中Mark为SourceRoot（会变成绿色文件夹那个）。所以Intellij不认为那是你的源代码，所以你在classpath：时，它就认为你指定的不对，如果你将该目录mark为SourceRoot，Intellij不仅不红，还是很智能的提示你，帮你补全。</p>
-
-<p>相反，那为什么他都帮我补全，而且可以Ctrl + B 跳过去了，但是Gradle jettyRun却提示找不到Bean呢？那是因为，你在Intellij中设置了Source目录，但是Gradle并不知道啊！！！你是否还会天真的以为，明明找得到啊，都Ctrl + B跳过去了，为什么还是不对呢？</p>
-
-<p>好吧，这是很多新人，包括以前的我在内，都不太了解的基本知识。</p>
-
-<p>希望今天这篇文章对大家有帮助，帮助大家解答所有的疑惑。不早了，晚安。</p>
+<p>AngularJS给现代Web应用开发带来曙光，让我们一起认认真真学习AngularJS。</p>
 
 <p>参考资料：</p>
 
-<p>1.<a href="http://www.cnblogs.com/hellojava/archive/2012/12/28/2835730.html">http://www.cnblogs.com/hellojava/archive/2012/12/28/2835730.html</a></p>
-
-<p>2.<a href="http://www.gradle.org/docs/current/userguide/java_plugin.html">http://www.gradle.org/docs/current/userguide/java_plugin.html</a></p>
-
-<p>3.<a href="http://lyfei022.blog.163.com/blog/static/82558312009112943635741/">http://lyfei022.blog.163.com/blog/static/82558312009112943635741/</a></p>
-
-<p>4.<a href="http://www.cnblogs.com/hzj-/articles/1689836.html">http://www.cnblogs.com/hzj-/articles/1689836.html</a></p>
+<p>1.《精通AngularJS》<br/>
+2.<a href="http://www.ngnice.com/docs/guide/introduction">http://www.ngnice.com/docs/guide/introduction</a> <br/>
+3.<a href="http://www.csdn.net/article/2012-12-10/2812658-Single-Page-Applications">http://www.csdn.net/article/2012-12-10/2812658-Single-Page-Applications</a></p>
 </div>
   
   
@@ -684,6 +333,14 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/17/deep-thinking-in-react-1/">React的思考（一）- 官网首页的信息量就挺大</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/01/22/go-cd-aliyun-spring-boot-docker/">如何用GoCD给阿里云的ECS配置Docker环境和部署SpringBoot的Docker应用到</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/11/23/gradle-resource-filtering/">Gradle对资源的过滤处理</a>
       </li>
     
@@ -693,14 +350,6 @@
     
       <li class="post">
         <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境下的性能优化</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
       </li>
     
   </ul>
@@ -743,7 +392,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - ZHU Benwei -
+  Copyright &copy; 2018 - ZHU Benwei -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

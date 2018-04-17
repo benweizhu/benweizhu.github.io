@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>如何用GoCD给阿里云的ECS配置Docker环境和部署SpringBoot的Docker应用到 - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="
+">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2018/01/22/go-cd-aliyun-spring-boot-docker">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">如何用GoCD给阿里云的ECS配置Docker环境和部署SpringBoot的Docker应用到</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2018-01-22T11:29:23+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2018</span></span> <span class='time'>11:29 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2018-01-22T11:29:23+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2018</span></span> <span class='time'>11:29 am</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2018/01/22/go-cd-aliyun-spring-boot-docker/" data-via="" data-counturl="http://benweizhu.github.io/blog/2018/01/22/go-cd-aliyun-spring-boot-docker/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2017/11/23/gradle-resource-filtering/" title="Previous Post: Gradle对资源的过滤处理">&laquo; Gradle对资源的过滤处理</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2018/04/17/deep-thinking-in-react-1/" title="Next Post: React的思考（一）- 官网首页的信息量就挺大">React的思考（一）- 官网首页的信息量就挺大 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <div style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</div>
+  <div style="margin-left: 8px;margin-top: 10px;">A Java/RoR/NodeJS-FE/Full Stack Developer</div>
+  <div style="margin-left: 8px;margin-top: 10px;">A Gradle Plugin Contributor</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-left: 8px;;margin-top: 10px;">计算机应用技术学术型硕士-<span style="font-weight: bold;">信息安全方向</span></div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle，Spring，前端开发，自动化构建，自动化测试，Devops，信息安全</div>
+  <div style="margin-top: 10px;margin-left: 8px;">我正在写的书：<a href='https://benweizhu.gitbooks.io/gradle-best-practice/content/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《Gradle最佳实践》</a></div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/17/deep-thinking-in-react-1/">React的思考（一）- 官网首页的信息量就挺大</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/01/22/go-cd-aliyun-spring-boot-docker/">如何用GoCD给阿里云的ECS配置Docker环境和部署SpringBoot的Docker应用到</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/11/23/gradle-resource-filtering/">Gradle对资源的过滤处理</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/07/01/understand-promise/">理解ES6 Promise</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境下的性能优化</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2018 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'benweiblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://benweizhu.github.io/blog/2018/01/22/go-cd-aliyun-spring-boot-docker/';
+        var disqus_url = 'http://benweizhu.github.io/blog/2018/01/22/go-cd-aliyun-spring-boot-docker/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在前面介绍的《用Spring Boot开发Spring项目 快速上手》上介绍过： “通过Spring Boot创建的Java应用可以直接通过java -jar启动（即便它是Web应用）。也就是说，在这里，首先运行gradle assemble，得到jar文件，然后运行java -jar gs- &hellip;">
+  <meta name="description" content="上一章节结尾，我们实现了Spring web security的最小实现，拦截所有url，采用表单登录，用户名和密码采用inMemory方式保存。 你可能在想，这个登录页面从哪里来的，我们并没有直接去实现一个页面。事实上，正是因为我们没有设置登录页面，Spring Security就自动生成了一个 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/06/11/spring-boot-starter-2/">Spring Boot 深入浅出系列（二） - 用Gradle启动应用</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/06/14/spring-web-security-2/">Spring Web Security 实战 (二) - 自定义登录页面</a></h1>
     
     
       <p class="meta">
@@ -79,236 +79,25 @@
 
 
 
-<time class='entry-date' datetime='2015-06-11T12:56:12+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:56 pm</span></time>
+<time class='entry-date' datetime='2015-06-14T15:45:34+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:45 pm</span></time>
         
-           | <a href="/blog/2015/06/11/spring-boot-starter-2/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/06/11/spring-boot-starter-2/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在前面介绍的《用Spring Boot开发Spring项目 快速上手》上介绍过：</p>
-
-<p>“通过Spring Boot创建的Java应用可以直接通过java -jar启动（即便它是Web应用）。也就是说，在这里，首先运行gradle assemble，得到jar文件，然后运行java -jar gs-spring-boot-0.1.0.jar。”</p>
-
-<p>但是，我们肯定不能每次这样去启动SpringBoot的应用。好在是，官方提供了与构建相关的插件Spring Boot Gradle plugin，插件中提供了对应的task给你使用：</p>
-
-<h2>Application tasks     </h2>
-
-<p>bootRun - Run the project with support for auto-detecting main class and reloading static resources.  <br/>
-distTar - Bundles the project as a JVM application with libs and OS specific scripts.  <br/>
-distZip - Bundles the project as a JVM application with libs and OS specific scripts.  <br/>
-installApp - Installs the project as a JVM application along with libs and OS specific scripts. <br/>
-run - Runs this project as a JVM application.</p>
-
-<h2>在构建中引入Spring Boot Gradle plugin</h2>
-
-<p>首先，你需要在构建中加入该插件：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">classpath</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-gradle-plugin:1.2.4.RELEASE&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;spring-boot&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>省略依赖的版本号</h2>
-
-<p>SpringBoot插件会注册一个定制的依赖解析策略，允许你省略对依赖版本的配置。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-web&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.thymeleaf:thymeleaf-spring4&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>那么问题来了，这个省略的版本号从哪里来呢？它有Spring Boot Plugin的版本号决定，比如，当前定义的插件是org.springframework.boot:spring-boot-gradle-plugin:1.2.4.RELEASE，版本号是1.2.4，那么对应的spring-boot-starter-web的版本号，也是1.2.4。</p>
-
-<p>当然，如果你想显示的指定版本号也是可以的：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.thymeleaf:thymeleaf-spring4:2.1.1.RELEASE&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>打包可执行的jar包或者war包</h2>
-
-<p>一旦使用了Spring boot插件，它就会用bootRepackage任务改写archive的过程。</p>
-
-<p>你可以在配置选项中指定main class，或者在Manifest添加Main-Class，如果你不指定，它会去搜索含有public static void main(String[] args)方法的类。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">bootRepackage</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mainClass</span> <span class="o">=</span> <span class="s1">&#39;demo.Application&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果你想要打成War包，并部署到外部容器里面，除了要使用war插件，还需要将embedded container的依赖放在providedRuntime里。如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="o">...</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;war&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">war</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">baseName</span> <span class="o">=</span> <span class="s1">&#39;myapp&#39;</span>
-</span><span class='line'>    <span class="n">version</span> <span class="o">=</span>  <span class="s1">&#39;0.5.0&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">jcenter</span><span class="o">()</span>
-</span><span class='line'>    <span class="n">maven</span> <span class="o">{</span> <span class="n">url</span> <span class="s2">&quot;http://repo.spring.io/libs-snapshot&quot;</span> <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">configurations</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">providedRuntime</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-web&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">providedRuntime</span><span class="o">(</span><span class="s2">&quot;org.springframework.boot:spring-boot-starter-tomcat&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料： <br/>
-1.<a href="http://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-gradle-plugin.html">http://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-gradle-plugin.html</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/06/10/spring-boot-starter-1/">Spring Boot 深入浅出系列（一） - 习惯使用注解</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-06-10T22:19:19+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:19 pm</span></time>
-        
-           | <a href="/blog/2015/06/10/spring-boot-starter-1/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/06/10/spring-boot-starter-1/">Comments</a>
+           | <a href="/blog/2015/06/14/spring-web-security-2/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/06/14/spring-web-security-2/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Spring Boot从一开始就告诉你，它更喜欢基于Java的配置，即注解的方式。所以它提供了你一大堆注解，并让你习惯使用注解。</p>
+  <div class="entry-content"><p>上一章节结尾，我们实现了Spring web security的最小实现，拦截所有url，采用表单登录，用户名和密码采用inMemory方式保存。</p>
 
-<p>@Bean</p>
+<p>你可能在想，这个登录页面从哪里来的，我们并没有直接去实现一个页面。事实上，正是因为我们没有设置登录页面，Spring Security就自动生成了一个，该页面是的Spring Security处理登录的标准页面。</p>
 
-<p>Indicates that a method produces a bean to be managed by the Spring container.</p>
+<p>不过，我们肯定是不会想要使用Spring Security给我们提供的标准页面，除非项目刚启动，处于demo阶段，否则，肯定采用自定义页面，那么如何做到呢？</p>
 
-<p>@Configuration</p>
+<p>在form-login标签提供了一个属性login-page，允许指定用户自定义的登录页面，于是，实现方式如下：</p>
 
-<p>Indicates that a class declares one or more @Bean methods and may be processed by the Spring container to generate bean definitions and service requests for those beans at runtime</p>
-
-<p>@EnableAutoConfiguration</p>
-
-<p>Enable auto-configuration of the Spring Application Context, attempting to guess and configure beans that you are likely to need. Auto-configuration classes are usually applied based on your classpath and what beans you have defined.</p>
-
-<p>@ComponentScan</p>
-
-<p>Configures component scanning directives for use with @Configuration classes. Provides support parallel with Spring XML&rsquo;s &lt;context:component-scan> element.</p>
-
-<h2>指定main application class的位置</h2>
-
-<p>SpringBoot建议你将主应用class（main application class）放在包根路径上，即其他子包之上。@EnableAutoConfiguration通常放在你的main class上，这样也隐含的指定了对某些配置项的搜索路径。比如，对@Entity的搜索。</p>
-
-<p>在主应用class上指定@ComponentScan，同样也隐式的指定了扫描时basePackage的路径。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Configuration</span>
-</span><span class='line'><span class="nd">@EnableAutoConfiguration</span>
-</span><span class='line'><span class="nd">@ComponentScan</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Application</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">Application</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果你的main application class的位置确实在包的根路径上，上面的三个注解，可以用@SpringBootApplication这一个注解代替。</p>
-
-<h2>多种方式加载Bean</h2>
-
-<p>你必然不会在main application class定义很多的@Bean，Spring提供两种方式将定义在另外一个带有@Configuration的类中的Bean加载，第一种，在Application类中使用@Import指定该类，第二种，让@ComponentScan扫描到该类。大部分情况都会选择第二种。</p>
-
-<h2>加载XML的配置</h2>
-
-<p>如果你必须使用XML的配置，你可以使用@ImportResource来加载指定的XML配置。</p>
-
-<h2>Bean的自动配置</h2>
-
-<p>SpringBoot有一个非常神秘的注解@EnableAutoConfiguration，官方的解释已经在上面的部分给出，简单点说就是它会根据定义在classpath下的类，自动的给你生成一些Bean，并加载到Spring的Context中。</p>
-
-<p>它的神秘之处，不在于它能做什么，而在于它会生成什么样的Bean对于开发人员是不可预知（或者说不容易预知）。举个例子：</p>
-
-<p>要开发一个基于Spring JPA的应用，会涉及到下面三个Bean的配置，DataSource，EntityManagerFactory，PlatformTransactionManager。</p>
+<p>首先定义一个登录页面JSP文件，里面的form表单和标准页面一样：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -333,46 +122,102 @@ run - Runs this project as a JVM application.</p>
 <span class='line-number'>21</span>
 <span class='line-number'>22</span>
 <span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Configuration</span>
-</span><span class='line'><span class="nd">@EnableJpaRepositories</span>
-</span><span class='line'><span class="nd">@EnableTransactionManagement</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ApplicationConfig</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@Bean</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">DataSource</span> <span class="nf">dataSource</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="o">...</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Bean</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">EntityManagerFactory</span> <span class="nf">entityManagerFactory</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="o">..</span>
-</span><span class='line'>      <span class="n">factory</span><span class="o">.</span><span class="na">setDataSource</span><span class="o">(</span><span class="n">dataSource</span><span class="o">());</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">factory</span><span class="o">.</span><span class="na">getObject</span><span class="o">();</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Bean</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">PlatformTransactionManager</span> <span class="nf">transactionManager</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">JpaTransactionManager</span> <span class="n">txManager</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">JpaTransactionManager</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">txManager</span><span class="o">.</span><span class="na">setEntityManagerFactory</span><span class="o">(</span><span class="n">entityManagerFactory</span><span class="o">());</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">txManager</span><span class="o">;</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ taglib prefix=&quot;form&quot; uri=&quot;http://www.springframework.org/tags/form&quot; %&gt;
+</span><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
+</span><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'><span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Spring MVC Security<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'><span class="nt">&lt;/head&gt;</span>
+</span><span class='line'><span class="nt">&lt;body&gt;</span>
+</span><span class='line'><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;/spring-mvc-security/j_spring_security_check&quot;</span> <span class="na">method=</span><span class="s">&quot;POST&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;table&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;tbody&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;tr&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;td&gt;</span>User:<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;td&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;j_username&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;tr&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;td&gt;</span>Password:<span class="nt">&lt;/td&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;td&gt;&lt;input</span> <span class="na">type=</span><span class="s">&quot;password&quot;</span> <span class="na">name=</span><span class="s">&quot;j_password&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;tr&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;td</span> <span class="na">colspan=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;&lt;input</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Login&quot;</span><span class="nt">&gt;&lt;/td&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/tr&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/tbody&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/table&gt;</span>
+</span><span class='line'><span class="nt">&lt;/form&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后定义一个对应的RequestMapping：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Controller</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">LoginController</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/login&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">login</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;login&quot;</span><span class="o">;</span>
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>@EnableJpaRepositories会查找满足作为Repository条件（继承父类或者使用注解）的类。</p>
-
-<p>@EnableTransactionManagement的作用：Enables Spring&rsquo;s annotation-driven transaction management capability, similar to the support found in Spring&rsquo;s &lt;tx:*> XML namespace。</p>
-
-<p>但是，如果你使用了@EnableAutoConfiguration，那么上面三个Bean，你都不需要配置。在classpath下面只引入了MySQL的驱动和SpringJpa。</p>
+<p>最后一步，就是配置http标签的内容，有两点，第一，设置form-login的属性login-page为登录页面的url，第二，设置login页面的访问权限为IS_AUTHENTICATED_ANONYMOUSLY，必须允许匿名用户可以访问，否则怎么登录呢。代码如下：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">compile</span> <span class="err">&#39;</span><span class="nl">mysql:</span><span class="n">mysql</span><span class="o">-</span><span class="n">connector</span><span class="o">-</span><span class="nl">java:</span><span class="mf">5.1</span><span class="o">.</span><span class="mi">18</span><span class="err">&#39;</span>
-</span><span class='line'><span class="n">compile</span> <span class="err">&#39;</span><span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">boot</span><span class="o">:</span><span class="n">spring</span><span class="o">-</span><span class="n">boot</span><span class="o">-</span><span class="n">starter</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">jpa</span><span class="err">&#39;</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;security:http&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;security:intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/login&quot;</span> <span class="na">access=</span><span class="s">&quot;IS_AUTHENTICATED_ANONYMOUSLY&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;security:intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;security:form-login</span> <span class="na">login-page=</span><span class="s">&quot;/login&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;security:logout/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/security:http&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>在Application类中写下下面这段代码，可以查看SpringBoot给你生成了这些Bean：</p>
+<p>当然，你也可以这么写，3.1之后，允许多个http标签的定义。不过这么做，相当于完全绕过Spring Security的filterChain，不在Spring Security相关管理之下。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/css/**&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;http</span> <span class="na">pattern=</span><span class="s">&quot;/login&quot;</span> <span class="na">security=</span><span class="s">&quot;none&quot;</span><span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>匿名登录</h2>
+
+<p>你肯定会问，上面那样写和IS_AUTHENTICATED_ANONYMOUSLY有什么区别？这里参考：<a href="http://www.mossle.com/docs/auth/html/ch107-anonymous.html">http://www.mossle.com/docs/auth/html/ch107-anonymous.html</a></p>
+
+<p>”匿名登录，即用户尚未登录系统，系统会为所有未登录的用户分配一个匿名用户，这个用户也拥有自己的权限，不过他是不能访问任何被保护资源的。</p>
+
+<p>设置一个匿名用户的好处是，我们在进行权限判断时，可以保证SecurityContext中永远是存在着一个权限主体的，启用了匿名登录功能之后，我们所需要做的工作就是从SecurityContext中取出权限主体，然后对其拥有的权限进行校验，不需要每次去检验这个权限主体是否为空了。这样做的好处是我们永远认为请求的主体是拥有权限的，即便他没有登录，系统也会自动为他赋予未登录系统角色的权限，这样后面所有的安全组件都只需要在当前权限主体上进行处理，不用一次一次的判断当前权限主体是否存在。这就更容易保证系统中操作的一致性。“</p>
+
+<p>这种一致性，统一了业务层代码的实现，将匿名用户看做是用户的一种类型，只是访问权限不一样而已。关于它们的优缺点 <a href="http://www.mossle.com/docs/auth/html/ch107-anonymous.html">http://www.mossle.com/docs/auth/html/ch107-anonymous.html</a> 的最后一部分有介绍。</p>
+
+<p>设置登录后的跳转页面，form-login还提供了两个属性default-target-url和always-use-default-target。如果用户进入登录页面是因为要访问某个受限制的资源，当用户登录后，就会回到该访问资源，但是如果不是，default-target-url，就起到作用，指定了登录后的跳转页面，它的默认值是“/”。always-use-default-target的含义就很简单了，是否永远跳转，不管用户之前访问的资源。</p>
+
+<h2>处理登出</h2>
+
+<p>因为在xml配置中添加了security:logout，所以Spring Security也默认提供了一个登出URL：“/j_spring_security_logout”。</p>
+
+<h2>获得用户名</h2>
+
+<p>让Spring注入Principal即可</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -382,96 +227,200 @@ run - Runs this project as a JVM application.</p>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">ConfigurableApplicationContext</span> <span class="n">ctx</span> <span class="o">=</span> <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">Application</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
-</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Let&#39;s inspect the beans provided by Spring Boot:&quot;</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">Object</span> <span class="n">dataSource</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="s">&quot;dataSource&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">Object</span> <span class="n">transactionManager</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="s">&quot;transactionManager&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">Object</span> <span class="n">entityManagerFactory</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="s">&quot;entityManagerFactory&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">dataSource</span><span class="o">);</span>
-</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">entityManagerFactory</span><span class="o">);</span>
-</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">transactionManager</span><span class="o">);</span>
-</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(((</span><span class="n">JpaTransactionManager</span><span class="o">)</span><span class="n">transactionManager</span><span class="o">).</span><span class="na">getDataSource</span><span class="o">());</span>
-</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(((</span><span class="n">JpaTransactionManager</span><span class="o">)</span><span class="n">transactionManager</span><span class="o">).</span><span class="na">getEntityManagerFactory</span><span class="o">());</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>输出如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">tomcat</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">pool</span><span class="o">.</span><span class="na">DataSource</span><span class="err">@</span><span class="mi">4</span><span class="n">f0e94db</span><span class="o">{</span><span class="n">ConnectionPool</span><span class="o">[</span><span class="n">defaultAutoCommit</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span> <span class="n">defaultReadOnly</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span> <span class="n">defaultTransactionIsolation</span><span class="o">=-</span><span class="mi">1</span><span class="o">;</span> <span class="n">defaultCatalog</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span> <span class="n">driverClassName</span><span class="o">=</span><span class="n">com</span><span class="o">.</span><span class="na">mysql</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">Driver</span><span class="o">;</span> <span class="n">maxActive</span><span class="o">=</span><span class="mi">100</span><span class="o">;</span> <span class="n">maxIdle</span><span class="o">=</span><span class="mi">100</span><span class="o">;</span> <span class="n">minIdle</span><span class="o">=</span><span class="mi">10</span><span class="o">;</span> <span class="n">initialSize</span><span class="o">=</span><span class="mi">10</span><span class="o">;</span> <span class="n">maxWait</span><span class="o">=</span><span class="mi">30000</span><span class="o">;</span> <span class="n">testOnBorrow</span><span class="o">=</span><span class="kc">true</span><span class="o">;</span> <span class="n">testOnReturn</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span> <span class="n">timeBetweenEvictionRunsMillis</span><span class="o">=</span><span class="mi">5000</span><span class="o">;</span> <span class="n">numTestsPerEvictionRun</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">minEvictableIdleTimeMillis</span><span class="o">=</span><span class="mi">60000</span><span class="o">;</span> <span class="n">testWhileIdle</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span> <span class="n">testOnConnect</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span> <span class="n">password</span><span class="o">=********;</span> <span class="o">...</span> <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">orm</span><span class="o">.</span><span class="na">jpa</span><span class="o">.</span><span class="na">LocalContainerEntityManagerFactoryBean</span><span class="err">@</span><span class="mi">5109</span><span class="n">d386</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">orm</span><span class="o">.</span><span class="na">jpa</span><span class="o">.</span><span class="na">JpaTransactionManager</span><span class="err">@</span><span class="mi">5</span><span class="n">c1e2bfa</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">tomcat</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">pool</span><span class="o">.</span><span class="na">DataSource</span><span class="err">@</span><span class="mi">4</span><span class="n">f0e94db</span><span class="o">{</span><span class="n">ConnectionPool</span><span class="o">[</span><span class="n">defaultAutoCommit</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span> <span class="n">defaultReadOnly</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span> <span class="n">defaultTransactionIsolation</span><span class="o">=-</span><span class="mi">1</span><span class="o">;</span> <span class="n">defaultCatalog</span><span class="o">=</span><span class="kc">null</span><span class="o">;</span> <span class="n">driverClassName</span><span class="o">=</span><span class="n">com</span><span class="o">.</span><span class="na">mysql</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">Driver</span><span class="o">;</span> <span class="n">maxActive</span><span class="o">=</span><span class="mi">100</span><span class="o">;</span> <span class="n">maxIdle</span><span class="o">=</span><span class="mi">100</span><span class="o">;</span> <span class="n">minIdle</span><span class="o">=</span><span class="mi">10</span><span class="o">;</span> <span class="n">initialSize</span><span class="o">=</span><span class="mi">10</span><span class="o">;</span> <span class="n">maxWait</span><span class="o">=</span><span class="mi">30000</span><span class="o">;</span> <span class="n">testOnBorrow</span><span class="o">=</span><span class="kc">true</span><span class="o">;</span> <span class="n">testOnReturn</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span> <span class="n">timeBetweenEvictionRunsMillis</span><span class="o">=</span><span class="mi">5000</span><span class="o">;</span> <span class="n">numTestsPerEvictionRun</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">minEvictableIdleTimeMillis</span><span class="o">=</span><span class="mi">60000</span><span class="o">;</span> <span class="n">testWhileIdle</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span> <span class="n">testOnConnect</span><span class="o">=</span><span class="kc">false</span><span class="o">;</span> <span class="n">password</span><span class="o">=********;...</span> <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">orm</span><span class="o">.</span><span class="na">jpa</span><span class="o">.</span><span class="na">LocalContainerEntityManagerFactoryBean</span><span class="err">@</span><span class="mi">5109</span><span class="n">d386</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Bean中的URL，username和password是在属性文件中配置的：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="err">#</span><span class="n">Database</span>
-</span><span class='line'><span class="n">spring</span><span class="o">.</span><span class="na">datasource</span><span class="o">.</span><span class="na">url</span><span class="o">=</span><span class="nl">jdbc:mysql:</span><span class="c1">//localhost:3306/xxxx      </span>
-</span><span class='line'><span class="n">spring</span><span class="o">.</span><span class="na">datasource</span><span class="o">.</span><span class="na">username</span><span class="o">=</span><span class="n">root</span>
-</span><span class='line'><span class="n">spring</span><span class="o">.</span><span class="na">datasource</span><span class="o">.</span><span class="na">password</span><span class="o">=</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Disable自动配置</h2>
-
-<p>如果你发现自动转配的Bean不是你想要的，你也可以disable它。比如说，我不想要自动装配Database的那些Bean</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.EnableAutoConfiguration</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Configuration</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Configuration</span>
-</span><span class='line'><span class="nd">@EnableAutoConfiguration</span><span class="o">(</span><span class="n">exclude</span> <span class="o">=</span> <span class="o">{</span><span class="n">DataSourceAutoConfiguration</span><span class="o">.</span><span class="na">class</span><span class="o">})</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyConfiguration</span> <span class="o">{</span>
-</span><span class='line'>  
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Controller</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HomeController</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/home&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">home</span><span class="o">(</span><span class="n">Principal</span> <span class="n">principal</span><span class="o">,</span> <span class="n">Model</span> <span class="n">model</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">model</span><span class="o">.</span><span class="na">addAttribute</span><span class="o">(</span><span class="s">&quot;userName&quot;</span><span class="o">,</span> <span class="n">principal</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;home&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
-
-<p>此时，就会报下面的错了</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Caused</span> <span class="nl">by:</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">beans</span><span class="o">.</span><span class="na">factory</span><span class="o">.</span><span class="na">NoSuchBeanDefinitionException</span><span class="o">:</span> <span class="n">No</span> <span class="n">qualifying</span> <span class="n">bean</span> <span class="n">of</span> <span class="n">type</span> <span class="o">[</span><span class="n">javax</span><span class="o">.</span><span class="na">sql</span><span class="o">.</span><span class="na">DataSource</span><span class="o">]</span> <span class="n">found</span> <span class="k">for</span> <span class="n">dependency</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>习惯使用和正确使用上面这些注解，是正确使用Spring Boot的重要起步。</p>
 
 <p>参考资料： <br/>
-1.Spring Boot Reference <br/>
-2.Spring JPA Reference</p>
+1.Spring security reference</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/06/12/spring-web-security-1/">Spring Web Security 实战 (一) - 最少配置启动</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-06-12T21:12:38+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>9:12 pm</span></time>
+        
+           | <a href="/blog/2015/06/12/spring-web-security-1/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/06/12/spring-web-security-1/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>你大概应该知道对于应用的安全性（无论是Web应用还是非Web应用），都包含两个方面“身份认证”（authentication）和“权限认证”（authorization，access-control）。身份认证是确立“访问者”所声称的“当事人”（principal）的一个过程（当事人可以是一个用户，设备，或者其他任何要在该应用操作的系统）。权限认证指的是确定该“当事人”是否可以在应用执行某一个操作的过程。</p>
+
+<p>Spring Security能提供的功能亦围绕着这两个核心概念展开。</p>
+
+<p>在“身份认证”方面，Spring Security能提供什么样的支持呢？如下：</p>
+
+<p>HTTP BASIC authentication headers(an IETF RFC-based standard)   <br/>
+HTTP Digest authentication headers(an IETF RFC-based standard)   <br/>
+HTTPX.509 client certificate exchange(an IETF RFC-based standard)   <br/>
+Form-based authentication(for simple user interface needs)   <br/>
+&hellip;
+更多类型，请参考Spring Security官文。</p>
+
+<p>好吧，概念性的东西就介绍到这，本篇文章以实战为主，下面我们还是来聊聊大家更关心的实现：</p>
+
+<p>在Spring Security 3.0中，相应的功能代码被分到了不同的Jar包中，以清晰的区分不同的功能和第三方依赖。下面介绍三个主要的Jar包：</p>
+
+<p>Core - spring-security-core.jar</p>
+
+<p>包含核心的“身份认证”和“访问控制”类和接口。任何Spring Security的应用都需要这个包，支持独立应用，远程客户端，方法级别（服务层）的安全，以及JDBC，主要包含下面几个顶级包：      <br/>
+org.springframework.security.core  <br/>
+org.springframework.security.access  <br/>
+org.springframework.security.authentication    <br/>
+org.springframework.security.provisioning</p>
+
+<p>Web - spring-security-web.jar</p>
+
+<p>包含对应的filter和web security相关的基础架构代码。任何与Servlet API相关的依赖。如果你需要Spring Security对web身份认证和URL级别的访问控制的支持，就需要它。里面主要包含的包是：org.springframework.security.web。</p>
+
+<p>Config - spring-security-config.jar</p>
+
+<p>包含security命名空间解析代码。如果你要使用XML方式的配置Security，那么你就会需要它。主要包含的包：org.springframework.security.config。</p>
+
+<p>以web应用和xml配置为例，要开始使用Spring Security，需要至少下面的两个依赖，web和config，web会自动依赖于core，所以不用显示的指定core。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework.security:spring-security-web:3.2.7.RELEASE&#39;</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework.security:spring-security-config:3.2.7.RELEASE&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>为了能够支持更多的Spring使用，我们以XML方法来配置Security框架。</p>
+
+<p>下面介绍下在Security命名空间下，都有哪些重要的元素节点。</p>
+
+<p>• Web/HTTP Security - 设置filter和相关的Service Bean，以应用框架的用户认证机制，安全化URL，渲染登录，错误页面等。</p>
+
+<p>• Business Object(Method) Security - 用来保证业务层的安全。</p>
+
+<p>• Authentication Manager - 处理身份认证请求</p>
+
+<p>• Access Decision Manager - 为web和method提供访问决策。框架提供了一个默认实现，你也可以自定义一个，语法和普通Bean定义一样。</p>
+
+<p>• AuthenticationProviders - 与Authentication Manager相对应的身份认真机制提供方，提供了多种标准选择，同样也支持自定义。</p>
+
+<p>• UserDetailsService - 与authentication providers联系紧密，也会被其他Bean使用。</p>
+
+<p>接下来，我们开始正式写代码。</p>
+
+<p>首先，你需要在web.xml中定义一个名字是springSecurityFilterChain的filter。它提供了一个“钩子“，来启动Spring Security Web的基础架构。DelegatingFilterProxy是Spring框架中一个类，它代理着一个以Spring Bean方式定义在Spring上下文中的filter。在本例中，bean的名字是springSecurityFilterChain，它是Spring提供的内部基础架构Bean，所以，我们定义的一些自定义的Bean的时候，就不可以使用这个名字springSecurityFilterChain。代码如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;filter&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;filter-name&gt;</span>springSecurityFilterChain<span class="nt">&lt;/filter-name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;filter-class&gt;</span>org.springframework.web.filter.DelegatingFilterProxy<span class="nt">&lt;/filter-class&gt;</span>
+</span><span class='line'><span class="nt">&lt;/filter&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;filter-mapping&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;filter-name&gt;</span>springSecurityFilterChain<span class="nt">&lt;/filter-name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;url-pattern&gt;</span>/*<span class="nt">&lt;/url-pattern&gt;</span>
+</span><span class='line'><span class="nt">&lt;/filter-mapping&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>springSecurityFilterChain是由Spring框架定义。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">security</span><span class="o">.</span><span class="na">config</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">configuration</span><span class="o">;</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebSecurityConfiguration</span><span class="o">{</span>
+</span><span class='line'>  <span class="nd">@org.springframework.context.annotation.Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="o">{</span><span class="s">&quot;springSecurityFilterChain&quot;</span><span class="o">})</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">javax</span><span class="o">.</span><span class="na">servlet</span><span class="o">.</span><span class="na">Filter</span> <span class="nf">springSecurityFilterChain</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Exception</span> <span class="o">{</span> <span class="cm">/* compiled code */</span> <span class="o">}</span>   
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>做完上面的”钩子”配置，你就可以正式开始Spring上下文的定义。首先来配置Web/HTTP Security节点部分“http”：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;http</span> <span class="na">use-expressions=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;intercept-url</span> <span class="na">pattern=</span><span class="s">&quot;/**&quot;</span> <span class="na">access=</span><span class="s">&quot;hasRole(&#39;ROLE_USER&#39;)&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;form-login/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;logout/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/http&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面是使得Spring Security工作的最小http节点配置。安全拦截所有应用中的URL，要求访问者（“当事人”）含有ROLE_USER权限，要求使用带有用户名和密码的表单登录，并提供一个登出的URL。上面的pattern可以使用正则表达式来匹配对应路径，access中的hasRole必须配合use-expressions=&ldquo;true&#8221;才能使用（4.0以上有所不同）。如果提供多种权限，ROLE_USER后面可以以逗号分隔以允许多种权限（如果是4.0以上版本，Spring会自动给hasRole中的值加上ROLE_作为前缀，所以需要注意）。</p>
+
+<p>这里允许定义多个intercept-url以应对不同的url，比如，css，js的访问，自定义登陆页面的访问，等。由于该intercept-url会根据定义的先后顺序来解析输入的url，所以，越明确的url模式，越应该放在前面。</p>
+
+<p>note：如果你对filter比较熟悉，你应该能明白intercept-url其实是在配置FilterChainProxy所使用的filter。</p>
+
+<p>接下来，需要配置Authentication Manager：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;authentication-manager&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;authentication-provider&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;user-service&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;user</span> <span class="na">name=</span><span class="s">&quot;ben&quot;</span> <span class="na">password=</span><span class="s">&quot;ben&quot;</span> <span class="na">authorities=</span><span class="s">&quot;ROLE_USER&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/user-service&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/authentication-provider&gt;</span>
+</span><span class='line'><span class="nt">&lt;/authentication-manager&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>authentication-provider和user-service分别创建了两个bean，DaoAuthenticationProvider和InMemoryDaoImpl。它们作为authentication-manager的子元素存在，而authentication-manager则创建了一个ProviderManager的Bean，并将authentication-provider注册到该ProviderManager。理解这段代码的含义很简单，一个用户ben，密码ben，拥有ROLE_USER这个权限。</p>
+
+<p>你还可以通过user-service上的properties属性来指定一个properties文件作为用户定义的输入。</p>
+
+<p>到此，你就完成了一个最简单的Spring Web Security的配置。拦截所有url，需要输入用户名和密码登录访问。</p>
+
+<p>参考资料：   <br/>
+1. Spring Security Reference。</p>
 </div>
   
   
@@ -506,6 +455,14 @@ run - Runs this project as a JVM application.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/17/deep-thinking-in-react-1/">React的思考（一）- 官网首页的信息量就挺大</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/01/22/go-cd-aliyun-spring-boot-docker/">如何用GoCD给阿里云的ECS配置Docker环境和部署SpringBoot的Docker应用到</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/11/23/gradle-resource-filtering/">Gradle对资源的过滤处理</a>
       </li>
     
@@ -515,14 +472,6 @@ run - Runs this project as a JVM application.</p>
     
       <li class="post">
         <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境下的性能优化</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
       </li>
     
   </ul>
@@ -565,7 +514,7 @@ run - Runs this project as a JVM application.</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - ZHU Benwei -
+  Copyright &copy; 2018 - ZHU Benwei -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

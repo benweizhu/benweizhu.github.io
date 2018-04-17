@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="这篇博客的起源比较有意思，客户给我们出了一道前端的开发题目，实现一个满足某种需求的web应用程序，算是某种程度的面试或者能力检测。 开发的技术栈采用我比较熟悉的： 环境：Node 脚手架，构建和依赖管理：Yoman，Gulp，Bower，NPM（Node包管理也算依赖管理吧） 开发框架： &hellip;">
+  <meta name="description" content="场景 在运行集成测试的时候，很可能会遇到这样一种情况： 本地的测试环境和持续集成服务器上的运行环境不同，最可能不同的的一种场景就是数据库服务器的配置不同，比如：host，端口，instance。 解决方案 这个时候，我希望，不同的环境下，使用不同的application. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/11/06/node-gulp-travisci-heroku/">在Node下通过TravisCI部署由Gulp启动服务的应用到云平台Heroku</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Spring4.0中通过ActiveProfiles和SpringActiveProfileResolver为不同环境下的集成测试指定不同的Properties配置</a></h1>
     
     
       <p class="meta">
@@ -79,45 +79,31 @@
 
 
 
-<time class='entry-date' datetime='2015-11-06T08:06:16+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:06 am</span></time>
+<time class='entry-date' datetime='2015-11-07T17:46:18+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>5:46 pm</span></time>
         
-           | <a href="/blog/2015/11/06/node-gulp-travisci-heroku/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/11/06/node-gulp-travisci-heroku/">Comments</a>
+           | <a href="/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/11/07/spring-active-profile-resolver-and-active-profiles-and-integration-test/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>这篇博客的起源比较有意思，客户给我们出了一道前端的开发题目，实现一个满足某种需求的web应用程序，算是某种程度的面试或者能力检测。</p>
+  <div class="entry-content"><h2>场景</h2>
 
-<p>开发的技术栈采用我比较熟悉的：</p>
+<p>在运行集成测试的时候，很可能会遇到这样一种情况：</p>
 
-<p>环境：Node  <br/>
-脚手架，构建和依赖管理：Yoman，Gulp，Bower，NPM（Node包管理也算依赖管理吧）  <br/>
-开发框架：AngularJS，Bootstrap  <br/>
-测试框架和Runner：Karma，Protractor，Jasmine，Webdriver</p>
+<p>本地的测试环境和持续集成服务器上的运行环境不同，最可能不同的的一种场景就是数据库服务器的配置不同，比如：host，端口，instance。</p>
 
-<p>当然还有些七七八八的JavaScript类库，这里就不罗列了。</p>
+<h2>解决方案</h2>
 
-<p>开发时间大概用了不到一天，考虑到这些环境我都没安装，所以下载还是花了点时间的，基本的本地运行，单元测试，功能测试都完善了，本来想着已经差不多了，但作为一个在以构建，持续集成和持续交付自豪的公司（Build and CI is in our DNA）里工作的开发人员，好像还差点什么。</p>
+<p>这个时候，我希望，不同的环境下，使用不同的application.properties文件配置。</p>
 
-<p>没错，就是<strong>持续集成和部署到PreProduction环境或者Production环境</strong>，之前没怎么用过Heroku，所以彻底完成还是足足花费了一天的时间，也就是从开发到上线用了两天，不过这其中踩了无数的坑。</p>
+<p>如果你熟悉Spring Boot中profile的概念，那么，你一定会想到指定不同的profile，于是就有了两个不同的配置文件application-local.properties和application-ci.properties。</p>
 
-<p>关于开发以及构建的部分，我就不详细说明了，这与标题也不符合。</p>
+<p>如果是启动Spring Boot，可以通过&ndash;spring.active.profile=dev来指定不同的profile。</p>
 
-<h2>TravisCI</h2>
-
-<p><img src="https://travis-ci.com/img/travis-mascot-200px.png" alt="Alt text" /></p>
-
-<blockquote><p>Test and Deploy with Confidence
-Easily sync your GitHub projects with Travis CI and you’ll be testing your code in minutes!</p></blockquote>
-
-<p>TravisCI是一个免费的，可以和Github项目同步的持续集成服务器，对持续集成这个概念不懂的同学，请参考我司（我厂）高级咨询师腾云的翻译的Martin Fowler的文章《持续集成》 <a href="http://www.cnblogs.com/CloudTeng/archive/2012/02/25/2367565.html">http://www.cnblogs.com/CloudTeng/archive/2012/02/25/2367565.html</a> 。</p>
-
-<p>其实，要使用TravisCI是非常简单的，假设你是Java的项目，且采用了Maven或者Gradle做构建，那么只需要在项目中添加一个.travis.yml的文件，在里面写上language: java，提交，并在TravisCI上将项目Sync打开，就可以开始构建了。可以参考资料： <a href="http://docs.travis-ci.com/user/languages/java/">http://docs.travis-ci.com/user/languages/java/</a></p>
-
-<p>但是在本例子中，采用的是Node环境，所以相对的配置就需要有所改变。基本配置和Java环境类似：</p>
+<p>如果是测试呢？通过注解@ActiveProfiles。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -129,123 +115,59 @@ Easily sync your GitHub projects with Travis CI and you’ll be testing your cod
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">language</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">node_js</span>
-</span><span class='line'><span class="l-Scalar-Plain">node_js</span><span class="p-Indicator">:</span>
-</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;4.1&quot;</span>
-</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;4.0&quot;</span>
-</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.12&quot;</span>
-</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.11&quot;</span>
-</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.10&quot;</span>
-</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.8&quot;</span>
-</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;0.6&quot;</span>
-</span><span class='line'>  <span class="p-Indicator">-</span> <span class="s">&quot;iojs&quot;</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@RunWith</span><span class="o">(</span><span class="n">SpringJUnit4ClassRunner</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@SpringApplicationConfiguration</span><span class="o">(</span><span class="n">classes</span> <span class="o">=</span> <span class="n">Application</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@WebAppConfiguration</span>
+</span><span class='line'><span class="nd">@Transactional</span>
+</span><span class='line'><span class="nd">@ActiveProfiles</span><span class="o">(</span><span class="s">&quot;test&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractControllerIntegrationTest</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">protected</span> <span class="n">MockMvc</span> <span class="n">mockMvc</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Autowired</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">WebApplicationContext</span> <span class="n">webApplicationContext</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Before</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">mockMvc</span> <span class="o">=</span> <span class="n">MockMvcBuilders</span><span class="o">.</span><span class="na">webAppContextSetup</span><span class="o">(</span><span class="n">webApplicationContext</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这里要注意的是Node的版本，如果你使用4.0以上版本，很有可能在TravisCI上会遇到，导致npm install失败：</p>
+<p>可是，这样做还有一个问题，通过@ActiveProfiles(&ldquo;test&rdquo;)，是硬编码该测试使用test这个profile，那本地环境和集成测试环境要使用不同的profile，应该怎么办呢？</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">../</span><span class="n">node_modules</span><span class="o">/</span><span class="n">nan</span><span class="o">/</span><span class="n">nan</span><span class="o">.</span><span class="n">h</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">3</span><span class="p">:</span> <span class="n">error</span><span class="p">:</span> <span class="c">#error This version of node/NAN/v8 requires a C++11 compiler</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>官方文档上并没有给出解决这个问题的办法，唯一的临时解决办法就是使用低于4的稳定版本，比如我使用是0.12。</p>
-
-<p>对于Node项目，TravisCI默认执行：npm test命令来运行你的测试（官方翻译：测试套件）。</p>
-
-<p>如果你查看了官方文档，项目采用Gulp做构建，它会告诉你还需要在.travis.yml文件中添加：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">before_script</span><span class="p-Indicator">:</span>
-</span><span class='line'>  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">npm install -g gulp</span>
-</span><span class='line'><span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">gulp</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果添加script: gulp，TravisCI会运行gulp，而不会运行npm test命令，所以这里取决于你的项目构建（测试）运行方式。我这里采用的npm test，因为需要同时运行单元测试和功能测试，在我的配置中，gulp任务只是最优化打包应用，所以在.travis.yml我并没有这些配置。</p>
-
-<p>官方参考文档： <a href="http://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Using-Gulp">http://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Using-Gulp</a></p>
-
-<p>我的配置全部在package.json的Script中，主要原因是为了方便Heroku部署，这里之所以需要在npm install之后运行bower install是为了功能测试能够正常运行。</p>
+<p>Spring 4中提供了一个接口：ActiveProfilesResolver，以可编程的方式提供active profile的解析。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;scripts&quot;</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;test&quot;</span><span class="o">:</span> <span class="s2">&quot;gulp test &amp; gulp protractor&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;start&quot;</span><span class="o">:</span> <span class="s2">&quot;./node_modules/.bin/gulp serve:dist&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;postinstall&quot;</span><span class="o">:</span> <span class="s2">&quot;./node_modules/.bin/bower install&quot;</span>
-</span><span class='line'><span class="p">}</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.test.context.ActiveProfilesResolver</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SpringActiveProfileResolver</span> <span class="kd">implements</span> <span class="n">ActiveProfilesResolver</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">String</span><span class="o">[]</span> <span class="nf">resolve</span><span class="o">(</span><span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">testClass</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">final</span> <span class="n">String</span> <span class="n">activeProfile</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;spring.profiles.active&quot;</span><span class="o">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]{</span><span class="n">activeProfile</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span> <span class="s">&quot;test&quot;</span> <span class="o">:</span> <span class="n">activeProfile</span><span class="o">};</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>到目前为止，TravisCI的配置就结束了，项目可以正常的在持续集成服务器（CI Server）上运行。</p>
-
-<h2>Heroku</h2>
-
-<p><img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/Heroku_logo.png/220px-Heroku_logo.png" alt="Alt text" /></p>
-
-<blockquote><p>Heroku (pronounced her-OH-koo) is a cloud application platform – a new way of building and deploying web apps.</p></blockquote>
-
-<p>Heroku是国外有名的云应用平台，旗下的产品有： <br/>
-Heroku Platform <br/>
-Heroku Postgres <br/>
-Heroku Redis <br/>
-Heroku Connect <br/>
-Heroku Enterprise</p>
-
-<h3>注册和安装Toolbelt</h3>
-
-<p>首先，你需要注册Heroku的账号，然后安装Heroku的Toolbelt工具。   <br/>
-可以参考： <a href="https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up">https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up</a></p>
-
-<p>安装参考资料的提示，登录：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">heroku</span> <span class="n">login</span>
-</span><span class='line'><span class="n">Enter</span> <span class="n">your</span> <span class="n">Heroku</span> <span class="n">credentials</span><span class="o">.</span>
-</span><span class='line'><span class="n">Email</span><span class="p">:</span> <span class="n">zeke</span><span class="nd">@example.com</span>
-</span><span class='line'><span class="n">Password</span><span class="p">:</span>
-</span><span class='line'><span class="o">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>在Travis中配置Heroku</h3>
-
-<p>登录Heroku创建一个应用程序，名字你自己取（得小写字母）</p>
-
-<p>进入到应用，在Deploy的tab里面，你会看到一个Connect to Github，你可以选择将哪个repository和该应用关联来实现自动部署或手动部署，但TravisCI的自动部署跟它没有关系，所以你不用管它。</p>
-
-<p>你要做的是看这里： <a href="http://docs.travis-ci.com/user/deployment/heroku/">http://docs.travis-ci.com/user/deployment/heroku/</a></p>
-
-<p>在.travis.yml中配置：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">deploy</span><span class="p-Indicator">:</span>
-</span><span class='line'>  <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">heroku</span>
-</span><span class='line'>  <span class="l-Scalar-Plain">api_key</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="l-Scalar-Plain">secure</span><span class="p-Indicator">:</span> <span class="s">&quot;YOUR</span><span class="nv"> </span><span class="s">ENCRYPTED</span><span class="nv"> </span><span class="s">API</span><span class="nv"> </span><span class="s">KEY&quot;</span>
-</span><span class='line'><span class="nn">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>虽然，你看得懂文档，但不建议手动配置，建议Travis和Heroku的客户端都安装，然后在项目目录下运行：travis setup heroku，来自动配置.travis.yml文件。</p>
-
-<p>可以参考的文档： <a href="http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/">http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/</a></p>
-
-<p>配置完成之后，.travis.yml文件大概和下面的相似：</p>
+<p>使用方式很简单，在ActiveProfiles中指定resolver。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -257,94 +179,75 @@ Heroku Enterprise</p>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">language</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">node_js</span>
-</span><span class='line'><span class="l-Scalar-Plain">node_js</span><span class="p-Indicator">:</span>
-</span><span class='line'><span class="p-Indicator">-</span> <span class="s">&#39;0.12&#39;</span>
-</span><span class='line'><span class="l-Scalar-Plain">deploy</span><span class="p-Indicator">:</span>
-</span><span class='line'>  <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">heroku</span>
-</span><span class='line'>  <span class="l-Scalar-Plain">api_key</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="l-Scalar-Plain">secure</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">QFSD0pnNddlsdZ6Wm/...</span>
-</span><span class='line'>  <span class="l-Scalar-Plain">app</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">yourapplicationname</span>
-</span><span class='line'>  <span class="l-Scalar-Plain">on</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="l-Scalar-Plain">repo</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">benweizhu/yourApplicationRepoName</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@RunWith</span><span class="o">(</span><span class="n">SpringJUnit4ClassRunner</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@SpringApplicationConfiguration</span><span class="o">(</span><span class="n">classes</span> <span class="o">=</span> <span class="n">Application</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@WebAppConfiguration</span>
+</span><span class='line'><span class="nd">@Transactional</span>
+</span><span class='line'><span class="nd">@ActiveProfiles</span><span class="o">(</span><span class="n">resolver</span> <span class="o">=</span> <span class="n">SpringActiveProfileResolver</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractControllerIntegrationTest</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">protected</span> <span class="n">MockMvc</span> <span class="n">mockMvc</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Autowired</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">WebApplicationContext</span> <span class="n">webApplicationContext</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Before</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">mockMvc</span> <span class="o">=</span> <span class="n">MockMvcBuilders</span><span class="o">.</span><span class="na">webAppContextSetup</span><span class="o">(</span><span class="n">webApplicationContext</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>提交代码之后，TravisCI就会开始在构建完成之后，开始执行部署到Heroku。</p>
+<p>根据上面ActiveProfileResolver的实现方式，你只需要在运行集成测试时，指定一个系统变量spring.profiles.active。</p>
 
-<p>这样就完了吗？错！！！前面已经踩过一些坑，但还不够坑。</p>
-
-<h2>现在正式开始采坑</h2>
-
-<p>执行完上面的步骤，你会发现构建是绿的，并且显示：</p>
+<p>以Gradle为例：
+如果运行集成测试的任务是test，那么你只需要这样写：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">-----&gt;</span> <span class="n">Compressing</span><span class="o">...</span> <span class="n">done</span><span class="p">,</span> <span class="mf">65.3</span><span class="n">MB</span>
-</span><span class='line'><span class="o">-----&gt;</span> <span class="n">Launching</span><span class="o">...</span> <span class="n">done</span><span class="p">,</span> <span class="n">v28</span>
-</span><span class='line'>       <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">yourapplicationname</span><span class="o">.</span><span class="n">herokuapp</span><span class="o">.</span><span class="n">com</span><span class="o">/</span> <span class="n">deployed</span> <span class="n">to</span> <span class="n">Heroku</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">systemProperty</span> <span class="s">&quot;spring.profiles.active&quot;</span><span class="o">,</span> <span class="s">&quot;ci&quot;</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>当你通过URL打开应用时，就会出现Application Error的页面。这个时候，就要开始troubleshooting了。</p>
-
-<p>首先，你需要在TravisCI上构建和部署的log，这个就不用我教了。</p>
-
-<p>如果TravisCI上没有问题，那么，你就需要查看Heroku服务器上的log，方法如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">heroku</span> <span class="n">logs</span> <span class="o">--</span><span class="n">tail</span> <span class="o">--</span><span class="n">app</span> <span class="n">appname</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>所有的出现问题/导致失败的原因都可以在log中看到。</p>
-
-<p><strong>常见问题</strong></p>
-
-<p>问题1：Heroku的Node环境启动时，运行npm start，所以，你需要配置好，package中的script命令来正确的启动服务器。你也可以配置Procfile文件，那么它就会执行文件中的命令：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">web</span><span class="p">:</span> <span class="n">node</span> <span class="n">node_modules</span><span class="o">/.</span><span class="n">bin</span><span class="o">/</span><span class="n">gulp</span> <span class="n">serve</span><span class="p">:</span><span class="n">dist</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>问题2：Heroku没有在全局（global）下安装gulp，所以项目的gulp需要安装在本地，在npm start的命令中也要有相应的配置，比如：gulp命令是执行本地的bin目录。</p>
-
-<p>问题3：Heroku会先运行npm install，所以如果项目使用了BowerJS，那么在postInstall要进行bower install。</p>
-
-<p>问题4：确保package中，dependencies的配置是正确的，很多情况下，我们都把依赖放在了devDependencies中，但在产品环境下，应该在dependencies下。</p>
-
-<p>问题5：端口号配置</p>
-
-<p>一个Web dyno并需和传递给他的$PORT在60秒内绑定。</p>
-
-<p>所以应用程序的端口配置应该：</p>
+<p>但是如果，你希望通过命令行参数传递，来决定active的profile，那么你还需要获取Gradle的命令参数：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// set the port of our application</span>
-</span><span class='line'><span class="c1">// process.env.PORT lets the port be set by Heroku</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">8080</span><span class="p">;</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">test</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">project</span><span class="o">.</span><span class="na">hasProperty</span><span class="o">(</span><span class="err">&#39;</span><span class="n">profile</span><span class="err">&#39;</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">systemProperty</span> <span class="s">&quot;spring.profiles.active&quot;</span><span class="o">,</span> <span class="s">&quot;$profile&quot;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Web Dynos: Web dynos are dynos of the “web” process type that is defined in your Procfile. Only web dynos receive HTTP traffic from Heroku’s routers.</p>
+<p>运行时的命令是：</p>
 
-<p>另外还有一些问题：可能出在Heroku的配置上，具体请参考<strong>Heroku官方的troubleshooting</strong>： <a href="https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate">https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate</a></p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">./</span><span class="n">gradlew</span> <span class="n">test</span> <span class="o">-</span><span class="n">Pprofile</span><span class="o">=</span><span class="n">ci</span>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <h2>结束语</h2>
 
-<p>整个项目是一个完整的JavaScript全栈项目，从需求，到开发，最后部署，花费两天时间，虽然辛苦，但是学到不少东西。</p>
+<p>通过这样的配置，在集成测试环境中，配置执行的命令就可以通过传递参数来指定激活的profile，而开发环境使用默认值（即不同在命令行指定参数）。</p>
 
-<p>参考资料： <br/>
-1.<a href="http://docs.travis-ci.com/user/languages/javascript-with-nodejs/">http://docs.travis-ci.com/user/languages/javascript-with-nodejs/</a>  <br/>
-2.<a href="http://docs.travis-ci.com/user/deployment/heroku/">http://docs.travis-ci.com/user/deployment/heroku/</a>  <br/>
-3.<a href="http://www.sitepoint.com/deploying-heroku-using-gulp-node-git/">http://www.sitepoint.com/deploying-heroku-using-gulp-node-git/</a>
-4.<a href="http://www.hygkui.com/2015/03/13/%E4%BD%BF%E7%94%A8Gulp-Node-Git%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E5%88%B0Heroku%E4%B8%8A/">http://www.hygkui.com/2015/03/13/%E4%BD%BF%E7%94%A8Gulp-Node-Git%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E5%88%B0Heroku%E4%B8%8A/</a> 上面的中文版  <br/>
-5.<a href="http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/">http://blog.travis-ci.com/2013-07-09-introducing-continuous-deployment-to-heroku/</a>  <br/>
-6.<a href="https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate">https://devcenter.heroku.com/articles/troubleshooting-node-deploys#start-with-a-blank-slate</a></p>
+<p>参考资料：  <br/>
+1.<a href="http://stackoverflow.com/questions/20551681/spring-integration-tests-with-profile">http://stackoverflow.com/questions/20551681/spring-integration-tests-with-profile</a> 作答人：Sam (author of the Spring TestContext Framework)</p>
 </div>
   
   
@@ -357,7 +260,7 @@ Heroku Enterprise</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a></h1>
     
     
       <p class="meta">
@@ -366,103 +269,156 @@ Heroku Enterprise</p>
 
 
 
-<time class='entry-date' datetime='2015-10-31T19:01:24+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>7:01 pm</span></time>
+<time class='entry-date' datetime='2015-11-07T13:14:19+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:14 pm</span></time>
         
-           | <a href="/blog/2015/10/31/static-url-for-seo/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/10/31/static-url-for-seo/">Comments</a>
+           | <a href="/blog/2015/11/07/coding-net-and-dao-cloud/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/11/07/coding-net-and-dao-cloud/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>URL静态化一直以来都是最基本的SEO要求之一，但近年来搜索引擎技术进步，抓取动态url已经不是问题，SEO行业对是否一定要做静态化也有了一些观念上的改变。</p>
+  <div class="entry-content"><p>昨天无意间搜索到一篇文章： <a href="http://blog.daocloud.io/daocloud_coding/">http://blog.daocloud.io/daocloud_coding/</a> DaoCloud完成与Coding对接</p>
 
-<h2>为什么要做静态化？</h2>
+<p>这让我感到很兴奋，原因是我搜索的关键字是“coding.net 持续集成”。</p>
 
-<p>现在的网站绝大多数都是数据库驱动，页面由程序实时生成，而不是真的在服务器上有一个静态HTML文件存在。当用户访问一个网址时，程序根据URL中的参数调用数据库，实时生成页面内容。因此动态页面相对应的URL原始状态也是动态的，包含问号，等号及参数。</p>
+<p>有一个项目放在coding平台的私有库中，一直没有做持续集成，如果是放在github的公有库，倒是可以用TravisCI做，但是这个项目不是开源的，一直希望找到一个国内的类似TravisCI的服务，直到昨天。</p>
 
-<p>搜索引擎在发展初期，一般不愿意爬行和收录动态URL，主要原因是可能陷入无限循环或收录大量重复内容，造成资源极大的浪费。最典型的无线循环就是某些网站上出现的万年历。万年历会使得蜘蛛可以无限点击下去。</p>
+<h2>DaoCloud</h2>
 
-<p>真实用户一眼就能看出这是一个万年历，但是搜索引擎蜘蛛面对的只是一串代码，不一定能判断它。</p>
+<p><img src="http://blog.daocloud.io/wp-content/uploads/2015/06/Logo_2.jpg" alt="Alt text" /></p>
 
-<p>有时候就算不是无限循环，动态URL也可能造成大量重复页面。比如：想用的URL和参数（也就是相同的页面），但是参数的顺序不同（有多个参数）。</p>
+<p>DaoCloud 是业界领先的企业级容器云平台和解决方案提供商，致力于以 Docker 为代表的容器技术，为企业打造面向下一代互联网应用的交付和运维平台，帮助客户实现云端持续创新，&hellip;.，等等。就不帮别人打广告了。</p>
 
-<p>更麻烦的是，有时候某些参数完全可以是任意值，服务器都能够正常的返回某个固定页面。</p>
+<p>对我来说最重要的是：  <br/>
+DaoCloud 对接 GitHub、Coding、GitCafe 等国内外代码托管库，采用云端 SaaS 化服务，帮助开发者实现自动化持续集成测试和 Docker 容器镜像构建。DaoCloud 镜像构建服务基于全球分布式网路，构建速度极快，提供私有镜像存储空间，为容器化交付和跨团队合作奠定了基础。</p>
 
-<p>这就是为什么搜索引擎对动态URL敬而远之的原因。</p>
+<h3>如何使用</h3>
 
-<h2>如何静态化URL呢？</h2>
+<p>其实它提供的持续集成服务和TravisCI有点类似，至少从使用者的角度，是这么理解的。</p>
 
-<p>最常见的方式是使用服务器URL重写模块，LAMP（Linux+Apache+MySQL+PHP）服务器上一般使用mod_rewrite模块，Windows服务器上也有类似的功能。</p>
+<p>目前支持如下语言和服务：</p>
 
-<p>举例：</p>
+<p>语言：Golang、Python、Ruby、Java、Javascript（NodeJS）、PHP、C（gcc） <br/>
+服务：MySQL、Redis、MongoDB</p>
 
-<p><a href="http://www.domain.com/products.php?id=123">http://www.domain.com/products.php?id=123</a></p>
+<p>服务指的意思是，比如：构建需要集成测试或者功能测试，那么它可以提供三种数据库供你使用。</p>
 
-<p>静态化为:</p>
-
-<p><a href="http://www.domain.com/products/123">http://www.domain.com/products/123</a></p>
-
-<p>需要请用服务器模块mod_rewrite，然后在.htaccess文件写入代码：</p>
+<p>和TravisCI类似，需要你提供一个daocloud.yml，格式如下：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">RewriteRule</span> <span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="p">([</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="o">/</span><span class="n">products</span><span class="o">.</span><span class="n">php</span><span class="err">?</span><span class="nb">id</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">image</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">daocloud/ci-golang:1.4</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">services</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">mongodb</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">mysql</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">redis</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">env</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">MYENV = &quot;hello&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">install</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an install segment&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Here, we usually run scripts to setup a base environment&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;For customized base image, you need to install git here unless you have git installed in your base image&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;e.g., apt-get install -y git-core&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">before_script</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an before_script segment&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Here, we usually run scripts to prepare our test&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an script segment&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Run test cases here&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Below shows how to use services, mongodb/mysql/redis are the hostnames of services&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 mongodb</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 mysql</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 redis</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>URL重写基于正则表达式，每个网站的动态URL结构都不同，所以写起来就很麻烦。</p>
+<p>image是指定构建运行的环境镜像，除了上面的go语言，还有其他node，java，php，ruby等，在文章底部的参考资料中可以找到。</p>
 
-<p>严格的说，这里所说的URL静态化应该称为“伪静态化”，也就是说服务器上还是不存在相应的HTML文件，用户访问时还是动态生成页面，只不过通过URL重写技术使网站看起来像是静态的。当然，也有CMS系统可以实现真正静态化，系统会自动真实生成静态的HTML文件。但对于搜索引擎来说，真正的静态化和伪静态化没有区别。</p>
+<h3>服务</h3>
 
-<h2>到底是否需要URL静态化？</h2>
+<p>service也就是你需要的数据库服务了，举个例子，假设，你指定了mysql。那么它提供的mysql的配置如下：</p>
 
-<p>近年来搜索引擎对URL的抓取有了很大进步。一般来说，URL中有两三个参数，对于收录不会造成任何影响。权重高的域名，再多几个问号也不是问题。不过一般还是建议将URL静态化，即能提高用户体验，又能降低收录难度。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="err">Version：MySQL</span> <span class="err">5.5</span>
+</span><span class='line'><span class="na">Docker Link Alias</span><span class="o">:</span> <span class="s">mysql</span>
+</span><span class='line'><span class="na">Host</span><span class="o">:</span> <span class="s">mysql</span>
+</span><span class='line'><span class="na">Port</span><span class="o">:</span> <span class="s">3306</span>
+</span><span class='line'><span class="na">UserName</span><span class="o">:</span> <span class="s">root</span>
+</span><span class='line'><span class="na">Password</span><span class="o">:</span> <span class="s">不设密码</span>
+</span><span class='line'><span class="na">Default Instance</span><span class="o">:</span> <span class="s">test</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>2008年9月，Google站长博客发表了一篇关于动态网址还是静态网址的帖子，颠覆了SEO界的观念。</p>
 
-<p>Google的帖子有几个要点。</p>
+<p>所以，项目中的测试在连接数据库的时候，也需要对应配置，否则就连接不上。</p>
 
-<p>一是Google完全有能力抓取动态网址，多少个问号也不是问题。这一点基本靠谱。</p>
+<h3>执行顺序</h3>
 
-<p>第二，动态网址更有助于Google蜘蛛读懂URL含义，并进行鉴别，因为网址中的参数有提示性。比如Google举了这个例子：</p>
+<p>设置环境变量。 <br/>
+执行 install 脚本。 <br/>
+克隆源代码，切换到对应的提交。 <br/>
+执行 before_script 脚本。 <br/>
+执行 script 脚本。</p>
 
-<p>www.example.com/article/bin/answer.foo?language=en&amp;answer=3&amp;sid=98971298178906&amp;query=URL</p>
+<p>script脚本，也就是你的构建执行命令了，比如：./gradlew clean build</p>
 
-<p>URL里的参数都有助于Google理解URL及网页内容。比如language后面跟的参数是提示语言，answer后面跟的是文章编号，sid后面的肯定是session ID。其他常用的包括color后面跟的参数指的是颜色，size后面跟的参数是尺寸等。有了这些参数的帮助，Google更容易理解网页。</p>
+<p>配置完成后，提交代码，就可以触发CI构建。</p>
 
-<p>而将网址静态化后，这些参数的意义通常就变得不明显了。比如这个URL：</p>
+<h2>微信提醒功能</h2>
 
-<p>www.example.com/shoes/red/7/12/men/index.html</p>
+<p>DaoCloud还可以和微信绑定，提供构建状态提醒，这样就不需要Build TV，直接手机微信提醒。</p>
 
-<p>就可能使Google不知道哪个是产品序列号，哪个是尺寸等。</p>
+<h2>结束语</h2>
 
-<p>第三，网址静态化很容易弄错，那就更得不偿失了。比如通常动态网址的参数调换顺序，所得到的页面其实是相同的，比如这两个网址很可能就是同一个页面：</p>
+<p>我的项目花费了大概半天的时间，就配置成功了，当然这包括项目本身的一些配置，与平台无关。</p>
 
-<p>www.example.com/article/bin/answer.foo?language=en&amp;answer=3</p>
-
-<p>www.example.com/article/bin/answer.foo?answer=3&amp;language=en</p>
-
-<p>保留动态网址，Google还比较容易明白这是一样的网页。而经过静态化后，这样两个网址Google就不容易判断是不是同一个页面，从而可能引起复制内容：</p>
-
-<p>www.example.com/shoes/men/7/red/index.html</p>
-
-<p>www.example.com/shoes/red/7/men/index.html</p>
-
-<p>再一个容易搞错的是session ID，也可能被静态化进URL：</p>
-
-<p>www.example.com/article/bin/answer.foo/en/3/98971298178906/URL</p>
-
-<p>这样网站将产生大量URL不同，但其实内容相同的页面。</p>
-
-<p>所以，Google建议不要静态化URL。</p>
-
-<h2>虽然如此</h2>
-
-<p>但是《SEO实战密码》的作者建议还是做静态化。他认为Google的这个帖子解释的有些极端和牵强，也没有从其他搜索引擎的角度出发。</p>
-
-<p>参考资料： <br/>
-1.《SEO实战密码》</p>
+<p>参考资料：  <br/>
+1.<a href="http://help.daocloud.io/features/continuous-integration/daocloud-yml.html">http://help.daocloud.io/features/continuous-integration/daocloud-yml.html</a></p>
 </div>
   
   
@@ -497,6 +453,14 @@ Heroku Enterprise</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/17/deep-thinking-in-react-1/">React的思考（一）- 官网首页的信息量就挺大</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/01/22/go-cd-aliyun-spring-boot-docker/">如何用GoCD给阿里云的ECS配置Docker环境和部署SpringBoot的Docker应用到</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/11/23/gradle-resource-filtering/">Gradle对资源的过滤处理</a>
       </li>
     
@@ -506,14 +470,6 @@ Heroku Enterprise</p>
     
       <li class="post">
         <a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境下的性能优化</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/04/26/web-debug/">Web Debug</a>
       </li>
     
   </ul>
@@ -556,7 +512,7 @@ Heroku Enterprise</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - ZHU Benwei -
+  Copyright &copy; 2018 - ZHU Benwei -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
