@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-04-17T23:49:14+08:00</updated>
+  <updated>2018-04-19T23:07:20+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,383 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[React的思考（二）- 逃不开的生命周期函数之构造函数]]></title>
+    <link href="http://benweizhu.github.io/blog/2018/04/18/deep-thinking-in-react-2/"/>
+    <updated>2018-04-18T21:23:11+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2018/04/18/deep-thinking-in-react-2</id>
+    <content type="html"><![CDATA[<p>这一定是一个老生常谈的话题，你们就别多想了，跟我一起回顾一遍，看我说的有没有道理。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">class</span> <span class="nx">Timer</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">seconds</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
+</span><span class='line'>        <span class="nx">Seconds</span><span class="o">:</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">seconds</span><span class="p">}</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'>    <span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Timer</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nx">mountNode</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Constructor</h3>
+
+<p>构造函数（或者构造器），这个概念对于熟悉基于类的面向对象语言的朋友们肯定烂熟于心，但是对于JavaScript而言，这个概念往往容易让人困惑。</p>
+
+<p>在JavaScript的世界里，构造函数和普通函数没有什么区别，你一样的可以像普通函数一样调用它，但如果通过new关键字来调用函数，该函数就成为了构造函数，this指针就会指向新创建的对象。</p>
+
+<p>比如：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kd">function</span> <span class="nx">Person</span><span class="p">(){</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;CodePlayer&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">Person</span><span class="p">()</span>
+</span><span class='line'><span class="nx">$</span> <span class="nx">Window</span> <span class="p">{</span><span class="nx">external</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nx">chrome</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nb">document</span><span class="o">:</span> <span class="nb">document</span><span class="p">,</span> <span class="nx">WPCOMSharing</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nx">RecaptchaTemplates</span><span class="o">:</span> <span class="nb">Object</span><span class="err">…</span><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">()</span>
+</span><span class='line'><span class="nx">$</span> <span class="nx">Person</span> <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;CodePlayer&quot;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>更多具体的解释请参考我以前的一篇博客：<a href="http://benweizhu.github.io/blog/2015/12/31/javascript-contructor-new-prototype/" title="JavaScript渐入佳境 - 构造函数、new、原型">JavaScript渐入佳境 - 构造函数、new、原型</a>。</p>
+
+<h3>ES6的Class、extends、super</h3>
+
+<p>上面是一个ES5的例子，然而，当我们写React代码时，我们会用到ES6语法，会用到class，constructor以及super关键字，他们的作用是什么？</p>
+
+<p>我们先看下面一个跟React无关的例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="c1">//ES6</span>
+</span><span class='line'><span class="kr">class</span> <span class="nx">Rectangle</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">constructor</span> <span class="p">(</span><span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">width</span>  <span class="o">=</span> <span class="nx">width</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="nx">height</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//翻译成ES5</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Rectangle</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">width</span> <span class="o">=</span> <span class="nx">width</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="nx">height</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//ES6</span>
+</span><span class='line'><span class="kr">class</span> <span class="nx">Shape</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kr">class</span> <span class="nx">Rectangle</span> <span class="kr">extends</span> <span class="nx">Shape</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">constructor</span> <span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kr">super</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">width</span>  <span class="o">=</span> <span class="nx">width</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="nx">height</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//概念性翻译成ES5</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Share</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Rectangle</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">Shape</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">width</span>  <span class="o">=</span> <span class="nx">width</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="nx">height</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="nx">Rectangle</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">Shape</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span>
+</span><span class='line'><span class="nx">Rectangle</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">=</span> <span class="nx">Rectangle</span><span class="p">;</span>
+</span><span class='line'><span class="nx">Rectangle</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">=</span> <span class="nx">Shape</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>简单来说，class的作用就是定义Shape和Rectangle两个function（这就是被人用烂的词，语法糖），extends的作用是定义函数Rectangle的prototype和<strong>proto</strong>属性来实现原型链的继承，super的作用是在Rectangle函数中执行Share函数，并绑定this指针。</p>
+
+<p>建议查看Babel的编译结果，它是更准确的ES5转义：<a href="https://babeljs.io/repl/#?babili=false&amp;browsers=&amp;build=&amp;builtIns=false&amp;code_lz=MYGwhgzhAEDKAWYAOBTaBvAUJgvp0kMASisAC5gB2A5iGigB5kqUAmMCyaW0v0wAe0oQyAJwCu5AaOgAKAJasANNAYqAnioDuisvBXwU86vDIBKDJj7XoEcalELlqjWYDcVm7z3yIAOh1WPV4AXmhAvQ8vb3hfP0NjU2gwhJMyKL48PCA&amp;debug=false&amp;forceAllTransforms=false&amp;shippedProposals=false&amp;circleciRepo=&amp;evaluate=false&amp;fileSize=false&amp;lineWrap=true&amp;presets=es2015&amp;prettier=false&amp;targets=&amp;version=6.26.0&amp;envVersion=" title="babel链接">babel链接</a></p>
+
+<blockquote><p>如果以后有人问我，JavaScript和Java有什么关系，我不会说它们没关系，我会告诉那个人，ES6抄袭Java的语法范式。</p></blockquote>
+
+<h3>React中的constructor</h3>
+
+<p>我们再来回到React上，看ES6和Babel编译后的结果：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="c1">//ES6</span>
+</span><span class='line'><span class="kr">class</span> <span class="nx">Rectangle</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//不完全Babel编译代码</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">Rectangle</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">_classCallCheck</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">Rectangle</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">_possibleConstructorReturn</span><span class="p">(</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">(</span><span class="nx">Rectangle</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">||</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">getPrototypeOf</span><span class="p">(</span><span class="nx">Rectangle</span><span class="p">))</span>
+</span><span class='line'>      <span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">)</span> <span class="c1">// 看这里</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//ES6</span>
+</span><span class='line'><span class="kr">class</span> <span class="nx">Rectangle</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="p">{</span>
+</span><span class='line'>    <span class="nx">constructor</span> <span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//不完全Babel编译代码</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">Rectangle</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>   <span class="nx">_classCallCheck</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">Rectangle</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="k">return</span> <span class="nx">_possibleConstructorReturn</span><span class="p">(</span>
+</span><span class='line'>     <span class="k">this</span><span class="p">,</span>
+</span><span class='line'>     <span class="p">(</span><span class="nx">Rectangle</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">||</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">getPrototypeOf</span><span class="p">(</span><span class="nx">Rectangle</span><span class="p">))</span>
+</span><span class='line'>       <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">props</span><span class="p">)</span> <span class="c1">// 看这里</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当我们创建一个组件时，如果不需要在constructor里面做任何初始化的操作时，我们是不需要复写constructor的，因为Babel编译后，会将整个arguments都绑定上this指针后传递给被Rectangle的原型（React.Component），并执行，它替我们将constructor中super()的操作做了，如上所示。</p>
+
+<p>如果有需要在constructor中做初始化的操作时，那么必须带上super(props)并放在最前面，因为它的作用是调用Rectangle的原型（React.Component），并绑定this指针。</p>
+
+<p>那么，哪些初始化的操作可以在constructor里面做呢？原则上只有一个，那就是初始化state。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">class</span> <span class="nx">Timer</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">seconds</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>有三个问题：</p>
+
+<p>1.为什么不用this.setState()来执行？</p>
+
+<p>原因：1.this.state够直接了，你还要怎样？2.this.setState()是一个异步执行的函数，执行完之后，组件的响应式重新渲染（render），你这第一次渲染都还没开始呢。3.在这里this.setState()是一个空指令，这么写，不会任何起作用，不信你可以试试。</p>
+
+<p>2.那么能不能在constructor里面执行网络请求来初始化数据？</p>
+
+<p>我问过许多来面试的候选人，你的网络请求会放置在什么时候执行，我印象中确实有人回答我说在constructor中。听起来，在constructor中获取数据来初始化挺合理的。而且确实有人问：<a href="https://stackoverflow.com/questions/39338464/reactjs-why-is-the-convention-to-fetch-data-on-componentdidmount" title="Stack Overflow">Stack Overflow</a></p>
+
+<p>然而，我们在官方文档上看到这样一句话：避免在构造函数中引入任何有副作用的代码（比如data fetching或者DOM manipulation）或执行订阅的操作，如果有，请在componentDidMount里执行。</p>
+
+<p>关于这个位置的理解，我常常这样解释，就像你用jQuery写代码一样，你一定会等到document ready之后，才开始操作DOM或执行网络请求（也是为了操作DOM），否则，很有可能遇到undefined的情况。虽然，React这里也许和jQuery不一样，但我认为它的理由是相似的。（如果不对，请纠正我）。</p>
+
+<p>3.那么可不可以传递props到state呢？非常像Java的写法。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">color</span><span class="o">:</span> <span class="nx">props</span><span class="p">.</span><span class="nx">initialColor</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//Java</span>
+</span><span class='line'><span class="kr">public</span> <span class="nx">Shape</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">Shape</span><span class="p">(</span><span class="nb">String</span> <span class="nx">color</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">color</span> <span class="o">=</span> <span class="nx">color</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这么写，没有说完全错误，但是你需要注意的是，要同时实现getDerivedStateFromProps()在React 16中，或者16之前的componentWillReceiveProps，来保证当父组件更新时，props能有传递到state，因为constructor只会执行一次。</p>
+
+<p>如果出现这种使用场景，我们需要思考一下，能否将state的控制向上提升，将Shape组件仅仅作为Presentional Component，这样减少在不同的两个位置（父组件和它自己）来控制组件的状态。</p>
+
+<h4>this.handleClick = this.handleClick.bind(this);</h4>
+
+<p>官方文档说，在constructor里面只做两件事情，初始化state，和绑定event的handler函数的this指针到组件对象本身。既然是this指针这么困惑的话题，我再啰嗦一句这里做了什么：</p>
+
+<p>当函数（这里指这个组件）就成为了构造函数，该函数中this指针就会指向新创建的对象，也就是constructor里面的this就是指向的它自己（该组件的实例），那么this.handleClick = this.handleClick.bind(this);就能保证在handleClick函数里面的this指针，无论handleClick被传递到了哪里，可能被基础DOM元素button使用，也可能被子组件传递到别的位置，handleClick里面的this指针都能指向该组件的（如果是下面的例子就是Toggle），这样里面的this.setState才能起作用。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">class</span> <span class="nx">Toggle</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span><span class="nx">isToggleOn</span><span class="o">:</span> <span class="kc">true</span><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// This binding is necessary to make `this` work in the callback</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">handleClick</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">handleClick</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">handleClick</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">prevState</span> <span class="o">=&gt;</span> <span class="p">({</span>
+</span><span class='line'>      <span class="nx">isToggleOn</span><span class="o">:</span> <span class="o">!</span><span class="nx">prevState</span><span class="p">.</span><span class="nx">isToggleOn</span>
+</span><span class='line'>    <span class="p">}));</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleClick</span><span class="p">}</span><span class="o">&gt;</span>
+</span><span class='line'>        <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isToggleOn</span> <span class="o">?</span> <span class="s1">&#39;ON&#39;</span> <span class="o">:</span> <span class="s1">&#39;OFF&#39;</span><span class="p">}</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="err">/button&gt;</span>
+</span><span class='line'>    <span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>总结</h3>
+
+<p>别小看一个constructor函数，这里面的知识点可多了。总结一下，就是只干这些事情，其他的别干：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span><span class="nx">isToggleOn</span><span class="o">:</span> <span class="kc">true</span><span class="p">};</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">handleClick</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">handleClick</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[React的思考（一）- 官网首页的信息量就挺大]]></title>
@@ -2779,270 +3156,6 @@ TLS运行在一个可靠的TCP协议上，意味着我们必须首先完成TCP�
 8. <a href="http://www.leiphone.com/news/201412/AYbd3Tp7tbbSa0AD.html">http://www.leiphone.com/news/201412/AYbd3Tp7tbbSa0AD.html</a></p>
 
 <p>本文参考大量网络资料，如有发现文中参考资料遗漏，请联系本文作者，我会及时更新</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[全民安全站Let's Encrypt配置NGINX]]></title>
-    <link href="http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt/"/>
-    <updated>2016-05-29T17:40:12+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2016/05/29/nginx-lets-encrypt</id>
-    <content type="html"><![CDATA[<p>ThoughtWorks2016年4月份最新发布的技术雷达对Let’s Encrypt项目的介绍：</p>
-
-<p>从2015年，12月开始，Let’s Encrypt项目从封闭测试阶段转向公开测试阶段，也就是说用户不再需要收到邀请才能使用它了。Let’s Encrypt为那些寻求网站安全的用户提供了一种简单的方式获取和管理证书。Let’s Encrypt也促使安全和隐私前进了一大步，而这一趋势已经随着ThoughtWorks和我们许多使用其进行证书认证的项目开始了。</p>
-
-<p>Let&rsquo;s Encrypt发布最新数据，至今该项目已经颁发了超过300万份证书——300万这个数字是在5月8日-9日之间达成的。Let&rsquo;s Encrypt是为了让HTTP连接做得更加安全的一个项目，所以越多的网站能够加入进来，则整个互联网也会变得更加安全。</p>
-
-<p>本文是一个简单的Tutorial，告诉你怎样在NGINX服务器配置SSL实现网站的https：</p>
-
-<h2>登录到你的服务器上</h2>
-
-<p>保证你申请SSL的域名和服务器的IP是一致的，即域名确实是解析到你的服务器上的，可以使用nslookup命令查询。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>nslookup www.yourwebsite.com
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Let’s Encrypt在给你分配证书时，会检查你所在的服务器是否和域名解析的服务器一致。</p>
-
-<h2>配置基本的Nginx设置：</h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
-</span><span class='line'>    listen       <span class="m">80</span> default_server<span class="p">;</span>
-</span><span class='line'>    listen       <span class="o">[</span>::<span class="o">]</span>:80 default_server<span class="p">;</span>
-</span><span class='line'>    server_name  yourwebsite.com<span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    location ^~ /.well-known/acme-challenge/ <span class="o">{</span>
-</span><span class='line'>       default_type <span class="s2">&quot;text/plain&quot;</span><span class="p">;</span>
-</span><span class='line'>       root     /var/www/letsencrypt<span class="p">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nv">location</span> <span class="o">=</span> /.well-known/acme-challenge/ <span class="o">{</span>
-</span><span class='line'>       <span class="k">return</span> 404<span class="p">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    ... 其他配置，例如
-</span><span class='line'>    location / <span class="o">{</span>
-</span><span class='line'>      proxy_pass http://localhost:8080<span class="p">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里location配置了一个/.well-known/acme-challenge/路径，里面host了简单文件，我这里host了一个简单的html文件。原因是你必须证明，你拥有所请求的证书的域名。因为 Let&rsquo;s Encrypt要求你host一些文件。</p>
-
-<h2>使用certbot申请证书</h2>
-
-<p>克隆certbot仓库：<a href="https://github.com/certbot/certbot">https://github.com/certbot/certbot</a></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install -y git
-</span><span class='line'>sudo git clone https://github.com/certbot/certbot /opt/letsencrypt
-</span><span class='line'>/opt/letsencrypt/letsencrypt-auto
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>运行certbot提供的脚本获取证书</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">DOMAINS</span><span class="o">=</span><span class="s2">&quot;yourdomain.here,www.yourdomain.here&quot;</span>
-</span><span class='line'><span class="nb">export </span><span class="nv">DIR</span><span class="o">=</span>/var/www/letsencrypt
-</span><span class='line'>/opt/letsencrypt/letsencrypt-auto certonly --server https://acme-v01.api.letsencrypt.org/directory -a webroot --webroot-path<span class="o">=</span><span class="nv">$DIR</span> -d <span class="nv">$DOMAINS</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>注意这里指定了一个webroot-path，他应该和上面well-known配置的root一样。</p>
-
-<p>运行成功之后，你会看到下面这个提示</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>IMPORTANT NOTES:
-</span><span class='line'>- Congratulations! Your certificate and chain have been saved at
-</span><span class='line'>  /etc/letsencrypt/live/letsecure.me/fullchain.pem. Your cert will
-</span><span class='line'>  expire on 2016-XX-XX. To obtain a new version of the certificate in
-</span><span class='line'>  the future, simply run Let<span class="s1">&#39;s Encrypt again.</span>
-</span><span class='line'><span class="s1">- Your account credentials have been saved in your Let&#39;</span>s Encrypt
-</span><span class='line'>  configuration directory at /etc/letsencrypt. You should make a
-</span><span class='line'>  secure backup of this folder now. This configuration directory will
-</span><span class='line'>  also contain certificates and private keys obtained by Let<span class="s1">&#39;s</span>
-</span><span class='line'><span class="s1">  Encrypt so making regular backups of this folder is ideal.</span>
-</span><span class='line'><span class="s1">- If you like Let&#39;</span>s Encrypt, please consider supporting our work by:
-</span><span class='line'>
-</span><span class='line'>Donating to ISRG / Let<span class="err">&#39;</span>s Encrypt:   https://letsencrypt.org/donate
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>配置https证书</h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>ssl_certificate /etc/letsencrypt/live/yourdomain.here/fullchain.pem<span class="p">;</span>
-</span><span class='line'>ssl_certificate_key /etc/letsencrypt/live/yourdomain.here/privkey.pem<span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>完整配置</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
-</span><span class='line'>    listen <span class="m">443</span> ssl<span class="p">;</span>
-</span><span class='line'>    server_name yourdomain.here www.yourdomain.here<span class="p">;</span>
-</span><span class='line'>    ssl_protocols TLSv1 TLSv1.1 TLSv1.2<span class="p">;</span>
-</span><span class='line'>    ssl_ciphers EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5<span class="p">;</span>
-</span><span class='line'>    ssl_prefer_server_ciphers On<span class="p">;</span>
-</span><span class='line'>    ssl_certificate /etc/letsencrypt/live/yourdomain.here/fullchain.pem<span class="p">;</span>
-</span><span class='line'>    ssl_certificate_key /etc/letsencrypt/live/yourdomain.here/privkey.pem<span class="p">;</span>
-</span><span class='line'>    ssl_session_cache shared:SSL:128m<span class="p">;</span>
-</span><span class='line'>    add_header Strict-Transport-Security <span class="s2">&quot;max-age=31557600; includeSubDomains&quot;</span><span class="p">;</span>
-</span><span class='line'>    ssl_stapling on<span class="p">;</span>
-</span><span class='line'>    ssl_stapling_verify on<span class="p">;</span>
-</span><span class='line'>    location / <span class="o">{</span>
-</span><span class='line'>      proxy_pass http://localhost:8080<span class="p">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>配置80端口跳转：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">return</span> <span class="m">301</span> https://<span class="nv">$server_name$request_uri</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>完整配置</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>server <span class="o">{</span>
-</span><span class='line'>    listen       <span class="m">80</span> default_server<span class="p">;</span>
-</span><span class='line'>    listen       <span class="o">[</span>::<span class="o">]</span>:80 default_server<span class="p">;</span>
-</span><span class='line'>    server_name  yourwebsite.com<span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    location ^~ /.well-known/acme-challenge/ <span class="o">{</span>
-</span><span class='line'>       default_type <span class="s2">&quot;text/plain&quot;</span><span class="p">;</span>
-</span><span class='line'>       root     /var/www/letsencrypt<span class="p">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nv">location</span> <span class="o">=</span> /.well-known/acme-challenge/ <span class="o">{</span>
-</span><span class='line'>       <span class="k">return</span> 404<span class="p">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    location / <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="m">301</span> https://<span class="nv">$server_name$request_uri</span><span class="p">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>证书90天过期</h2>
-
-<p>Let’s Encrypt证书会在90天后过期，需要配置脚本自动更新证书。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
-</span><span class='line'><span class="c"># This script renews all the Let&#39;s Encrypt certificates with a validity &lt; 30 days</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> ! /opt/letsencrypt/letsencrypt-auto renew &gt; /var/log/letsencrypt/renew.log 2&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">;</span> <span class="k">then</span>
-</span><span class='line'>    <span class="nb">echo </span>Automated renewal failed:
-</span><span class='line'>    cat /var/log/letsencrypt/renew.log
-</span><span class='line'>    <span class="nb">exit </span>1
-</span><span class='line'><span class="k">fi</span>
-</span><span class='line'>nginx -t <span class="o">&amp;&amp;</span> nginx -s reload
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>开启定时任务Cron</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo crontab -e
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>编辑任务内容</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>@daily /path/to/renewCerts.sh
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考资料：  <br/>
-1.<a href="https://letsecure.me/secure-web-deployment-with-lets-encrypt-and-nginx/">https://letsecure.me/secure-web-deployment-with-lets-encrypt-and-nginx/</a>  <br/>
-2.<a href="https://community.letsencrypt.org/t/how-to-nginx-configuration-to-enable-acme-challenge-support-on-all-http-virtual-hosts/5622">https://community.letsencrypt.org/t/how-to-nginx-configuration-to-enable-acme-challenge-support-on-all-http-virtual-hosts/5622</a>   <br/>
-3.<a href="https://letsencrypt.org/getting-started/">https://letsencrypt.org/getting-started/</a></p>
 ]]></content>
   </entry>
   

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://benweizhu.github.io/blog/2018/04/18/deep-thinking-in-react-2/</loc>
+<lastmod>2018-04-18T21:23:11+08:00</lastmod>
+</url>
+<url>
 <loc>http://benweizhu.github.io/blog/2018/04/17/deep-thinking-in-react-1/</loc>
 <lastmod>2018-04-17T21:11:23+08:00</lastmod>
 </url>
