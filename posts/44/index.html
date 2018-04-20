@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="标题取得不是太好哈，但是看这标题，就知道，这篇文章不是什么高大上的内容。四个看似完全搭不上边的东西，把它们结合在一起使用的时候，对于大部分Java新人来说，却绝对是个头疼的问题。 好，先把问题摆出来，看例子： 我有一个Spring Web MVC的小例子，项目结构是这样的： &hellip;">
+  <meta name="description" content="Jetty插件 Jetty插件提供两个重要方法：jettyRun和jettyRunWar。 jettyRun会将一个已暴露（解包的）的web应用部署到嵌入式Jetty Web容器中。它不需要将web应用打包成一个war文件，目的是为了节省部署时间。 jettyRunWar正好相反， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,285 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">Gradle Jetty和Gradle Watch插件实现热部署</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-07-27T14:53:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>2:53 pm</span></time>
+        
+           | <a href="/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2><strong>Jetty插件</strong></h2>
+
+<p>Jetty插件提供两个重要方法：jettyRun和jettyRunWar。</p>
+
+<p>jettyRun会将一个已暴露（解包的）的web应用部署到嵌入式Jetty Web容器中。它不需要将web应用打包成一个war文件，目的是为了节省部署时间。</p>
+
+<p>jettyRunWar正好相反，是将一个War包部署到Web容器中。</p>
+
+<p><strong>jettyRun的好处是，你可以改变静态文件和JSP文件，而不需要重新启动服务器。</strong></p>
+
+<p>但是即便如此，对于日常开发还是不方便，因为开发过程中改动最多的其实是Java文件和资源配置文件，所以真正需要的是<strong>热部署</strong>。</p>
+
+<p>jettyRun的Gradle API文档中有这么一句话：Once started, the web container can be configured to run continuously, scanning for changes in the project and automatically performing a hot redeploy when necessary. This allows the developer to concentrate on coding changes to the project using their IDE of choice and have those changes immediately and transparently reflected in the running web container, eliminating development time that is wasted on rebuilding, reassembling and redeploying.</p>
+
+<p>这句话简单总结就是Jetty提供实现热部署的特性，开发人员只需要专注于编写代码，减少重新构建，重新组装和重新部署所浪费的时间。</p>
+
+<p>但问题是，官方文档上写了这句话后，就不了了之了，没有说怎么做。我们都试过，默认配置是不会实现热部署的，那么应该怎么做呢？</p>
+
+<h3><strong>两个属性：</strong></h3>
+
+<p><strong>reload</strong>  The reload mode, which is either &ldquo;automatic&rdquo; or &ldquo;manual&rdquo;.</p>
+
+<p><strong>scanIntervalSeconds</strong>  The interval in seconds between scanning the web app for file changes. If file changes are detected, the web app is reloaded. Only relevant if reload is set to &ldquo;automatic&rdquo;. Defaults to 0, which disables automatic reloading.</p>
+
+<p>读完上面两段，说明默认scanIntervalSeconds的配置是不支持自动重新载入变化文件的。</p>
+
+<p>试一把，把它改为支持：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">jettyRun</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">reload</span> <span class="o">=</span> <span class="s2">&quot;automatic&quot;</span>
+</span><span class='line'>    <span class="n">scanIntervalSeconds</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后运行gradle jettyRun启动jetty容器，修改Java类，然后去页面验证变化，结果是没有变化。为什么？</p>
+
+<p>原来，jetty监听的是build目录下的class文件变化，而不是源代码变化，也就说源代码内容改变了，但class文件没有变化，那么不会自动触发jetty重载变化文件，那么该怎么办？最简单粗暴的解决方案就是另起一个命令行窗口，手动运行一次gradle compileJava命令。</p>
+
+<p>没错，这个方法是行得通的。但仍然不是最好的解决方案。我查了下，到目前为止，官方没有给出正式的解决方案，但是该特性是在GradleWare的To-Do-List上的，预计以后应该会有。</p>
+
+<h2><strong>Gradle Watch</strong></h2>
+
+<p>那么，唯一的办法只有借助第三方的插件来协助Jetty插件，一起实现热部署了，gradle-watch（日本人写的，因为上面的饿提交记录全是日文的）。 <a href="https://github.com/bluepapa32/gradle-watch-plugin">https://github.com/bluepapa32/gradle-watch-plugin</a></p>
+
+<p>gradle watch的作用是监听某种类型的文件的变化，包括添加，删除和修改，然后执行预定义的任务。</p>
+
+<p>使用起来很简单：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">jettyRun</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">reload</span> <span class="o">=</span> <span class="s2">&quot;automatic&quot;</span>
+</span><span class='line'>    <span class="n">scanIntervalSeconds</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">jcenter</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">classpath</span> <span class="s1">&#39;com.bluepapa32:gradle-watch-plugin:0.1.3&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;watch&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">watch</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">files</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;src/main/java&#39;</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;compileJava&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>配置watch闭包，什么文件发生变化后就执行什么任务（好像它没有提供默认配置，所以需要手动显示的配置）。</p>
+
+<p>在启动了gradle jettyRun之后，开启另一个窗口运行gradle watch。一次Java文件变化的输出如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">:</span><span class="nx">watch</span>
+</span><span class='line'><span class="nx">Starting</span><span class="p">............</span> <span class="nx">OK</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">--------------------------------------------------------------------------------</span>
+</span><span class='line'><span class="nx">Sun</span> <span class="nx">Jul</span> <span class="mi">27</span> <span class="mi">15</span><span class="o">:</span><span class="mi">36</span><span class="o">:</span><span class="mi">51</span> <span class="nx">CST</span> <span class="mi">2014</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">File</span> <span class="s2">&quot;src/main/java/me/zeph/springmvc/jrebel/controller/HelloJRebelController.java&quot;</span> <span class="nx">was</span> <span class="nx">changed</span><span class="p">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-----------------------------------------------------</span>
+</span><span class='line'><span class="o">:</span><span class="nx">compileJava</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">BUILD</span> <span class="nx">SUCCESSFUL</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Total</span> <span class="nx">time</span><span class="o">:</span> <span class="mf">0.954</span> <span class="nx">secs</span>
+</span><span class='line'><span class="nx">Building</span> <span class="o">&gt;</span> <span class="o">:</span><span class="nx">watch</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可见，成功的更新了Java的class文件到build目录。刷新一次页面，就可以查看变化了。</p>
+
+<p>那么对于资源文件呢？比如，我使用了Spring，需要改变Spring的Bean配置文件，同样可以。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">watch</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">java</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">files</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;src/main/java&#39;</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;compileJava&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">resources</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">files</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="s1">&#39;src/main/resources&#39;</span><span class="o">,</span> <span class="nl">include:</span> <span class="s1">&#39;**/*.xml&#39;</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;processResources&#39;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>输出结果如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">--------------------------------------------------------------------------------</span>
+</span><span class='line'><span class="nx">Sun</span> <span class="nx">Jul</span> <span class="mi">27</span> <span class="mi">15</span><span class="o">:</span><span class="mi">56</span><span class="o">:</span><span class="mi">39</span> <span class="nx">CST</span> <span class="mi">2014</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">File</span> <span class="s2">&quot;src/main/resources/applicationContextService.xml&quot;</span> <span class="nx">was</span> <span class="nx">changed</span><span class="p">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">--------------------------------------------------------------------------------</span>
+</span><span class='line'><span class="o">:</span><span class="nx">processResources</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">BUILD</span> <span class="nx">SUCCESSFUL</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Total</span> <span class="nx">time</span><span class="o">:</span> <span class="mf">0.501</span> <span class="nx">secs</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>是不是很爽，这样是不是就再也不用重启服务器了，开发速度瞬间提升好几万战斗力。</p>
+
+<p>加一句，该插件同样支持properties文件的改变，与XML一样配置。</p>
+
+<p>好吧，就到这里，我觉得热部署也算的上某种自动化开发的一部分，至少他们的目的一样，提升开发效率，得到快速反馈，希望这篇文章对大家有所帮助。</p>
+
+<p>参考资料：</p>
+
+<p>1.<a href="http://forums.gradle.org/gradle/topics/hot_deploy_with_jetty_plugins_jettyrun">http://forums.gradle.org/gradle/topics/hot_deploy_with_jetty_plugins_jettyrun</a></p>
+
+<p>2.<a href="http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.jetty.JettyRun.html">http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.jetty.JettyRun.html</a></p>
+
+<p>3.<a href="https://github.com/bluepapa32/gradle-watch-plugin">https://github.com/bluepapa32/gradle-watch-plugin</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -378,739 +657,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/19/spring-validation-by-example/">Spring Validation 深入浅出</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-07-19T19:12:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>7:12 pm</span></time>
-        
-           | <a href="/blog/2014/07/19/spring-validation-by-example/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2014/07/19/spring-validation-by-example/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在Web开发中，一个重要的特性，那就是对表单提交的内容进行合法性校验。</p>
-
-<p>校验的方式根据方式的不同，分为两类：前端校验和后端校验。</p>
-
-<p>前端校验的优点是，不用与服务器交互，由JavaScript直接对页面元素中的内容进行校验，速度更快。但这种方式的安全性不高，对于了解web开发的人可以通过修改页面内容的方式绕过前端验证。</p>
-
-<p>后端验证需要表单提交，一般情况下会刷新页面，对于用户体验不是太理想。</p>
-
-<p>所以，一般前端验证会和后端验证会配合在一起。</p>
-
-<p>今天我们一起来学习一下，在Spring MVC中，是如何进行后端的校验，它又是如何通过Spring提供的Form标签，将错误警告信息传递到前端来显示。</p>
-
-<h2><strong>基本了解</strong></h2>
-
-<p>我们先来简单的写一个demo，这种HelloWorld式例子最容易让人有信心去理解和学习，要实现它，你只需要了解下面五样或者四样东西。</p>
-
-<p><strong>一个重要的包：</strong></p>
-
-<p>Spring框架中有一个非常重要的包，org.springframework.validation，它提供了两个重要的特性：数据绑定和校验。</p>
-
-<p>数据绑定允许用户的输入动态的绑定到应用的领域模型，实现字符串类型和其他类型的转换。</p>
-
-<p>在Spring MVC，数据绑定机制允许你使用任何的命令对象或者表单对象-你不需要实现一个框架指定的接口或者类。</p>
-
-<p><strong>一个重要接口：</strong></p>
-
-<p>Errors：用于存储和暴露于某个对象相关的数据绑定和错误校验信息。</p>
-
-<p><strong>一个重要的类：</strong></p>
-
-<p>BeanPropertyBindingResult：Spring中，Errors和BindingResult接口的默认实现类，主要给JavaBean对象的绑定错误进行注册和评估。</p>
-
-<p><strong>一个重要的Form标签：</strong></p>
-
-<p>&lt;form:errors>:这个标签会将对象field的错误渲染成一个HTML的span标签。它能够访问由Controller或者与Controller相关的的Validator创建出来的errors对象。（关于Validator，后面会介绍）</p>
-
-<p><strong>两个重要的函数：</strong></p>
-
-<p>那么，要在Controller中实现一个最简单的校验，并将校验结果显示在前端就非常简单了，你只需要在了解Errors接口的两个函数：</p>
-
-<p>reject():使用给定的错误描述信息，给这个目标对象注册一个全局的错误信息</p>
-
-<p>rejectValue()：使用给定的错误描述信息，注册一个field的错误到当前对象的某个指定field上（或者该对象的某个成员变量的field上，比如customer.name.firstName）。这个field名字也可以是null或者空串来说明是指定该对象而不是该对象的一个field（不过这样容易导致一些错误）。</p>
-
-<p>看下面的例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:mvc=</span><span class="s">&quot;http://www.springframework.org/schema/mvc&quot;</span>
-</span><span class='line'>       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
-</span><span class='line'>       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/mvc</span>
-</span><span class='line'><span class="s">                    http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd</span>
-</span><span class='line'><span class="s">                    http://www.springframework.org/schema/beans</span>
-</span><span class='line'><span class="s">                    http://www.springframework.org/schema/beans/spring-beans-3.1.xsd</span>
-</span><span class='line'><span class="s">                    http://www.springframework.org/schema/context</span>
-</span><span class='line'><span class="s">                    http://www.springframework.org/schema/context/spring-context-3.1.xsd&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;me.zeph.springview.demo&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;viewResolver&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;viewClass&quot;</span> <span class="na">value=</span><span class="s">&quot;org.springframework.web.servlet.view.JstlView&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;prefix&quot;</span> <span class="na">value=</span><span class="s">&quot;/WEB-INF/view/&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;suffix&quot;</span> <span class="na">value=</span><span class="s">&quot;.jsp&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c">&lt;!-- bind your messages.properties --&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">&quot;messageSource&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.context.support.ResourceBundleMessageSource&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;basename&quot;</span> <span class="na">value=</span><span class="s">&quot;messages&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/bean&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;mvc:annotation-driven/&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这里唯一特殊的一点就是配置了一个ResourceBundle，它指向一个messages.properties文件，里面存放这校验错误码对应的信息。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>NotEmpty.customer.name=Name is required
-</span><span class='line'>NotEmpty.customer.password=Password is required
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.Customer</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.Errors</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">StringUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Controller</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ErrorController</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">ERROR</span> <span class="o">=</span> <span class="s">&quot;error&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">ERROR_SUCCESS</span> <span class="o">=</span> <span class="s">&quot;error-success&quot;</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;error&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">view</span><span class="o">(</span><span class="n">Customer</span> <span class="n">customer</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">ERROR</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;error&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">commit</span><span class="o">(</span><span class="n">Customer</span> <span class="n">customer</span><span class="o">,</span> <span class="n">Errors</span> <span class="n">errors</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">isEmpty</span><span class="o">(</span><span class="n">customer</span><span class="o">.</span><span class="na">getName</span><span class="o">()))</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">errors</span><span class="o">.</span><span class="na">rejectValue</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;NotEmpty.customer.name&quot;</span><span class="o">,</span> <span class="s">&quot;name is empty&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">isEmpty</span><span class="o">(</span><span class="n">customer</span><span class="o">.</span><span class="na">getPassword</span><span class="o">()))</span> <span class="o">{</span>
-</span><span class='line'>          <span class="n">errors</span><span class="o">.</span><span class="na">rejectValue</span><span class="o">(</span><span class="s">&quot;password&quot;</span><span class="o">,</span> <span class="s">&quot;NotEmpty.customer.password&quot;</span><span class="o">,</span> <span class="s">&quot;password is empty&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>      <span class="c1">//Just for demonstrating reject the object itself</span>
-</span><span class='line'>      <span class="n">errors</span><span class="o">.</span><span class="na">reject</span><span class="o">(</span><span class="s">&quot;customer.invalid&quot;</span><span class="o">,</span> <span class="s">&quot;Customer is invalid&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">errors</span><span class="o">.</span><span class="na">hasErrors</span><span class="o">()</span> <span class="o">?</span> <span class="n">ERROR</span> <span class="o">:</span> <span class="n">ERROR_SUCCESS</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在Controller里面，通过参数让Spring帮我们注入Errors对象（注意Errors作为参数的位置一定要在领域对象（表单对象）的后面，猜测原因是Spring需要知道Errors对象是与哪个对象绑定的）。这里自己写校验逻辑，然后调用errors的rejectValue方法，将错误信息保存起来。如果你在这里打断点，你会看到，Errors真正的类型是BeanPropertyBindingResult。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="err">&lt;</span>%@ taglib prefix=&quot;form&quot; uri=&quot;http://www.springframework.org/tags/form&quot; %&gt;
-</span><span class='line'><span class="err">&lt;</span>%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Spring MVC View Demo<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'><span class="nt">&lt;h1&gt;</span>Spring MVC View Demo<span class="nt">&lt;/h1&gt;</span>
-</span><span class='line'><span class="nt">&lt;form:form</span> <span class="na">commandName=</span><span class="s">&quot;customer&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">action=</span><span class="s">&quot;error&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;form:errors</span> <span class="na">path=</span><span class="s">&quot;*&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;name&quot;</span><span class="nt">&gt;</span>name :<span class="nt">&lt;/label&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;form:input</span> <span class="na">path=</span><span class="s">&quot;name&quot;</span> <span class="na">id=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;password&quot;</span><span class="nt">&gt;</span>password :<span class="nt">&lt;/label&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;form:password</span> <span class="na">path=</span><span class="s">&quot;password&quot;</span> <span class="na">id=</span><span class="s">&quot;password&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;submit&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;/form:form&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>path=&ldquo;*&rdquo; - 显示全部的内容</strong>   <br/>
-<strong>path=&ldquo;name&rdquo; - 显示与name这个field相关的错误信息</strong><br/>
-<strong>如果path不填 - 只显示与表单对象本身相关的错误信息</strong></p>
-
-<p>到这里，你就可以去试一试，看能不能正常显示出你想要的信息。但是是不是到这里就为止了呢？远远没有。这只是Spring Validation最根本和最简单的实现，这种方式并不被Spring推荐，我们继续。</p>
-
-<h2><strong>JSR-303</strong></h2>
-
-<p>在Spring 3.0之后，Spring Validation的功能增强了，支持结合使用JSR-303标准进行校验。</p>
-
-<p>先讲讲什么是JSR-303，它是Java标准中Bean Validation的1.0版本。</p>
-
-<p>它可以让你通过注解的方式来对对象模型添加限制，它提供的开箱即用的常用限制注解，同时也允许你写自己的限制规则。</p>
-
-<p>不过就像之前学习的，它只是标准，具体实现由第三方提供，默认的参考实现是Hibernate Validator。</p>
-
-<p>结合JSR-303，对表单的对象的校验就是成为了简单的给领域对象添加限定规则的注解。</p>
-
-<p>来看看怎么写</p>
-
-<p>首先给领域对象的field添加你需要的注解</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">domain</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.hibernate.validator.constraints.NotEmpty</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@NotEmpty</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="nd">@NotEmpty</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">password</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getPassword</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">password</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPassword</span><span class="o">(</span><span class="n">String</span> <span class="n">password</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">password</span> <span class="o">=</span> <span class="n">password</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>接下来，Controller就简单了，没有写任何校验逻辑。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.User</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.Errors</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.validation.Valid</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Controller</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ValidController</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VALID</span> <span class="o">=</span> <span class="s">&quot;valid&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VALID_SUCCESS</span> <span class="o">=</span> <span class="s">&quot;valid-success&quot;</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;valid&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">view</span><span class="o">(</span><span class="n">User</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">VALID</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;valid&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">commit</span><span class="o">(</span><span class="nd">@Valid</span> <span class="n">User</span> <span class="n">user</span><span class="o">,</span> <span class="n">Errors</span> <span class="n">errors</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">errors</span><span class="o">.</span><span class="na">hasErrors</span><span class="o">()</span> <span class="o">?</span> <span class="n">VALID</span> <span class="o">:</span> <span class="n">VALID_SUCCESS</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>看下面的错误码和消息的写法，你应该知道JSR-303生成错误码的规则。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">NotEmpty</span><span class="o">.</span><span class="na">user</span><span class="o">.</span><span class="na">name</span><span class="o">=</span><span class="n">Name</span> <span class="n">is</span> <span class="n">required</span>
-</span><span class='line'><span class="n">NotEmpty</span><span class="o">.</span><span class="na">user</span><span class="o">.</span><span class="na">password</span><span class="o">=</span><span class="n">Password</span> <span class="n">is</span> <span class="n">required</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果你觉得它提供的注解不够你用，你还可以写自己的注解，具体的内容就不在这里谈了，这是JSR-303的内容。如果你想了解，可以参考Hibernate Validation的指南： <a href="http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#validator-customconstraints">http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#validator-customconstraints</a></p>
-
-<p>还没讲完呢，继续深入。</p>
-
-<h2><strong>深入理解</strong></h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="n">String</span> <span class="nf">commit</span><span class="o">(</span><span class="nd">@Valid</span> <span class="n">User</span> <span class="n">user</span><span class="o">,</span> <span class="n">Errors</span> <span class="n">errors</span><span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>看到没，在我们的领域对象User上有一个注解@Valid，它是JSR-303标准API提供的。</p>
-
-<p>在Spring3.0之后，Spring MVC提供了一种能力可以让Controller输入参数进行自动的校验，之前后需要我们自己去触发校验逻辑。方法就是在输入参数加一个@Valid注解。</p>
-
-<p>关于Spring Validation与JSR-303的结合使用，暂时到这里，我们再来看点别的。如果你也在学习Spring的Validation，那么你肯定会看到Spring的文档的第六章（ <a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/validation.html">http://docs.spring.io/spring/docs/current/spring-framework-reference/html/validation.html</a> ）。</p>
-
-<p>它没有像我这样讲解Errors对象，讲解form怎么显示错误信息，而是介绍了一个Validator接口。那它是什么呢？</p>
-
-<p>如果你有看它的API的解释，它会告诉你，它只是一个单纯的接口，期待将校验逻辑与web层，数据访问层解耦，它提供两个方法supports和validate。</p>
-
-<p>根据它在指南中给的信息，我写出来下面的这段代码。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.Account</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.validator.AccountValidator</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.Errors</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.validation.Valid</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Controller</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ValidatorController</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Autowired</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">AccountValidator</span> <span class="n">accountValidator</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VALIDATOR</span> <span class="o">=</span> <span class="s">&quot;validator&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VALIDATOR_SUCCESS</span> <span class="o">=</span> <span class="s">&quot;validator-success&quot;</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;validator&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">view</span><span class="o">(</span><span class="n">Account</span> <span class="n">account</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">VALIDATOR</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;validator&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">commit</span><span class="o">(</span><span class="n">Account</span> <span class="n">account</span><span class="o">,</span> <span class="n">Errors</span> <span class="n">errors</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">accountValidator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="n">account</span><span class="o">,</span> <span class="n">errors</span><span class="o">);</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">errors</span><span class="o">.</span><span class="na">hasErrors</span><span class="o">()</span> <span class="o">?</span> <span class="n">VALIDATOR</span> <span class="o">:</span> <span class="n">VALIDATOR_SUCCESS</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">validator</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.Account</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.Errors</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.ValidationUtils</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.Validator</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Component</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AccountValidator</span> <span class="kd">implements</span> <span class="n">Validator</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">supports</span><span class="o">(</span><span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">clazz</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">Account</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">clazz</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">validate</span><span class="o">(</span><span class="n">Object</span> <span class="n">target</span><span class="o">,</span> <span class="n">Errors</span> <span class="n">errors</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">ValidationUtils</span><span class="o">.</span><span class="na">rejectIfEmpty</span><span class="o">(</span><span class="n">errors</span><span class="o">,</span> <span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;NotEmpty.account.name&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">ValidationUtils</span><span class="o">.</span><span class="na">rejectIfEmpty</span><span class="o">(</span><span class="n">errors</span><span class="o">,</span> <span class="s">&quot;password&quot;</span><span class="o">,</span> <span class="s">&quot;NotEmpty.account.password&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>和我写的第一个例子比较，是不是很简洁，将校验逻辑和Controller分离。</p>
-
-<p>等等，你这只是分了一个Service层来专门做校验，你在Controller层还是手动触发了校验逻辑，哪里像Validator API中说的那么理想，完全解耦了。</p>
-
-<p>那是因为我写错了，正确的写法应该是这样的。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">springview</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">controller</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.domain.Account</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.springview.demo.validator.AccountValidator</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.validation.Errors</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.WebDataBinder</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.InitBinder</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.validation.Valid</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">springframework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">bind</span><span class="o">.</span><span class="na">annotation</span><span class="o">.</span><span class="na">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nd">@Controller</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ValidatorController</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Autowired</span>
-</span><span class='line'>  <span class="kd">private</span> <span class="n">AccountValidator</span> <span class="n">accountValidator</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VALIDATOR</span> <span class="o">=</span> <span class="s">&quot;validator&quot;</span><span class="o">;</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">VALIDATOR_SUCCESS</span> <span class="o">=</span> <span class="s">&quot;validator-success&quot;</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@InitBinder</span>
-</span><span class='line'>  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">initBinder</span><span class="o">(</span><span class="n">WebDataBinder</span> <span class="n">binder</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">binder</span><span class="o">.</span><span class="na">setValidator</span><span class="o">(</span><span class="n">accountValidator</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;validator&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">view</span><span class="o">(</span><span class="n">Account</span> <span class="n">account</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">VALIDATOR</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;validator&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">commit</span><span class="o">(</span><span class="nd">@Valid</span> <span class="n">Account</span> <span class="n">account</span><span class="o">,</span> <span class="n">Errors</span> <span class="n">errors</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">errors</span><span class="o">.</span><span class="na">hasErrors</span><span class="o">()</span> <span class="o">?</span> <span class="n">VALIDATOR</span> <span class="o">:</span> <span class="n">VALIDATOR_SUCCESS</span><span class="o">;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面的代码说明了两件事情：</p>
-
-<p>1.我在Account的前面加了@Valid，导致自动触发校验过程<br/>
-2.校验逻辑是由我写的Validator实现</p>
-
-<p>你先不要去想@InitBinder是干什么，简单的说，它是Controller中的一个回调函数，Controller容器会在Controller的生命周期的某个阶段调用它。</p>
-
-<p>WebDataBinder到是可以看看，它是web请求参数转换为JavaBean对象时，使用的特殊的数据绑定（DataBinder）对象。因为我们这里不涉及到数据绑定的内容，所以不细聊，但是你可以想象，该数据绑定的过程，必然在进入Controller的某个请求方法之前完成的（因为Spring必须在给我们注入领域对象啊）。</p>
-
-<h3><strong>回头想一个问题</strong></h3>
-
-<p>好了，如果这里你想清楚了，可以再回头想一个问题，前面使用JSR-303方式定义校验，怎么没有定义一个Validator呢？</p>
-
-<p>原因在这个对象：LocalValidatorFactoryBean，它是Spring为支持JSR-303标准专门实现的一个类，为了同时支持Spring的Validation机制和JSR-303，它同时实现了Spring的Validator接口和JSR-303中Validator接口（这两个不一样哦）。</p>
-
-<p>那么，如果我要使用JSR-303标准，需要显示的在容器中声明这个bean吗？需要也不需要。</p>
-
-<p>在你的xxx-servlet.xml中定义的&lt;mvc:annotation-driven/>标签会帮你声明。</p>
-
-<p>所以如果你在initBinder方法那打个断点，你可以看到WebDataBinder中的Validator对象就是LocalValidatorFactoryBean。</p>
-
-<p>现在是不是比较清楚了？</p>
-
-<h2><strong>再讲一个重要的东西</strong></h2>
-
-<p>还需要再讲一个东西：MessageCodesResolver和DefaultMessageCodesResolver</p>
-
-<p>MessageCodesResolver是从Validation的ErrorCode映射到MessageCode的策略接口，被DataBinder使用，给ObjectErrors和FieldErrors构建MessageCode列表。</p>
-
-<p>DefaultMessageCodesResolver是MessageCodesResolver提供的一个默认实现。</p>
-
-<p>策略是：</p>
-
-<p>针对object的错误，会去找两种错误信息码：</p>
-
-<p>1.code + &ldquo;.&rdquo; + object name<br/>
-2.code</p>
-
-<p>针对field的错误，会去找三种错误信息码：</p>
-
-<p>1.code + &ldquo;.&rdquo; + object name + &ldquo;.&rdquo; + field<br/>
-2.code + &ldquo;.&rdquo; + field<br/>
-3.code + &ldquo;.&rdquo; + field type<br/>
-4.code</p>
-
-<p>举例来说：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">//field, error code, default message</span>
-</span><span class='line'><span class="n">errors</span><span class="o">.</span><span class="na">rejectValue</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="s">&quot;NotEmpty&quot;</span><span class="o">,</span> <span class="s">&quot;name is empty&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">errors</span><span class="o">.</span><span class="na">rejectValue</span><span class="o">(</span><span class="s">&quot;password&quot;</span><span class="o">,</span> <span class="s">&quot;NotEmpty&quot;</span><span class="o">,</span> <span class="s">&quot;password is empty&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">errors</span><span class="o">.</span><span class="na">reject</span><span class="o">(</span><span class="s">&quot;Invalid&quot;</span><span class="o">,</span> <span class="s">&quot;Customer is invalid&quot;</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//messages.properties</span>
-</span><span class='line'><span class="n">NotEmpty</span><span class="o">=</span><span class="n">Name</span> <span class="n">is</span> <span class="n">required</span>
-</span><span class='line'><span class="n">NotEmpty</span><span class="o">.</span><span class="na">password</span><span class="o">=</span><span class="n">Password</span> <span class="n">is</span> <span class="n">required</span>
-</span><span class='line'><span class="n">Invalid</span><span class="o">=</span><span class="n">Customer</span> <span class="n">is</span> <span class="n">invalid</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>所以，如果你回过头去，看我写的第一个例子，实际上，它是使用的最后一个策略。</p>
-
-<p>好了，关于Spring Validation的基本内容到此为止，应该比较清楚了，如果你要正确使用它，应该没有任何问题。</p>
-
-<p>其实，我很早就想写这篇文章，一直拖到在项目上遇到问题，才促使我完成，实在惭愧。希望这篇文章对大家有所帮助</p>
-
-<p>参考资料：</p>
-
-<p>1.<a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/validation.html">http://docs.spring.io/spring/docs/current/spring-framework-reference/html/validation.html</a></p>
-
-<p>2.<a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/view.html">http://docs.spring.io/spring/docs/current/spring-framework-reference/html/view.html</a></p>
-
-<p>3.<a href="http://docs.spring.io/spring/docs/2.5.x/api/org/springframework/validation/package-summary.html">http://docs.spring.io/spring/docs/2.5.x/api/org/springframework/validation/package-summary.html</a></p>
-
-<p>4.<a href="http://docs.huihoo.com/spring/3.0.x/en-us/ch05s07.html">http://docs.huihoo.com/spring/3.0.x/en-us/ch05s07.html</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/45">&larr; Older</a>
@@ -1138,6 +684,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/20/deep-thinking-in-react-3/">React的思考（三）- 总结下shouldComponentUpdate</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/18/deep-thinking-in-react-2/">React的思考（二）- 逃不开的生命周期函数之构造函数</a>
       </li>
     
@@ -1151,10 +701,6 @@
     
       <li class="post">
         <a href="/blog/2017/11/23/gradle-resource-filtering/">Gradle对资源的过滤处理</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/07/01/understand-promise/">理解ES6 Promise</a>
       </li>
     
   </ul>

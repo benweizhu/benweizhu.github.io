@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Web Debug - NO END FOR LEARNING</title>
+  <title>React的思考（三）- 总结下shouldComponentUpdate - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="
-">
+  <meta name="description" content="Google来，百度去，原来网上已经有一大堆讲解shouldComponentUpdate的文章，差点就打算放弃了，为了学习精神，那我就集百家之长，小总结一下。 它的作用 首先，简单说一下shouldComponentUpdate的作用（如果你已经知道，请不要跳过，帮助我审查下有没有描述错误） 1 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io/blog/2017/04/26/web-debug">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2018/04/20/deep-thinking-in-react-3">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -68,7 +67,7 @@
   
   <header>
     
-      <h1 class="entry-title">Web Debug</h1>
+      <h1 class="entry-title">React的思考（三）- 总结下shouldComponentUpdate</h1>
     
     
       <p class="meta">
@@ -77,7 +76,7 @@
 
 
 
-<time class='entry-date' datetime='2017-04-26T21:18:54+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>9:18 pm</span></time>
+<time class='entry-date' datetime='2018-04-20T11:10:09+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>11:10 am</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://benweizhu.github.io">Comments</a>
@@ -87,7 +86,65 @@
   </header>
 
 
-<div class="entry-content">
+<div class="entry-content"><p>Google来，百度去，原来网上已经有一大堆讲解shouldComponentUpdate的文章，差点就打算放弃了，为了学习精神，那我就集百家之长，小总结一下。</p>
+
+<h3>它的作用</h3>
+
+<p>首先，简单说一下shouldComponentUpdate的作用（如果你已经知道，请不要跳过，帮助我审查下有没有描述错误）</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">shouldComponentUpdate</span><span class="p">(</span><span class="nx">nextProps</span><span class="p">,</span> <span class="nx">nextState</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>extends React.Component和写Functional Stateless Component（它不能复写shouldComponentUpdate），shouldComponentUpdate默认都是返回true。</p>
+
+<p>这意味着，当props或者state更新时，该组件一定会调用render方法。</p>
+
+<p>也就意味着，React一定会去对比该组件节点上的VisualDOM，但是，不一定会去更新真实DOM，因为reconciliation的结果可能是相等的。（一致性对比，对比新返回的元素是否和之前的元素是否一样）</p>
+
+<p>如果，你将shouldComponentUpdate复写，返回false，那么componentWillUpdate()，render()和componentDidUpdate()都不会被调用，那么该组件不会更新。</p>
+
+<p>当shouldComponentUpdate返回true，这个过程是向叶子节点传递的，比如：父节点返回true，它有两个叶子节点A和B，那么A和B会被要求执行mount或者update的生命周期，如果A的shouldComponentUpdate返回false，B返回true，那么只有B更新。</p>
+
+<p>React官方的<a href="https://reactjs.org/docs/optimizing-performance.html#shouldcomponentupdate-in-action" title="ShouldComponentUpdate In Action">ShouldComponentUpdate In Action</a>讲解的很清楚。</p>
+
+<h3>逃生出口</h3>
+
+<p>听起来貌似很有道理，谁不希望减少无谓的计算，提高性能。</p>
+
+<p>然而，我又看到这样一句话：React team called shouldComponentUpdate an &ldquo;escape hatch&#8221;（逃生出口）instead of &#8220;turbo button&#8221;（涡轮增压按钮）。在 github issue <a href="https://github.com/facebook/react/issues/5677" title="Stateless functional components and shouldComponentUpdate">Stateless functional components and shouldComponentUpdate</a>上也有人这么说。
+听上去总结起来，有两个原因：</p>
+
+<p>1.维护自定义的shouldComponentUpdate成本太高，有可能加了一个新的prop，但是忘记更新shouldComponentUpdate的代码，导致bug   <br/>
+2.也许shouldComponentUpdate的比较计算逻辑比起直接重新render更加浪费性能</p>
+
+<h3>尴尬了</h3>
+
+<p>那这就尴尬了，这到底是写还是不写呢？当被问到这个问题的时候，永远都有一个正确但不受人欢迎的答案：“Well, it depends”（好吧，看情况）。</p>
+
+<h3>React.Component，PureComponent和Function</h3>
+
+<p>与其思考这个没有人能够给出准确答案的问题，不如我们思考怎么样结合对shouldComponentUpdate的理解，合理的写组件，设计合理的状态结构树。</p>
+
+<p>大家对React.Component和Functional Stateless Component比较熟，一个就是extends React.Component，一个就是函数，前面也说了，它们的shouldComponentUpdate永远返回true。</p>
+
+<p>React里还有一个顶级的组件API：<a href="https://reactjs.org/docs/react-api.html#reactpurecomponent" title="PureComponent">PureComponent</a>。
+这个PureComponent，对shouldComponentUpdate有一个默认实现，官方称为shallow的prop和state对比。啥意思呢？就是帮你对比this.props和this.state上的第一层叶子节点的引用。</p>
+
+<p>如果，某一个叶子节点里面深层的一个元素改变了，而该叶子节点本身的引用没变，shouldComponentUpdate是检查不出来的。</p>
+
+<p>什么类型的组件比较适合写成PureComponent呢？比如：基础组件Button，它本身的属性就相对简单，完全可以和普通HTML的button元素相似，这样就可以将组件的属性拍平一层展现，用PureComponent正好满足shallow对比。</p>
+
+<h3>总结</h3>
+
+<p>一切不分析性能瓶颈而做的性能优化，都是无用功，shouldComponentUpdate不一定是你的性能瓶颈，但是，我们在这里讨论shouldComponentUpdate，为React组件的更新的问题开了一个头，后面介绍Redux和Object.assign还会在提到组件（不）更新的问题。</p>
+
+<p>周五了，祝大家周末愉快。</p>
 </div>
 
 
@@ -103,7 +160,7 @@
 
 
 
-<time class='entry-date' datetime='2017-04-26T21:18:54+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>9:18 pm</span></time>
+<time class='entry-date' datetime='2018-04-20T11:10:09+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>11:10 am</span></time>
       
 
 
@@ -111,7 +168,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2017/04/26/web-debug/" data-via="" data-counturl="http://benweizhu.github.io/blog/2017/04/26/web-debug/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2018/04/20/deep-thinking-in-react-3/" data-via="" data-counturl="http://benweizhu.github.io/blog/2018/04/20/deep-thinking-in-react-3/" >Tweet</a>
   
   
   
@@ -120,10 +177,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2017/04/15/website-effecient/" title="Previous Post: 前端不止系列 - 时间都去哪了？">&laquo; 前端不止系列 - 时间都去哪了？</a>
+        <a class="basic-alignment left" href="/blog/2018/04/18/deep-thinking-in-react-2/" title="Previous Post: React的思考（二）- 逃不开的生命周期函数之构造函数">&laquo; React的思考（二）- 逃不开的生命周期函数之构造函数</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2017/04/26/web-vr/" title="Next Post: 技术雷达之Web VR浅尝">技术雷达之Web VR浅尝 &raquo;</a>
       
     </p>
   </footer>
@@ -226,8 +281,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://benweizhu.github.io/blog/2017/04/26/web-debug/';
-        var disqus_url = 'http://benweizhu.github.io/blog/2017/04/26/web-debug/';
+        var disqus_identifier = 'http://benweizhu.github.io/blog/2018/04/20/deep-thinking-in-react-3/';
+        var disqus_url = 'http://benweizhu.github.io/blog/2018/04/20/deep-thinking-in-react-3/';
         var disqus_script = 'embed.js';
       
     (function () {

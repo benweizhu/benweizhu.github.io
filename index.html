@@ -9,23 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="这一定是一个老生常谈的话题，你们就别多想了，跟我一起回顾一遍，看我说的有没有道理。 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-class Timer extends React.Component { constructor(props) { super( &hellip;">
+  <meta name="description" content="Google来，百度去，原来网上已经有一大堆讲解shouldComponentUpdate的文章，差点就打算放弃了，为了学习精神，那我就集百家之长，小总结一下。 它的作用 首先，简单说一下shouldComponentUpdate的作用（如果你已经知道，请不要跳过，帮助我审查下有没有描述错误） 1 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -80,6 +64,96 @@ class Timer extends React.Component { constructor(props) { super( &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2018/04/20/deep-thinking-in-react-3/">React的思考（三）- 总结下shouldComponentUpdate</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2018-04-20T11:10:09+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>11:10 am</span></time>
+        
+           | <a href="/blog/2018/04/20/deep-thinking-in-react-3/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/20/deep-thinking-in-react-3/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Google来，百度去，原来网上已经有一大堆讲解shouldComponentUpdate的文章，差点就打算放弃了，为了学习精神，那我就集百家之长，小总结一下。</p>
+
+<h3>它的作用</h3>
+
+<p>首先，简单说一下shouldComponentUpdate的作用（如果你已经知道，请不要跳过，帮助我审查下有没有描述错误）</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">shouldComponentUpdate</span><span class="p">(</span><span class="nx">nextProps</span><span class="p">,</span> <span class="nx">nextState</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>extends React.Component和写Functional Stateless Component（它不能复写shouldComponentUpdate），shouldComponentUpdate默认都是返回true。</p>
+
+<p>这意味着，当props或者state更新时，该组件一定会调用render方法。</p>
+
+<p>也就意味着，React一定会去对比该组件节点上的VisualDOM，但是，不一定会去更新真实DOM，因为reconciliation的结果可能是相等的。（一致性对比，对比新返回的元素是否和之前的元素是否一样）</p>
+
+<p>如果，你将shouldComponentUpdate复写，返回false，那么componentWillUpdate()，render()和componentDidUpdate()都不会被调用，那么该组件不会更新。</p>
+
+<p>当shouldComponentUpdate返回true，这个过程是向叶子节点传递的，比如：父节点返回true，它有两个叶子节点A和B，那么A和B会被要求执行mount或者update的生命周期，如果A的shouldComponentUpdate返回false，B返回true，那么只有B更新。</p>
+
+<p>React官方的<a href="https://reactjs.org/docs/optimizing-performance.html#shouldcomponentupdate-in-action" title="ShouldComponentUpdate In Action">ShouldComponentUpdate In Action</a>讲解的很清楚。</p>
+
+<h3>逃生出口</h3>
+
+<p>听起来貌似很有道理，谁不希望减少无谓的计算，提高性能。</p>
+
+<p>然而，我又看到这样一句话：React team called shouldComponentUpdate an &ldquo;escape hatch&#8221;（逃生出口）instead of &#8220;turbo button&#8221;（涡轮增压按钮）。在 github issue <a href="https://github.com/facebook/react/issues/5677" title="Stateless functional components and shouldComponentUpdate">Stateless functional components and shouldComponentUpdate</a>上也有人这么说。
+听上去总结起来，有两个原因：</p>
+
+<p>1.维护自定义的shouldComponentUpdate成本太高，有可能加了一个新的prop，但是忘记更新shouldComponentUpdate的代码，导致bug   <br/>
+2.也许shouldComponentUpdate的比较计算逻辑比起直接重新render更加浪费性能</p>
+
+<h3>尴尬了</h3>
+
+<p>那这就尴尬了，这到底是写还是不写呢？当被问到这个问题的时候，永远都有一个正确但不受人欢迎的答案：“Well, it depends”（好吧，看情况）。</p>
+
+<h3>React.Component，PureComponent和Function</h3>
+
+<p>与其思考这个没有人能够给出准确答案的问题，不如我们思考怎么样结合对shouldComponentUpdate的理解，合理的写组件，设计合理的状态结构树。</p>
+
+<p>大家对React.Component和Functional Stateless Component比较熟，一个就是extends React.Component，一个就是函数，前面也说了，它们的shouldComponentUpdate永远返回true。</p>
+
+<p>React里还有一个顶级的组件API：<a href="https://reactjs.org/docs/react-api.html#reactpurecomponent" title="PureComponent">PureComponent</a>。
+这个PureComponent，对shouldComponentUpdate有一个默认实现，官方称为shallow的prop和state对比。啥意思呢？就是帮你对比this.props和this.state上的第一层叶子节点的引用。</p>
+
+<p>如果，某一个叶子节点里面深层的一个元素改变了，而该叶子节点本身的引用没变，shouldComponentUpdate是检查不出来的。</p>
+
+<p>什么类型的组件比较适合写成PureComponent呢？比如：基础组件Button，它本身的属性就相对简单，完全可以和普通HTML的button元素相似，这样就可以将组件的属性拍平一层展现，用PureComponent正好满足shallow对比。</p>
+
+<h3>总结</h3>
+
+<p>一切不分析性能瓶颈而做的性能优化，都是无用功，shouldComponentUpdate不一定是你的性能瓶颈，但是，我们在这里讨论shouldComponentUpdate，为React组件的更新的问题开了一个头，后面介绍Redux和Object.assign还会在提到组件（不）更新的问题。</p>
+
+<p>周五了，祝大家周末愉快。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -481,106 +555,6 @@ class Timer extends React.Component { constructor(props) { super( &hellip;">
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2018/04/17/deep-thinking-in-react-1/">React的思考（一）- 官网首页的信息量就挺大</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2018-04-17T21:11:23+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>9:11 pm</span></time>
-        
-           | <a href="/blog/2018/04/17/deep-thinking-in-react-1/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/17/deep-thinking-in-react-1/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>没错，这个标题有些大的，也挺抽象，给自己画了一个大饼，就看能不能给圆上。</p>
-
-<h2>从官网的首页开始</h2>
-
-<h3>先看小标题</h3>
-
-<p>我们就从<a href="https://reactjs.org/" title="React">React</a>官方网站的首页开始我们的思考。先看它的小标题：</p>
-
-<blockquote><p>A JavaScript library for building user interfaces。</p></blockquote>
-
-<p>React从一开始就将自己到底是一个什么样的存在，定义的非常的清楚。看清楚，我不是一个框架，我就是一个JavaScript的库，那我是干什么用的呢？构建用户的界面（UI），其他的乱七八糟的事情我不管。</p>
-
-<p>有人可能会问，其他乱七八糟事情的是什么？比如：页面的路由，网络请求，逻辑控制器（Controller），服务等等，是不是听起来挺像前几年某A打头的框架做的事情，这里我就不点名了，大家心里都清楚，没有谁对谁错，此一时彼一时的。</p>
-
-<p>为什么React是这样的一个定义呢？关于这一点，我们可以在Pete Hunt在2013年5月份写的一篇博客<a href="https://reactjs.org/blog/2013/06/05/why-react.html" title="Why did we build React?">Why did we build React?</a>中看到一些insight。比如：
-简单摘录一段：</p>
-
-<p><em>React isn’t an MVC framework.</em></p>
-
-<p><em>React is a library for building composable user interfaces. It encourages the creation of reusable UI components which present data that changes over time.</em></p>
-
-<p>鄙人简单理解和翻译：我不是MVC框架。React是一个用于构建可组合用户界面的库。它鼓励创建可重用的UI组件，以呈现随时间变化的数据。Pete Hunt将React的目的说的很透彻。</p>
-
-<p>React官网也通过这样一句话，给自己了一个清晰的定位，并且在这个清晰的定位下，给出下面三个基本特性：Declarative，Component-Based和Learn Once, Write Anywhere。我们一个个来看：</p>
-
-<h4>Declarative</h4>
-
-<p>Declarative，声明式的，嗯呐嗯呐，这是什么意思？相信大家对“声明”这个词比较了解，比如：声明一个变量，声明一个函数。</p>
-
-<p>要理解它，首先要引入另外一个东西，叫做Imperative Programming（命令式编程）。声明式编程和命令式编程，都是一种编程范式，那么他们的区别是什么？简单来说就是what和how的区别。</p>
-
-<p><em>命令式编程：命令“机器”如何去做事情(how)，这样不管你想要的是什么(what)，它都会按照你的命令实现。</em></p>
-
-<p><em>声明式编程：告诉“机器”你想要的是什么(what)，让“机器”想出如何去做(how)。</em></p>
-
-<p>命令式编程应该大家都比较好理解，比如：操作几个变量，最后计算出你想要的结果，这里的重点在于你通过指令操作它们得到结果。那么声明式呢？举个例子，比如，SQL语句：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='SQL'><span class='line'><span class="k">Select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">JSLibrary</span> <span class="k">where</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;React&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>你没告诉SQL该怎么去搜索，只是告诉它要找到名字是React的库，对吧？</p>
-
-<p>React就是采用声明式的编程范式思想，你只需要设计在不同状态下，组件应该是长什么样子，React自己会帮助完成组件的更新。它的最直接明白的对比（反面教材），就是通过jQuery操作DOM来更新UI。</p>
-
-<p>React的这种开发模式和有限状态机的思想是一致的，在预知所有状态的条件下，去规划你的代码，也因此衍生了Redux, MobX这样的状态管理库。</p>
-
-<h4>Component-Based</h4>
-
-<p>基于组件的，这个相对比较好理解，组件是什么？对数据和方法的简单封装。它应该具备具有独立性，封装性，可重用性，职责单一，有自己的状态等等。React组件就封装了自己的状态来构建复杂的UI的组件。</p>
-
-<p><em>Since component logic is written in JavaScript instead of templates, you can easily pass rich data through your app and keep state out of the DOM.</em></p>
-
-<p>官方网站上说：组件的逻辑是用JavaScript编写，而不是模板，所以你轻松的传递数据到应用，并且让状态不和DOM打交道。</p>
-
-<p>如果你十分好奇，这里的“而不是模板”是什么意思？Pete Hunt的那篇文章其实说的很清楚，传统的Web应用是通过HTML或者模板引擎（比如后端模板引擎：JSP，HAML等，前端模板引擎：handlebar,ejs等）来构建UI的，而React使用有完整功能编程语言来渲染视图。</p>
-
-<p>其实，我是不太认同的，JSX不算模板，VueTemplate不算模板？不过JSX允许你用JavaScript的方式做一些逻辑的处理，而不像JSP需要些JSTL和ctag的的逻辑标签，如果我的理解有误，请务必纠正我。</p>
-
-<h4>Learn Once, Write Anywhere</h4>
-
-<p>这个，看看就行，官方网站这里特指的是React Native可以开发移动端的应用，不过大家也不要太天真，你理解成React和React-Native的思想和语法是融会贯通的就行了，不要真的以为可以很轻松的将组件在React和RN之间移植，否则你会被鄙视的。</p>
-
-<p>另外提一点，在ElectronJS的帮助下，可以通过React开发桌面应用，这个倒是真可行。</p>
-
-<h3>总结</h3>
-
-<p>你看，首页的信息量其实挺大吧，认证阅读和思考，其实收获不少，总结下来就是：我是一个用来实现基于状态的UI组件的JavaScript库（妈呀，有点绕）。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -606,6 +580,10 @@ class Timer extends React.Component { constructor(props) { super( &hellip;">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/20/deep-thinking-in-react-3/">React的思考（三）- 总结下shouldComponentUpdate</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/18/deep-thinking-in-react-2/">React的思考（二）- 逃不开的生命周期函数之构造函数</a>
       </li>
     
@@ -619,10 +597,6 @@ class Timer extends React.Component { constructor(props) { super( &hellip;">
     
       <li class="post">
         <a href="/blog/2017/11/23/gradle-resource-filtering/">Gradle对资源的过滤处理</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/07/01/understand-promise/">理解ES6 Promise</a>
       </li>
     
   </ul>
