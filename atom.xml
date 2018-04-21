@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-04-20T22:33:20+08:00</updated>
+  <updated>2018-04-21T21:43:32+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,85 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[React的思考（四）- componentDidMakeSense之生命周期面试调侃]]></title>
+    <link href="http://benweizhu.github.io/blog/2018/04/21/deep-thinking-in-react-4/"/>
+    <updated>2018-04-21T20:51:50+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2018/04/21/deep-thinking-in-react-4</id>
+    <content type="html"><![CDATA[<p>看到一个老外的博客用了这样一个标题《componentDidMakeSense — React Component Lifecycle Explanation》，我只能说：老哥你太有才了，本来都不太想写这篇文章，冲你这个标题，我再啰嗦下生命周期。</p>
+
+<h3>没有水平的面试官老喜欢问的问题</h3>
+
+<p>“你能说一下React的生命周期函数调用过程吗？”</p>
+
+<p>“大哥，是不是我背出来，你就录用我？不是的话，你给我10秒钟，网不卡的话，我立马Google给你答案”</p>
+
+<p>手贱，给你们扩皮了一份。
+<strong>Mounting</strong></p>
+
+<p>constructor()  <br/>
+static getDerivedStateFromProps()  <br/>
+componentWillMount() / UNSAFE_componentWillMount()  <br/>
+render()  <br/>
+componentDidMount()</p>
+
+<p><strong>Updating</strong></p>
+
+<p>componentWillReceiveProps() / UNSAFE_componentWillReceiveProps()  <br/>
+static getDerivedStateFromProps()  <br/>
+shouldComponentUpdate()  <br/>
+componentWillUpdate() / UNSAFE_componentWillUpdate()  <br/>
+render() <br/>
+getSnapshotBeforeUpdate()  <br/>
+componentDidUpdate()</p>
+
+<p><strong>Unmounting</strong></p>
+
+<p>componentWillUnmount()</p>
+
+<p><strong>Error Handling</strong></p>
+
+<p>componentDidCatch()</p>
+
+<h3>你不如这样问</h3>
+
+<p>你那么问别人问题，既不实际，也很尴尬，别人还觉得你没水平。不如我们结合实际问些问题：</p>
+
+<p>1.组件需要做一次网络请求来获取数据，请问应该怎么写？组件有一些事件订阅放在哪个位置比较合适？为什么？</p>
+
+<p>2.在哪些生命周期函数里面我不应该调用setState？如果调用了，会导致什么样的问题？</p>
+
+<p>3.如果我这么写constructor来初始化对象会有什么问题？</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">color</span><span class="o">:</span> <span class="nx">props</span><span class="p">.</span><span class="nx">color</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>4.你以前的经历中，用到了哪些生命周期函数？遇到过什么奇怪的问题没有？</p>
+
+<p>等等，这样会显得你比较有水平，如果朋友们还问过其他类型的问题？请不惜赐教！我会好好收藏的。</p>
+
+<h3>其他参考资料</h3>
+
+<p>官方文档其实就是不错的和最准确的 <a href="https://reactjs.org/docs/react-component.html#the-component-lifecycle" title="the-component-lifecycle">the-component-lifecycle</a></p>
+
+<p>另外推荐看 <a href="https://reactarmory.com/guides/lifecycle-simulators">https://reactarmory.com/guides/lifecycle-simulators</a></p>
+
+<p>另外，放心，我这些面试问题都没有给答案，不会被套路的，大不了，我换个方式问。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[React的思考（三）- 总结下shouldComponentUpdate]]></title>
@@ -2839,109 +2918,6 @@ Mac OS X — an exception</p>
 <p>就是注意一点，这里提到Mac会有些不同。</p>
 
 <p>什么时候会用到呢？其实有很多，比如，安装mysql时，希望通过命令访问，就需要把mysql的路径放在path中。又比如，安装nvm时，配置nvm的命令。还有比如希望使用alias命令，添加一些快捷命令，也需要配置。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[在AWS上部署Jenkins]]></title>
-    <link href="http://benweizhu.github.io/blog/2016/06/27/host-jenkins-on-aws/"/>
-    <updated>2016-06-27T20:57:25+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2016/06/27/host-jenkins-on-aws</id>
-    <content type="html"><![CDATA[<h2>注册AWS账号</h2>
-
-<p><a href="https://aws.amazon.com">https://aws.amazon.com</a></p>
-
-<h2>通过信用卡验证</h2>
-
-<p>付款1刀</p>
-
-<h2>选择Region</h2>
-
-<p>美国东部（弗吉尼亚北部） <br/>
-美国西部（俄勒冈） <br/>
-美国西部（加利福尼亚北部） <br/>
-欧洲（爱尔兰） <br/>
-欧洲（法兰克福） <br/>
-亚太区域（新加坡） <br/>
-亚太区域（东京） <br/>
-亚太区域 (首尔) <br/>
-亚太区域（悉尼）<br/>
-南美洲（圣保罗）</p>
-
-<h2>AWS Identity and Access Management (IAM)</h2>
-
-<ul>
-<li>对您 AWS 账户的共享访问权限</li>
-<li>精细权限</li>
-<li>在 Amazon EC2 上运行的应用程序针对 AWS 资源的安全访问权限</li>
-<li>等等</li>
-</ul>
-
-
-<h3>创建用户</h3>
-
-<p><a href="https://console.aws.amazon.com/iam/home#home">https://console.aws.amazon.com/iam/home#home</a></p>
-
-<p>AWS分为根账号用户和IAM用户</p>
-
-<p>在账户中创建与组织中的用户对应的各IAM用户，而不是与他人共享您的根账户凭证。IAM用户不是单独的账户；它们是您账户中的用户。每个用户都可以有自己的密码以用于访问AWS管理控制台。您还可以为每个用户创建单独的访问密钥，以便用户可以发出编程请求以使用账户中的资源。</p>
-
-<p>可以将IAM用户组织为IAM组，然后将策略附加到组。这种情况下，各用户仍有自己的凭证，但是组中的所有用户都具有附加到组的权限。</p>
-
-<p>1.我创建了一个Administrators的组，并赋予AdministratorAccess权限。 <br/>
-2.创建一个用户，用户名：someuser，勾选：为每个用户生成访问密钥，用户需要访问密钥，以确保向 AWS 服务 API 提交安全的 REST 或查询协议请求。<br/>
-3.给用户分配用户组 <br/>
-4.设置用户的安全证书管理，即创建用户名密码访问权限和第二验证策略 <br/>
-5.下载用户密码安全凭证</p>
-
-<p>要使用AWS管理控制台的用户必须通过特定于您账户的登录页面登录到您的AWS账户。您需要为您的用户提供他们用于访问登录页面的URL地址。凭证中包含URL： <a href="https://My_AWS_Account_ID.signin.aws.amazon.com/console/">https://My_AWS_Account_ID.signin.aws.amazon.com/console/</a></p>
-
-<h3>创建EC2实例（我等穷人只能用免费的）</h3>
-
-<p>Amazon Elastic Compute Cloud (Amazon EC2) 在 Amazon Web Services (AWS) 云中提供可扩展的计算容量。使用 Amazon EC2 可避免前期的硬件投入，因此您能够快速开发和部署应用程序。通过使用 Amazon EC2，您可以根据自身需要启动任意数量的虚拟服务器、配置安全和网络以及管理存储。Amazon EC2 允许您根据需要进行缩放以应对需求变化或流行高峰，降低流量预测需求。</p>
-
-<p>1.用新用户登录： <a href="https://My_AWS_Account_ID.signin.aws.amazon.com/console/">https://My_AWS_Account_ID.signin.aws.amazon.com/console/</a> <br/>
-2.创建一个EC2实例<br/>
-3.选择一个Amazon系统映像（AMI），我选择Ubuntu的免费版 <br/>
-4.选择一个实例类型（计算资源），免费版只有1G内存，实在不够用 <br/>
-5.配置实例详细信息（我采用默认配置） <br/>
-6.选择存储大小，最大免费30G <br/>
-7.标签实例（我留空了） <br/>
-8.配置安全组，这里要注意了，只要配置SSH和TCP的8080端口（jenkins用） <br/>
-9.下载SSH证书</p>
-
-<p>SSH证书是用于SSH登录服务器的：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>ssh -i somepem.pem user@serveraddress
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>安装Jenkins</h2>
-
-<p>SSH登录到服务器上，然后运行下面的脚本：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget -q -O - https://jenkins-ci.org/debian/jenkins-ci.org.key <span class="p">|</span> sudo apt-key add -
-</span><span class='line'>sudo sh -c <span class="s1">&#39;echo deb http://pkg.jenkins-ci.org/debian-stable binary/ &gt; /etc/apt/sources.list.d/jenkins.list&#39;</span>
-</span><span class='line'>sudo apt-get update
-</span><span class='line'>sudo apt-get install jenkins
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>注意jenkins默认是8080端口，这就是上面安全组要配置的TCP的8080端口。</p>
-
-<p>然后，可以通过ip地址+8080端口。</p>
-
-<p>参考资料：  <br/>
-1. <a href="http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/concepts.html">http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/concepts.html</a>  <br/>
-2. <a href="http://docs.aws.amazon.com/zh_cn/IAM/latest/UserGuide/introduction.html">http://docs.aws.amazon.com/zh_cn/IAM/latest/UserGuide/introduction.html</a> <br/>
-3. <a href="http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/AMIs.html">http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/AMIs.html</a> <br/>
-4. <a href="https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins+on+Ubuntu">https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins+on+Ubuntu</a> <br/>
-5. <a href="http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html">http://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html</a></p>
 ]]></content>
   </entry>
   

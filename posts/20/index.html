@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="场景 在运行集成测试的时候，很可能会遇到这样一种情况： 本地的测试环境和持续集成服务器上的运行环境不同，最可能不同的的一种场景就是数据库服务器的配置不同，比如：host，端口，instance。 解决方案 这个时候，我希望，不同的环境下，使用不同的application. &hellip;">
+  <meta name="description" content="用了这么久的CI服务应用，Jenkins， Go pipeline，还没有自己尝试搭建一个。今天花点时间在本地搭建了Jenkins。 安装 以Mac版本为例： 打开： https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins ， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,149 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/11/10/make-jenkins-run-github-code/">配置Jenkins运行Github的仓库代码构建</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-11-10T13:38:27+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:38 pm</span></time>
+        
+           | <a href="/blog/2015/11/10/make-jenkins-run-github-code/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/11/10/make-jenkins-run-github-code/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>用了这么久的CI服务应用，Jenkins， Go pipeline，还没有自己尝试搭建一个。今天花点时间在本地搭建了Jenkins。</p>
+
+<h2>安装</h2>
+
+<p>以Mac版本为例：</p>
+
+<p>打开： <a href="https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins">https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins</a> ，下载Mac版本。</p>
+
+<p>安装完成之后，会直接启动 <a href="http://localhost:8080">http://localhost:8080</a> ，也就是说，Jenkins会默认启动8080端口作为服务端口。</p>
+
+<p>在mac下，如果你想要切换端口，你需要这么做：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">unload</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
+</span><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpPort</span> <span class="mi">8443</span>
+</span><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">load</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果切换成https，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpPort</span> <span class="mi">8443</span>
+</span><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpsKeyStore</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">keystore</span><span class="o">/</span><span class="nb">file</span>
+</span><span class='line'><span class="n">sudo</span> <span class="n">defaults</span> <span class="n">write</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Preferences</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span> <span class="n">httpsKeyStorePassword</span> <span class="o">&lt;</span><span class="n">keystore</span> <span class="n">password</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>你会发现，它们都有下面的两个命令，它们用来在mac中启动和关闭Jenkins服务：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">load</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
+</span><span class='line'><span class="n">sudo</span> <span class="n">launchctl</span> <span class="n">unload</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">LaunchDaemons</span><span class="o">/</span><span class="n">org</span><span class="o">.</span><span class="n">jenkins</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="n">plist</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>安装Github插件和配置项目第一个项目</h2>
+
+<p>安装完成之后，你可以点击new item来新建一个构建项目，选择Freestyle project。</p>
+
+<p>在Source Code Management中，你会发现，它CVS和Subversion的支持。没错，Jenkins默认并不支持Git配置。你需要安装Github Plugin。</p>
+
+<p>回到Jenkins服务器的首页，打开Manage Jenkins，里面有Manage Plugins。在Available Plugin中搜索GitHub plugin，安装并重启Jenkins（页面上又重启的checkbox，点击一下即可）。</p>
+
+<p>安装完成后，再次新建item，可以看GitHub project字段，Source Code Management中多了Git，Build Triggers中多了Build when a change is pushed to GitHub(但简单配置这个，还不能实现自动trigger，后面讲)。</p>
+
+<p>在Build那一栏，选择添加Build Step，在本例中选择python。</p>
+
+<p>我的项目是一个NodeJS项目，所以第一步是npm install。</p>
+
+<p>保存项目，回到项目栏，点击Schedule a build。</p>
+
+<h2>构建执行失败和Jenkins用户</h2>
+
+<p>正如这个小标题，构建执行失败了，你会发现失败的原因是command npm not found。</p>
+
+<p>NPM这个命令不存在，原因是Jenkins在执行该shell脚本的时候是以jenkins这个用户身份去执行，所以命令的PATH配置是不正确的。</p>
+
+<h2>Prepare Env Before Run</h2>
+
+<p>在运行前配置Jenkins运行命令的环境，有两种方式：</p>
+
+<p>1.直接在Prepare an environment for the run中配置   <br/>
+2.安装Environment Inject插件，在Inject environment variables to the build process中配置</p>
+
+<p>我这里配置了下node的bin，npm中的bin。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">PATH</span><span class="o">=</span><span class="err">$</span><span class="n">PATH</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">node</span><span class="o">/</span><span class="mf">0.12</span><span class="o">.</span><span class="mi">5</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">npm</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>A Blue Ball Appear，一个蓝色灯泡的故事</h2>
+
+<p>配置完成之后，再次执行，构建成功。但是构建的提示是一个蓝颜色的球。为什么是蓝色球呢？请看： <a href="http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls">http://jenkins-ci.org/content/why-does-jenkins-have-blue-balls</a></p>
+
+<p>当然我不太习惯，好在要换成绿色球也很简单，安装插件：Green Ball Plugin。</p>
+
+<h2>Pipeline插件</h2>
+
+<p>根据现代软件的开发方式，我们更习惯于构建CI以pipeline的方式呈现，pipeline中有不同的step，有可以自动的trigger，也有可以手动trigger，比如：部署到Test或者Production环境，理论上应该是手动的触发。</p>
+
+<p>这个时候，你需要安装Jenkins的pipeline插件。安装完成之后，回到首页，点击tab上的加号，添加一个tab，你就可以看到pipeline选项。</p>
+
+<p>新建一个pipeline的tab，需要你填写一些信息，比如：在pipeline页面一次显示多少个构建的pipeline，配置完成之后，你就可以看到pipeline页面了。</p>
+
+<p>在pipeline页面，你可以添加一个step，其实也就是新建一个item，选项可以是free style的，也可以从别现有项目copy生成。</p>
+
+<p>配置方式和新建一个item一样。</p>
+
+<p>配置完成之后，你可以在前一个项目的Post-build Actions中添加Build Other Projects，选择Trigger only if build is stable或者其他，填写被trigger的项目。</p>
+
+<p>这样就可以自动触发后续的step。</p>
+
+<h2>Clone Workspace</h2>
+
+<p>你肯定会发现，既然新的step就是一个新的item，那么不是要重新check out一次代码，而且之前build的archive也不在了。</p>
+
+<p>没错，这是个问题，这个时候，你需要安装Clone Workspace SCM Plugin，安装完成之后，你需要做两件事情：</p>
+
+<p>1.在upstream的项目中的Post-Build Actions中添加Achieve for Clone Workspace SCM <br/>
+2.在downstream的项目的Source Code Management中选择Clone Workspace</p>
+
+<h2>关于Build when a change is pushed to GitHub</h2>
+
+<p>简单的添加这个选项还不行，需要你在github的webhook中进行配置，方法在下面的链接中，但是前提是，需要配置的jenkins有url，如果是像我这样在本地配置的，可能就会有问题。
+<a href="http://thepracticalsysadmin.com/setting-up-a-github-webhook-in-jenkins/">http://thepracticalsysadmin.com/setting-up-a-github-webhook-in-jenkins/</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -255,177 +398,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-11-07T13:14:19+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:14 pm</span></time>
-        
-           | <a href="/blog/2015/11/07/coding-net-and-dao-cloud/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/11/07/coding-net-and-dao-cloud/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>昨天无意间搜索到一篇文章： <a href="http://blog.daocloud.io/daocloud_coding/">http://blog.daocloud.io/daocloud_coding/</a> DaoCloud完成与Coding对接</p>
-
-<p>这让我感到很兴奋，原因是我搜索的关键字是“coding.net 持续集成”。</p>
-
-<p>有一个项目放在coding平台的私有库中，一直没有做持续集成，如果是放在github的公有库，倒是可以用TravisCI做，但是这个项目不是开源的，一直希望找到一个国内的类似TravisCI的服务，直到昨天。</p>
-
-<h2>DaoCloud</h2>
-
-<p><img src="http://blog.daocloud.io/wp-content/uploads/2015/06/Logo_2.jpg" alt="Alt text" /></p>
-
-<p>DaoCloud 是业界领先的企业级容器云平台和解决方案提供商，致力于以 Docker 为代表的容器技术，为企业打造面向下一代互联网应用的交付和运维平台，帮助客户实现云端持续创新，&hellip;.，等等。就不帮别人打广告了。</p>
-
-<p>对我来说最重要的是：  <br/>
-DaoCloud 对接 GitHub、Coding、GitCafe 等国内外代码托管库，采用云端 SaaS 化服务，帮助开发者实现自动化持续集成测试和 Docker 容器镜像构建。DaoCloud 镜像构建服务基于全球分布式网路，构建速度极快，提供私有镜像存储空间，为容器化交付和跨团队合作奠定了基础。</p>
-
-<h3>如何使用</h3>
-
-<p>其实它提供的持续集成服务和TravisCI有点类似，至少从使用者的角度，是这么理解的。</p>
-
-<p>目前支持如下语言和服务：</p>
-
-<p>语言：Golang、Python、Ruby、Java、Javascript（NodeJS）、PHP、C（gcc） <br/>
-服务：MySQL、Redis、MongoDB</p>
-
-<p>服务指的意思是，比如：构建需要集成测试或者功能测试，那么它可以提供三种数据库供你使用。</p>
-
-<p>和TravisCI类似，需要你提供一个daocloud.yml，格式如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">image</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">daocloud/ci-golang:1.4</span>
-</span><span class='line'>
-</span><span class='line'><span class="l-Scalar-Plain">services</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">mongodb</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">mysql</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">redis</span>
-</span><span class='line'>
-</span><span class='line'><span class="l-Scalar-Plain">env</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">MYENV = &quot;hello&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="l-Scalar-Plain">install</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an install segment&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Here, we usually run scripts to setup a base environment&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;For customized base image, you need to install git here unless you have git installed in your base image&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;e.g., apt-get install -y git-core&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="l-Scalar-Plain">before_script</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an before_script segment&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Here, we usually run scripts to prepare our test&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an script segment&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Run test cases here&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Below shows how to use services, mongodb/mysql/redis are the hostnames of services&quot;</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 mongodb</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 mysql</span>
-</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 redis</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>image是指定构建运行的环境镜像，除了上面的go语言，还有其他node，java，php，ruby等，在文章底部的参考资料中可以找到。</p>
-
-<h3>服务</h3>
-
-<p>service也就是你需要的数据库服务了，举个例子，假设，你指定了mysql。那么它提供的mysql的配置如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="err">Version：MySQL</span> <span class="err">5.5</span>
-</span><span class='line'><span class="na">Docker Link Alias</span><span class="o">:</span> <span class="s">mysql</span>
-</span><span class='line'><span class="na">Host</span><span class="o">:</span> <span class="s">mysql</span>
-</span><span class='line'><span class="na">Port</span><span class="o">:</span> <span class="s">3306</span>
-</span><span class='line'><span class="na">UserName</span><span class="o">:</span> <span class="s">root</span>
-</span><span class='line'><span class="na">Password</span><span class="o">:</span> <span class="s">不设密码</span>
-</span><span class='line'><span class="na">Default Instance</span><span class="o">:</span> <span class="s">test</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>所以，项目中的测试在连接数据库的时候，也需要对应配置，否则就连接不上。</p>
-
-<h3>执行顺序</h3>
-
-<p>设置环境变量。 <br/>
-执行 install 脚本。 <br/>
-克隆源代码，切换到对应的提交。 <br/>
-执行 before_script 脚本。 <br/>
-执行 script 脚本。</p>
-
-<p>script脚本，也就是你的构建执行命令了，比如：./gradlew clean build</p>
-
-<p>配置完成后，提交代码，就可以触发CI构建。</p>
-
-<h2>微信提醒功能</h2>
-
-<p>DaoCloud还可以和微信绑定，提供构建状态提醒，这样就不需要Build TV，直接手机微信提醒。</p>
-
-<h2>结束语</h2>
-
-<p>我的项目花费了大概半天的时间，就配置成功了，当然这包括项目本身的一些配置，与平台无关。</p>
-
-<p>参考资料：  <br/>
-1.<a href="http://help.daocloud.io/features/continuous-integration/daocloud-yml.html">http://help.daocloud.io/features/continuous-integration/daocloud-yml.html</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/21">&larr; Older</a>
@@ -453,6 +425,10 @@ DaoCloud 对接 GitHub、Coding、GitCafe 等国内外代码托管库，采用�
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/21/deep-thinking-in-react-4/">React的思考（四）- componentDidMakeSense之生命周期面试调侃</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/20/deep-thinking-in-react-3/">React的思考（三）- 总结下shouldComponentUpdate</a>
       </li>
     
@@ -466,10 +442,6 @@ DaoCloud 对接 GitHub、Coding、GitCafe 等国内外代码托管库，采用�
     
       <li class="post">
         <a href="/blog/2018/01/22/go-cd-aliyun-spring-boot-docker/">如何用GoCD给阿里云的ECS配置Docker环境和部署SpringBoot的Docker应用到</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/11/23/gradle-resource-filtering/">Gradle对资源的过滤处理</a>
       </li>
     
   </ul>

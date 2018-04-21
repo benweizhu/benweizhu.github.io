@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>前端不止系列 - 时间都去哪了？ - NO END FOR LEARNING</title>
+  <title>React的思考（四）- componentDidMakeSense之生命周期面试调侃 - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="只有10%~20%的最终用户响应时间花在了下载HTML文档上，其余的80%~90%时间花在了下载页面中的所有组件上。 - 性能黄金法则，Steve Souders 性能黄金法则由《高性能网站建站指南》的作者Steve Souders在2007年提出。在2012年，他重新发表了一篇博客《The &hellip;">
+  <meta name="description" content="看到一个老外的博客用了这样一个标题《componentDidMakeSense — React Component Lifecycle Explanation》，我只能说：老哥你太有才了，本来都不太想写这篇文章，冲你这个标题，我再啰嗦下生命周期。 没有水平的面试官老喜欢问的问题 “ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io/blog/2017/04/15/website-effecient">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2018/04/21/deep-thinking-in-react-4">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -67,7 +67,7 @@
   
   <header>
     
-      <h1 class="entry-title">前端不止系列 - 时间都去哪了？</h1>
+      <h1 class="entry-title">React的思考（四）- componentDidMakeSense之生命周期面试调侃</h1>
     
     
       <p class="meta">
@@ -76,7 +76,7 @@
 
 
 
-<time class='entry-date' datetime='2017-04-15T18:58:04+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>6:58 pm</span></time>
+<time class='entry-date' datetime='2018-04-21T20:51:50+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2018</span></span> <span class='time'>8:51 pm</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://benweizhu.github.io">Comments</a>
@@ -86,11 +86,77 @@
   </header>
 
 
-<div class="entry-content"><p>只有10%~20%的最终用户响应时间花在了下载HTML文档上，其余的80%~90%时间花在了下载页面中的所有组件上。   - 性能黄金法则，Steve Souders</p>
+<div class="entry-content"><p>看到一个老外的博客用了这样一个标题《componentDidMakeSense — React Component Lifecycle Explanation》，我只能说：老哥你太有才了，本来都不太想写这篇文章，冲你这个标题，我再啰嗦下生命周期。</p>
 
-<p><img src="/images/performance/golden-top10.png" width="400" title="前十名网站" alt="Alt text" /></p>
+<h3>没有水平的面试官老喜欢问的问题</h3>
 
-<p>性能黄金法则由《高性能网站建站指南》的作者Steve Souders在2007年提出。在2012年，他重新发表了一篇博客<a href="https://www.stevesouders.com/blog/2012/02/10/the-performance-golden-rule/" title="《The Performance Golden Rule》">《The Performance Golden Rule》</a>，分析并统计排名前10，10个在10000排名左右网站的加载时间，并计算了在<a href="http://httparchive.org/index.php" title="HTTP Archive">HTTP Archive</a>上被抓取到的50000个网站的前后端耗时占比，而最终验证了自2007年提出的这个理念的准确性。</p>
+<p>“你能说一下React的生命周期函数调用过程吗？”</p>
+
+<p>“大哥，是不是我背出来，你就录用我？不是的话，你给我10秒钟，网不卡的话，我立马Google给你答案”</p>
+
+<p>手贱，给你们扩皮了一份。
+<strong>Mounting</strong></p>
+
+<p>constructor()  <br/>
+static getDerivedStateFromProps()  <br/>
+componentWillMount() / UNSAFE_componentWillMount()  <br/>
+render()  <br/>
+componentDidMount()</p>
+
+<p><strong>Updating</strong></p>
+
+<p>componentWillReceiveProps() / UNSAFE_componentWillReceiveProps()  <br/>
+static getDerivedStateFromProps()  <br/>
+shouldComponentUpdate()  <br/>
+componentWillUpdate() / UNSAFE_componentWillUpdate()  <br/>
+render() <br/>
+getSnapshotBeforeUpdate()  <br/>
+componentDidUpdate()</p>
+
+<p><strong>Unmounting</strong></p>
+
+<p>componentWillUnmount()</p>
+
+<p><strong>Error Handling</strong></p>
+
+<p>componentDidCatch()</p>
+
+<h3>你不如这样问</h3>
+
+<p>你那么问别人问题，既不实际，也很尴尬，别人还觉得你没水平。不如我们结合实际问些问题：</p>
+
+<p>1.组件需要做一次网络请求来获取数据，请问应该怎么写？组件有一些事件订阅放在哪个位置比较合适？为什么？</p>
+
+<p>2.在哪些生命周期函数里面我不应该调用setState？如果调用了，会导致什么样的问题？</p>
+
+<p>3.如果我这么写constructor来初始化对象会有什么问题？</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">color</span><span class="o">:</span> <span class="nx">props</span><span class="p">.</span><span class="nx">color</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>4.你以前的经历中，用到了哪些生命周期函数？遇到过什么奇怪的问题没有？</p>
+
+<p>等等，这样会显得你比较有水平，如果朋友们还问过其他类型的问题？请不惜赐教！我会好好收藏的。</p>
+
+<h3>其他参考资料</h3>
+
+<p>官方文档其实就是不错的和最准确的 <a href="https://reactjs.org/docs/react-component.html#the-component-lifecycle" title="the-component-lifecycle">the-component-lifecycle</a></p>
+
+<p>另外推荐看 <a href="https://reactarmory.com/guides/lifecycle-simulators">https://reactarmory.com/guides/lifecycle-simulators</a></p>
+
+<p>另外，放心，我这些面试问题都没有给答案，不会被套路的，大不了，我换个方式问。</p>
 </div>
 
 
@@ -106,7 +172,7 @@
 
 
 
-<time class='entry-date' datetime='2017-04-15T18:58:04+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>6:58 pm</span></time>
+<time class='entry-date' datetime='2018-04-21T20:51:50+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2018</span></span> <span class='time'>8:51 pm</span></time>
       
 
 
@@ -114,7 +180,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2017/04/15/website-effecient/" data-via="" data-counturl="http://benweizhu.github.io/blog/2017/04/15/website-effecient/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2018/04/21/deep-thinking-in-react-4/" data-via="" data-counturl="http://benweizhu.github.io/blog/2018/04/21/deep-thinking-in-react-4/" >Tweet</a>
   
   
   
@@ -123,10 +189,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2017/04/03/svg-and-icon-font/" title="Previous Post: 前端不止系列 - 请告诉我，你要什么样的图标">&laquo; 前端不止系列 - 请告诉我，你要什么样的图标</a>
+        <a class="basic-alignment left" href="/blog/2018/04/20/deep-thinking-in-react-3/" title="Previous Post: React的思考（三）- 总结下shouldComponentUpdate">&laquo; React的思考（三）- 总结下shouldComponentUpdate</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2017/04/26/web-debug/" title="Next Post: web debug">web debug &raquo;</a>
       
     </p>
   </footer>
@@ -229,8 +293,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://benweizhu.github.io/blog/2017/04/15/website-effecient/';
-        var disqus_url = 'http://benweizhu.github.io/blog/2017/04/15/website-effecient/';
+        var disqus_identifier = 'http://benweizhu.github.io/blog/2018/04/21/deep-thinking-in-react-4/';
+        var disqus_url = 'http://benweizhu.github.io/blog/2018/04/21/deep-thinking-in-react-4/';
         var disqus_script = 'embed.js';
       
     (function () {
