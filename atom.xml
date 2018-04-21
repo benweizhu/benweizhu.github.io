@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-04-21T21:43:32+08:00</updated>
+  <updated>2018-04-21T21:45:39+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -22,9 +22,9 @@
 
 <h3>没有水平的面试官老喜欢问的问题</h3>
 
-<p>“你能说一下React的生命周期函数调用过程吗？”</p>
+<p>面试官：“你能说一下React的生命周期函数调用过程吗？”</p>
 
-<p>“大哥，是不是我背出来，你就录用我？不是的话，你给我10秒钟，网不卡的话，我立马Google给你答案”</p>
+<p>我以及和我一样的人：“大哥，是不是我背出来，你就录用我？不是的话，你给我10秒钟，网不卡的话，我立马Google给你答案”</p>
 
 <p>手贱，给你们扩皮了一份。
 <strong>Mounting</strong></p>
