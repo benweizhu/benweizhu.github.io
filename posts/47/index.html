@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="JDBC（Java Data Base Connectivity，Java数据库连接）是一种用于执行SQL语句的Java API，可以为多种关系数据库提供统一访问，它由一组用Java语言编写的类和接口组成。 API 先来了解JDBC中几个非常重要的API（以下内容来自JDBC API中文文档， &hellip;">
+  <meta name="description" content="什么是命名服务？什么是目录服务？什么是命名服务的上下文？ 命名服务NS（Naming Service）是命名系统提供的服务功能，通过名字访问命名系统中的对象。 目录服务DS(Directory Service)是命名服务的扩展，它不仅把名字与对象对应在一起，并且把名字与对象属性(Attribute &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,351 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/07/07/learning-jdbc-with-jndi/">再次了解JDBC（中）- 引入JNDI</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-07-07T13:56:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>1:56 pm</span></time>
+        
+           | <a href="/blog/2014/07/07/learning-jdbc-with-jndi/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2014/07/07/learning-jdbc-with-jndi/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2><strong>什么是命名服务？什么是目录服务？什么是命名服务的上下文？</strong></h2>
+
+<p>命名服务NS（Naming Service）是命名系统提供的服务功能，通过名字访问命名系统中的对象。</p>
+
+<p>目录服务DS(Directory Service)是命名服务的扩展，它不仅把名字与对象对应在一起，并且把名字与对象属性(Attribute) 联系在一起，因此不仅可以通过名字还可以通过属性来搜索对象。</p>
+
+<p>对象名与对应的对象构成的集合叫对象上下文（Context）。
+例如，在文件命名系统中，一个目录就是一个Context，其内容是文件名（名）和对应的文件的集合。</p>
+
+<h2><strong>那什么是JNDI？</strong></h2>
+
+<p>Java Naming and Dirctory Interface - Java命名和目录接口，它是sun公司提出的方便应用程序访问命名和目录服务的的API。</p>
+
+<p>和其他设计一样，JNDI是接口API，它独立于任何命名或者目录服务的具体实现。这样，你就可以用相同的API去访问多种不同类型的命名和目录服务。</p>
+
+<p>根据它们作用的不同，典型应用场景也就分为两个部分：</p>
+
+<p>（1）将Java应用程序连接到外部的目录服务。</p>
+
+<p>（2）允许Java的Servlet在web容器中寻找定义配置信息。</p>
+
+<p>JNDI的架构是有一套API和一套SPI（Service Provider Interface）接口组成。Java应用程序使用JNDI API来访问不同的命名和目录服务。SPI则让不同的命名和目录服务可以透明和无缝插入，这样Java应用程序才能使用JNDI API来访问它们的服务。</p>
+
+<p><img class="center" src="/../images/jndi/arch.png"></p>
+
+<p>JNDI是包含在Java SE平台中。要使用JNDI，你必须有JNDI的类库和一个到多个服务提供商。JDK本身包含一些服务提供商：</p>
+
+<p>Lightweight Directory Access Protocol (LDAP)<br/>
+Common Object Request Broker Architecture (CORBA) Common Object Services (COS) name service<br/>
+Java Remote Method Invocation (RMI) Registry<br/>
+Domain Name Service (DNS)</p>
+
+<p>JNDI API是访问任何命名或者目录服务的通用API。实际访问一个命名或目录服务需要在JNDI下插入一个服务提供商。</p>
+
+<p>服务提供商是一个映射到JNDI API能实际调用命名或目录服务器的软件。一般情况，服务提供商的角色和命名或目录服务器的角色是不一样的。从C/S软件角度说，JNDI和服务器提供商是JNDI的客户端，命名或者目录服务器是服务端。</p>
+
+<p>客户端和服务器端交互的方式有很多。一种比较常用的方式是，使用网络协议。而服务器通常支持不同的客户端，不仅仅是JNDI的客户端，只是它们要遵循不同协议。JNDI也不规定JNDI客户端和服务端交互的方式。</p>
+
+<h2><strong>JDNI的Context（上下文）</strong></h2>
+
+<p>上下文这个概念在Java的开发中经常出现，比如，ServletContext，Spring的Context，Android中也有Context，JNDI也不例外。</p>
+
+<p>JNDI的上下文，依赖于一个重要的接口Context和一个重要的类InitialContext</p>
+
+<p>Context接口 它表示一个命名上下文，由一组名称到对象的绑定组成。它提供了查找，绑定，重命名，创建和销毁子上下文的接口。</p>
+
+<p>InitialContext类 所有命名操作都相对于某一上下文，它是JNDI提供的，执行命名和目录操作的初始上下文，是根上下文，为命名和目录服务提供起点。一旦你有了初始化上下文，你就可以去查找其他的上下文和对象。</p>
+
+<h2><strong>JNDI的环境变量</strong></h2>
+
+<p>JNDI需要定义许多环境变量来说明访问什么样的命名和目录服务。</p>
+
+<p>而为了简化设置JNDI应用需要的环境变量，应用程序组件和服务提供商会和资源文件一起发布。JNDI的资源文件就是常用的properties文件格式，包含的是键值对。</p>
+
+<p>JNDI的资源文件有两种类型：provider和application</p>
+
+<p>每个服务商都有一个可选的资源文件：[prefix/]jndiprovider.properties，这个prefix前缀是context实现类的包名。例如：</p>
+
+<p>com.sun.jndi.ldap.LdapCtx对应的资源文件是com/sun/jndi/ldap/jndiprovider.properties</p>
+
+<p>JNDI会使用ClassLoader.getResources()方法在应用程序的所有资源文件中查找一个叫jndi.properties的文件。该文件中定义的所有属性都会放到InitialContext里面，而其他的Context会继承自该InitialContext。</p>
+
+<p>当InitialContext被构建时，它的环境会被初始化，要么通过传递进来的HashMap参数，要么通过定义的Java应用properties文件。而IntialContext的具体实现是在运行时决定的，默认的策略是使用环境变量“java.naming.factory.initial”定义的InitContextFactory（工厂类）。</p>
+
+<p><strong>回到我们的例子当中：</strong></p>
+
+<p>那么在<a href="http://benweizhu.github.io/blog/2014/07/06/learning-jdbc/" title="再次了解JDBC（上）">上一篇</a>中，DataSource API文档里提到的“实现DataSource接口的对象通常在基于JavaTM Naming and Directory Interface(JNDI) API的命名服务中注册。”就是JNDI的第二种应用方式。</p>
+
+<p>我们使用的Apache Common的DBCP作为DataSource的实现，而DBCP也是Tomcat的数据库连接池组建，所以针对它，我么可以使用Tomcat实现的JNDI服务。</p>
+
+<p>首先需要把上一篇中的例子改为一个Java Web应用。</p>
+
+<p>定义Context.xml，位置在webapp/META-INF/context.xml</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&#39;1.0&#39; encoding=&#39;utf-8&#39;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;Context&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;Resource</span> <span class="na">name=</span><span class="s">&quot;jdbc/mysql/bookshelf&quot;</span> <span class="na">auth=</span><span class="s">&quot;Container&quot;</span> <span class="na">type=</span><span class="s">&quot;javax.sql.DataSource&quot;</span>
+</span><span class='line'>              <span class="na">maxActive=</span><span class="s">&quot;100&quot;</span> <span class="na">maxIdle=</span><span class="s">&quot;30&quot;</span> <span class="na">maxWait=</span><span class="s">&quot;10000&quot;</span>
+</span><span class='line'>              <span class="na">username=</span><span class="s">&quot;root&quot;</span> <span class="na">password=</span><span class="s">&quot;&quot;</span> <span class="na">driverClassName=</span><span class="s">&quot;com.mysql.jdbc.Driver&quot;</span>
+</span><span class='line'>              <span class="na">url=</span><span class="s">&quot;jdbc:mysql://localhost:3306/bookshelf&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/Context&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在JDNI中，对象是一种资源，Tomcat指定资源的入口出在<Context>元素中，有两个位置可以定义，一个是在$CATALINA_BASE/conf/server.xml，一个是在每个web应用需的META-INF/context.xml中。前一种方式，Tomcat容器中所有的Web应用都可以使用，算是一种全局的资源。不过一般第二种方式会更好。</p>
+
+<p>我在使用第一种方式的时候，遇到了MySQL的Driver文件找不到的问题，应该是需要将MySQL的驱动拷贝的Tomcat的lib下。</p>
+
+<p>定义web.xml文件，位置在webapp/WEB-INF/web.xml</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;web-app</span> <span class="na">version=</span><span class="s">&quot;2.4&quot;</span>
+</span><span class='line'>         <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span>
+</span><span class='line'>         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee</span>
+</span><span class='line'><span class="s">        http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;servlet&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>helloDataSource<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;servlet-class&gt;</span>me.zeph.jdbc.example.servlet.HelloDataSourceServlet<span class="nt">&lt;/servlet-class&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/servlet&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;servlet-mapping&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;servlet-name&gt;</span>helloDataSource<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;url-pattern&gt;</span>/helloDataSource<span class="nt">&lt;/url-pattern&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/servlet-mapping&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;resource-ref&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;description&gt;</span>DB Connection<span class="nt">&lt;/description&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;res-ref-name&gt;</span>jdbc/mysql/bookshelf<span class="nt">&lt;/res-ref-name&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;res-type&gt;</span>javax.sql.DataSource<span class="nt">&lt;/res-type&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;res-auth&gt;</span>Application<span class="nt">&lt;/res-auth&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/resource-ref&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>光定义资源还不行，web应用必须要有个办法知道资源有哪些？所以需要在web.xml定义资源的引用。</p>
+
+<p>此时，获取Connection的方式就可以换成JNDI的方式了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">me</span><span class="o">.</span><span class="na">zeph</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">dao</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">me.zeph.jdbc.example.model.Book</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.naming.Context</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.naming.InitialContext</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.naming.NamingException</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.sql.DataSource</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.Connection</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.ResultSet</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.SQLException</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.sql.Statement</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookDaoWithDS</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">Book</span> <span class="nf">findBookByISBN</span><span class="o">(</span><span class="kt">int</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>      <span class="n">Statement</span> <span class="n">statement</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>      <span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">connection</span> <span class="o">=</span> <span class="n">getConnection</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">statement</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createStatement</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">book</span> <span class="o">=</span> <span class="n">getBook</span><span class="o">(</span><span class="n">statement</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">(</span><span class="n">getQuerySqlFor</span><span class="o">(</span><span class="n">isbn</span><span class="o">)));</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>          <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>              <span class="k">if</span> <span class="o">(</span><span class="n">statement</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                  <span class="n">statement</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>              <span class="o">}</span>
+</span><span class='line'>              <span class="k">if</span> <span class="o">(</span><span class="n">connection</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                  <span class="n">connection</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>              <span class="o">}</span>
+</span><span class='line'>          <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>              <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>          <span class="o">}</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">book</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Connection</span> <span class="nf">getConnection</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">DataSource</span> <span class="n">dataSource</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">InitialContext</span> <span class="n">initialContext</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">InitialContext</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">Context</span> <span class="n">envContext</span> <span class="o">=</span> <span class="o">(</span><span class="n">Context</span><span class="o">)</span> <span class="n">initialContext</span><span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="s">&quot;java:/comp/env&quot;</span><span class="o">);</span>
+</span><span class='line'>          <span class="n">dataSource</span> <span class="o">=</span> <span class="o">(</span><span class="n">DataSource</span><span class="o">)</span> <span class="n">envContext</span><span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="s">&quot;jdbc/mysql/bookshelf&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">NamingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">dataSource</span><span class="o">.</span><span class="na">getConnection</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="nf">getQuerySqlFor</span><span class="o">(</span><span class="kt">int</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;select * from book where isbn = &quot;</span> <span class="o">+</span> <span class="n">isbn</span> <span class="o">+</span> <span class="s">&quot;;&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Book</span> <span class="nf">getBook</span><span class="o">(</span><span class="n">ResultSet</span> <span class="n">resultSet</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Book</span> <span class="n">book</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>      <span class="k">while</span> <span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">next</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">book</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Book</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setIsbn</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getInt</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span>
+</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="mi">2</span><span class="o">));</span>
+</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setPrice</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getDouble</span><span class="o">(</span><span class="mi">3</span><span class="o">));</span>
+</span><span class='line'>          <span class="n">book</span><span class="o">.</span><span class="na">setAuthor</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="mi">4</span><span class="o">));</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">book</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里你可以将java.naming.factory.initial和java.naming.factory.url.pkgs打印出来，结果是：org.apache.naming.java.javaURLContextFactory和org.apache.naming。</p>
+
+<p>java.naming.factory.url.pkgs的作用是告诉JNDI去哪个包下面，找满足java.javaURLContextFactory的类。</p>
+
+<p>你应该还看到一点有点疑惑，我的资源名字命名就是：jdbc/mysql/bookshelf，为什么前面还有java:/comp/env。</p>
+
+<p>java:/comp/env是环境命名上下文，是针对Java EE组件中使用JNDI引入的，目的是为了防止冲突。Java EE环境下，被访问的系统或者用户定义的对象都是存储在java:comp/env的环境命名上下文中。</p>
+
+<p>到此，我们实现了JNDI的引入，可以通过JNDI来配置DataSource，此时，如果我们希望从MySQL迁移到Oracle就不需要修改Java代码，只需要更改一下配置文件即可，这也就是JNDI的好处。</p>
+
+<p>再下一篇，我们继续讨论，JDBC的事务。</p>
+
+<p>参考资料：</p>
+
+<p><a href="http://docs.oracle.com/javase/tutorial/jndi/overview/index.html">http://docs.oracle.com/javase/tutorial/jndi/overview/index.html</a></p>
+
+<p><a href="http://tomcat.apache.org/tomcat-7.0-doc/jndi-resources-howto.html">http://tomcat.apache.org/tomcat-7.0-doc/jndi-resources-howto.html</a></p>
+
+<p><a href="http://docs.oracle.com/javase/jndi/tutorial/">http://docs.oracle.com/javase/jndi/tutorial/</a></p>
+
+<p><a href="http://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html">http://docs.oracle.com/javase/8/docs/api/javax/naming/Context.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -523,430 +868,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/06/01/slf4j-and-log4j/">logger（SLF4j和log4j）</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-06-01T12:33:00+08:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>12:33 pm</span></time>
-        
-           | <a href="/blog/2014/06/01/slf4j-and-log4j/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2014/06/01/slf4j-and-log4j/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2><strong>SLF4j</strong></h2>
-
-<p>Simple Logging Facade for Java (SLF4J)</p>
-
-<p>SLF4J，简单日志门面（Facade），是各个不同日志框架的抽象，它不是具体的日志解决方案，只服务于各种各样的日志系统，例如java.util.logging, log4j等，它允许最终用户在部署其应用时使用其所希望的日志系统。</p>
-
-<p><strong>什么意思？</strong>SLF4J就像一个接口，是一个门面，在写代码时，我们只需要根据这个接口提供的方法去记录日志。这个接口可以和不同的日志框架绑定，比如Java自带的java.util.logging，或者大家常听到的log4j。这样，你可以在不修改代码的情况下，去替换不同的日志框架。</p>
-
-<p>基本概念明白之后，看下面这个例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.logger</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.loggerFactory</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">loggerFactory</span><span class="o">.</span><span class="na">getlogger</span><span class="o">(</span><span class="n">HelloWorld</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>    <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;Hello World&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>输出的结果是：</p>
-
-<p>SLF4J: Failed to load class &ldquo;org.slf4j.impl.StaticloggerBinder&rdquo;.<br/>
-SLF4J: Defaulting to no-operation (NOP) logger implementation<br/>
-SLF4J: See <a href="http://www.slf4j.org/codes.html#StaticloggerBinder">http://www.slf4j.org/codes.html#StaticloggerBinder</a> for further details.</p>
-
-<p>原因是你没有将SLF4j和某一个具体的日志框架绑定。怎么绑定呢？不需要你做任何事情，简单的加一个依赖就可以了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-simple:1.7.7&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>输出是：[main] INFO log.HelloWorld - Hello World</p>
-
-<p><strong>SLF4J支持对很多不同框架的绑定：</strong></p>
-
-<p>slf4j-log4j12-1.7.7.jar<br/>
-slf4j-jdk14-1.7.7.jar<br/>
-slf4j-nop-1.7.7.jar<br/>
-slf4j-simple-1.7.7.jar<br/>
-slf4j-jcl-1.7.7.jar</p>
-
-<p><strong>那么有个问题，SLF4J支不支持对多个日志框架的绑定呢？答案是不支持，也感觉一般这是不必要需求。</strong></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-simple:1.7.7&#39;</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-log4j12:1.7.7&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>输出：</p>
-
-<p>SLF4J: Class path contains multiple SLF4J bindings.<br/>
-&hellip;</p>
-
-<p><strong>在SLF4J的官方文档上也说明了这点：</strong></p>
-
-<p>“SLF4J does not rely on any special class loader machinery. In fact, each SLF4J binding is hardwired at compile time to use one and only one specific logging framework. For example, the slf4j-log4j12-1.7.7.jar binding is bound at compile time to use log4j. In your code, in addition to slf4j-api-1.7.7.jar, you simply drop one and only one binding of your choice onto the appropriate class path location. Do not place more than one binding on your class path.”</p>
-
-<p>OK，关于SLF4J的内容就到这里，该进入重头戏&ndash;log4J。</p>
-
-<h2><strong>log4j</strong></h2>
-
-<p>log4j相对于SLF4j就复杂许多了，毕竟SLF4j只是接口，log4j则是具体的实现了。</p>
-
-<p>log4j由三个重要的组件组成：</p>
-
-<ol>
-<li>类型和级别(logger)</li>
-<li>输出目的地(Appender)</li>
-<li>输出格式(Layout)</li>
-</ol>
-
-
-<h3><strong>logger</strong></h3>
-
-<p><strong>logger hierarchy（logger的层次级别）</strong></p>
-
-<p><strong>Named Hierarchy（以名字分层）</strong></p>
-
-<p>logger的名字是大小写敏感的，并且根据名字的不同，logger之间存在父子层次关系。举例来说，com.foo是com.foo.bar的父logger，com是com.foo.bar的祖先logger。</p>
-
-<p>在这些logger之间，存在一个root logger，位于这个层次的顶层，它是永久存在，并且不能够通过名字获取，要获取它，只能通过logger.getRootlogger()方法获取。而这样一个层次关系，也决定了logger和logger之间存在着一些继承关系。</p>
-
-<p><strong>Level Inheritance（级别继承）</strong></p>
-
-<p>子类继承父类的级别：如果子类级别没有显示的指定，子类的级别等于第一个级别非空的父类logger的级别，直到追溯到根logger。</p>
-
-<p>前面提到logger的级别，它们分别是TRACE, DEBUG, INFO, WARN, ERROR和FATAL。</p>
-
-<p>这些级别存在高低关系：DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL。</p>
-
-<p>如果你以前有用过一点点log4j，这些级别映射到你的记忆中，一定是反映成logger的各个方法。没错，在logger这个对象中，你会看到很多的打印方法，debug, info, warn, error, fatal和log。</p>
-
-<p><strong>回过头来想想，如果你给一个logger指定了级别，但是你打印日志时，又不是调用对应级别的方法，会发生什么事情呢？</strong></p>
-
-<p>答案是：对这些方法的调用，不光是打印日志信息，也是对logger对象级别改变的请求。</p>
-
-<p>但是，并不是你调用它，级别就一定会改变，对级别改变的请求还是取决于logger对象本身的级别（无论是被显示的指定，还是继承）。如果请求的级别低于该logger当前的级别，那么改变就不会成功。</p>
-
-<h3><strong>Appender</strong></h3>
-
-<p>Appender的作用是指出日志信息的输出位置，比如控制台，文件。而且好处是，你可以给一个logger指定多个appender，比如同时在控制台和文件中输出日志。</p>
-
-<h4><strong>Appender Additivity(附加性)</strong></h4>
-
-<p>每一个Appender都有一个属性，叫做additivity flag，默认是true。什么意思呢？</p>
-
-<p>子类会继承它直接父类的appender（包括该父类自己继承的appender），如果设置为false，则不继承其父类的appender。</p>
-
-<p><strong>这句话应该好理解，那下面这种情况呢？</strong></p>
-
-<table>
-<thead>
-<tr>
-<th style="text-align:left;">Logger </th>
-<th style="text-align:center;"> Appender </th>
-<th style="text-align:center;"> Additivity</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">root         </td>
-<td style="text-align:center;"> A1        </td>
-<td style="text-align:center;"> null</td>
-</tr>
-<tr>
-<td style="text-align:left;">appenderFather</td>
-<td style="text-align:center;"> A2        </td>
-<td style="text-align:center;"> false</td>
-</tr>
-<tr>
-<td style="text-align:left;">appenderFather.appenderChild</td>
-<td style="text-align:center;"> A3</td>
-<td style="text-align:center;">true</td>
-</tr>
-</tbody>
-</table>
-
-
-<p>appenderFather的flag设置为了false，所以他拥有的appender的结果应该比较明显，就是A2。</p>
-
-<p>appenderFather.appenderChild的结果应该是什么？答案是A2和A3。因为它只是继承它直接父类的appender。</p>
-
-<p><strong>log4j提供的Appender有哪些呢？</strong></p>
-
-<p>org.apache.log4j.ConsoleAppender（控制台）</p>
-
-<p>org.apache.log4j.FileAppender（文件）</p>
-
-<p>org.apache.log4j.DailyRollingFileAppender（每天产生一个日志文件）</p>
-
-<p>org.apache.log4j.RollingFileAppender（文件大小到达指定尺寸的时候产生新文件，用的较多，限制文件大小）</p>
-
-<p>org.apache.log4j.WriterAppender（将日志信息以流格式发送到任意指定的地方）</p>
-
-<h3><strong>Layout</strong></h3>
-
-<p>日志信息布局（格式）是log4j提供的另外一个非常有用的特性。</p>
-
-<p><strong>log4j提供四种Layout方式：</strong></p>
-
-<p>org.apache.log4j.HTMLLayout（以HTML表格形式布局），</p>
-
-<p>org.apache.log4j.PatternLayout（可以灵活地指定布局模式，比较常用），</p>
-
-<p>org.apache.log4j.SimpleLayout（包含日志信息的级别和信息字符串），</p>
-
-<p>org.apache.log4j.TTCCLayout（包含日志产生的时间、线程、类别等等信息）</p>
-
-<p><strong>log4j采用类似C语言中的printf函数的打印格式格式化日志信息，打印参数如下：</strong></p>
-
-<p>%m 输出代码中指定的消息 　</p>
-
-<p>%p 输出优先级，即DEBUG，INFO，WARN，ERROR，FATAL 　　</p>
-
-<p>%r 输出自应用启动到输出该log信息耗费的毫秒数 　　</p>
-
-<p>%c 输出所属的类目，通常就是所在类的全名 　　</p>
-
-<p>%t 输出产生该日志事件的线程名 　　</p>
-
-<p>%n 输出一个回车换行符，Windows平台为“rn”，Unix平台为“n” 　　</p>
-
-<p>%d 输出日志时间点的日期或时间，默认格式为ISO8601，也可以在其后指定格式，比如：%d{yyy MMM dd HH:mm:ss,SSS}，输出类似：2002年10月18日 22：10：28，921 　　</p>
-
-<p>%l 输出日志事件的发生位置，包括类目名、发生的线程，以及在代码中的行数。举例：Testlog4.main(TestLog4.java:10)</p>
-
-<p>%x: 输出和当前线程相关联的NDC(嵌套诊断环境),尤其用到像java servlets这样的多客户多线程的应用中。</p>
-
-<p>%%: 输出一个”%”字符 %F: 输出日志消息产生时所在的文件名称</p>
-
-<p>%L: 输出代码中的行号</p>
-
-<p>%m: 输出代码中指定的消息,产生的日志具体信息</p>
-
-<p>%n: 输出一个回车换行符，Windows平台为”\r\n”，Unix平台为”\n”输出日志信息换行 可以在%与模式字符之间加上修饰符来控制其最小宽度、最大宽度、和文本的对齐方式。</p>
-
-<p>Ok，基本知识就到这里，看一个例子。</p>
-
-<h2><strong>Example</strong></h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;java&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-api:1.7.7&#39;</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.slf4j:slf4j-log4j12:1.7.7&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在配置依赖时，将SLF4J和log4j绑定</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">log</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.Logger</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.slf4j.LoggerFactory</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">HelloWorld</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">say</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;start time&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hello, world!!!&quot;</span><span class="o">);</span>
-</span><span class='line'>      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">logger</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
-</span><span class='line'>      <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;end time&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">HelloWorld</span> <span class="n">helloWorld</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HelloWorld</span><span class="o">();</span>
-</span><span class='line'>      <span class="n">helloWorld</span><span class="o">.</span><span class="na">say</span><span class="o">();</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>通过SLF4J的LoggerFactory.getLogger()方法得到一个logger的实力。logger的名字就是类名（全限定的类名）。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="na">log4j.rootLogger</span><span class="o">=</span><span class="s">info, console, file</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">log4j.appender.console</span><span class="o">=</span><span class="s">org.apache.log4j.ConsoleAppender</span>
-</span><span class='line'><span class="na">log4j.appender.console.layout</span><span class="o">=</span><span class="s">org.apache.log4j.PatternLayout</span>
-</span><span class='line'><span class="na">log4j.appender.console.layout.ConversionPattern</span><span class="o">=</span><span class="s">%p %l %d{yyy MMM dd HH:mm:ss,SSS} %m %n</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">log4j.appender.file</span><span class="o">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
-</span><span class='line'><span class="na">log4j.appender.file.File</span><span class="o">=</span><span class="s">logger.log</span>
-</span><span class='line'><span class="na">log4j.appender.file.layout</span><span class="o">=</span><span class="s">org.apache.log4j.PatternLayout</span>
-</span><span class='line'><span class="na">log4j.appender.file.layout.ConversionPattern</span><span class="o">=</span><span class="s">%p %l %d{yyy MMM dd HH:mm:ss,SSS} %m %n</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在log4j的properties文件中，指定了根logger的级别，以及它的两个appender，分别是console和file。然后定义这两个appender，并指定它们的layout使用PatternLayout，让它们输出：级别，日志输出的位置，时间，指定的信息和换行。</p>
-
-<p>输出结果如下：</p>
-
-<p>INFO log.HelloWorld.say(HelloWorld.java:11) 2014 Jun 01 16:57:54,807 start time <br/>
-Hello, world!!!<br/>
-INFO log.HelloWorld.say(HelloWorld.java:13) 2014 Jun 01 16:57:54,809 end time<br/>
-log.HelloWorld</p>
-
-<p>总结，log不算是功能代码，但是他对于开发人员和维护人员，非常有用了，往往是解决问题的唯一线索，特别是对于后台系统，往往只能通过log来分析问题。</p>
-
-<p>参考资料：</p>
-
-<p>1.<a href="http://logging.apache.org/log4j/1.2/manual.html">http://logging.apache.org/log4j/1.2/manual.html</a><br/>
-2.<a href="http://www.slf4j.org/manual.html">http://www.slf4j.org/manual.html</a><br/>
-3.<a href="http://www.cnblogs.com/dennisit/archive/2013/01/01/2841603.html">http://www.cnblogs.com/dennisit/archive/2013/01/01/2841603.html</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/48">&larr; Older</a>
@@ -974,6 +895,10 @@ log.HelloWorld</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/22/deep-thinking-in-react-5/">React的思考（五）- Reconciliation</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/21/deep-thinking-in-react-4/">React的思考（四）- componentDidMakeSense之生命周期面试调侃</a>
       </li>
     
@@ -987,10 +912,6 @@ log.HelloWorld</p>
     
       <li class="post">
         <a href="/blog/2018/04/17/deep-thinking-in-react-1/">React的思考（一）- 官网首页的信息量就挺大</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/01/22/go-cd-aliyun-spring-boot-docker/">如何用GoCD给阿里云的ECS配置Docker环境和部署SpringBoot的Docker应用到</a>
       </li>
     
   </ul>
