@@ -122,7 +122,7 @@
 
 <p>Fiber在React 16中首次登场，发布时间是2017年9月26号，那么意味着，在这之前，有另外一套Reconciliation的算法。React现在把它命名为Stack Reconciler。它存在于React 15及更早版本的实现中。</p>
 
-<p>Stack Reconciler犯了一个单线程或者存在UI主线程环境下的“禁忌” - 用同步的方式来处理整个组件树。</p>
+<p><strong>Stack Reconciler犯了一个单线程或者存在UI主线程环境下的“禁忌” - 用同步的方式来处理整个组件树。</strong></p>
 
 <p>Virtual DOM diff会一次性处理整个组件树，重点在于，Stack Reconciler始终会一次性地同步处理整个组件树。因为整个过程都是在内存中完成，所以当组件树比较小的时候的，不会感觉到问题，但是，当组件树比较庞大的时候，就会出现卡顿（掉帧）的情况。</p>
 
