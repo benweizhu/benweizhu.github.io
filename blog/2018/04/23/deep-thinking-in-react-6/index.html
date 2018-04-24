@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>NO END FOR LEARNING</title>
+  <title>React的思考（六）- 不可变性 - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2018/04/23/deep-thinking-in-react-6">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -62,15 +62,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2018/04/23/deep-thinking-in-react-6/">React的思考（六）- 不可变性</a></h1>
+      <h1 class="entry-title">React的思考（六）- 不可变性</h1>
     
     
       <p class="meta">
@@ -81,15 +78,15 @@
 
 <time class='entry-date' datetime='2018-04-23T22:29:51+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2018</span></span> <span class='time'>10:29 pm</span></time>
         
-           | <a href="/blog/2018/04/23/deep-thinking-in-react-6/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/23/deep-thinking-in-react-6/">Comments</a>
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h2>为什么immutable在React中那么重要？</h2>
+<div class="entry-content"><h2>为什么immutable在React中那么重要？</h2>
 
 <p>我尝试用简（kuo）单（hao）易（li）懂（mian）的词解释</p>
 
@@ -248,231 +245,52 @@
 
 <p>React和Redux之所以要求使用Immutable，原因的初衷是性能，避免深度对比。对于我们使用React和Redux的开发人员，除了关注性能，更是因为需要遵循React和Redux的编程规范来写出正确的代码。</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2018-04-23T22:29:51+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2018</span></span> <span class='time'>10:29 pm</span></time>
+      
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2018/04/22/deep-thinking-in-react-5/">React的思考（五）- Reconciliation</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2018-04-22T12:33:42+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2018</span></span> <span class='time'>12:33 pm</span></time>
-        
-           | <a href="/blog/2018/04/22/deep-thinking-in-react-5/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/22/deep-thinking-in-react-5/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>Reconciliation的含义本身</h3>
-
-<p>Reconciliation有的人翻译成“协调算法”，有的人翻译成“一致性对比”，在没有官方答案之前，我认为直译可能会比较准确，它的作用是React用来区分一棵节点树和另一棵节点树的算法，以确定哪些部分需要更改。</p>
-
-<p>Reconciliation是通常被理解为“虚拟DOM”背后的算法。</p>
-
-<p>简单描述就是：当您渲染React应用时，会生成描述该应用的节点树并将其保存在内存中。然后将该节点树刷新到渲染环境 - 例如，在浏览器应用程序的情况下，它会转换为一组DOM操作。当应用程序更新（比如，通过setState）时，会生成一棵新树。对比得到新树与前一棵树的区别，以计算需要更新渲染应用的操作。</p>
-
-<h3>React 16+的Reconciler - React Fiber</h3>
-
-<p>React团队在2016年7月公开发布React Fiber，React新的核心算法，React Fiber的目标是提高其对动画，布局和手势等领域的适用性。它的特征是增量渲染：能够将渲染工作分割成块并将其分散到多个帧中。</p>
-
-<p>按照官方文档的说法，Fiber Reconciler的主要目标：</p>
-
-<ul>
-<li>能够将可中断的任务拆分成块。</li>
-<li>能够对进程中的工作划分优先级、重新设定基址（Rebase）、恢复。</li>
-<li>能够在父子之间来回反复，借此为React的Layout提供支持。</li>
-<li>能够通过render()返回多个元素。</li>
-<li>为错误边界提供了更好的支持。</li>
-</ul>
-
-
-<p>这个项目持续的2年之久，蕴含着过去多年来Facebook不断改进的工作成果。该架构可向后兼容，彻底重写了React的协调（Reconciliation）算法。他们还专门做了一个网站叫：<a href="http://isfiberreadyyet.com/">http://isfiberreadyyet.com/</a></p>
-
-<p><img src="/images/isfiberready.jpg" width="500" title="isfiberreadyyet" alt="Alt text" />    <br/>
-27 September 2017</p>
-
-<p>我们都知道DOM只是React可以渲染的渲染环境之一，另外一个就是React Native。（这就是为什么“虚拟DOM”有点用词不当）。</p>
-
-<p>它可以支持如此多环境的原因是因为React的设计使是Reconciliation和渲染是分开的阶段。Reconciler执行计算树的哪些部分已经改变; 渲染器然后使用该信息实际更新呈现的应用。这种分离意味着React DOM和React Native可以在共享由React核心提供的相同Reconciler的同时使用它们自己的渲染器。</p>
-
-<h3>React 15以及以前的Reconciler - Stack Reconciler</h3>
-
-<p>Fiber在React 16中首次登场，发布时间是2017年9月26号，那么意味着，在这之前，有另外一套Reconciliation的算法。React现在把它命名为Stack Reconciler。它存在于React 15及更早版本的实现中。</p>
-
-<p><strong>Stack Reconciler犯了一个单线程或者存在UI主线程环境下的“禁忌” - 用同步的方式来处理整个组件树。</strong></p>
-
-<p>Virtual DOM diff会一次性处理整个组件树，重点在于，Stack Reconciler始终会一次性地同步处理整个组件树。因为整个过程都是在内存中完成，所以当组件树比较小的时候的，不会感觉到问题，但是，当组件树比较庞大的时候，就会出现卡顿（掉帧）的情况。</p>
-
-<p><img src="/images/Stack.jpg" width="500" title="Stack Reconciler" alt="Alt text" />   <br/>
-单线程进入到栈中，要从栈从退出来，才能响应其他用户操作</p>
-
-<p><img src="/images/Fiber.jpg" width="500" title="Fiber Reconciler" alt="Alt text" />   <br/>
-按照时间片段的方式执行</p>
-
-<p>参考：<a href="https://www.youtube.com/watch?v=ZCuYPiUIONs" title="Lin Clark - A Cartoon Intro to Fiber - React Conf 2017">Lin Clark - A Cartoon Intro to Fiber - React Conf 2017</a></p>
-
-<h3>会不会有影响（参考官方文档）</h3>
-
-<p>首先，不变的地方是，diff节点或者说判断两个节点是否相同的方式没有变：</p>
-
-<p>1.不同的元素类型</p>
-
-<p>每当根元素具有不同类型时，React就会销毁旧的树并从头开始构建新树。从a到img ，或者从Article到Comment，从Button到div – 这些都将导致全部重新构建。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='HTML'><span class='line'><span class="nt">&lt;div&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;Counter</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;span&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;Counter</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/span&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>2.相同DOM元素类型，有不同的属性</p>
-
-<p>当比较两个相同类型的React DOM元素时，React检查它们的属性（attributes），保留相同的底层DOM节点，只更新发生改变的属性（attributes）。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='HTML'><span class='line'><span class="nt">&lt;div</span> <span class="na">className=</span><span class="s">&quot;before&quot;</span> <span class="na">title=</span><span class="s">&quot;stuff&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;div</span> <span class="na">className=</span><span class="s">&quot;after&quot;</span> <span class="na">title=</span><span class="s">&quot;stuff&quot;</span> <span class="nt">/&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>3.子元素递归</p>
-
-<p>默认情况下，当递归一个DOM节点的子节点时，React只需同时遍历所有的孩子基点同时生成一个改变当它们不同时。</p>
-
-<p>例如，当给子元素末尾添加一个元素，在两棵树之间转化中性能就不错:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='HTML'><span class='line'><span class="nt">&lt;ul&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li&gt;</span>first<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li&gt;</span>second<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;ul&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li&gt;</span>first<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li&gt;</span>second<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li&gt;</span>third<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>React 会比较两个 li.first 树与两个 li.second 树，然后插入 li.third 树。</p>
-
-<p>如果在开始处插入一个节点也是这样简单地实现，那么性能将会很差。例如，在下面两棵树的转化中性能就不佳。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='HTML'><span class='line'><span class="nt">&lt;ul&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li&gt;</span>Duke<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li&gt;</span>Villanova<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;ul&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li&gt;</span>Connecticut<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li&gt;</span>Duke<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li&gt;</span>Villanova<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>React 将会改变每一个子节点而没有意识到需要保留 li.Duke 和 li.Villanova 两个子树。这种低效是一个问题。</p>
-
-<p>为了解决这个问题，React 支持一个 key 属性（attributes）。当子节点有了 key ，React 使用这个 key 去比较原来的树的子节点和之后树的子节点。例如，添加一个 key 到我们上面那个低效的例子中可以使树的转换变高效：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='HTML'><span class='line'><span class="nt">&lt;ul&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">key=</span><span class="s">&quot;2015&quot;</span><span class="nt">&gt;</span>Duke<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">key=</span><span class="s">&quot;2016&quot;</span><span class="nt">&gt;</span>Villanova<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;ul&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">key=</span><span class="s">&quot;2014&quot;</span><span class="nt">&gt;</span>Connecticut<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">key=</span><span class="s">&quot;2015&quot;</span><span class="nt">&gt;</span>Duke<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">key=</span><span class="s">&quot;2016&quot;</span><span class="nt">&gt;</span>Villanova<span class="nt">&lt;/li&gt;</span>
-</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>现在 React 知道有&#8217;2014&#8217; key 的元素是新的， key为&#8217;2015&#8217; 和&#8217;2016&#8217;的两个元素仅仅只是被移动而已。</p>
-
-<p><strong>关于key的使用，这个key需要在它的兄弟节点中是唯一的就可以了，不需要是全局唯一。而且必须唯一可以表示该节点，比如：不能使用index。</strong></p>
-
-<p>据说，会影响到生命周期的调用，就目前我从官方网站上看到的，还没有正式提出哪些变化，所以可以暂时不用慌张。</p>
-
-<h3>总结</h3>
-
-<p>本来只是想借助Reconciliation来讲最后一点关于key的使用，不知道怎么写成了介绍Reconciliation的历史过程，所以Copy Paste的比较多。不过，从整体看来，Fiber引入时间片的异步更新，确实改进不少页面渲染的性能问题。</p>
-
-<p>另外，<a href="https://www.youtube.com/watch?v=nLF0n9SACd4&amp;list=PL37ZVnwpeshEO7qXEbjG4riQD7SzydLEO&amp;index=2" title="Dan Abramov: Beyond React 16 | JSConf Iceland 2018">Dan Abramov: Beyond React 16 | JSConf Iceland 2018</a>有简单介绍关于这个Fiber的异步更新功能启用后的页面渲染速度演示，但目前这个功能还没有开启。</p>
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2018/04/23/deep-thinking-in-react-6/" data-via="" data-counturl="http://benweizhu.github.io/blog/2018/04/23/deep-thinking-in-react-6/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2018/04/22/deep-thinking-in-react-5/" title="Previous Post: React的思考（五）- Reconciliation">&laquo; React的思考（五）- Reconciliation</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/posts/2">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -546,6 +364,7 @@
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -560,7 +379,10 @@
       var disqus_shortname = 'benweiblog';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://benweizhu.github.io/blog/2018/04/23/deep-thinking-in-react-6/';
+        var disqus_url = 'http://benweizhu.github.io/blog/2018/04/23/deep-thinking-in-react-6/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
