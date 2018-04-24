@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-04-24T22:18:11+08:00</updated>
+  <updated>2018-04-24T22:24:00+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -26,7 +26,9 @@
 2.简单的编程和调试体验，少出bug（不会操作共享对象）  <br/>
 3.数据更容易追踪，推导（保留previewState可以对比）</p>
 
-<p>下面，我用一个React初学者，特别容易犯的一个错误来说明这三个问题，请看题板：</p>
+<p>Talk is shit, show me your money.</p>
+
+<p>光说还是差了点，虽然很通俗了，但是还是看下面一段代码，我用一个React初学者，特别容易犯的一个错误来说明这三个问题，请看题板：</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
