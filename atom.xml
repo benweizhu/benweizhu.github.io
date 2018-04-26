@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-04-26T22:45:26+08:00</updated>
+  <updated>2018-04-26T22:46:24+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -67,7 +67,7 @@
 
 <h2>Redux applyMiddlewares()</h2>
 
-<p>那Redux的提供了applyMiddlewares的方式，所以就不需要我们像上面那样写，那它是怎么做的呢？</p>
+<p>真实情况下，我们肯定不用这样写代码，那Redux提供了applyMiddlewares的方式，所以就不需要我们像上面那样写，那它是怎么做的呢？</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
