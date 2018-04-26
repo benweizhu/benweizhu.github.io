@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-04-26T22:46:24+08:00</updated>
+  <updated>2018-04-26T22:47:25+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -125,6 +125,8 @@
 </pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">R</span><span class="p">.</span><span class="nx">compose</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">,</span> <span class="nx">R</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="nx">R</span><span class="p">.</span><span class="nx">multiply</span><span class="p">(</span><span class="mi">2</span><span class="p">))(</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span> <span class="c1">// 7</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+<p>-4 * 2 + 1 再求绝对值</p>
 
 <h2>总结</h2>
 
