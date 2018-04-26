@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在京东搜索《实战Gradle》 在淘宝搜索《实战Gradle》 在亚马逊搜索《实战Gradle》 在当当网搜索《实战Gradle》 内容简介 Gradle是Java软件开发中的自动化构建工具，类似的传统工具如Ant和Maven。Gradle吸收或沿用了Maven中比较成功的一些实践， &hellip;">
+  <meta name="description" content="默认情况下，Rails 提供了三个环境：开发（development），测试（test）和生产（production）。这三个环境能满足大多数需求，但有时需要更多的环境。 假设有个服务器镜像了生产环境，但只用于测试。这种服务器一般叫做“交付准备服务器”（staging server）。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,70 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/09/26/rails-env-and-capistrano/">Rails环境和Capistrano部署</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-09-26T10:09:49+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:09 am</span></time>
+        
+           | <a href="/blog/2015/09/26/rails-env-and-capistrano/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/09/26/rails-env-and-capistrano/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>默认情况下，Rails 提供了三个环境：开发（development），测试（test）和生产（production）。这三个环境能满足大多数需求，但有时需要更多的环境。</p>
+
+<p>假设有个服务器镜像了生产环境，但只用于测试。这种服务器一般叫做“交付准备服务器”（staging server）。要想为这个服务器定义一个名为“staging”的环境，新建文件 config/environments/staging.rb 即可。请使用 config/environments 文件夹中的任一文件作为模板，以此为基础修改设置。</p>
+
+<p>在持续集成开发的场景下，除了开发环境（提供给Dev的验证环境），测试环境（提供QA的测试环境），一般还会有一个UAT环境（用户验收测试环境 - User Acceptance Test），它是离生产环境最近的一个预备环境，就像上面所说的staging。</p>
+
+<p>通过Rails Server命令启动环境，默认是development。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">=&gt;</span> <span class="n">Booting</span> <span class="n">Puma</span>
+</span><span class='line'><span class="o">=&gt;</span> <span class="n">Rails</span> <span class="mf">4.2</span><span class="o">.</span><span class="mi">0</span> <span class="n">application</span> <span class="n">starting</span> <span class="ow">in</span> <span class="n">development</span> <span class="n">on</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span>
+</span><span class='line'><span class="o">=&gt;</span> <span class="n">Run</span> <span class="sb">`rails server -h`</span> <span class="k">for</span> <span class="n">more</span> <span class="n">startup</span> <span class="n">options</span>
+</span><span class='line'><span class="o">=&gt;</span> <span class="n">Ctrl</span><span class="o">-</span><span class="n">C</span> <span class="n">to</span> <span class="n">shutdown</span> <span class="n">server</span>
+</span><span class='line'><span class="n">Puma</span> <span class="mf">2.11</span><span class="o">.</span><span class="mi">1</span> <span class="n">starting</span><span class="o">...</span>
+</span><span class='line'><span class="o">*</span> <span class="n">Min</span> <span class="n">threads</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">max</span> <span class="n">threads</span><span class="p">:</span> <span class="mi">16</span>
+</span><span class='line'><span class="o">*</span> <span class="n">Environment</span><span class="p">:</span> <span class="n">development</span>
+</span><span class='line'><span class="o">*</span> <span class="n">Listening</span> <span class="n">on</span> <span class="n">tcp</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">3000</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>切换不同的环境启动可以通过参数-e</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">rails</span> <span class="n">server</span> <span class="o">-</span><span class="n">e</span> <span class="n">production</span> <span class="o">-</span><span class="n">p</span> <span class="mi">4000</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -132,114 +196,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/09/10/active-record-migration/">关于运行Active Record数据迁移</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-09-10T08:51:45+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:51 am</span></time>
-        
-           | <a href="/blog/2015/09/10/active-record-migration/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/09/10/active-record-migration/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Active Record数据库迁移是 Active Record提供的一个功能，按照时间顺序管理数据库模式。使用迁移，无需编写 SQL，使用简单的Ruby DSL就能修改数据表，对数据库的操作和所用的数据库种类无关。</p>
-
-<p>你可以把每个迁移看做数据库的一个修订版本。数据库中一开始什么也没有，各个迁移会添加或删除数据表、字段或记录。Active Record知道如何按照时间线更新数据库，不管数据库现在的模式如何，都能更新到最新结构。同时，Active Record还会更新db/schema.rb文件，匹配最新的数据库结构。</p>
-
-<h2>db:migrate</h2>
-
-<p>Rails提供了很多Rake任务，用来执行指定的迁移。</p>
-
-<p>其中最常使用的是rake db:migrate，执行还没执行的迁移中的change或up方法。如果没有未运行的迁移，直接退出。rake db:migrate按照迁移文件名中时间戳顺序执行迁移。</p>
-
-<p>注意，执行db:migrate时还会执行db:schema:dump，更新db/schema.rb文件，匹配数据库的结构。</p>
-
-<h2>db:migrate VERSION</h2>
-
-<p>如果指定了版本，Active Record会运行该版本之前的所有迁移。版本就是迁移文件名前的数字部分。例如，要运行 20080906120000 这个迁移，可以执行下面的命令：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="n">migrate</span> <span class="no">VERSION</span><span class="o">=</span><span class="mi">20080906120000</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果20080906120000比当前的版本高，上面的命令就会执行所有20080906120000之前（包括 20080906120000）的迁移中的change或up方法，但不会运行20080906120000之后的迁移。如果回滚迁移，则会执行 20080906120000之前（不包括20080906120000）的迁移中的down方法。</p>
-
-<h2>db:rollback</h2>
-
-<p>还有一个常用的操作时回滚到之前的迁移。例如，迁移代码写错了，想纠正。我们无须查找迁移的版本号，直接执行下面的命令即可：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="n">rollback</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个命令会回滚上一次迁移，撤销 change 方法中的操作，或者执行 down 方法。如果想撤销多个迁移，可以使用 STEP 参数：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="n">rollback</span> <span class="no">STEP</span><span class="o">=</span><span class="mi">3</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个命令会撤销前三次迁移。</p>
-
-<h2>db:redo</h2>
-
-<p>db:migrate:redo 命令可以回滚上一次迁移，然后再次执行迁移。和 db:rollback 一样，如果想重做多次迁移，可以使用 STEP 参数。例如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="ss">migrate</span><span class="p">:</span><span class="k">redo</span> <span class="no">STEP</span><span class="o">=</span><span class="mi">3</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这些 Rake 任务的作用和 db:migrate 一样，只是用起来更方便，因为无需查找特定的迁移版本号。</p>
-
-<h2>db:migrate:up和db:migrate:down</h2>
-
-<p>如果想执行指定迁移，或者撤销指定迁移，可以使用db:migrate:up和db:migrate:down任务，指定相应的版本号，就会根据需求调用change、up或down方法。例如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="ss">migrate</span><span class="p">:</span><span class="n">up</span> <span class="no">VERSION</span><span class="o">=</span><span class="mi">20080906120000</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个命令会执行20080906120000迁移中的change方法或up方法。db:migrate:up 首先会检测指定的迁移是否已经运行，如果Active Record任务已经执行，就不会做任何操作。</p>
-
-<h2>修改现有的迁移</h2>
-
-<p>有时编写的迁移中可能有错误，如果已经运行了迁移，不能直接编辑迁移文件再运行迁移。Rails 认为这个迁移已经运行，所以执行 rake db:migrate 任务时什么也不会做。这种情况必须先回滚迁移（例如，执行 rake db:rollback 任务），编辑迁移文件后再执行 rake db:migrate 任务执行改正后的版本。</p>
-
-<p>一般来说，直接修改现有的迁移不是个好主意。这么做会为你以及你的同事带来额外的工作量，如果这个迁移已经在生产服务器上运行过，还可能带来不必要的麻烦。你应该编写一个新的迁移，做所需的改动。编辑新生成还未纳入版本控制的迁移（或者更宽泛地说，还没有出现在开发设备之外），相对来说是安全的。</p>
-
-<h2>在不同的环境中运行迁移</h2>
-
-<p>默认情况下，rake db:migrate 任务在 development 环境中执行。要在其他环境中运行迁移，执行命令时可以使用环境变量 RAILS_ENV 指定环境。例如，要在 test 环境中运行迁移，可以执行下面的命令：</p>
-
-<p>$ rake db:migrate RAILS_ENV=test</p>
-
-<p>参考资料：   <br/>
-1.<a href="http://guides.ruby-china.org/active_record_migrations.html">http://guides.ruby-china.org/active_record_migrations.html</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/28">&larr; Older</a>
@@ -267,6 +223,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/23/deep-thinking-in-react-6/">React的思考（六）- 不可变性</a>
       </li>
     
@@ -280,10 +240,6 @@
     
       <li class="post">
         <a href="/blog/2018/04/20/deep-thinking-in-react-3/">React的思考（三）- 总结下shouldComponentUpdate</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/18/deep-thinking-in-react-2/">React的思考（二）- 逃不开的生命周期函数之构造函数</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="本篇博客系列的目的： 之前一直想要实现一个日志类库：https://github.com/benweizhu/LoggerUtil 用来记录某个方法在调用前，调用后，抛出异常后的一些信息，比如方法名，参数，返回值。还希望可以指定记录的格式以及日志的级别（INFO，DEBUG等）。最关键的是， &hellip;">
+  <meta name="description" content="Active Record数据库迁移是 Active Record提供的一个功能，按照时间顺序管理数据库模式。使用迁移，无需编写 SQL，使用简单的Ruby DSL就能修改数据表，对数据库的操作和所用的数据库种类无关。 你可以把每个迁移看做数据库的一个修订版本。数据库中一开始什么也没有， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,114 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/09/10/active-record-migration/">关于运行Active Record数据迁移</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-09-10T08:51:45+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:51 am</span></time>
+        
+           | <a href="/blog/2015/09/10/active-record-migration/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/09/10/active-record-migration/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Active Record数据库迁移是 Active Record提供的一个功能，按照时间顺序管理数据库模式。使用迁移，无需编写 SQL，使用简单的Ruby DSL就能修改数据表，对数据库的操作和所用的数据库种类无关。</p>
+
+<p>你可以把每个迁移看做数据库的一个修订版本。数据库中一开始什么也没有，各个迁移会添加或删除数据表、字段或记录。Active Record知道如何按照时间线更新数据库，不管数据库现在的模式如何，都能更新到最新结构。同时，Active Record还会更新db/schema.rb文件，匹配最新的数据库结构。</p>
+
+<h2>db:migrate</h2>
+
+<p>Rails提供了很多Rake任务，用来执行指定的迁移。</p>
+
+<p>其中最常使用的是rake db:migrate，执行还没执行的迁移中的change或up方法。如果没有未运行的迁移，直接退出。rake db:migrate按照迁移文件名中时间戳顺序执行迁移。</p>
+
+<p>注意，执行db:migrate时还会执行db:schema:dump，更新db/schema.rb文件，匹配数据库的结构。</p>
+
+<h2>db:migrate VERSION</h2>
+
+<p>如果指定了版本，Active Record会运行该版本之前的所有迁移。版本就是迁移文件名前的数字部分。例如，要运行 20080906120000 这个迁移，可以执行下面的命令：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="n">migrate</span> <span class="no">VERSION</span><span class="o">=</span><span class="mi">20080906120000</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果20080906120000比当前的版本高，上面的命令就会执行所有20080906120000之前（包括 20080906120000）的迁移中的change或up方法，但不会运行20080906120000之后的迁移。如果回滚迁移，则会执行 20080906120000之前（不包括20080906120000）的迁移中的down方法。</p>
+
+<h2>db:rollback</h2>
+
+<p>还有一个常用的操作时回滚到之前的迁移。例如，迁移代码写错了，想纠正。我们无须查找迁移的版本号，直接执行下面的命令即可：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="n">rollback</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个命令会回滚上一次迁移，撤销 change 方法中的操作，或者执行 down 方法。如果想撤销多个迁移，可以使用 STEP 参数：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="n">rollback</span> <span class="no">STEP</span><span class="o">=</span><span class="mi">3</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个命令会撤销前三次迁移。</p>
+
+<h2>db:redo</h2>
+
+<p>db:migrate:redo 命令可以回滚上一次迁移，然后再次执行迁移。和 db:rollback 一样，如果想重做多次迁移，可以使用 STEP 参数。例如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="ss">migrate</span><span class="p">:</span><span class="k">redo</span> <span class="no">STEP</span><span class="o">=</span><span class="mi">3</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这些 Rake 任务的作用和 db:migrate 一样，只是用起来更方便，因为无需查找特定的迁移版本号。</p>
+
+<h2>db:migrate:up和db:migrate:down</h2>
+
+<p>如果想执行指定迁移，或者撤销指定迁移，可以使用db:migrate:up和db:migrate:down任务，指定相应的版本号，就会根据需求调用change、up或down方法。例如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="ss">db</span><span class="p">:</span><span class="ss">migrate</span><span class="p">:</span><span class="n">up</span> <span class="no">VERSION</span><span class="o">=</span><span class="mi">20080906120000</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个命令会执行20080906120000迁移中的change方法或up方法。db:migrate:up 首先会检测指定的迁移是否已经运行，如果Active Record任务已经执行，就不会做任何操作。</p>
+
+<h2>修改现有的迁移</h2>
+
+<p>有时编写的迁移中可能有错误，如果已经运行了迁移，不能直接编辑迁移文件再运行迁移。Rails 认为这个迁移已经运行，所以执行 rake db:migrate 任务时什么也不会做。这种情况必须先回滚迁移（例如，执行 rake db:rollback 任务），编辑迁移文件后再执行 rake db:migrate 任务执行改正后的版本。</p>
+
+<p>一般来说，直接修改现有的迁移不是个好主意。这么做会为你以及你的同事带来额外的工作量，如果这个迁移已经在生产服务器上运行过，还可能带来不必要的麻烦。你应该编写一个新的迁移，做所需的改动。编辑新生成还未纳入版本控制的迁移（或者更宽泛地说，还没有出现在开发设备之外），相对来说是安全的。</p>
+
+<h2>在不同的环境中运行迁移</h2>
+
+<p>默认情况下，rake db:migrate 任务在 development 环境中执行。要在其他环境中运行迁移，执行命令时可以使用环境变量 RAILS_ENV 指定环境。例如，要在 test 环境中运行迁移，可以执行下面的命令：</p>
+
+<p>$ rake db:migrate RAILS_ENV=test</p>
+
+<p>参考资料：   <br/>
+1.<a href="http://guides.ruby-china.org/active_record_migrations.html">http://guides.ruby-china.org/active_record_migrations.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -156,221 +264,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/08/09/postgres-full-text-search-1/">如何使用Postgres全文搜索特性（一）</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-08-09T08:24:23+08:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:24 am</span></time>
-        
-           | <a href="/blog/2015/08/09/postgres-full-text-search-1/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/08/09/postgres-full-text-search-1/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>基本概念</h2>
-
-<p>全文搜索提供了一种能力来鉴别的自然语言文档是否满足某个查询语句，并根据与查询语句的相关性来对查询结果排序。最常见的查询就是找到所有包含查询术语（term）的文档，并根据他们的相似性进行排序。</p>
-
-<p>文字查询已经在数据库中存在多年。PostgreSQL有~，~*，LIKE和ILIKE这样的对应文字数据类型的操作符，但它们缺少现代信息系统需要的必要属性：</p>
-
-<p>1.没有语言特性的支持，比如，英语中的单数和复数，用正则表达式是做不到识别复数单词的。<br/>
-2.没有查询结果的相似性的排序。 <br/>
-3.因为没有索引支持，所以会比较慢</p>
-
-<p>全文搜索允许对文档进行预处理，比允许建立索引来提供搜索速度。预处理一般包括：</p>
-
-<p>1.将文档解析为符号。这对于解析不同类型的符号非常有用。比如，数字，单词，复杂单词，email，这样它们就可以用不同的方式被处理。原则上，符号类型取决于文档，但是大部分情况，可以使用预定义的类型就足够了。Postgres提供了一个标准的解析器，但也可以建立自定义的解析器。</p>
-
-<p>2.将符号转化为分词。一个分词（词位，单词单位）是一个字符串，跟符号相似，但是它被正常化，这样就可以匹配同一个单词的不同形式，比如，正常化允许将大写字母转换为小写，更常见的是英语单词的前缀和后缀（复数单词），这就允许搜索同一个单词的不同形式，而不需要输入该单词的全部可能变形式。（话句话说，符号是文档文本的直接片段，而分词是可以用来索引和搜索的有用单词）。而Postgres实现这种方式的办法就是利用词典，可以提供不同标准的词典，或者自定义的词典来满足不同的需要。</p>
-
-<p>3.Storing preprocessed documents optimized for searching. For example, each document can be represented as a sorted array of normalized lexemes. Along with the lexemes it is often desirable to store positional information to use for proximity ranking, so that a document that contains a more &ldquo;dense&rdquo; region of query words is assigned a higher rank than one with scattered query words.(这段没看明白)</p>
-
-<h2>文档</h2>
-
-<p>上面提到一个很重要的概念，叫做文档（Document）。那么，它的含义是什么？</p>
-
-<p>在PostgresSQL的搜索中，文档可以是数据库表中某一行的某一个文字字段（textual field），或者是多个这样的字段的组合，也许他们存储在不同表中，又或者是动态获取到的结果。话句话说，文档是由不同的部分组成，可能并不会作为一个整体存在某一个位置。比如：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">title</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span>  <span class="n">author</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span>  <span class="n">abstract</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">body</span> <span class="k">AS</span> <span class="n">document</span>
-</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span>
-</span><span class='line'><span class="k">WHERE</span> <span class="n">mid</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">SELECT</span> <span class="n">m</span><span class="p">.</span><span class="n">title</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">m</span><span class="p">.</span><span class="n">author</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">m</span><span class="p">.</span><span class="n">abstract</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">d</span><span class="p">.</span><span class="n">body</span> <span class="k">AS</span> <span class="n">document</span>
-</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span> <span class="n">m</span><span class="p">,</span> <span class="n">docs</span> <span class="n">d</span>
-</span><span class='line'><span class="k">WHERE</span> <span class="n">mid</span> <span class="o">=</span> <span class="n">did</span> <span class="k">AND</span> <span class="n">mid</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span> 
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>title，author，abstract作为了文档，它们是message的不同字段。</p>
-
-<p>还有一种可能，文档以简单文本的方式存储在文件系统中，这样的情况下，数据库中可以存放全文的索引来执行搜索，并使用一些独立的标识符来从文件系统中获取文档。</p>
-
-<h2>TSVECTOR（分词向量）</h2>
-
-<p>以文本搜索为目的，每个文档必须缩减为预处理的tsvector（某种向量）形式，搜索和排名都是在这个可以代表文档的tsvector上执行，文档只是在需要用户需要使用时才去获取，因此，我们常常将tsvector作为一种文档，当然它只是全文文档的一种压缩形式。</p>
-
-<p>PostgreSQL全文搜索是基于匹配操作符@@实现，当一个tsvector（document）匹配一个tsquery（query）时，返回true。至于哪个写在前面，哪个写在后面不重要：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="s1">&#39;a fat cat sat on a mat and ate a fat rat&#39;</span><span class="p">::</span><span class="n">tsvector</span> <span class="o">@@</span> <span class="s1">&#39;cat &amp; rat&#39;</span><span class="p">::</span><span class="n">tsquery</span><span class="p">;</span>
-</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
-</span><span class='line'><span class="c1">----------</span>
-</span><span class='line'> <span class="n">t</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">SELECT</span> <span class="s1">&#39;fat &amp; cow&#39;</span><span class="p">::</span><span class="n">tsquery</span> <span class="o">@@</span> <span class="s1">&#39;a fat cat sat on a mat and ate a fat rat&#39;</span><span class="p">::</span><span class="n">tsvector</span><span class="p">;</span>
-</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
-</span><span class='line'><span class="c1">----------</span>
-</span><span class='line'> <span class="n">f</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如上面的例子中，一个tsquery不是单纯的文本，tsvector也是一样。一个tsquery包含搜索术语（term），它们是已经做过正常化的分词，并且可能通过AND，OR和NOT操作将多个术语结合。函数to_tsquery和plainto_tsquery可以帮助将用户写的文本转化为适当的tsquery。简单来说，to_tsvector是用来解析和正常化一个文档字符串的。所以，在实际应用中，一个文本搜索匹配应该长如下这样：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;fat cats ate fat rats&#39;</span><span class="p">)</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;fat &amp; rat&#39;</span><span class="p">);</span>
-</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
-</span><span class='line'><span class="c1">----------</span>
-</span><span class='line'> <span class="n">t</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>注意，如果写成如下方式将不会成功：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="s1">&#39;fat cats ate fat rats&#39;</span><span class="p">::</span><span class="n">tsvector</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;fat &amp; rat&#39;</span><span class="p">);</span>
-</span><span class='line'> <span class="o">?</span><span class="k">column</span><span class="o">?</span>
-</span><span class='line'><span class="c1">----------</span>
-</span><span class='line'> <span class="n">f</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>@@操作符也支持文本输入，简单情况下，允许跳过具体的tsvector或者tsquery的转换。使用如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="n">tsvector</span> <span class="o">@@</span> <span class="n">tsquery</span>
-</span><span class='line'><span class="n">tsquery</span>  <span class="o">@@</span> <span class="n">tsvector</span>
-</span><span class='line'><span class="nb">text</span> <span class="o">@@</span> <span class="n">tsquery</span>
-</span><span class='line'><span class="nb">text</span> <span class="o">@@</span> <span class="nb">text</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>如何在数据库表中进行搜索，并使用索引呢？</h2>
-
-<p>我们是可以再没有索引的情况下做全文搜索的，如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">title</span>
-</span><span class='line'><span class="k">FROM</span> <span class="n">pgweb</span>
-</span><span class='line'><span class="k">WHERE</span> <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="s1">&#39;friend&#39;</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>创建索引</h3>
-
-<p>我们可以创建GIN索引来提供文本搜索的速度：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">pgweb_idx</span> <span class="k">ON</span> <span class="n">pgweb</span> <span class="k">USING</span> <span class="n">gin</span><span class="p">(</span><span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">body</span><span class="p">));</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>注意这里使用两个参数的to_tsvector方法。只有文本搜索指定了一个配置名字才能使用在表达式索引中。这是因为索引内容必须不被default_text_search_config所影响。如果它们被影响了，索引内容有可能不一致，因为不同的条目（entries）可以包含有不同配置生成的tsvector，所以没有办法猜测谁是谁。所以也就没办法正确的删除和还原这样是索引。</p>
-
-<p>因为上面使用了两个参数版本的to_tsvector，只有也使用了两参数版本to_tsvector并且配置相同的查询语句才能使用。也就说，WHERE to_tsvector(&lsquo;english&rsquo;, body) @@ &lsquo;a &amp; b&#8217;可以使用索引，WHERE to_tsvector(body) @@ &#8216;a &amp; b&#8217;就不行。</p>
-
-<p>索引可以建立在联合的字段中：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">pgweb_idx</span> <span class="k">ON</span> <span class="n">pgweb</span> <span class="k">USING</span> <span class="n">gin</span><span class="p">(</span><span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">title</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">body</span><span class="p">));</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>在单独的字段创建向量</h3>
-
-<p>另外一种办法就是创建一个单独的tsvector字段来保存to_tsvector的输出，本例中，coalesce用来保证即便有一个字段是null，仍然会生成索引：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">pgweb</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">textsearchable_index_col</span> <span class="n">tsvector</span><span class="p">;</span>
-</span><span class='line'><span class="k">UPDATE</span> <span class="n">pgweb</span> <span class="k">SET</span> <span class="n">textsearchable_index_col</span> <span class="o">=</span>
-</span><span class='line'>     <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">coalesce</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39; &#39;</span> <span class="o">||</span> <span class="n">coalesce</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">));</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>我们创建一个GIN索引来加快搜索：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">textsearch_idx</span> <span class="k">ON</span> <span class="n">pgweb</span> <span class="k">USING</span> <span class="n">gin</span><span class="p">(</span><span class="n">textsearchable_index_col</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>现在可以来执行一个快速的全文搜索：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">title</span>
-</span><span class='line'><span class="k">FROM</span> <span class="n">pgweb</span>
-</span><span class='line'><span class="k">WHERE</span> <span class="n">textsearchable_index_col</span> <span class="o">@@</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;create &amp; table&#39;</span><span class="p">)</span>
-</span><span class='line'><span class="k">ORDER</span> <span class="k">BY</span> <span class="n">last_mod_date</span> <span class="k">DESC</span>
-</span><span class='line'><span class="k">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当使用独立字段来存储tsvector的结果时，非常有必要创建一个触发器（trigger）来保证tsvector的状态，当title或者body发生改变。</p>
-
-<p>独立列的方式比表达式索引方式好的其中一点是当使用索引查询时，不用在查询语句中指定文本查询的配置。正如上面的例子中，查询语句依赖于default_text_search_config。另外一个优点是，查询更快速，因为它不需要重新执行to_tsvector来验证索引的匹配（特别是使用GiST的时候）。唯一的不同时，这种方式需要占据存储空间。</p>
-
-<p>参考自：<a href="http://www.postgresql.org/docs/9.2/static/textsearch-intro.html">http://www.postgresql.org/docs/9.2/static/textsearch-intro.html</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/29">&larr; Older</a>
@@ -398,6 +291,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/23/deep-thinking-in-react-6/">React的思考（六）- 不可变性</a>
       </li>
     
@@ -411,10 +308,6 @@
     
       <li class="post">
         <a href="/blog/2018/04/20/deep-thinking-in-react-3/">React的思考（三）- 总结下shouldComponentUpdate</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/18/deep-thinking-in-react-2/">React的思考（二）- 逃不开的生命周期函数之构造函数</a>
       </li>
     
   </ul>
