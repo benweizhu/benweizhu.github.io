@@ -132,7 +132,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这样，我们就在Redux原来的store.dispatch附近添加了我们自己代码，当我们再次调用store.dispatch，它就会打印log了，不过monkey patching本质上是一种hack，“将任意的方法替换成你想要的”。</p>
+<p>通过上面这样一段代码，我们就在Redux原来的store.dispatch附近添加了我们自己代码，当我们再次调用store.dispatch，它就会打印log了，不过monkey patching本质上是一种hack，“将任意的方法替换成你想要的”。</p>
 
 <p>如果，我们想给dispatch加另一个补丁，那就在它的前面，或者后面，在加上一段类似的代码呗。</p>
 
