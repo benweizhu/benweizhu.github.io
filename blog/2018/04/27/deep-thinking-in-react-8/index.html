@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>NO END FOR LEARNING</title>
+  <title>React的思考（八）- Redux的Middleware（下）异步的世界 - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://benweizhu.github.io">
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2018/04/27/deep-thinking-in-react-8">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
@@ -62,15 +62,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a></h1>
+      <h1 class="entry-title">React的思考（八）- Redux的Middleware（下）异步的世界</h1>
     
     
       <p class="meta">
@@ -81,15 +78,15 @@
 
 <time class='entry-date' datetime='2018-04-27T13:38:01+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>1:38 pm</span></time>
         
-           | <a href="/blog/2018/04/27/deep-thinking-in-react-8/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/27/deep-thinking-in-react-8/">Comments</a>
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h2>有序而独立的同步世界</h2>
+<div class="entry-content"><h2>有序而独立的同步世界</h2>
 
 <p>没有异步的情况下，Redux配合React很容易理解的（Action->Reducer->CombineReducers->React-Redux->Component），简单回顾下：</p>
 
@@ -180,164 +177,52 @@
 </span></code></pre></td></tr></table></div></figure>
 
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2018-04-27T13:38:01+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>1:38 pm</span></time>
+      
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2018-04-25T21:14:18+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>9:14 pm</span></time>
-        
-           | <a href="/blog/2018/04/25/deep-thinking-in-react-7/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/25/deep-thinking-in-react-7/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Redux的Middleware（中间件）是Redux中相对比较神秘的部分。</p>
-
-<h2>怎么理解middleware这个概念呢？</h2>
-
-<p>middle这个词很重要，它是指，这个件（ware），被放在（穿插）于某一个已存在操作的过程当中（middle）。</p>
-
-<p>我这么平淡直白无水准的解释，你应该能get到吧，如果你熟悉Java Web开发，你可能第一时间会想到Java Servlet Filters，当然也许你比较年轻，你对Spring熟悉，你可能会立刻想到AOP（面向切面编程），它们可以完成日志，审计，authentication, authorization等。</p>
-
-<p>那么，再往后面走，如果你使用过Express或者Koa等服务端框架，在这类框架中，middleware是指可以被嵌入在框架“接收请求到产生响应过程之中”的代码。例如，Express或者Koa的middleware可以完成添加CORS headers、记录日志、内容压缩等工作。</p>
-
-<h2>Redux的中间件是做什么呢？</h2>
-
-<p>回过头来，看Redux的中间件，同样，它肯定是指穿插在Redux的某一个过程当中，那么问题来了，这个ware可以在哪里穿插，或者哪里有穿插操作的需要呢？我们来逐一分析，以下内容，参考阮一峰的文章：</p>
-
-<p>（1）Reducer：纯函数，只承担计算State的功能，不合适承担其他功能，也承担不了，因为理论上，纯函数不能进行读写操作。</p>
-
-<p>（2）View：与State一一对应，可以看作State的视觉层，也不合适承担其他功能。</p>
-
-<p>（3）Action：存放数据的对象，即消息的载体，只能被别人操作，自己不能进行任何操作。</p>
-
-<p>其实，和其他服务端框架类似，它被嵌入到Redux“接收请求到产生响应过程之中”，位于action被发起之后，到达reducer之前，也就是store.dispatch()附近。</p>
-
-<h2>举个例子：如何在dispatch的时候log state和action</h2>
-
-<p>我在看官方文档的时候，看到一个非常有趣的概念，猴子补丁（monkey patching），大概的意思是指在运行时动态修改模块、类或函数，通常是添加功能或修正缺陷。</p>
-
-<p>通过这种方式，可以在代码的运行过程中，给store.dispatch打补丁，增加额外的功能，比如log state和action，代码如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kd">let</span> <span class="nx">next</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">;</span>
-</span><span class='line'><span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">dispatchAndLog</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;dispatching&#39;</span><span class="p">,</span> <span class="nx">action</span><span class="p">);</span>
-</span><span class='line'>  <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
-</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;next state&#39;</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">());</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>通过上面这样一段代码，我们就在Redux原来的store.dispatch附近添加了我们自己代码，当我们再次调用store.dispatch，它就会打印log了，不过monkey patching本质上是一种hack，“将任意的方法替换成你想要的”。</p>
-
-<p>如果，我们想给dispatch加另一个补丁，那就在它的前面，或者后面，在加上一段类似的代码呗。</p>
-
-<h2>Redux applyMiddlewares()</h2>
-
-<p>真实情况下，我们肯定不用这样写代码，那Redux提供了applyMiddlewares的方式，所以就不需要我们像上面那样写，那它是怎么做的呢？</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">const</span> <span class="nx">store</span> <span class="o">=</span> <span class="nx">createStore</span><span class="p">(</span>
-</span><span class='line'>  <span class="nx">reducer</span><span class="p">,</span>
-</span><span class='line'>  <span class="nx">applyMiddleware</span><span class="p">(</span><span class="nx">thunk</span><span class="p">,</span> <span class="nx">promise</span><span class="p">,</span> <span class="nx">logger</span><span class="p">)</span>
-</span><span class='line'><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="nx">applyMiddleware</span><span class="p">(...</span><span class="nx">middlewares</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="p">(</span><span class="nx">createStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">reducer</span><span class="p">,</span> <span class="nx">preloadedState</span><span class="p">,</span> <span class="nx">enhancer</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">store</span> <span class="o">=</span> <span class="nx">createStore</span><span class="p">(</span><span class="nx">reducer</span><span class="p">,</span> <span class="nx">preloadedState</span><span class="p">,</span> <span class="nx">enhancer</span><span class="p">);</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">dispatch</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">;</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">chain</span> <span class="o">=</span> <span class="p">[];</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">middlewareAPI</span> <span class="o">=</span> <span class="p">{</span> <span class="c1">//注意这里：getState和dispatch都传入了middleware</span>
-</span><span class='line'>      <span class="nx">getState</span><span class="o">:</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">dispatch</span><span class="o">:</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">dispatch</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>    <span class="nx">chain</span> <span class="o">=</span> <span class="nx">middlewares</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">middleware</span> <span class="o">=&gt;</span> <span class="nx">middleware</span><span class="p">(</span><span class="nx">middlewareAPI</span><span class="p">));</span><span class="c1">//注意这里：这些middleware都是函数</span>
-</span><span class='line'>    <span class="nx">dispatch</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(...</span><span class="nx">chain</span><span class="p">)(</span><span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="p">{...</span><span class="nx">store</span><span class="p">,</span> <span class="nx">dispatch</span><span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>所有中间件被放进了一个数组chain，通过compose，将多个中间件合并，从右到左执行。中间件可以拿到getState和dispatch这两个方法。</p>
-
-<p>注：compose: 将多个函数合并成一个函数，从右到左执行。例如：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">R</span><span class="p">.</span><span class="nx">compose</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">,</span> <span class="nx">R</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="nx">R</span><span class="p">.</span><span class="nx">multiply</span><span class="p">(</span><span class="mi">2</span><span class="p">))(</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span> <span class="c1">// 7</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>-4 * 2 + 1 再求绝对值</p>
-
-<h2>总结</h2>
-
-<p>仔细看下来之后，中间件就没有那么神秘了，下一篇文章，我们来介绍下Redux的异步中间件，比如：Redux-Thunk，看懂这一个，其他的都差不多。</p>
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2018/04/27/deep-thinking-in-react-8/" data-via="" data-counturl="http://benweizhu.github.io/blog/2018/04/27/deep-thinking-in-react-8/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2018/04/25/deep-thinking-in-react-7/" title="Previous Post: React的思考（七）- Redux的Middleware（上）">&laquo; React的思考（七）- Redux的Middleware（上）</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/posts/2">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -411,6 +296,7 @@
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -425,7 +311,10 @@
       var disqus_shortname = 'benweiblog';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://benweizhu.github.io/blog/2018/04/27/deep-thinking-in-react-8/';
+        var disqus_url = 'http://benweizhu.github.io/blog/2018/04/27/deep-thinking-in-react-8/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

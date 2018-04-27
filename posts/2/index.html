@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="Reconciliation的含义本身 Reconciliation有的人翻译成“协调算法”，有的人翻译成“一致性对比”，在没有官方答案之前，我认为直译可能会比较准确，它的作用是React用来区分一棵节点树和另一棵节点树的算法，以确定哪些部分需要更改。 Reconciliation是通常被理解为“ &hellip;">
+  <meta name="description" content="为什么immutable在React中那么重要？ 我尝试用简（kuo）单（hao）易（li）懂（mian）的词解释 1.可以给你的React应用带来性能提升（不用深度对比） 2.简单的编程和调试体验，少出bug（不会操作共享对象） 3.数据更容易追踪，推导（保留previewState可以对比） &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,197 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2018/04/23/deep-thinking-in-react-6/">React的思考（六）- 不可变性</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2018-04-23T22:29:51+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2018</span></span> <span class='time'>10:29 pm</span></time>
+        
+           | <a href="/blog/2018/04/23/deep-thinking-in-react-6/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/23/deep-thinking-in-react-6/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>为什么immutable在React中那么重要？</h2>
+
+<p>我尝试用简（kuo）单（hao）易（li）懂（mian）的词解释</p>
+
+<p>1.可以给你的React应用带来性能提升（不用深度对比） <br/>
+2.简单的编程和调试体验，少出bug（不会操作共享对象）  <br/>
+3.数据更容易追踪，推导（保留previewState可以对比）</p>
+
+<p>Talk is shit, show me your money.</p>
+
+<p>光说还是差了点，虽然很通俗了，但是还是看下面一段代码，我用一个React初学者，特别容易犯的一个错误来说明这三个问题，请看题板：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">updateState</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">const</span> <span class="p">{</span><span class="nx">value</span><span class="p">}</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">let</span> <span class="nx">user</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">user</span><span class="p">;</span>
+</span><span class='line'>  <span class="nx">user</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">user</span><span class="p">});</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">updateState</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">const</span> <span class="p">{</span><span class="nx">value</span><span class="p">}</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">let</span> <span class="nx">user</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">user</span><span class="p">,</span> <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="nx">value</span><span class="p">});</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">user</span><span class="p">});</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>请问，第一种写法有什么问题？你有20秒的时间思考并作答，对不起，由于我没法遮挡住答案，请自觉闭眼思考。</p>
+
+<p>答案：就是上面说的三点，举个例子：shouldComponentUpdate(nextProps, nextState)，需要对比nextState和this.state的区别来决定是否渲染，但此时this.state已经不是以前的state了状态了，特别是PureComponent的shallow compare，直接导致组件不重新渲染，会出bug</p>
+
+<h2>为什么immutable在Redux中那么重要？</h2>
+
+<p>因为不用就会出bug，因为你就会问“为什么UI不更新”，因为Redux和React-Redux都使用了浅比较。</p>
+
+<p>具体行为体现在两处，一个在按照Domain区分的combineReducers那，一个在使用数据被connect包裹的组件那：</p>
+
+<p><strong>1.Redux的combineReducers方法浅比较它调用的reducer的引用是否发生变化</strong></p>
+
+<p>比如:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">combineReducers</span><span class="p">({</span> <span class="nx">todos</span><span class="o">:</span> <span class="nx">myTodosReducer</span><span class="p">,</span> <span class="nx">counter</span><span class="o">:</span> <span class="nx">myCounterReducer</span> <span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>combineReducers会遍历所有这些键值对，判断每一个reducer执行返回结果后的引用是否发生变化（所以是浅比较），如果其中一个变化了，就会设置一个标志位hasChanged为true，当遍历结束，如果hasChanged为true，则返回新的conbineReducers合并的总的state，否则返回旧的那个state（这个新旧的state在React-Redux中会用到）。</p>
+
+<p>这就是为什么在reducer当中要使用Object.assign({},state,{..}}来返回一个新的state，如果你直接操作state，并返回它，combineReducers会认为它没有改变。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kd">function</span> <span class="nx">myTodosReducer</span><span class="p">(</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">initialState</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">switch</span> <span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nx">SET_VISIBILITY_FILTER</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span> <span class="nx">state</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">visibilityFilter</span><span class="o">:</span> <span class="nx">action</span><span class="p">.</span><span class="nx">filter</span>
+</span><span class='line'>      <span class="p">})</span>
+</span><span class='line'>    <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">state</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>2.React-Redux的state和mapStateToProps</strong></p>
+
+<p>React-Redux的connect方法生成的组件，会假设包装的组件是一个“纯”（pure）组件，即给定相同的props和state，这个组件会返回相同的结果。做出这样的假设后，React-Redux就只需检查根state对象或mapStateToProps的返回值是否改变。如果没变，包装的组件就无需重新渲染。</p>
+
+<p>我们回忆一下，上面说道，combineReducers会决定是否返回新的根state，而每次调用React-Redux提供的connect函数时，它之前储存的根state对象的引用，会与当前传递给store的根state对象之间进行浅比较。如果相等，说明根state对象没有变化，也就无需重新渲染组件，甚至无需调用mapStateToProps。</p>
+
+<p>如果不相等，则connect会调用mapStateToProps来，并查看最后传给组件的props是否被更新。同样，这里也是一个浅比较，它要对比的是这个对象的第一层引用是否变化。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kd">function</span> <span class="nx">mapStateToProps</span><span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">todos</span><span class="o">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">todos</span><span class="p">,</span> <span class="c1">// prop value</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="nx">connect</span><span class="p">(</span><span class="nx">mapStateToProps</span><span class="p">)(</span><span class="nx">TodoApp</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>即，这个对象的todos是否变化。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">todos</span><span class="o">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">todos</span><span class="p">,</span> <span class="c1">// prop value</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>比如，如果在todos的reducer返回的state没有变化，那么这里的todos也就是没有变化，因此组件就不需要渲染。</p>
+
+<p>mapStateToProps因为它特殊的作用，很容易出现一种反模式，我们需要注意，就是像下面这样写：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kd">function</span> <span class="nx">mapStateToProps</span><span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">todos</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">all</span><span class="o">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">todos</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">visibleTodos</span><span class="o">:</span> <span class="nx">getVisibleTodos</span><span class="p">(</span><span class="nx">state</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="nx">connect</span><span class="p">(</span><span class="nx">mapStateToProps</span><span class="p">)(</span><span class="nx">TodoApp</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>todos对象永远拿到的都是新的对象{}，而不是直接由reducer里面返回的对象，所以组件一定会重新渲染，无论state是否变化。</p>
+
+<p><strong>React-Redux这样设计是有道理的</strong></p>
+
+<p>因为Redux本身的CombineReducers只会决定最根节点的state有没有变化，也就是这个{ todos: myTodosReducer, counter: myCounterReducer }里面的存不存在变化，然后决定返回新的或者旧的，而每一个connect的组件拿到这个新的根state，首先判断state有没有变化，然后判断这个变化和它想要的数据（一个或者多个reducer）有没有关，如果没有关系，当然就不用重新渲染。</p>
+
+<h2>总结</h2>
+
+<p>React和Redux之所以要求使用Immutable，原因的初衷是性能，避免深度对比。对于我们使用React和Redux的开发人员，除了关注性能，更是因为需要遵循React和Redux的编程规范来写出正确的代码。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -276,109 +467,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2018/04/21/deep-thinking-in-react-4/">React的思考（四）- componentDidMakeSense之生命周期面试调侃</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2018-04-21T20:51:50+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2018</span></span> <span class='time'>8:51 pm</span></time>
-        
-           | <a href="/blog/2018/04/21/deep-thinking-in-react-4/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/21/deep-thinking-in-react-4/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>看到一个老外的博客用了这样一个标题《componentDidMakeSense — React Component Lifecycle Explanation》，我只能说：老哥你太有才了，本来都不太想写这篇文章，冲你这个标题，我再啰嗦下生命周期。</p>
-
-<h3>没有水平的面试官老喜欢问的问题</h3>
-
-<p>面试官：“你能说一下React的生命周期函数调用过程吗？”</p>
-
-<p>我以及和我一样的人：“大哥，是不是我背出来，你就录用我？不是的话，你给我10秒钟，网不卡的话，我立马Google给你答案”</p>
-
-<p>手贱，给你们扩皮了一份。</p>
-
-<p><strong>Mounting</strong></p>
-
-<p>constructor()  <br/>
-static getDerivedStateFromProps()  <br/>
-componentWillMount() / UNSAFE_componentWillMount()  <br/>
-render()  <br/>
-componentDidMount()</p>
-
-<p><strong>Updating</strong></p>
-
-<p>componentWillReceiveProps() / UNSAFE_componentWillReceiveProps()  <br/>
-static getDerivedStateFromProps()  <br/>
-shouldComponentUpdate()  <br/>
-componentWillUpdate() / UNSAFE_componentWillUpdate()  <br/>
-render() <br/>
-getSnapshotBeforeUpdate()  <br/>
-componentDidUpdate()</p>
-
-<p><strong>Unmounting</strong></p>
-
-<p>componentWillUnmount()</p>
-
-<p><strong>Error Handling</strong></p>
-
-<p>componentDidCatch()</p>
-
-<h3>你不如这样问</h3>
-
-<p>你那么问别人问题，既不实际，也很尴尬，别人还觉得你没水平。不如我们结合实际问些问题：</p>
-
-<p>1.组件需要做一次网络请求来获取数据，请问应该怎么写？组件有一些事件订阅放在哪个位置比较合适？为什么？</p>
-
-<p>2.在哪些生命周期函数里面我不应该调用setState？如果调用了，会导致什么样的问题？</p>
-
-<p>3.如果我这么写constructor来初始化对象会有什么问题？</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">color</span><span class="o">:</span> <span class="nx">props</span><span class="p">.</span><span class="nx">color</span>
-</span><span class='line'>  <span class="p">};</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>4.你以前的经历中，用到了哪些生命周期函数？遇到过什么奇怪的问题没有？</p>
-
-<p>等等，这样会显得你比较有水平，如果朋友们还问过其他类型的问题？请不惜赐教！我会好好收藏的。</p>
-
-<h3>其他参考资料</h3>
-
-<p>官方文档其实就是不错的和最准确的 <a href="https://reactjs.org/docs/react-component.html#the-component-lifecycle" title="the-component-lifecycle">the-component-lifecycle</a></p>
-
-<p>另外推荐看 <a href="https://reactarmory.com/guides/lifecycle-simulators">https://reactarmory.com/guides/lifecycle-simulators</a></p>
-
-<p>另外，放心，我这些面试问题都没有给答案，不会被套路的，大不了，我换个方式问。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/3">&larr; Older</a>
@@ -406,6 +494,10 @@ componentDidUpdate()</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）</a>
       </li>
     
@@ -419,10 +511,6 @@ componentDidUpdate()</p>
     
       <li class="post">
         <a href="/blog/2018/04/21/deep-thinking-in-react-4/">React的思考（四）- componentDidMakeSense之生命周期面试调侃</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/20/deep-thinking-in-react-3/">React的思考（三）- 总结下shouldComponentUpdate</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="这篇博客的起源比较有意思，客户给我们出了一道前端的开发题目，实现一个满足某种需求的web应用程序，算是某种程度的面试或者能力检测。 开发的技术栈采用我比较熟悉的： 环境：Node 脚手架，构建和依赖管理：Yoman，Gulp，Bower，NPM（Node包管理也算依赖管理吧） 开发框架： &hellip;">
+  <meta name="description" content="昨天无意间搜索到一篇文章： http://blog.daocloud.io/daocloud_coding/ DaoCloud完成与Coding对接 这让我感到很兴奋，原因是我搜索的关键字是“coding.net 持续集成”。 有一个项目放在coding平台的私有库中，一直没有做持续集成， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,177 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/11/07/coding-net-and-dao-cloud/">通过DaoCloud配置Coding平台的持续集成服务</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-11-07T13:14:19+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:14 pm</span></time>
+        
+           | <a href="/blog/2015/11/07/coding-net-and-dao-cloud/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/11/07/coding-net-and-dao-cloud/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>昨天无意间搜索到一篇文章： <a href="http://blog.daocloud.io/daocloud_coding/">http://blog.daocloud.io/daocloud_coding/</a> DaoCloud完成与Coding对接</p>
+
+<p>这让我感到很兴奋，原因是我搜索的关键字是“coding.net 持续集成”。</p>
+
+<p>有一个项目放在coding平台的私有库中，一直没有做持续集成，如果是放在github的公有库，倒是可以用TravisCI做，但是这个项目不是开源的，一直希望找到一个国内的类似TravisCI的服务，直到昨天。</p>
+
+<h2>DaoCloud</h2>
+
+<p><img src="http://blog.daocloud.io/wp-content/uploads/2015/06/Logo_2.jpg" alt="Alt text" /></p>
+
+<p>DaoCloud 是业界领先的企业级容器云平台和解决方案提供商，致力于以 Docker 为代表的容器技术，为企业打造面向下一代互联网应用的交付和运维平台，帮助客户实现云端持续创新，&hellip;.，等等。就不帮别人打广告了。</p>
+
+<p>对我来说最重要的是：  <br/>
+DaoCloud 对接 GitHub、Coding、GitCafe 等国内外代码托管库，采用云端 SaaS 化服务，帮助开发者实现自动化持续集成测试和 Docker 容器镜像构建。DaoCloud 镜像构建服务基于全球分布式网路，构建速度极快，提供私有镜像存储空间，为容器化交付和跨团队合作奠定了基础。</p>
+
+<h3>如何使用</h3>
+
+<p>其实它提供的持续集成服务和TravisCI有点类似，至少从使用者的角度，是这么理解的。</p>
+
+<p>目前支持如下语言和服务：</p>
+
+<p>语言：Golang、Python、Ruby、Java、Javascript（NodeJS）、PHP、C（gcc） <br/>
+服务：MySQL、Redis、MongoDB</p>
+
+<p>服务指的意思是，比如：构建需要集成测试或者功能测试，那么它可以提供三种数据库供你使用。</p>
+
+<p>和TravisCI类似，需要你提供一个daocloud.yml，格式如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">image</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">daocloud/ci-golang:1.4</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">services</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">mongodb</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">mysql</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">redis</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">env</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">MYENV = &quot;hello&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">install</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an install segment&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Here, we usually run scripts to setup a base environment&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;For customized base image, you need to install git here unless you have git installed in your base image&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;e.g., apt-get install -y git-core&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">before_script</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an before_script segment&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Here, we usually run scripts to prepare our test&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">script</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo $MYENV</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;This is an script segment&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Run test cases here&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">echo &quot;Below shows how to use services, mongodb/mysql/redis are the hostnames of services&quot;</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 mongodb</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 mysql</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ping -c 2 redis</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>image是指定构建运行的环境镜像，除了上面的go语言，还有其他node，java，php，ruby等，在文章底部的参考资料中可以找到。</p>
+
+<h3>服务</h3>
+
+<p>service也就是你需要的数据库服务了，举个例子，假设，你指定了mysql。那么它提供的mysql的配置如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="err">Version：MySQL</span> <span class="err">5.5</span>
+</span><span class='line'><span class="na">Docker Link Alias</span><span class="o">:</span> <span class="s">mysql</span>
+</span><span class='line'><span class="na">Host</span><span class="o">:</span> <span class="s">mysql</span>
+</span><span class='line'><span class="na">Port</span><span class="o">:</span> <span class="s">3306</span>
+</span><span class='line'><span class="na">UserName</span><span class="o">:</span> <span class="s">root</span>
+</span><span class='line'><span class="na">Password</span><span class="o">:</span> <span class="s">不设密码</span>
+</span><span class='line'><span class="na">Default Instance</span><span class="o">:</span> <span class="s">test</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>所以，项目中的测试在连接数据库的时候，也需要对应配置，否则就连接不上。</p>
+
+<h3>执行顺序</h3>
+
+<p>设置环境变量。 <br/>
+执行 install 脚本。 <br/>
+克隆源代码，切换到对应的提交。 <br/>
+执行 before_script 脚本。 <br/>
+执行 script 脚本。</p>
+
+<p>script脚本，也就是你的构建执行命令了，比如：./gradlew clean build</p>
+
+<p>配置完成后，提交代码，就可以触发CI构建。</p>
+
+<h2>微信提醒功能</h2>
+
+<p>DaoCloud还可以和微信绑定，提供构建状态提醒，这样就不需要Build TV，直接手机微信提醒。</p>
+
+<h2>结束语</h2>
+
+<p>我的项目花费了大概半天的时间，就配置成功了，当然这包括项目本身的一些配置，与平台无关。</p>
+
+<p>参考资料：  <br/>
+1.<a href="http://help.daocloud.io/features/continuous-integration/daocloud-yml.html">http://help.daocloud.io/features/continuous-integration/daocloud-yml.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -352,124 +523,6 @@ Heroku Enterprise</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-10-31T19:01:24+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>7:01 pm</span></time>
-        
-           | <a href="/blog/2015/10/31/static-url-for-seo/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/10/31/static-url-for-seo/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>URL静态化一直以来都是最基本的SEO要求之一，但近年来搜索引擎技术进步，抓取动态url已经不是问题，SEO行业对是否一定要做静态化也有了一些观念上的改变。</p>
-
-<h2>为什么要做静态化？</h2>
-
-<p>现在的网站绝大多数都是数据库驱动，页面由程序实时生成，而不是真的在服务器上有一个静态HTML文件存在。当用户访问一个网址时，程序根据URL中的参数调用数据库，实时生成页面内容。因此动态页面相对应的URL原始状态也是动态的，包含问号，等号及参数。</p>
-
-<p>搜索引擎在发展初期，一般不愿意爬行和收录动态URL，主要原因是可能陷入无限循环或收录大量重复内容，造成资源极大的浪费。最典型的无线循环就是某些网站上出现的万年历。万年历会使得蜘蛛可以无限点击下去。</p>
-
-<p>真实用户一眼就能看出这是一个万年历，但是搜索引擎蜘蛛面对的只是一串代码，不一定能判断它。</p>
-
-<p>有时候就算不是无限循环，动态URL也可能造成大量重复页面。比如：想用的URL和参数（也就是相同的页面），但是参数的顺序不同（有多个参数）。</p>
-
-<p>更麻烦的是，有时候某些参数完全可以是任意值，服务器都能够正常的返回某个固定页面。</p>
-
-<p>这就是为什么搜索引擎对动态URL敬而远之的原因。</p>
-
-<h2>如何静态化URL呢？</h2>
-
-<p>最常见的方式是使用服务器URL重写模块，LAMP（Linux+Apache+MySQL+PHP）服务器上一般使用mod_rewrite模块，Windows服务器上也有类似的功能。</p>
-
-<p>举例：</p>
-
-<p><a href="http://www.domain.com/products.php?id=123">http://www.domain.com/products.php?id=123</a></p>
-
-<p>静态化为:</p>
-
-<p><a href="http://www.domain.com/products/123">http://www.domain.com/products/123</a></p>
-
-<p>需要请用服务器模块mod_rewrite，然后在.htaccess文件写入代码：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">RewriteRule</span> <span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="p">([</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="o">/</span><span class="n">products</span><span class="o">.</span><span class="n">php</span><span class="err">?</span><span class="nb">id</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>URL重写基于正则表达式，每个网站的动态URL结构都不同，所以写起来就很麻烦。</p>
-
-<p>严格的说，这里所说的URL静态化应该称为“伪静态化”，也就是说服务器上还是不存在相应的HTML文件，用户访问时还是动态生成页面，只不过通过URL重写技术使网站看起来像是静态的。当然，也有CMS系统可以实现真正静态化，系统会自动真实生成静态的HTML文件。但对于搜索引擎来说，真正的静态化和伪静态化没有区别。</p>
-
-<h2>到底是否需要URL静态化？</h2>
-
-<p>近年来搜索引擎对URL的抓取有了很大进步。一般来说，URL中有两三个参数，对于收录不会造成任何影响。权重高的域名，再多几个问号也不是问题。不过一般还是建议将URL静态化，即能提高用户体验，又能降低收录难度。</p>
-
-<p>2008年9月，Google站长博客发表了一篇关于动态网址还是静态网址的帖子，颠覆了SEO界的观念。</p>
-
-<p>Google的帖子有几个要点。</p>
-
-<p>一是Google完全有能力抓取动态网址，多少个问号也不是问题。这一点基本靠谱。</p>
-
-<p>第二，动态网址更有助于Google蜘蛛读懂URL含义，并进行鉴别，因为网址中的参数有提示性。比如Google举了这个例子：</p>
-
-<p>www.example.com/article/bin/answer.foo?language=en&amp;answer=3&amp;sid=98971298178906&amp;query=URL</p>
-
-<p>URL里的参数都有助于Google理解URL及网页内容。比如language后面跟的参数是提示语言，answer后面跟的是文章编号，sid后面的肯定是session ID。其他常用的包括color后面跟的参数指的是颜色，size后面跟的参数是尺寸等。有了这些参数的帮助，Google更容易理解网页。</p>
-
-<p>而将网址静态化后，这些参数的意义通常就变得不明显了。比如这个URL：</p>
-
-<p>www.example.com/shoes/red/7/12/men/index.html</p>
-
-<p>就可能使Google不知道哪个是产品序列号，哪个是尺寸等。</p>
-
-<p>第三，网址静态化很容易弄错，那就更得不偿失了。比如通常动态网址的参数调换顺序，所得到的页面其实是相同的，比如这两个网址很可能就是同一个页面：</p>
-
-<p>www.example.com/article/bin/answer.foo?language=en&amp;answer=3</p>
-
-<p>www.example.com/article/bin/answer.foo?answer=3&amp;language=en</p>
-
-<p>保留动态网址，Google还比较容易明白这是一样的网页。而经过静态化后，这样两个网址Google就不容易判断是不是同一个页面，从而可能引起复制内容：</p>
-
-<p>www.example.com/shoes/men/7/red/index.html</p>
-
-<p>www.example.com/shoes/red/7/men/index.html</p>
-
-<p>再一个容易搞错的是session ID，也可能被静态化进URL：</p>
-
-<p>www.example.com/article/bin/answer.foo/en/3/98971298178906/URL</p>
-
-<p>这样网站将产生大量URL不同，但其实内容相同的页面。</p>
-
-<p>所以，Google建议不要静态化URL。</p>
-
-<h2>虽然如此</h2>
-
-<p>但是《SEO实战密码》的作者建议还是做静态化。他认为Google的这个帖子解释的有些极端和牵强，也没有从其他搜索引擎的角度出发。</p>
-
-<p>参考资料： <br/>
-1.《SEO实战密码》</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/24">&larr; Older</a>
@@ -497,6 +550,10 @@ Heroku Enterprise</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）</a>
       </li>
     
@@ -510,10 +567,6 @@ Heroku Enterprise</p>
     
       <li class="post">
         <a href="/blog/2018/04/21/deep-thinking-in-react-4/">React的思考（四）- componentDidMakeSense之生命周期面试调侃</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/20/deep-thinking-in-react-3/">React的思考（三）- 总结下shouldComponentUpdate</a>
       </li>
     
   </ul>

@@ -9,12 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="模板引擎这个概念，相信对大家并不陌生，如果做过Java EE的开发，或者Rails开发，那么Jsp，Erb，Haml都是一种模板引擎，也许你还听说过Apache的velocity，只不过它们是后端的模板引擎，模板的渲染由服务器端完成。 比如这样的代码： 1
-2
-3
-4
-5
-//Jsp With &hellip;">
+  <meta name="description" content="URL静态化一直以来都是最基本的SEO要求之一，但近年来搜索引擎技术进步，抓取动态url已经不是问题，SEO行业对是否一定要做静态化也有了一些观念上的改变。 为什么要做静态化？ 现在的网站绝大多数都是数据库驱动，页面由程序实时生成，而不是真的在服务器上有一个静态HTML文件存在。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -69,6 +64,124 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/10/31/static-url-for-seo/">SEO实战密码：URL静态化</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-10-31T19:01:24+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>7:01 pm</span></time>
+        
+           | <a href="/blog/2015/10/31/static-url-for-seo/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2015/10/31/static-url-for-seo/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>URL静态化一直以来都是最基本的SEO要求之一，但近年来搜索引擎技术进步，抓取动态url已经不是问题，SEO行业对是否一定要做静态化也有了一些观念上的改变。</p>
+
+<h2>为什么要做静态化？</h2>
+
+<p>现在的网站绝大多数都是数据库驱动，页面由程序实时生成，而不是真的在服务器上有一个静态HTML文件存在。当用户访问一个网址时，程序根据URL中的参数调用数据库，实时生成页面内容。因此动态页面相对应的URL原始状态也是动态的，包含问号，等号及参数。</p>
+
+<p>搜索引擎在发展初期，一般不愿意爬行和收录动态URL，主要原因是可能陷入无限循环或收录大量重复内容，造成资源极大的浪费。最典型的无线循环就是某些网站上出现的万年历。万年历会使得蜘蛛可以无限点击下去。</p>
+
+<p>真实用户一眼就能看出这是一个万年历，但是搜索引擎蜘蛛面对的只是一串代码，不一定能判断它。</p>
+
+<p>有时候就算不是无限循环，动态URL也可能造成大量重复页面。比如：想用的URL和参数（也就是相同的页面），但是参数的顺序不同（有多个参数）。</p>
+
+<p>更麻烦的是，有时候某些参数完全可以是任意值，服务器都能够正常的返回某个固定页面。</p>
+
+<p>这就是为什么搜索引擎对动态URL敬而远之的原因。</p>
+
+<h2>如何静态化URL呢？</h2>
+
+<p>最常见的方式是使用服务器URL重写模块，LAMP（Linux+Apache+MySQL+PHP）服务器上一般使用mod_rewrite模块，Windows服务器上也有类似的功能。</p>
+
+<p>举例：</p>
+
+<p><a href="http://www.domain.com/products.php?id=123">http://www.domain.com/products.php?id=123</a></p>
+
+<p>静态化为:</p>
+
+<p><a href="http://www.domain.com/products/123">http://www.domain.com/products/123</a></p>
+
+<p>需要请用服务器模块mod_rewrite，然后在.htaccess文件写入代码：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">RewriteRule</span> <span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="p">([</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">)</span><span class="o">/</span><span class="n">products</span><span class="o">.</span><span class="n">php</span><span class="err">?</span><span class="nb">id</span><span class="o">=</span><span class="err">$</span><span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>URL重写基于正则表达式，每个网站的动态URL结构都不同，所以写起来就很麻烦。</p>
+
+<p>严格的说，这里所说的URL静态化应该称为“伪静态化”，也就是说服务器上还是不存在相应的HTML文件，用户访问时还是动态生成页面，只不过通过URL重写技术使网站看起来像是静态的。当然，也有CMS系统可以实现真正静态化，系统会自动真实生成静态的HTML文件。但对于搜索引擎来说，真正的静态化和伪静态化没有区别。</p>
+
+<h2>到底是否需要URL静态化？</h2>
+
+<p>近年来搜索引擎对URL的抓取有了很大进步。一般来说，URL中有两三个参数，对于收录不会造成任何影响。权重高的域名，再多几个问号也不是问题。不过一般还是建议将URL静态化，即能提高用户体验，又能降低收录难度。</p>
+
+<p>2008年9月，Google站长博客发表了一篇关于动态网址还是静态网址的帖子，颠覆了SEO界的观念。</p>
+
+<p>Google的帖子有几个要点。</p>
+
+<p>一是Google完全有能力抓取动态网址，多少个问号也不是问题。这一点基本靠谱。</p>
+
+<p>第二，动态网址更有助于Google蜘蛛读懂URL含义，并进行鉴别，因为网址中的参数有提示性。比如Google举了这个例子：</p>
+
+<p>www.example.com/article/bin/answer.foo?language=en&amp;answer=3&amp;sid=98971298178906&amp;query=URL</p>
+
+<p>URL里的参数都有助于Google理解URL及网页内容。比如language后面跟的参数是提示语言，answer后面跟的是文章编号，sid后面的肯定是session ID。其他常用的包括color后面跟的参数指的是颜色，size后面跟的参数是尺寸等。有了这些参数的帮助，Google更容易理解网页。</p>
+
+<p>而将网址静态化后，这些参数的意义通常就变得不明显了。比如这个URL：</p>
+
+<p>www.example.com/shoes/red/7/12/men/index.html</p>
+
+<p>就可能使Google不知道哪个是产品序列号，哪个是尺寸等。</p>
+
+<p>第三，网址静态化很容易弄错，那就更得不偿失了。比如通常动态网址的参数调换顺序，所得到的页面其实是相同的，比如这两个网址很可能就是同一个页面：</p>
+
+<p>www.example.com/article/bin/answer.foo?language=en&amp;answer=3</p>
+
+<p>www.example.com/article/bin/answer.foo?answer=3&amp;language=en</p>
+
+<p>保留动态网址，Google还比较容易明白这是一样的网页。而经过静态化后，这样两个网址Google就不容易判断是不是同一个页面，从而可能引起复制内容：</p>
+
+<p>www.example.com/shoes/men/7/red/index.html</p>
+
+<p>www.example.com/shoes/red/7/men/index.html</p>
+
+<p>再一个容易搞错的是session ID，也可能被静态化进URL：</p>
+
+<p>www.example.com/article/bin/answer.foo/en/3/98971298178906/URL</p>
+
+<p>这样网站将产生大量URL不同，但其实内容相同的页面。</p>
+
+<p>所以，Google建议不要静态化URL。</p>
+
+<h2>虽然如此</h2>
+
+<p>但是《SEO实战密码》的作者建议还是做静态化。他认为Google的这个帖子解释的有些极端和牵强，也没有从其他搜索引擎的角度出发。</p>
+
+<p>参考资料： <br/>
+1.《SEO实战密码》</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -270,273 +383,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/10/27/sass-basic/">重温SASS基础</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-10-27T14:18:48+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:18 pm</span></time>
-        
-           | <a href="/blog/2015/10/27/sass-basic/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/10/27/sass-basic/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>最早因为Bootstrap接触到了LESS，但LESS随着时间，使用的人越来越少，大家都开始转向SASS，至于为什么，原因很多，大家可以去网上搜索，有很多人都对比了LESS和SASS。今天主要是来回顾SASS的基础知识。</p>
-
-<p>CSS很好，但是随着stylesheets的内容增多，变得越来越复杂，也越来越难以维护。此时，CSS预处理器横空出世，SASS就是其中一种。</p>
-
-<p>SASS允许你做许多在CSS中做不了的事情，比如：变量，网状结构（接近DOM结构），mixin，继承等。</p>
-
-<h3>变量</h3>
-
-<p>Sass使用$符号定义变量，就和其他编程语言一定，它可以被赋值和重复使用。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">$</span><span class="nt">font-stack</span><span class="o">:</span>    <span class="nt">Helvetica</span><span class="o">,</span> <span class="nt">sans-serif</span><span class="o">;</span>
-</span><span class='line'><span class="o">$</span><span class="nt">primary-color</span><span class="o">:</span> <span class="nf">#333</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">body</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">font</span><span class="o">:</span> <span class="m">100%</span> <span class="err">$</span><span class="k">font</span><span class="o">-</span><span class="n">stack</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">color</span><span class="o">:</span> <span class="err">$</span><span class="n">primary</span><span class="o">-</span><span class="k">color</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>网状结构</h3>
-
-<p>Sass比CSS强大的一点是，可读性好，CSS有后代选择器和权重的知识，它们与DOM结构息息相关，但是CSS本身却没有很好的语法结构来反映这种结构，Sass做到了这一点。</p>
-
-<p>Sass让你的css选择器符合真实的HTML层次结构，当然Sass官方也提示如果过度的使用网状结构，也会导致CSS很难维护。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">nav</span> <span class="p">{</span>
-</span><span class='line'>  <span class="n">ul</span> <span class="err">{</span>
-</span><span class='line'>    <span class="k">margin</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">padding</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">list-style</span><span class="o">:</span> <span class="k">none</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nt">li</span> <span class="p">{</span> <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nt">a</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">display</span><span class="o">:</span> <span class="k">block</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">padding</span><span class="o">:</span> <span class="m">6px</span> <span class="m">12px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">text-decoration</span><span class="o">:</span> <span class="k">none</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="err">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>上面的例子中，ul和li是在nav结构之中的。</p>
-
-<h3>通过Partial和Import来做模块化</h3>
-
-<p>CSS本身也是有import功能的，但是缺点是，它会在页面中单独发送一个Http请求来获取这个import进来的css。</p>
-
-<p>Sass是一个CSS预处理器，它的import是建立在编译过程中，将两个或者多个文件合并，所以机制完全不同。</p>
-
-<p>比如，有_reset.scss和base.scss两个文件，注意，定义Partial的sass文件是以下划线开头的。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">//</span> <span class="nt">_reset</span><span class="nc">.scss</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">html</span><span class="o">,</span>
-</span><span class='line'><span class="nt">body</span><span class="o">,</span>
-</span><span class='line'><span class="nt">ul</span><span class="o">,</span>
-</span><span class='line'><span class="nt">ol</span> <span class="p">{</span>
-</span><span class='line'>   <span class="k">margin</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">padding</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">//</span> <span class="nt">base</span><span class="nc">.scss</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">@import</span> <span class="s1">&#39;reset&#39;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">body</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">font</span><span class="o">:</span> <span class="m">100%</span> <span class="n">Helvetica</span><span class="o">,</span> <span class="k">sans-serif</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="m">#efefef</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Mixins</h3>
-
-<p>Mixins是一个非常有用的功能，Mixins允许你将一组css定义在不同的位置重用，而且还可以像函数一样传递变量。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="k">@mixin</span> <span class="nt">border-radius</span><span class="o">($</span><span class="nt">radius</span><span class="o">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nt">-webkit-border-radius</span><span class="o">:</span> <span class="o">$</span><span class="nt">radius</span><span class="o">;</span>
-</span><span class='line'>     <span class="nt">-moz-border-radius</span><span class="o">:</span> <span class="o">$</span><span class="nt">radius</span><span class="o">;</span>
-</span><span class='line'>      <span class="nt">-ms-border-radius</span><span class="o">:</span> <span class="o">$</span><span class="nt">radius</span><span class="o">;</span>
-</span><span class='line'>          <span class="nt">border-radius</span><span class="o">:</span> <span class="o">$</span><span class="nt">radius</span><span class="o">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.box</span> <span class="p">{</span> <span class="o">@</span><span class="n">include</span> <span class="k">border</span><span class="o">-</span><span class="n">radius</span><span class="p">(</span><span class="m">10px</span><span class="p">);</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Extend/Inheritance继承</h3>
-
-<p>通过@extend关键字，你可以让一系列的在某个选择器中css属性，在另一个css选择器中继承，也是重用css定义的一种模式。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.message</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">border</span><span class="o">:</span> <span class="m">1px</span> <span class="k">solid</span> <span class="m">#ccc</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">padding</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">color</span><span class="o">:</span> <span class="m">#333</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.success</span> <span class="p">{</span>
-</span><span class='line'>  <span class="o">@</span><span class="n">extend</span> <span class="o">.</span><span class="n">message</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">border-color</span><span class="o">:</span> <span class="nb">green</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.error</span> <span class="p">{</span>
-</span><span class='line'>  <span class="o">@</span><span class="n">extend</span> <span class="o">.</span><span class="n">message</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">border-color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.warning</span> <span class="p">{</span>
-</span><span class='line'>  <span class="o">@</span><span class="n">extend</span> <span class="o">.</span><span class="n">message</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">border-color</span><span class="o">:</span> <span class="nb">yellow</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Operators操作符/运算符</h3>
-
-<p>Sass可以轻易的进行数学运算，+, -, *, /, %</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.container</span> <span class="p">{</span> <span class="k">width</span><span class="o">:</span> <span class="m">100%</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">article</span><span class="o">[</span><span class="nt">role</span><span class="o">=</span><span class="s2">&quot;main&quot;</span><span class="o">]</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">float</span><span class="o">:</span> <span class="k">left</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">600px</span> <span class="o">/</span> <span class="m">960px</span> <span class="o">*</span> <span class="m">100%</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">aside</span><span class="o">[</span><span class="nt">role</span><span class="o">=</span><span class="s2">&quot;complimentary&quot;</span><span class="o">]</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">float</span><span class="o">:</span> <span class="k">right</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">300px</span> <span class="o">/</span> <span class="m">960px</span> <span class="o">*</span> <span class="m">100%</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Data Types有用的数据类型</h3>
-
-<p>SassScript支持七种主要的数据类型</p>
-
-<p>numbers (e.g. 1.2, 13, 10px) <br/>
-strings of text, with and without quotes (e.g. &ldquo;foo&rdquo;, &lsquo;bar&rsquo;, baz) <br/>
-colors (e.g. blue, #04a3f9, rgba(255, 0, 0, 0.5)) <br/>
-booleans (e.g. true, false) <br/>
-nulls (e.g. null) <br/>
-lists of values, separated by spaces or commas (e.g. 1.5em 1em 0 2em, Helvetica, Arial, sans-serif) <br/>
-maps from one value to another (e.g. (key1: value1, key2: value2))</p>
-
-<p>比如：map</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="o">$</span><span class="nt">map</span><span class="o">:</span> <span class="o">(</span><span class="nt">key1</span><span class="o">:</span> <span class="nt">value1</span><span class="o">,</span> <span class="nt">key2</span><span class="o">:</span> <span class="nt">value2</span><span class="o">,</span> <span class="nt">key3</span><span class="o">:</span> <span class="nt">value3</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>参考文献： <br/>
-1.SASS官方文档</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/25">&larr; Older</a>
@@ -564,6 +410,10 @@ maps from one value to another (e.g. (key1: value1, key2: value2))</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）</a>
       </li>
     
@@ -577,10 +427,6 @@ maps from one value to another (e.g. (key1: value1, key2: value2))</p>
     
       <li class="post">
         <a href="/blog/2018/04/21/deep-thinking-in-react-4/">React的思考（四）- componentDidMakeSense之生命周期面试调侃</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/20/deep-thinking-in-react-3/">React的思考（三）- 总结下shouldComponentUpdate</a>
       </li>
     
   </ul>

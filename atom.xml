@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-04-26T22:47:25+08:00</updated>
+  <updated>2018-04-27T14:34:11+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -12,6 +12,104 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[React的思考（八）- Redux的Middleware（下）异步的世界]]></title>
+    <link href="http://benweizhu.github.io/blog/2018/04/27/deep-thinking-in-react-8/"/>
+    <updated>2018-04-27T13:38:01+08:00</updated>
+    <id>http://benweizhu.github.io/blog/2018/04/27/deep-thinking-in-react-8</id>
+    <content type="html"><![CDATA[<h2>有序而独立的同步世界</h2>
+
+<p>没有异步的情况下，Redux配合React很容易理解的（Action->Reducer->CombineReducers->React-Redux->Component），简单回顾下：</p>
+
+<p>1.在组件里面dispatch（发出）一个action对象（带上类型和数据）  <br/>
+2.action对象被传递到reducer的入口，reducer根据类型给到不同的switch分支，然后根据带入的数据操作state，返回新的state   <br/>
+3.redux发现有新的state，配合React-Redux，通知所有component，请注意你自己要不要更新，然后各自判断各自更新</p>
+
+<p>被传递到组件里的disptach</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">const</span> <span class="nx">mapDispatchToProps</span> <span class="o">=</span> <span class="nx">dispatch</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">onAddTodo</span><span class="o">:</span> <span class="nx">text</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">dispatch</span><span class="p">(</span><span class="nx">addTodo</span><span class="p">(</span><span class="nx">text</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">addTodo</span> <span class="o">=</span> <span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;ADD_TODO&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">text</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">onAddTodo</span><span class="p">(</span><span class="s1">&#39;My first todo&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Reducer的入口</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kd">function</span> <span class="nx">todoApp</span><span class="p">(</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">initialState</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">switch</span> <span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nx">ADD_TODO</span><span class="o">:</span><span class="c1">//命中这个switch case</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span> <span class="nx">state</span><span class="p">,</span> <span class="p">{</span><span class="c1">//返回新的state</span>
+</span><span class='line'>        <span class="nx">todos</span><span class="o">:</span> <span class="p">[</span>
+</span><span class='line'>          <span class="p">...</span><span class="nx">state</span><span class="p">.</span><span class="nx">todos</span><span class="p">,</span>
+</span><span class='line'>          <span class="p">{</span>
+</span><span class='line'>            <span class="nx">text</span><span class="o">:</span> <span class="nx">action</span><span class="p">.</span><span class="nx">text</span><span class="p">,</span>
+</span><span class='line'>            <span class="nx">completed</span><span class="o">:</span> <span class="kc">false</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>        <span class="p">]</span>
+</span><span class='line'>      <span class="p">})</span>
+</span><span class='line'>    <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">state</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>组件的connect发现todos变了，所以要更新这个connect嵌入的组件</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">const</span> <span class="nx">mapStateToProps</span> <span class="o">=</span> <span class="nx">state</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">todos</span><span class="o">:</span> <span class="nx">getVisibleTodos</span><span class="p">(</span><span class="nx">state</span><span class="p">.</span><span class="nx">todos</span><span class="p">,</span> <span class="nx">state</span><span class="p">.</span><span class="nx">visibilityFilter</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[React的思考（七）- Redux的Middleware（上）]]></title>
@@ -3137,145 +3235,6 @@ Can I use svg?</p>
 <p>那么，“风格指南驱动开发”到底驱动了什么？也许，它驱动着我们尽最大可能去重新使用已有的组件（代码）和设计更通用的组件，也驱动着我们（开发，UX，BA）进行更加频繁的沟通，它驱动着BA（业务分析）书写更加合理的Story，也驱动开发进行更加合理的代码和资源的管理。</p>
 
 <p>如果转载本文，请注明转载地址： <a href="http://benweizhu.github.io/blog/2016/11/19/style-guide-driven-development/">http://benweizhu.github.io/blog/2016/11/19/style-guide-driven-development/</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Living Style Guide - 缩小设计和开发的沟通鸿沟]]></title>
-    <link href="http://benweizhu.github.io/blog/2016/10/27/living-style-guide/"/>
-    <updated>2016-10-27T10:04:27+08:00</updated>
-    <id>http://benweizhu.github.io/blog/2016/10/27/living-style-guide</id>
-    <content type="html"><![CDATA[<p>本文作者：朱本威，杨松</p>
-
-<h3>什么是Style Guide（风格指南）？</h3>
-
-<p>如果你做过Web开发，我打赌你肯定听说过“风格指南”!</p>
-
-<p>风格指南是什么？它是一系列关于书写和设计标准的文档，比如一些常见的标准有：字体，颜色，Logo，间距等等。</p>
-
-<p>风格指南最早出自于印刷行业，比如：出版社就是风格指南的常见用户。</p>
-
-<p style="text-align: center;">
-  <img src="http://benweizhu.github.io/images/style-guide/duzhe99.png" width="500" title="1999年的《读者》" alt="Alt text">
-  <img src="http://benweizhu.github.io/images/style-guide/duzhe2016.png" width="294" title="2016年的《读者》" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">从1999年到2016年，《读者》的封面风格都没有改变过</p>
-
-
-<p>好的品牌，通常都有一个非常棒的风格指南，无论是哪个行业，比如：KFC。我们也将KFC的这种风格指南成为VI（Visual Identity，企业视觉设计）。</p>
-
-<p style="text-align: center;">
-  <img src="http://benweizhu.github.io/images/style-guide/KFC.png" width="500" title="KFC Style Guide" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">KFC老爷爷大家都认识</p>
-
-
-<p>对于我们的WEB开发，也需要风格指南，目的是保证最终的交付产物和最初设计的一致性，打造出一致的核心用户体验。</p>
-
-<p style="text-align: center;">
-  <img src="http://benweizhu.github.io/images/style-guide/optus.png" width="500" title="OPUTS Style Guide" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">Optus澳大利亚电讯公司</p>
-
-
-<h3>风格指南过去的工作方式</h3>
-
-<p>在过去，一种常用的工作方式，设计与开发是分离开了。设计师在这儿，前端工程师在那儿，中间有一条无形的巨大的鸿沟。</p>
-
-<p>唯一的沟通渠道就是这样一个PDF材料。设计师最开始把PDF给你，然后和工程师各自为阵开始忙自己的，打死不相往来。</p>
-
-<p>沟通不及时就不说了，有时候设计还要埋怨你，说你的实现怎么和他最初的设计不一样。</p>
-
-<p>每一个工程师都应该都会有一段被设计师逼着改实现的经历，也许有的设计师们根本不理解我们修复IE问题时的痛苦，也不一定明白PDF文档沟通的效率是有限的。</p>
-
-<p>“我怎么能知道点击每一个按钮时候的行为呢？”</p>
-
-<p>答案是我根本不知道，等我看完了一百页文档，还不如你直接给我解释来得简单直接。</p>
-
-<p style="text-align: center;">
-  <img src="http://benweizhu.github.io/images/style-guide/ui-dev.png" width="500" title="UX 和 UIDev" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">UX，UI Dev和Backend Dev</p>
-
-
-<p>而每一次修改都需要很长的反馈周期，中间浪费了不少时间。</p>
-
-<p>然而，当第二版，第三版，第四版来的时候，我的PDF和PSD文件已经堆积成山，我也不清楚哪一个才是最新的版本，没有版本管理工具，即便有，这种二进制文件也很难立刻查看它和上一个版本的区别在哪。</p>
-
-<p>而且我相信大部分像我一样没有强迫症的人，一定是文件下载或者拷贝随意放置在桌面或者什么位置，然后常常根据时间排序去找最新的。久而久之，就不知道在哪了，然后又找设计师要一版。</p>
-
-<p>经历了以上种种的痛点之后，我们是怎么做的？</p>
-
-<h3>Living Style Guide</h3>
-
-<p style="text-align: center;">
-  <img src="http://benweizhu.github.io/images/style-guide/living-style-guide-logo.png" width="500" title="UX 和 UIDev" alt="Alt text">
-</p>
-
-
-<p>我们忍受不了这种不够敏捷的工作方式，尝试着用新的方式去解决这个问题，我们构建一个Living Style Guide。它是一个在线站点，同时也是一种工作方式，一种实践。我们尝试通过这种实践去解决这个问题。</p>
-
-<p><strong>Living Style Guide和Style Guide的区别：</strong></p>
-
-<p>一个直观的变化就是，曾经的PDF文档，代码化了。比如，最开始只存在于PDF文件中的调色板，字体，在网站上就可以直接查看，而不用担心是否过期，找不到等等。</p>
-
-<p>同时，也是一种工作方式的改变，我们的设计师与工程师需要更加紧密地工作在一起了。让Living Style Guide成了一个钮带，连接着设计师与工程师。</p>
-
-<p>设计看到的文档即代码，开发人员看到的代码即文档。不会出现设计师所认为的设计和实际开发出来的结果不一致的情况，我们做到Single source of truth(唯一真实来源)。同时，你看到的是动态，可交互的一系列组件。不需要考虑怎么用文档去描述一种行为，你所看到的就包含自身行为。</p>
-
-<p>敏捷宣言中有这样一句话：工作的软件 高于 详尽的文档，Living Style Guide在努力实现这一点，尝试将设计与前端的闭环缩小。</p>
-
-<h3>聊聊工程师们关心的干货</h3>
-
-<p><strong>选择合适的技术栈</strong></p>
-
-<p>技术栈的选择还是要回归到项目需求上。我们从大的方向上考虑了这么几点：组件化，数据驱动，易定制和可测试。</p>
-
-<p>Living Style Guide是一个供设计师和前端开发工程师使用的平台，并可以将开发的内容打包使用在其他不同的Web应用平台，对通用性和易用性都有较高的要求，我们没有做一个大而全的框架，而是想要做到以组件为单位，灵活发布，并能灵活使用在各种平台。</p>
-
-<p style="text-align: center;">
-  <img src="http://benweizhu.github.io/images/style-guide/tech-stack.png" width="500" title="我们的技术栈" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">我们的技术栈</p>
-
-
-<p>上面这张图涵盖了我们大部分的技术栈内容，具体内容我就不单独介绍了。不过，我突然想起来前段时间有一篇非常火的文章《在2016年学JavaScript是一种什么样的体验?》，它写的就是我们这个feel。</p>
-
-<p><strong>关于代码组织结构方式</strong></p>
-
-<p>组件化是我们的核心价值，所以在代码结构上，我们将“自包含”属性作为一个很重要的特性。每一个组件包含了它自己所需要的相关文件：测试文件（单元测试，功能测试），样式文件（Sass），组件和文档，而公共的部分，我们抽离到其他位置，从而尽量做到高内聚，低耦合，同时提高代码重用性。</p>
-
-<p style="text-align: center;">
-  <img src="http://benweizhu.github.io/images/style-guide/folder-structure.png" width="300" title="代码组织结构" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">我们项目的代码组织结构</p>
-
-
-<p><strong>需要注意的点</strong></p>
-
-<p>组件化的好处是相互隔离，又可被重用。实现组件化一定要需要合理的分类和管理好组件，比如，区分业务组件和通用组件，保证被重用的组件拥有足够的可扩展性。</p>
-
-<p><strong>最后</strong></p>
-
-<p>Living Style Guide是我们在缩小设计与开发沟通鸿沟的一种尝试，努力将闭环缩小，以提高效率，降低成本，这是一种实践，也是设计师和工程师工作方式的改变。</p>
-
-<p>转载请注明： <a href="http://benweizhu.github.io/blog/2016/10/27/living-style-guide/">http://benweizhu.github.io/blog/2016/10/27/living-style-guide/</a></p>
-
-<p>参考资料： <br/>
-1. <a href="https://asinthecity.com/2011/11/10/the-difference-between-a-ux-designer-and-ui-developer/">https://asinthecity.com/2011/11/10/the-difference-between-a-ux-designer-and-ui-developer/</a> <br/>
-2. 敏捷宣言（ <a href="http://agilemanifesto.org/iso/zhchs/">http://agilemanifesto.org/iso/zhchs/</a> ）</p>
 ]]></content>
   </entry>
   
