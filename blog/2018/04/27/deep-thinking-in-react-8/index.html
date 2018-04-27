@@ -94,7 +94,7 @@
 2.action对象被传递到reducer的入口，reducer根据类型给到不同的switch分支，然后根据带入的数据操作state，返回新的state   <br/>
 3.redux发现有新的state，配合React-Redux，通知所有component，请注意你自己要不要更新，然后各自判断各自更新</p>
 
-<p>被传递到组件里的disptach</p>
+<p>一个被传递到组件里的disptach</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -125,7 +125,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Reducer的入口</p>
+<p>action被传递到reducer的入口</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -162,7 +162,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>组件的connect发现todos变了，所以要更新这个connect嵌入的组件</p>
+<p>组件被通知请查看你是否需要更新，connect发现todos变了，所以要更新这个connect嵌入的组件</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
