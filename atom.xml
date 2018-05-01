@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-05-01T17:06:32+08:00</updated>
+  <updated>2018-05-01T17:07:38+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -248,9 +248,9 @@
 
 <p>其实，没有Redux-Thunk我们已经可以处理异步请求，只不过异步逻辑不在Redux里面，而是在组件里面，如果我们加入Redux-Thunk会有什么不同呢？</p>
 
-<p>我在<a href="http://benweizhu.github.io/blog/2018/04/25/deep-thinking-in-react-7/" title="上面篇文章">上面篇文章</a>讲过，中间件的作用是在dispatch的附近做一些额外的操作，让Redux拥有不同的能力，Redux-Thunk中间件的能力，可以让action creater，不返回一个action对象，而是一个函数，这个action创建的函数就成为一个thunk。</p>
+<p>我在<a href="http://benweizhu.github.io/blog/2018/04/25/deep-thinking-in-react-7/" title="上面篇文章">上面篇文章</a>讲过，中间件的作用是在dispatch的附近做一些额外的操作，让Redux拥有不同的能力，Redux-Thunk中间件的能力，可以让action creater，不用返回一个action对象，而是一个函数，这个action创建的函数就成为一个thunk。</p>
 
-<p>（Thunk函数的含义，编译器的&#8221;传名调用&#8221;实现，往往是将参数放到一个临时函数之中，再将这个临时函数传入函数体。这个临时函数就叫做Thunk函数。）</p>
+<p>（关于Thunk函数的含义：编译器的&#8221;传名调用&#8221;实现，往往是将参数放到一个临时函数之中，再将这个临时函数传入函数体。这个临时函数就叫做Thunk函数。）</p>
 
 <p>这个函数并不需要保持纯净，它还可以带有副作用，包括执行异步API请求。这个函数还可以dispatch action。</p>
 
