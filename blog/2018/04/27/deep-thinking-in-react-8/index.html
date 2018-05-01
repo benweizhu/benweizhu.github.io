@@ -236,7 +236,7 @@
 </span><span class='line'>    <span class="p">);</span>
 </span><span class='line'>  <span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="nx">getRandomName</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">getRandomName</span><span class="p">()</span> <span class="p">{</span> <span class="c1">// 重点是这么一段代码</span>
 </span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">loading</span><span class="o">:</span> <span class="kc">true</span><span class="p">})</span>
 </span><span class='line'>    <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;https://randomuser.me/api/&#39;</span><span class="p">)</span>
 </span><span class='line'>      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
