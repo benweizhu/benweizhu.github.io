@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-04-27T14:37:15+08:00</updated>
+  <updated>2018-05-01T17:00:25+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -24,7 +24,7 @@
 
 <p>1.在组件里面dispatch（发出）一个action对象（带上类型和数据）  <br/>
 2.action对象被传递到reducer的入口，reducer根据类型给到不同的switch分支，然后根据带入的数据操作state，返回新的state   <br/>
-3.redux发现有新的state，配合React-Redux，通知所有component，请注意你自己要不要更新，然后各自判断各自更新</p>
+3.redux发现有新的state，配合React-Redux，通知所有component，告诉组件请注意你自己要不要更新，然后各自判断各自更新</p>
 
 <p>一个被传递到组件里的disptach</p>
 
@@ -41,6 +41,9 @@
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
 </pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">const</span> <span class="nx">mapDispatchToProps</span> <span class="o">=</span> <span class="nx">dispatch</span> <span class="o">=&gt;</span> <span class="p">{</span>
 </span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
 </span><span class='line'>    <span class="nx">onAddTodo</span><span class="o">:</span> <span class="nx">text</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -53,7 +56,10 @@
 </span><span class='line'>  <span class="nx">text</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'><span class="nx">onAddTodo</span><span class="p">(</span><span class="s1">&#39;My first todo&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="c1">//在组件里面点击时触发</span>
+</span><span class='line'><span class="nx">handleClickAdd</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">onAddTodo</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">todoText</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -108,6 +114,198 @@
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+<h2>没有Redux的异步世界</h2>
+
+<p>异步世界没什么可怕的（又不是异世界）</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">class</span> <span class="nx">ExampleComponent</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">){</span>
+</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nx">loading</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">errorMessage</span><span class="o">:</span> <span class="s1">&#39;&#39;</span> <span class="p">};</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">_getRandomName</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getRandomName</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kr">const</span> <span class="p">{</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">errorMessage</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span><span class="p">(</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">_getRandomName</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">PRESS</span> <span class="nx">ME</span><span class="o">!&lt;</span><span class="err">/button&gt;</span>
+</span><span class='line'>        <span class="p">{</span> <span class="nx">errorMessage</span> <span class="o">&amp;&amp;</span> <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">errorMessage</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt; }</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'>    <span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">getRandomName</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">loading</span><span class="o">:</span> <span class="kc">true</span><span class="p">})</span>
+</span><span class='line'>    <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;https://randomuser.me/api/&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
+</span><span class='line'>      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">data</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">results</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span> <span class="nx">name</span><span class="o">:</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">first</span><span class="p">}</span> <span class="nx">$</span><span class="p">{</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">last</span><span class="p">}</span><span class="err">`</span><span class="p">,</span> <span class="nx">loading</span><span class="o">:</span> <span class="kc">false</span> <span class="p">})</span>
+</span><span class='line'>      <span class="p">})</span>
+</span><span class='line'>      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">reason</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">errorMessage</span><span class="o">:</span><span class="s1">&#39;get name failed&#39;</span><span class="p">,</span> <span class="nx">loading</span><span class="o">:</span> <span class="kc">false</span><span class="p">})</span>
+</span><span class='line'>      <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>过程很简单，我们需要考虑三种页面状态：请求开始和进行中，请求成功，请求失败，然后分别设置组件的state。</p>
+
+<h2>如果没有类似Redux-Thunk中间件</h2>
+
+<p>按照“没有Redux的异步世界”的思想，我们仍然可以依葫芦画瓢的在Redux中进行异步的Redux的操作。</p>
+
+<p>一个异步请求都需要dispatch至少三种action：</p>
+
+<p>1.通知reducer请求开始   <br/>
+2.通知reducer请求成功   <br/>
+3.通知reducer请求失败</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;FETCH_POSTS_REQUEST&#39;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;FETCH_POSTS_FAILURE&#39;</span><span class="p">,</span> <span class="nx">error</span><span class="o">:</span> <span class="s1">&#39;Oops&#39;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;FETCH_POSTS_SUCCESS&#39;</span><span class="p">,</span> <span class="nx">response</span><span class="o">:</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Redux&#39;</span><span class="p">}</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果没有类似Redux-Thunk的中间件，那么你的做法和没有Redux时是类似的，你需要在mapDispatchToProps那传入三个disptach，将异步的fetch逻辑放在组件里面实现，Redux本身仍然是处理同步的state操作。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">getRandomName</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">fetchRequest</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+</span><span class='line'>  <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;https://randomuser.me/api/&#39;</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">data</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">results</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">fetchSuccess</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">first</span><span class="p">}</span> <span class="nx">$</span><span class="p">{</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">last</span><span class="p">}</span><span class="err">`</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>    <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">reason</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">fetchFailure</span><span class="p">(</span><span class="s1">&#39;get name failed&#39;</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>使用Redux-Thunk的不同点在哪？</h2>
+
+<p>Redux-Thunk刚刚引入的时候，往往容易让使用者有些感到混乱，一个原因是函数式编程的嵌套写法，第二个是和Redux之前dispatch函数做的事情不一样了。</p>
+
+<p>其实，没有Redux-Thunk我们已经可以处理异步请求，只不过异步逻辑不在Redux里面，而是在组件里面，如果我们加入Redux-Thunk会有什么不同呢？</p>
+
+<p>我在<a href="http://benweizhu.github.io/blog/2018/04/25/deep-thinking-in-react-7/" title="上面篇文章">上面篇文章</a>讲过，中间件的作用是在dispatch的附近做一些额外的操作，让Redux拥有不同的能力，Redux-Thunk中间件的能力，可以让action creater，不返回一个action对象，而是一个函数，这个action创建的函数就成为一个thunk。</p>
+
+<p>（Thunk函数的含义，编译器的&#8221;传名调用&#8221;实现，往往是将参数放到一个临时函数之中，再将这个临时函数传入函数体。这个临时函数就叫做Thunk函数。）</p>
+
+<p>这个函数并不需要保持纯净，它还可以带有副作用，包括执行异步API请求。这个函数还可以dispatch action。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">export</span> <span class="kd">function</span> <span class="nx">fetchRandmonName</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">dispatch</span><span class="p">(</span><span class="nx">fetchRequest</span><span class="p">(</span><span class="kc">true</span><span class="p">))</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;https://randomuser.me/api/&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
+</span><span class='line'>      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">data</span> <span class="o">=&gt;</span><span class="p">{</span>
+</span><span class='line'>        <span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">results</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span><span class='line'>        <span class="nx">dispatch</span><span class="p">(</span><span class="nx">fetchSuccess</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">first</span><span class="p">}</span> <span class="nx">$</span><span class="p">{</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">last</span><span class="p">}</span><span class="err">`</span><span class="p">,</span> <span class="kc">false</span><span class="p">))</span>
+</span><span class='line'>      <span class="p">})</span>
+</span><span class='line'>      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">reason</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">dispatch</span><span class="p">(</span><span class="nx">fetchFailure</span><span class="p">(</span><span class="s1">&#39;get name failed&#39;</span><span class="p">,</span> <span class="kc">false</span><span class="p">))</span>
+</span><span class='line'>      <span class="p">})</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">mapDispatchToProps</span> <span class="o">=</span> <span class="nx">dispatch</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">fetchRandmonName</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">dispatch</span><span class="p">(</span><span class="nx">fetchRandmonName</span><span class="p">())</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">getRandomName</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">fetchRandmonName</span><span class="p">();</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>因为Redux-Thunk，你可以将异步的处理逻辑，从组件里面拿出来，将它放在一个和Redux其他代码更加的内聚的位置，也许是action的存放位置，而组件里面只需要dispatch一个thunk。</p>
+
+<h2>总结</h2>
+
+<p>关于Redux的异步世界，暂时更新到这里，Redux里面处理异步的中间件有好多，我就不一个个分析了，你肯定很关心这个，<a href="http://react-china.org/t/redux/8761" title="《Redux异步方案选型》">《Redux异步方案选型》</a></p>
 ]]></content>
   </entry>
   
