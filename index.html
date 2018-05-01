@@ -351,7 +351,9 @@
 <span class='line-number'>24</span>
 <span class='line-number'>25</span>
 <span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">export</span> <span class="kd">function</span> <span class="nx">fetchRandmonName</span><span class="p">()</span> <span class="p">{</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="c1">//actions.js</span>
+</span><span class='line'><span class="kr">export</span> <span class="kd">function</span> <span class="nx">fetchRandmonName</span><span class="p">()</span> <span class="p">{</span>
 </span><span class='line'>  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">)</span> <span class="p">{</span>
 </span><span class='line'>    <span class="nx">dispatch</span><span class="p">(</span><span class="nx">fetchRequest</span><span class="p">(</span><span class="kc">true</span><span class="p">))</span>
 </span><span class='line'>    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;https://randomuser.me/api/&#39;</span><span class="p">)</span>
