@@ -349,6 +349,7 @@
 <span class='line-number'>25</span>
 <span class='line-number'>26</span>
 <span class='line-number'>27</span>
+<span class='line-number'>28</span>
 </pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="c1">//actions.js</span>
 </span><span class='line'><span class="kr">export</span> <span class="kd">function</span> <span class="nx">fetchRandmonName</span><span class="p">()</span> <span class="p">{</span>
 </span><span class='line'>  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">)</span> <span class="p">{</span>
@@ -373,13 +374,14 @@
 </span><span class='line'>  <span class="p">}</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
+</span><span class='line'><span class="c1">//ExampleComponent.js</span>
 </span><span class='line'><span class="nx">getRandomName</span><span class="p">()</span> <span class="p">{</span>
 </span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">fetchRandmonName</span><span class="p">();</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>因为Redux-Thunk，你可以将异步的处理逻辑，从组件里面拿出来，将它放在一个和Redux其他代码更加的内聚的位置，也许是action的存放位置，而组件里面只需要dispatch一个thunk。</p>
+<p>你看其实代码差不多，只不过，因为Redux-Thunk，你可以将异步的处理逻辑，从组件里面拿出来，将它放在一个和Redux其他代码更加的内聚的位置，也许是action的存放位置，而组件里面只需要dispatch一个thunk。</p>
 
 <h2>总结</h2>
 
