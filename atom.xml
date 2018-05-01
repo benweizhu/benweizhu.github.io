@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-05-01T17:04:53+08:00</updated>
+  <updated>2018-05-01T17:06:32+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -186,7 +186,7 @@
 
 <p>过程很简单，我们需要考虑三种页面状态：请求开始和进行中，请求成功，请求失败，然后分别设置组件的state。</p>
 
-<h2>如果没有类似Redux-Thunk中间件</h2>
+<h2>如果没有Redux异步中间件</h2>
 
 <p>按照“没有Redux的异步世界”的思想，在Redux里面，我们仍然可以依葫芦画瓢的进行异步的Redux的操作。</p>
 
@@ -205,7 +205,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>如果没有类似Redux-Thunk的中间件，那么你的做法和没有Redux时是类似的，你需要在mapDispatchToProps那传入三个disptach，将异步的fetch逻辑放在组件里面实现，Redux本身仍然是处理同步的state操作。</p>
+<p>如果没有Redux异步中间件，那么你的做法和没有Redux时是类似的，你需要在mapDispatchToProps那传入三个disptach，将异步的fetch逻辑放在组件里面实现，Redux本身仍然是处理同步的state操作。</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -241,6 +241,8 @@
 
 
 <h2>使用Redux-Thunk的不同点在哪？</h2>
+
+<p>因为Redux官网推荐，我们就以Redux-Thunk为例。</p>
 
 <p>Redux-Thunk刚刚引入的时候，往往容易让使用者有些感到混乱，一个原因是函数式编程的嵌套写法，第二个是和Redux之前dispatch函数做的事情不一样了。</p>
 
