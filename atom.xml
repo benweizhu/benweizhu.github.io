@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-05-03T23:19:39+08:00</updated>
+  <updated>2018-05-03T23:20:28+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -79,7 +79,7 @@
 
 <p>现在还不是时候讨论Redux里面存什么，我们反向推理，用排除法，先看看React里面应该存在什么。</p>
 
-<p>React中的state存在于组件当中，那我们就需要思考组件的特性，它能独立，也许还能自治，一般都高可重用，这是它的部分典型特性。基于它这些特性，也就决定了它的state也必须满足这些要求，组件的state是服务于组件本身的，这些state能够不收外部干预下就自我管理，这些state当组件被用在任何位置时，都能适应。一个典型的例子：UI状态。</p>
+<p>React中的state存在于组件当中，那我们就需要思考组件的特性，它能独立，也许还能自治，一般都高可重用，这是它的部分典型特性。基于它这些特性，也就决定了它的state也必须满足这些要求，组件的state是服务于组件本身的，这些state能够在不收外部干预下就自我管理，这些state当组件被用在任何位置时，都能适应。一个典型的例子：UI状态。</p>
 
 <p>当然，上面是我对React组件state理解的一个抽象描述，能够一定程度下知道我的思考。还有什么原则，能够帮助决策什么样的state可以放在组件中，Dan Abramov在他的Twitter发了这样一张图片也具有不错的指导意义：</p>
 
