@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "React的思考（七）- Redux的Middleware（上）"
+title: "React的思考（七）- Redux的Middleware（上）- 中间件的概念"
 date: 2018-04-25 21:14:18 +0800
 comments: true
 categories:
