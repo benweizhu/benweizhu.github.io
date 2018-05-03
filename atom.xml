@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-05-03T23:09:35+08:00</updated>
+  <updated>2018-05-03T23:12:10+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[React的思考（九）- 组织state和reducer（中）]]></title>
+    <title type="html"><![CDATA[React的思考（十）- 组织state和reducer（中）]]></title>
     <link href="http://benweizhu.github.io/blog/2018/05/03/deep-thinking-in-react-10/"/>
     <updated>2018-05-03T23:05:04+08:00</updated>
     <id>http://benweizhu.github.io/blog/2018/05/03/deep-thinking-in-react-10</id>
