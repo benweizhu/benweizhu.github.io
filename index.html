@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="有序而独立的同步世界 没有异步的情况下，Redux配合React很容易理解的（Action->Reducer->CombineReducers->React-Redux->Component），简单回顾下： 1.在组件里面dispatch（发出）一个action对象（带上类型和数据） 2. &hellip;&#8221;>
+  <meta name="description" content="redux的state和服务器端的数据 reducer共享state 一个action要操作多个reducer中的state 思考后端的操作逻辑，微服务的场景，按照业务的Restful API，Redux的这种设计模式导致这种CRUD和Service的冲突 redux的state和页面的关系 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a></h1>
+      <h1 class="entry-title"><a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（九）- 组织state和reducer（中）</a></h1>
     
     
       <p class="meta">
@@ -79,316 +79,27 @@
 
 
 
-<time class='entry-date' datetime='2018-04-27T13:38:01+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>1:38 pm</span></time>
+<time class='entry-date' datetime='2018-05-03T23:05:04+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2018</span></span> <span class='time'>11:05 pm</span></time>
         
-           | <a href="/blog/2018/04/27/deep-thinking-in-react-8/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/27/deep-thinking-in-react-8/">Comments</a>
+           | <a href="/blog/2018/05/03/deep-thinking-in-react-10/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2018/05/03/deep-thinking-in-react-10/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h2>有序而独立的同步世界</h2>
+  <div class="entry-content"><h2>redux的state和服务器端的数据</h2>
 
-<p>没有异步的情况下，Redux配合React很容易理解的（Action->Reducer->CombineReducers->React-Redux->Component），简单回顾下：</p>
+<h2>reducer共享state</h2>
 
-<p>1.在组件里面dispatch（发出）一个action对象（带上类型和数据）  <br/>
-2.action对象被传递到reducer的入口，reducer根据类型给到不同的switch分支，然后根据带入的数据操作state，返回新的state   <br/>
-3.redux发现有新的state，配合React-Redux，通知所有component，告诉组件请注意你自己要不要更新，然后各自判断各自更新</p>
+<h3>一个action要操作多个reducer中的state</h3>
 
-<p>一个被传递到组件里的disptach</p>
+<p>思考后端的操作逻辑，微服务的场景，按照业务的Restful API，Redux的这种设计模式导致这种CRUD和Service的冲突</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">const</span> <span class="nx">mapDispatchToProps</span> <span class="o">=</span> <span class="nx">dispatch</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">onAddTodo</span><span class="o">:</span> <span class="nx">text</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">dispatch</span><span class="p">(</span><span class="nx">addTodo</span><span class="p">(</span><span class="nx">text</span><span class="p">))</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="kr">const</span> <span class="nx">addTodo</span> <span class="o">=</span> <span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;ADD_TODO&#39;</span><span class="p">,</span>
-</span><span class='line'>  <span class="nx">text</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//在组件里面点击时触发</span>
-</span><span class='line'><span class="nx">handleClickAdd</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">onAddTodo</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">todoText</span><span class="p">)</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<h2>redux的state和页面的关系</h2>
 
-
-<p>action被传递到reducer的入口</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kd">function</span> <span class="nx">todoApp</span><span class="p">(</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">initialState</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">switch</span> <span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">case</span> <span class="nx">ADD_TODO</span><span class="o">:</span><span class="c1">//命中这个switch case</span>
-</span><span class='line'>      <span class="k">return</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span> <span class="nx">state</span><span class="p">,</span> <span class="p">{</span><span class="c1">//返回新的state</span>
-</span><span class='line'>        <span class="nx">todos</span><span class="o">:</span> <span class="p">[</span>
-</span><span class='line'>          <span class="p">...</span><span class="nx">state</span><span class="p">.</span><span class="nx">todos</span><span class="p">,</span>
-</span><span class='line'>          <span class="p">{</span>
-</span><span class='line'>            <span class="nx">text</span><span class="o">:</span> <span class="nx">action</span><span class="p">.</span><span class="nx">text</span><span class="p">,</span>
-</span><span class='line'>            <span class="nx">completed</span><span class="o">:</span> <span class="kc">false</span>
-</span><span class='line'>          <span class="p">}</span>
-</span><span class='line'>        <span class="p">]</span>
-</span><span class='line'>      <span class="p">})</span>
-</span><span class='line'>    <span class="k">default</span><span class="o">:</span>
-</span><span class='line'>      <span class="k">return</span> <span class="nx">state</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>组件被通知请查看你是否需要更新，connect发现todos变了，所以要更新这个connect嵌入的组件</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">const</span> <span class="nx">mapStateToProps</span> <span class="o">=</span> <span class="nx">state</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">todos</span><span class="o">:</span> <span class="nx">getVisibleTodos</span><span class="p">(</span><span class="nx">state</span><span class="p">.</span><span class="nx">todos</span><span class="p">,</span> <span class="nx">state</span><span class="p">.</span><span class="nx">visibilityFilter</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>没有Redux的异步世界</h2>
-
-<p>异步世界其实没什么可怕的（又不是异世界），看下面一个React里面用fetch实现的数据异步加载：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">class</span> <span class="nx">ExampleComponent</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">){</span>
-</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nx">loading</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">errorMessage</span><span class="o">:</span> <span class="s1">&#39;&#39;</span> <span class="p">};</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">_getRandomName</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getRandomName</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kr">const</span> <span class="p">{</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">errorMessage</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">return</span><span class="p">(</span>
-</span><span class='line'>      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">_getRandomName</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">PRESS</span> <span class="nx">ME</span><span class="o">!&lt;</span><span class="err">/button&gt;</span>
-</span><span class='line'>        <span class="p">{</span> <span class="nx">errorMessage</span> <span class="o">&amp;&amp;</span> <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">errorMessage</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt; }</span>
-</span><span class='line'>      <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>    <span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">getRandomName</span><span class="p">()</span> <span class="p">{</span> <span class="c1">// 重点是这么一段代码</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">loading</span><span class="o">:</span> <span class="kc">true</span><span class="p">})</span>
-</span><span class='line'>    <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;https://randomuser.me/api/&#39;</span><span class="p">)</span>
-</span><span class='line'>      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
-</span><span class='line'>      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">data</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>        <span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">results</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span> <span class="nx">name</span><span class="o">:</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">first</span><span class="p">}</span> <span class="nx">$</span><span class="p">{</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">last</span><span class="p">}</span><span class="err">`</span><span class="p">,</span> <span class="nx">loading</span><span class="o">:</span> <span class="kc">false</span> <span class="p">})</span>
-</span><span class='line'>      <span class="p">})</span>
-</span><span class='line'>      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">reason</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">errorMessage</span><span class="o">:</span><span class="s1">&#39;get name failed&#39;</span><span class="p">,</span> <span class="nx">loading</span><span class="o">:</span> <span class="kc">false</span><span class="p">})</span>
-</span><span class='line'>      <span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>过程很简单，我们需要考虑三种页面状态：请求开始和进行中，请求成功，请求失败，然后分别设置组件的state。</p>
-
-<h2>如果没有Redux异步中间件</h2>
-
-<p>按照“没有Redux的异步世界”的思想，在Redux里面，我们仍然可以依葫芦画瓢的进行异步的Redux的操作。</p>
-
-<p>首先，一个异步请求都需要dispatch至少三种action，对应至少三个不同的状态：</p>
-
-<p>1.通知reducer请求开始   <br/>
-2.通知reducer请求成功   <br/>
-3.通知reducer请求失败</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;FETCH_POSTS_REQUEST&#39;</span> <span class="p">}</span>
-</span><span class='line'><span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;FETCH_POSTS_FAILURE&#39;</span><span class="p">,</span> <span class="nx">error</span><span class="o">:</span> <span class="s1">&#39;Oops&#39;</span> <span class="p">}</span>
-</span><span class='line'><span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;FETCH_POSTS_SUCCESS&#39;</span><span class="p">,</span> <span class="nx">response</span><span class="o">:</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Redux&#39;</span><span class="p">}</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果没有Redux异步中间件，那么你的做法和没有Redux时是类似的，你需要在mapDispatchToProps那传入三个disptach，将异步的fetch逻辑放在组件里面实现，Redux本身仍然是处理同步的state操作。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">class</span> <span class="nx">ExampleComponent</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="p">...</span>
-</span><span class='line'>  <span class="nx">getRandomName</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">fetchRequest</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
-</span><span class='line'>    <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;https://randomuser.me/api/&#39;</span><span class="p">)</span>
-</span><span class='line'>      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
-</span><span class='line'>      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">data</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>        <span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">results</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">fetchSuccess</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">first</span><span class="p">}</span> <span class="nx">$</span><span class="p">{</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">last</span><span class="p">}</span><span class="err">`</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
-</span><span class='line'>      <span class="p">})</span>
-</span><span class='line'>      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">reason</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">fetchFailure</span><span class="p">(</span><span class="s1">&#39;get name failed&#39;</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
-</span><span class='line'>      <span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>使用Redux-Thunk的不同点在哪？</h2>
-
-<p>因为Redux官网推荐，我们就以Redux-Thunk为例。</p>
-
-<p>Redux-Thunk刚刚引入的时候，往往容易让使用者有些感到混乱，一个原因是函数式编程的嵌套写法，第二个是和Redux之前dispatch函数做的事情不一样了。</p>
-
-<p>其实，没有Redux-Thunk我们已经可以处理异步请求，只不过异步逻辑不在Redux里面，而是在组件里面，如果我们加入Redux-Thunk会有什么不同呢？</p>
-
-<p>我在<a href="http://benweizhu.github.io/blog/2018/04/25/deep-thinking-in-react-7/" title="上面篇文章">上面篇文章</a>讲过，中间件的作用是在dispatch的附近做一些额外的操作，让Redux拥有不同的能力，Redux-Thunk中间件的能力，可以让action creater，不用返回一个action对象，而是一个函数，这个action创建的函数就成为一个thunk。</p>
-
-<p>（关于Thunk函数的含义：编译器的&#8221;传名调用&#8221;实现，往往是将参数放到一个临时函数之中，再将这个临时函数传入函数体。这个临时函数就叫做Thunk函数。）</p>
-
-<p>这个函数并不需要保持纯净，它还可以带有副作用，包括执行异步API请求。这个函数还可以dispatch action。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="c1">//actions.js</span>
-</span><span class='line'><span class="kr">export</span> <span class="kd">function</span> <span class="nx">fetchRandmonName</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">dispatch</span><span class="p">(</span><span class="nx">fetchRequest</span><span class="p">(</span><span class="kc">true</span><span class="p">))</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;https://randomuser.me/api/&#39;</span><span class="p">)</span>
-</span><span class='line'>      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
-</span><span class='line'>      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">data</span> <span class="o">=&gt;</span><span class="p">{</span>
-</span><span class='line'>        <span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">results</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-</span><span class='line'>        <span class="nx">dispatch</span><span class="p">(</span><span class="nx">fetchSuccess</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">first</span><span class="p">}</span> <span class="nx">$</span><span class="p">{</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">last</span><span class="p">}</span><span class="err">`</span><span class="p">,</span> <span class="kc">false</span><span class="p">))</span>
-</span><span class='line'>      <span class="p">})</span>
-</span><span class='line'>      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">reason</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">dispatch</span><span class="p">(</span><span class="nx">fetchFailure</span><span class="p">(</span><span class="s1">&#39;get name failed&#39;</span><span class="p">,</span> <span class="kc">false</span><span class="p">))</span>
-</span><span class='line'>      <span class="p">})</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kr">const</span> <span class="nx">mapDispatchToProps</span> <span class="o">=</span> <span class="nx">dispatch</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">fetchRandmonName</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">dispatch</span><span class="p">(</span><span class="nx">fetchRandmonName</span><span class="p">())</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//ExampleComponent.js</span>
-</span><span class='line'><span class="nx">getRandomName</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">fetchRandmonName</span><span class="p">();</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>你看其实代码差不多，只不过，因为Redux-Thunk，<strong>你可以将异步的处理逻辑，从组件里面拿出来，将它放在一个和Redux其他代码更加的内聚的位置</strong>，也许是action的存放位置actions.js，而组件里面只需要dispatch一个thunk。</p>
-
-<h2>总结</h2>
-
-<p>关于Redux的异步世界，暂时更新到这里，Redux里面处理异步的中间件有好多，我就不一个个分析了，你肯定很关心这个，<a href="http://react-china.org/t/redux/8761" title="《Redux异步方案选型》">《Redux异步方案选型》</a></p>
+<h2>开发过程中state的演进过程</h2>
 </div>
   
   
@@ -401,7 +112,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）</a></h1>
+      <h1 class="entry-title"><a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（上）</a></h1>
     
     
       <p class="meta">
@@ -410,129 +121,67 @@
 
 
 
-<time class='entry-date' datetime='2018-04-25T21:14:18+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>9:14 pm</span></time>
+<time class='entry-date' datetime='2018-05-01T22:47:38+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2018</span></span> <span class='time'>10:47 pm</span></time>
         
-           | <a href="/blog/2018/04/25/deep-thinking-in-react-7/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/25/deep-thinking-in-react-7/">Comments</a>
+           | <a href="/blog/2018/05/01/deep-thinking-in-react-9/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2018/05/01/deep-thinking-in-react-9/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Redux的Middleware（中间件）是Redux中相对比较神秘的部分。</p>
+  <div class="entry-content"><h2>前提条件</h2>
 
-<h2>怎么理解middleware这个概念呢？</h2>
+<p>在进行深入探讨之前，我先确保大家的理解是一致的，因为这部分是客观的，而之后的内容是相对主观和有争议的。</p>
 
-<p>middle这个词很重要，它是指，这个件（ware），被放在（穿插）于某一个已存在操作的过程当中（middle）。</p>
+<p>1.当组件的某个操作dispatch了一个action，所有的reducer都会接收到：<a href="https://stackoverflow.com/questions/33590579/all-reducers-will-be-invoked-when-an-action-is-dispatched" title="All reducers will be invoked when an action is dispatched?">All reducers will be invoked when an action is dispatched?</a>，<a href="https://cn.redux.js.org/docs/recipes/reducers/UsingCombineReducers.html" title="combineReducers用法中也有讲到">combineReducers用法中也有讲到</a></p>
 
-<p>我这么平淡直白无水准的解释，你应该能get到吧，如果你熟悉Java Web开发，你可能第一时间会想到Java Servlet Filters，当然也许你比较年轻，你对Spring熟悉，你可能会立刻想到AOP（面向切面编程），它们可以完成日志，审计，authentication, authorization等。</p>
+<p>2.当combineReducers发现有任意一个reducer返回了新的state，会通知所有和redux关联（connect）的组件准备更新，请检查自己是否要更新</p>
 
-<p>那么，再往后面走，如果你使用过Express或者Koa等服务端框架，在这类框架中，middleware是指可以被嵌入在框架“接收请求到产生响应过程之中”的代码。例如，Express或者Koa的middleware可以完成添加CORS headers、记录日志、内容压缩等工作。</p>
+<p>3.每一个通过connect构建的组件，其mapStateToProps中的state，是combineReducers合并的state，也就是每个组件都能拿到所有reducer中的state（曾经有遇到过有人误以为是跟它action相关的reducer的state）</p>
 
-<h2>Redux的中间件是做什么呢？</h2>
+<h2>state的上帝视角</h2>
 
-<p>回过头来，看Redux的中间件，同样，它肯定是指穿插在Redux的某一个过程当中，那么问题来了，这个ware可以在哪里穿插，或者哪里有穿插操作的需要呢？我们来逐一分析，以下内容，参考阮一峰的文章：</p>
+<p>Redux的三大设计原则之一，单一数据源，定义了整个应用的state被储存在一棵object tree中，并且这个object tree只存在于唯一一个store中。这样一个顶层的状态树，会拥有一个全局的视角，掌握着整个应用的状态。</p>
 
-<p>（1）Reducer：纯函数，只承担计算State的功能，不合适承担其他功能，也承担不了，因为理论上，纯函数不能进行读写操作。</p>
+<p>单一数据源的设计原则在许多程序设计的领域都是准确的，但仅仅用一个JavaScript对象来存储整个应用的状态，总会让人感觉某一天这个对象一定会特别臃肿，上帝实在太忙，要关注的东西太多。</p>
 
-<p>（2）View：与State一一对应，可以看作State的视觉层，也不合适承担其他功能。</p>
+<p>很自然的，我们就会去思考，物尽其用，到底什么样的数据应该放在Redux中，什么样的数据应该放在别处来管理。</p>
 
-<p>（3）Action：存放数据的对象，即消息的载体，只能被别人操作，自己不能进行任何操作。</p>
+<h2>应用的拥有的数据和状态</h2>
 
-<p>其实，和其他服务端框架类似，它被嵌入到Redux“接收请求到产生响应过程之中”，位于action被发起之后，到达reducer之前，也就是store.dispatch()附近。</p>
+<p>大多数应用会处理多种类型的数据和状态，通常可以分为以下三类：领域数据（Domain data），应用状态（App state），UI状态（UI state）</p>
 
-<h2>举个例子：如何在dispatch的时候log state和action</h2>
+<p>领域数据也就是业务相关数据，一般和你的后台业务系统数据相关联，是领域数据的数据来源，但他们不一定直接对等。</p>
 
-<p>我在看官方文档的时候，看到一个非常有趣的概念，猴子补丁（monkey patching），大概的意思是指在运行时动态修改模块、类或函数，通常是添加功能或修正缺陷。</p>
+<p>应用状态和UI状态有时候不容易分清，应用状态是描述应用无限循环的生命周期中的某一种存在（中间）状态，而这样一个应用状态可能会导致一个或者多个UI的状态变化。比如：用户登录，是一个应用状态，它可能导致导航栏的UI状态改变。</p>
 
-<p>通过这种方式，可以在代码的运行过程中，给store.dispatch打补丁，增加额外的功能，比如log state和action，代码如下：</p>
+<p>UI的状态，自然是描述UI的改变，但不一定是由应用状态的变化导致。比如：页面上tab的切换。</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kd">let</span> <span class="nx">next</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">;</span>
-</span><span class='line'><span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">dispatchAndLog</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;dispatching&#39;</span><span class="p">,</span> <span class="nx">action</span><span class="p">);</span>
-</span><span class='line'>  <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
-</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;next state&#39;</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">());</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<h2>应用数据和状态的存储位置和影响范围</h2>
 
+<p>根据上面的应用数据和状态的分类，好像让我们对这样一个问题有些头绪。不过在你下任何判断之前，我们在从另外一个维度继续思考一下。</p>
 
-<p>通过上面这样一段代码，我们就在Redux原来的store.dispatch附近添加了我们自己代码，当我们再次调用store.dispatch，它就会打印log了，不过monkey patching本质上是一种hack，“将任意的方法替换成你想要的”。</p>
+<p>从前面我们就了解到，Redux存储的数据，在任何一个与之关联的组件中都能拿到，也就是说，Redux存储的是一个全局的数据。</p>
 
-<p>如果，我们想给dispatch加另一个补丁，那就在它的前面，或者后面，在加上一段类似的代码呗。</p>
+<p>反之，React本身也有一个state，而它所关注的只是组件本身以及它的子组件，兄弟和父组件它都不关心。</p>
 
-<h2>Redux applyMiddlewares()</h2>
+<p>除了Redux和React，就没有别的位置保存数据了？当然不是，比如：cookie，local storage。这些也是保存数据的关键位置，毕竟当页面刷新后，Redux和React中的state就丢失了，还需要从后台重新加载。</p>
 
-<p>真实情况下，我们肯定不用这样写代码，那Redux提供了applyMiddlewares的方式，所以就不需要我们像上面那样写，那它是怎么做的呢？</p>
+<h2>React组件的state存什么？</h2>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">const</span> <span class="nx">store</span> <span class="o">=</span> <span class="nx">createStore</span><span class="p">(</span>
-</span><span class='line'>  <span class="nx">reducer</span><span class="p">,</span>
-</span><span class='line'>  <span class="nx">applyMiddleware</span><span class="p">(</span><span class="nx">thunk</span><span class="p">,</span> <span class="nx">promise</span><span class="p">,</span> <span class="nx">logger</span><span class="p">)</span>
-</span><span class='line'><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>现在还不是时候讨论Redux里面存什么，我们反向推理，用排除法，先看看React里面应该存在什么。</p>
 
+<p>React中的state存在于组件当中，那我们就需要思考组件的特性，能独立，也许能自治，必然高可重用，这是它的部分典型特性。基于它这些特性，也就决定了它的state也必须满足这些要求，组件的state是服务于组件本身的，这些state能够不收外部干预下就自我管理，这些state当组件被用在任何位置时，都能适应。一个典型的例子：UI状态。</p>
 
+<p>当然，上面是我对React组件state理解的一个抽象描述，能够一定程度下知道我的思考。还有什么原则，能够帮助决策什么样的state可以放在组件中，Dan Abramov在他的Twitter发了这样一张图片也具有不错的指导意义：</p>
 
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="nx">applyMiddleware</span><span class="p">(...</span><span class="nx">middlewares</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="p">(</span><span class="nx">createStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">reducer</span><span class="p">,</span> <span class="nx">preloadedState</span><span class="p">,</span> <span class="nx">enhancer</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">store</span> <span class="o">=</span> <span class="nx">createStore</span><span class="p">(</span><span class="nx">reducer</span><span class="p">,</span> <span class="nx">preloadedState</span><span class="p">,</span> <span class="nx">enhancer</span><span class="p">);</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">dispatch</span> <span class="o">=</span> <span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">;</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">chain</span> <span class="o">=</span> <span class="p">[];</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">middlewareAPI</span> <span class="o">=</span> <span class="p">{</span> <span class="c1">//注意这里：getState和dispatch都传入了middleware</span>
-</span><span class='line'>      <span class="nx">getState</span><span class="o">:</span> <span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">dispatch</span><span class="o">:</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">dispatch</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>    <span class="nx">chain</span> <span class="o">=</span> <span class="nx">middlewares</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">middleware</span> <span class="o">=&gt;</span> <span class="nx">middleware</span><span class="p">(</span><span class="nx">middlewareAPI</span><span class="p">));</span><span class="c1">//注意这里：这些middleware都是函数</span>
-</span><span class='line'>    <span class="nx">dispatch</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(...</span><span class="nx">chain</span><span class="p">)(</span><span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="p">{...</span><span class="nx">store</span><span class="p">,</span> <span class="nx">dispatch</span><span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>所有中间件被放进了一个数组chain，通过compose，将多个中间件合并，从右到左执行。中间件可以拿到getState和dispatch这两个方法。</p>
-
-<p>注：compose: 将多个函数合并成一个函数，从右到左执行。例如：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">R</span><span class="p">.</span><span class="nx">compose</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">,</span> <span class="nx">R</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="nx">R</span><span class="p">.</span><span class="nx">multiply</span><span class="p">(</span><span class="mi">2</span><span class="p">))(</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span> <span class="c1">// 7</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>-4 * 2 + 1 再求绝对值</p>
+<p><img src="https://camo.githubusercontent.com/5e85994aa142e7699548e2f5a1e74583229ebd10/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f436d654273477a57384151705f61762e6a7067" width="500" alt="" /></p>
 
 <h2>总结</h2>
 
-<p>仔细看下来之后，中间件就没有那么神秘了，下一篇文章，我们来介绍下Redux的异步中间件，比如：Redux-Thunk，看懂这一个，其他的都差不多。</p>
+<p>今天先写到这里，后续还会继续讨论redux的state和reducer的设计思考。</p>
 </div>
   
   
@@ -565,6 +214,14 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（九）- 组织state和reducer（中）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（上）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a>
       </li>
     
@@ -574,14 +231,6 @@
     
       <li class="post">
         <a href="/blog/2018/04/23/deep-thinking-in-react-6/">React的思考（六）- 不可变性</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/22/deep-thinking-in-react-5/">React的思考（五）- Reconciliation</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/21/deep-thinking-in-react-4/">React的思考（四）- componentDidMakeSense之生命周期面试调侃</a>
       </li>
     
   </ul>

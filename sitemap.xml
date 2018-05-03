@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://benweizhu.github.io/blog/2018/05/03/deep-thinking-in-react-10/</loc>
+<lastmod>2018-05-03T23:05:04+08:00</lastmod>
+</url>
+<url>
+<loc>http://benweizhu.github.io/blog/2018/05/01/deep-thinking-in-react-9/</loc>
+<lastmod>2018-05-01T22:47:38+08:00</lastmod>
+</url>
+<url>
 <loc>http://benweizhu.github.io/blog/2018/04/27/deep-thinking-in-react-8/</loc>
 <lastmod>2018-04-27T13:38:01+08:00</lastmod>
 </url>
@@ -660,5 +668,8 @@
 </url>
 <url>
 <loc>http://benweizhu.github.io/posts/59/</loc>
+</url>
+<url>
+<loc>http://benweizhu.github.io/posts/60/</loc>
 </url>
 </urlset>

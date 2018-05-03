@@ -9,12 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="什么都不说，先照着做 安装合适的node版本和包管理工具Yarn 1
-2
-3
-4
-5
-node -version v6.9.4(用nvm) brew update（如果是mac的） brew install yarn https://yarnpkg.com/en/docs/install &hellip;">
+  <meta name="description" content="所见不一定即所得 眼睛是心灵的窗户，也是蒙蔽你的一种途径。 假设，我给你一张图片，你觉得肉眼可以观察到全部的细节吗？ 屏幕上一张清晰的图片 肉眼在屏幕上看到图片的清晰度由三个因素决定，一是图片像素本身是否精细，二是屏幕分辨率，三是屏幕大小。 我们来逐步分析它们之间的关系： 屏幕分辨率 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,7 +70,7 @@ node -version v6.9.4(用nvm) brew update（如果是mac的） brew install yarn 
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2017/01/17/react-step-by-step-1/">一步一步做React(一) - Hello React</a></h1>
+      <h1 class="entry-title"><a href="/blog/2017/03/25/css-retina-image/">前端不止系列 - Retina屏幕下两倍图</a></h1>
     
     
       <p class="meta">
@@ -84,75 +79,329 @@ node -version v6.9.4(用nvm) brew update（如果是mac的） brew install yarn 
 
 
 
-<time class='entry-date' datetime='2017-01-17T21:08:15+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>9:08 pm</span></time>
+<time class='entry-date' datetime='2017-03-25T16:40:09+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>4:40 pm</span></time>
         
-           | <a href="/blog/2017/01/17/react-step-by-step-1/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2017/01/17/react-step-by-step-1/">Comments</a>
+           | <a href="/blog/2017/03/25/css-retina-image/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2017/03/25/css-retina-image/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>什么都不说，先照着做</p>
+  <div class="entry-content"><h3>所见不一定即所得</h3>
 
-<h4>安装合适的node版本和包管理工具Yarn</h4>
+<blockquote><p>眼睛是心灵的窗户，也是蒙蔽你的一种途径。</p></blockquote>
+
+<p>假设，我给你一张图片，你觉得肉眼可以观察到全部的细节吗？</p>
+
+<h3>屏幕上一张清晰的图片</h3>
+
+<p>肉眼在屏幕上看到图片的清晰度由三个因素决定，一是图片像素本身是否精细，二是屏幕分辨率，三是屏幕大小。</p>
+
+<p>我们来逐步分析它们之间的关系：</p>
+
+<h4>屏幕分辨率</h4>
+
+<p>屏幕分辨率也就是设备分辨率，设备像素，它是物理的像素，比如，新的iPhone7，屏幕分辨率是1334 x 750像素分辨率，326 ppi。</p>
+
+<p><img src="/images/iphone7-screen.png" width="400" title="iPhone7分辨率" alt="Alt text" /></p>
+
+<h4>图像大小</h4>
+
+<p>如果你学过《数字图像处理》这门课，那你对下面的解释就是非常熟悉了。</p>
+
+<p>位图是由像素（Pixel）组成的，像素是位图最小的信息单元，存储在图像栅格中。每个像素都具有特定的位置和颜色值。按从左到右、从上到下的顺序来记录图像中每一个像素的信息，如：像素在屏幕上的位置、像素的颜色等。位图图像质量是由单位长度内像素的多少来决定的。单位长度内像素越多，分辨率越高，图像的效果越好。</p>
+
+<p><img src="/images/tw-logo.png" width="200" title="ThoughtWorks Logo" alt="Alt text" /></p>
+
+<p>假设，以上这个logo的图像大小是1334 x 750像素和iPhone7屏幕分辨率一样，那么,一位图像素对应的就是一个设备像素，这就是会是一个完全保真的显示。因为一个位置像素不能进一步分裂，我想这一点应该大家非常容易理解，也就是一个萝卜一个坑。</p>
+
+<h4>屏幕分辨率和屏幕尺寸</h4>
+
+<p><img src="/images/resolution.png" width="400" title="Windows分辨率" alt="Alt text" /></p>
+
+<p>相信大部分人对上面这个设置肯定特别熟悉，有些人可能对XP，甚至98系统的样式更熟悉（一不小心暴露了年龄），在Windows系统下，提高屏幕分辨率一般都需要提高屏幕尺寸。</p>
+
+<p>因为在固定屏幕的情况下，提高屏幕分辨率（如上图），图像和文字显示目标会相应缩小，原因是系统并不会自动根据屏幕尺寸和分辨率关系相应的调整文字和图标的大小，这是Windows系统自身的行为。</p>
+
+<p>我相信，如果家里有年长的人使用电脑，肯定屏幕分辨率调的很低，因为这样文字和图标才会比较大，我家06年买的台式机就是这样。</p>
+
+<p>也因此，我们很容易有一个错觉，那就是屏幕越大，分辨率就能越大（在单位面积内像素数量固定的情况下，尺寸越大，单个屏幕拥有的像素就越多，分辨率自然就越大）。</p>
+
+<p><strong>直到，苹果Retina屏幕的出现，原来小屏幕也可以拥有大分辨率。</strong></p>
+
+<h4>PPI的概念</h4>
+
+<p>PPI，像素密度，即每英寸所拥有的像素数目（比如：上面iPhone 7的PPI是326），PPI数值越高，代表显示屏能够以越高的密度显示图像，画面的细节就会越丰富。</p>
+
+<p>以Retina屏幕为例，它并不是像普通显示器那样通过增大尺寸来增加分辨率，而是靠提升屏幕单位面积内的像素数量，即像素密度来提升分辨率，这样就有了高像素密度屏幕。</p>
+
+<p>根据上面的分析，分辨率提升了，那么图标和文字尺寸就会变小，但是Mac的操作系统不同，它自动采取相应的模式（如Mac下的HiDPI）进行适配，将缩小后的字体（苹果一直采用矢量字体）和图标重新放大，这样苹果用了更多的像素数来显示同样的内容，所以显示尺寸仍然不变。</p>
+
+<p>苹果将“高像素密度屏幕”的概念营销出一个专业的术语“Retina”，将其称为双密度显示，声称人类的肉眼将无法区分单个像素。</p>
+
+<p>当一个显示屏像素密度超过300ppi时，人眼就无法区分出单独的像素。这也是讲：显示设备清晰度已达到人视网膜可分辨像素的极限。因此，行动电话显示器的像素密度达到或高于300ppi就不会再出现颗粒感，而手持平板类电器显示器的像素密度达到或高于260ppi就不会再出现颗粒感，苹果电脑Mac的Retina显示器像素密度只要超过200ppi就无法区分出单独的像素。</p>
+
+<p><img src="/images/retina-display.jpg" width="500" title="retina-display" alt="Alt text" /></p>
+
+<p>好，说了这么多，都是谈屏幕的问题，貌似和前端开发没有什么关系，我又不是要买新手机（呵呵），那么现在，我们现在来谈谈前端的问题。</p>
+
+<h4>Web中的像素（CSS像素）</h4>
+
+<p>CSS像素是一个抽象概念，设备无关像素，简称-“DIPS”，device-independent像素，主要使用在浏览器上，用来精确的度量（确定）Web页面上的内容。</p>
+
+<p>在标准情况下一个CSS像素对应一个设备像素。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>node -version v6.9.4(用nvm)
-</span><span class='line'>
-</span><span class='line'>brew update（如果是mac的）
-</span><span class='line'>
-</span><span class='line'>brew install yarn</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.box</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">200px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">font-size</span><span class="o">:</span> <span class="m">12px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="https://yarnpkg.com/en/docs/install">https://yarnpkg.com/en/docs/install</a></p>
+<p>上面的代码，将会在显示屏设备上绘制一个200x300像素的盒子，在标准屏幕下，它占据的就是200x300设备像素。但是在Retina屏幕下，相同的div却使用了400x600设备像素，保持相同的物理尺寸显示，导致每个像素点实际上有4倍的普通像素点。</p>
 
-<h4>安装webpack</h4>
+<p><img src="/images/retina-web.jpg" width="500" title="retina-web" alt="Alt text" /></p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add --dev webpack</span></code></pre></td></tr></table></div></figure>
+<p>对于图片来说也是如此：</p>
+
+<p><img src="/images/retina-web-bitmap.jpg" width="500" title="retina-web bitmap" alt="Alt text" /></p>
+
+<p>这个时候，屏幕会怎么处理呢？其实，有点类似图像软件的放大图片功能，采用自有的算法（图像处理算法）计算放大方式。只不过，这里是苹果Retina屏幕的计算方法，一个CSS像素点实际分成了四个，造成颜色肯定会存在偏差（非全保真的显示），于是，我们看上去就变得模糊了（特别是图片，非常的明显）。</p>
+
+<p>开发当中遇到这样的事情，我们应该怎么处理呢？这时，我们需要引出devicePixelRatio的概念。</p>
+
+<h5>devicePixelRatio设备像素比</h5>
+
+<p>window.devicePixelRatio是设备上物理像素和设备独立像素(device-independent pixels (dips))的比例。</p>
+
+<p>公式表示就是：window.devicePixelRatio = 物理像素 / dips</p>
+
+<ul>
+<li>普通密度桌面显示屏的devicePixelRatio=1</li>
+<li>高密度桌面显示屏(Mac Retina)的devicePixelRatio=2</li>
+<li>主流手机显示屏的devicePixelRatio=2或3</li>
+</ul>
 
 
-<h4>安装babel</h4>
+<p>举例说明，一张100x100的图片，通过CSS设置它{ width:100px; height:100px }。在普通密度桌面显示屏的电脑上打开，没有什么问题，但假设在手机/或者Retina屏幕的Mac，按照逻辑分辨率来渲染，他们的devicePixelRatio=2，那么就相当于拿4个物理像素来描绘1个电子像素。这等于拿一个2倍的放大镜去看图片，图片可能因此变得模糊。</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add --dev babel-core babel-loader babel-preset-es2015 babel-preset-react</span></code></pre></td></tr></table></div></figure>
+<p><img src="/images/devicePixelRatio.png" title="devicePixelRatio" alt="Alt text" /></p>
 
+<h3>代码如何解决呢？</h3>
 
-<h4>安装React</h4>
+<p>原理我们明白了，那么从代码层面，我们应该如何实现呢？</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add react react-dom</span></code></pre></td></tr></table></div></figure>
+<p>一个常见的做法是把图片换成200x200的，CSS宽高不变，仍然是{ width:100px; height:100px }，这样，CSS宽高换算成物理像素是200x200，图片也是200x200，就不会变糊了。可以采用媒体查询和JS操作的方式</p>
 
-
-<h4>创建和编辑.babelrc</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>touch .babelrc   
-</span><span class='line'>vim .babelrc  </span></code></pre></td></tr></table></div></figure>
-
+<h4>CSS Media Queries</h4>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>{
-</span><span class='line'>  "presets" : ["es2015", "react"]
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nf">#element</span> <span class="p">{</span> <span class="k">background-image</span><span class="o">:</span> <span class="sx">url(&#39;hires.png&#39;)</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@media</span> <span class="nt">only</span> <span class="nt">screen</span> <span class="nt">and</span> <span class="o">(</span><span class="nt">min-device-pixel-ratio</span><span class="o">:</span> <span class="nt">2</span><span class="o">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nf">#element</span> <span class="p">{</span> <span class="k">background-image</span><span class="o">:</span> <span class="sx">url(&#39;hires@2x.png&#39;)</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@media</span> <span class="nt">only</span> <span class="nt">screen</span> <span class="nt">and</span> <span class="o">(</span><span class="nt">min-device-pixel-ratio</span><span class="o">:</span> <span class="nt">3</span><span class="o">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nf">#element</span> <span class="p">{</span> <span class="k">background-image</span><span class="o">:</span> <span class="sx">url(&#39;hires@3x.png&#39;)</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<h4>创建和编辑webpack.config.js</h4>
+<h4>JS查询</h4>
+
+<p><strong>retinajs库</strong></p>
+
+<p><a href="http://imulus.github.io/retinajs/">http://imulus.github.io/retinajs/</a></p>
+
+<p><img src="/images/caniuserdevicePixelRatio.png" title="devicePixelRatio" alt="Alt text" /></p>
+
+<h3>是不是适配Retina屏幕所有的图片都需要切换呢？</h3>
+
+<p>不是，一般情况下，不需要针对网站上的所有图片都提供两个版本（非Retina屏幕和Retina屏幕），大部分图片缩放并不会太多的影响用户的体验。</p>
+
+<p>常常需要被处理的图片有：网站的logo、彩色图片图标，因为他们的图像大小都偏小，在Retina上物理像素放两倍显示就会出现模糊情况，这个时候，你就需要通过媒体查询或者JS操作来替换图片。</p>
+
+<p><em>最后：眼睛是心灵的窗户，也是蒙蔽你的一种途径，带上知识的眼镜，将世界看个清楚</em></p>
+
+<p>参考资料：  <br/>
+1. <a href="http://www.w3cplus.com/css/towards-retina-web.html">http://www.w3cplus.com/css/towards-retina-web.html</a> <br/>
+2. <a href="http://www.jianshu.com/p/bb76c606f0b4">http://www.jianshu.com/p/bb76c606f0b4</a>  <br/>
+3. <a href="https://developer.mozilla.org/zh-CN/docs/Mobile/Viewport_meta_tag">https://developer.mozilla.org/zh-CN/docs/Mobile/Viewport_meta_tag</a> <br/>
+4. <a href="http://caniuse.com/#search=devicePixelRatio">http://caniuse.com/#search=devicePixelRatio</a>  <br/>
+5. <a href="https://www.web-tinker.com/article/20590.html">https://www.web-tinker.com/article/20590.html</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/02/01/react-step-by-step-2/">一步一步做React(二) - CSS Modules</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-02-01T22:44:09+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2017</span></span> <span class='time'>10:44 pm</span></time>
+        
+           | <a href="/blog/2017/02/01/react-step-by-step-2/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2017/02/01/react-step-by-step-2/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>基于上次的内容 <a href="http://benweizhu.github.io/blog/2017/01/17/react-step-by-step-1/">《一步一步做React(一) - Hello React》</a>，我们继续搭建一个React项目的工程实践 - CSS Modules。</p>
+
+<h3>CSS Modules概念</h3>
+
+<p>Github文档 - <a href="https://github.com/css-modules/css-modules">CSS Modules</a></p>
+
+<p><strong>CSS Modules — Local Scope 局部作用域</strong></p>
+
+<p>CSS Modules里面最基础也是最重要的概念 - 局部作用域。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>touch webpack.config.js
-</span><span class='line'>vim webpack.config.js</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.backdrop {}
+</span><span class='line'>.prompt {}
+</span><span class='line'>.pullquote {}</span></code></pre></td></tr></table></div></figure>
 
+
+<p>定义在style.css中的样式都存在于一个组件内的局部作用域，不会污染全局的样式。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import styles from "./style.css"
+</span><span class='line'>
+</span><span class='line'>const Component = props =&gt; {
+</span><span class='line'>  return (
+</span><span class='line'>    &lt;div className={styles.backdrop}&gt;
+</span><span class='line'>      &lt;div className={styles.prompt}&gt;
+</span><span class='line'>      &lt;/div&gt;
+</span><span class='line'>      &lt;div className={styles.pullquote}&gt;
+</span><span class='line'>      &lt;/div&gt;
+</span><span class='line'>   &lt;/div&gt;
+</span><span class='line'>  )
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>怎么解释？如何不会污染全局的样式？答案是唯一的命名。现在，我们先来看是怎么配置的。</p>
+
+<h3>用webpack处理样式</h3>
+
+<p><strong>style-loader | css-loader | sass-loader</strong></p>
+
+<p>给webpack.config.js中的module添加一个新的loaders配置，如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>module: {
+</span><span class='line'>  loaders: [
+</span><span class='line'>    {
+</span><span class='line'>      test: /\.jsx?/,
+</span><span class='line'>      include: APP_DIR,
+</span><span class='line'>      loader: 'babel',
+</span><span class='line'>    },
+</span><span class='line'>    {
+</span><span class='line'>      test: /\.scss$/,
+</span><span class='line'>      loaders: ["style", "css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]", "sass"],
+</span><span class='line'>    },
+</span><span class='line'>  ],
+</span><span class='line'>},</span></code></pre></td></tr></table></div></figure>
+
+
+<p>webpack的loader是用来预处理由require()或者import加载文件，比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>import styles from "./style.scss"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在上面的webpack配置中，针对*.scss文件，配置了一个loader的管道，顺序是：</p>
+
+<p>sass-loader => css-loader => style-loader</p>
+
+<p>sass-loader顾名思义用来编译SCSS到CSS</p>
+
+<p>css-loader和style-loader用来将样式嵌入到Webpack打包后的JS文件中，从而实现样式的模块化管理。</p>
+
+<p>针对css-loader的配置，你会看到它的格式是如下的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>css?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其实，这是webpack loader传递参数的一种方式（URL方式），css-loader的参数表请进入<a href="https://github.com/webpack-contrib/css-loader#options-1">传送门</a>。</p>
+
+<p>localIdentName是用于指定局部className的格式，比如：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[name]__[local]___[hash:base64:5]
+</span><span class='line'>ComponentName__LocalName___HashCode
+</span><span class='line'>Component__pullquote___SDFe34IIE</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>如何抽离出独立的css文件？Extract Text Plugin</h3>
+
+<p>正如前面所强调的，style-loader和css-loader，将样式嵌入到Webpack打包后的JS文件。</p>
+
+<p>这当然不是最好的方式，我们需要将样式抽离到独立的css文件中，但就是<a href="https://github.com/webpack-contrib/extract-text-webpack-plugin">Extract Text Plugin</a>。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>yarn add extract-text-webpack-plugin --dev</span></code></pre></td></tr></table></div></figure>
+
+
+<p>完整的webpack.config.js文件如下：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -178,289 +427,56 @@ node -version v6.9.4(用nvm) brew update（如果是mac的） brew install yarn 
 <span class='line-number'>22</span>
 <span class='line-number'>23</span>
 <span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>var webpack = require('webpack');
-</span><span class='line'>var path = require('path');
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>const path = require('path');
+</span><span class='line'>const ExtractTextPlugin = require('extract-text-webpack-plugin');
 </span><span class='line'>
-</span><span class='line'>var BUILD_DIR = path.resolve(__dirname, 'public');
-</span><span class='line'>var APP_DIR = path.resolve(__dirname, 'src');
+</span><span class='line'>const BUILD_DIR = path.resolve(__dirname, 'public');
+</span><span class='line'>const APP_DIR = path.resolve(__dirname, 'src');
 </span><span class='line'>
-</span><span class='line'>var config = {
-</span><span class='line'>  entry: APP_DIR + '/index.jsx',
+</span><span class='line'>const extractCSS = new ExtractTextPlugin(`${BUILD_DIR}/styles.css`);
+</span><span class='line'>
+</span><span class='line'>const config = {
+</span><span class='line'>  entry: `${APP_DIR}/index.jsx`,
 </span><span class='line'>  output: {
-</span><span class='line'>      path: BUILD_DIR,
-</span><span class='line'>      filename: 'bundle.js'
+</span><span class='line'>    path: BUILD_DIR,
+</span><span class='line'>    filename: 'bundle.js',
 </span><span class='line'>  },
 </span><span class='line'>  module: {
-</span><span class='line'>      loaders: [
-</span><span class='line'>          {
-</span><span class='line'>              test: /\.jsx?/,
-</span><span class='line'>              include: APP_DIR,
-</span><span class='line'>              loader: 'babel'
-</span><span class='line'>          }
-</span><span class='line'>      ]
-</span><span class='line'>  }
+</span><span class='line'>    loaders: [
+</span><span class='line'>      {
+</span><span class='line'>        test: /\.jsx?/,
+</span><span class='line'>        include: APP_DIR,
+</span><span class='line'>        loader: 'babel',
+</span><span class='line'>      },
+</span><span class='line'>      {
+</span><span class='line'>        test: /\.scss$/,
+</span><span class='line'>        loader: extractCSS.extract(['css?minimize&modules&importLoaders=2&localIdentName=[name]__[local]', 'postcss', 'sass']),
+</span><span class='line'>      },
+</span><span class='line'>    ],
+</span><span class='line'>  },
+</span><span class='line'>  resolve: {
+</span><span class='line'>    extensions: ['', '.js', '.jsx'],
+</span><span class='line'>  },
+</span><span class='line'>  plugins: [
+</span><span class='line'>    extractCSS,
+</span><span class='line'>  ],
 </span><span class='line'>};
 </span><span class='line'>
-</span><span class='line'>module.exports = config;</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>module.exports = config;
+</span></code></pre></td></tr></table></div></figure>
 
-
-<h4>创建和编辑src/index.jsx</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mkdir src
-</span><span class='line'>cd src
-</span><span class='line'>touch index.jsx
-</span><span class='line'>vim index.jsx</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>import React from 'react';
-</span><span class='line'>import {render} from 'react-dom';
-</span><span class='line'>
-</span><span class='line'>class App extends React.Component {
-</span><span class='line'>  render () {
-</span><span class='line'>      return &lt;p&gt; Hello React!&lt;/p&gt;;
-</span><span class='line'>  }
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>render(&lt;App/&gt;, document.getElementById('app'));</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>在html中引用</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>cd src
-</span><span class='line'>touch index.html
-</span><span class='line'>vim index.html</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;!doctype html&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;html lang="zh"&gt;
-</span><span class='line'>&lt;head&gt;
-</span><span class='line'>    &lt;!-- The first thing in any HTML file should be the charset --&gt;
-</span><span class='line'>    &lt;meta charset="utf-8"&gt;
-</span><span class='line'>    &lt;!-- Make the page mobile compatible --&gt;
-</span><span class='line'>    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
-</span><span class='line'>    &lt;meta name="mobile-web-app-capable" content="yes"&gt;
-</span><span class='line'>    &lt;title&gt;17High&lt;/title&gt;
-</span><span class='line'>&lt;/head&gt;
-</span><span class='line'>&lt;body&gt;
-</span><span class='line'>&lt;div id="app"/&gt;
-</span><span class='line'>&lt;!-- Display a message if JS has been disabled on the browser. --&gt;
-</span><span class='line'>&lt;noscript&gt;If you're seeing this message, that means &lt;strong&gt;JavaScript has been disabled on your browser&lt;/strong&gt;, please &lt;strong&gt;enable JS&lt;/strong&gt; to make this app work.&lt;/noscript&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;script src="../public/bundle.js" type="text/javascript"&gt;&lt;/script&gt;
-</span><span class='line'>&lt;/body&gt;
-</span><span class='line'>&lt;/html&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>运行webpack命令，生成打包文件bundle.js</h4>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>./node_modules/.bin/webpack -d
-</span><span class='line'>./node_modules/.bin/webpack -d --watch //监听文件变化</span></code></pre></td></tr></table></div></figure>
-
-
-<p>打开index.html看效果</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/11/19/style-guide-driven-development/">你听说过“风格指南驱动开发”吗？</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-11-19T21:16:37+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:16 pm</span></time>
-        
-           | <a href="/blog/2016/11/19/style-guide-driven-development/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2016/11/19/style-guide-driven-development/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>第一次听说“SGDD”</h3>
-
-<p>我听说过TDD（测试驱动开发），我在软件开发中一致坚持执行</p>
-
-<p>它以其倡导先写测试程序，然后编码实现其功能得名，在开发中，我们带着两顶帽子思考：先戴上实现功能的帽子，在测试的辅助下，快速实现其功能；再戴上重构的帽子，在测试的保护下，通过去除冗余的代码，提高代码质量。</p>
-
-<p>我也听说过BDD（行为驱动开发），我熟练使用Cucumber编写端到端测试</p>
-
-<p>它鼓励软件项目中的开发者、QA和非技术人员或商业参与者之间进行协作，通过用自然语言书写非程序员可读的测试用例，以扩展测试驱动的开发方法。</p>
-
-<p>我头一次听说SGDD（风格指南驱动开发），我蒙蔽了</p>
-
-<p>我打开百度（请不要鄙视我，它毕竟还是“最好的中文搜索引擎”），搜索关键字 - “风格指南驱动开发”，却只看到寥寥的一篇翻译“干货”。收货不多，但能证明了一点，即风格指南驱动开发（SGDD）的思想还没有像TDD和BDD那样在国内得到较为广泛的推广。</p>
-
-<p>本文是一篇我目前所在项目实践的总结，也是对这种新的开发思想的思考。</p>
-
-<h3>“风格指南驱动开发”是什么？</h3>
-
-<p>“风格指南驱动开发”其实是一个相当新的术语，最早在公开场合中谈到这个概念的人应该是Nicole Sullivan，她在2014年9月一次演讲《Components &amp; SGDD》中提出SGDD的概念（Nicole Sullivan目前在NPM这家公司，没错，就是那个NPM，做Product Manager &amp; Design Manager）。</p>
-
-<p>“风格指南驱动开发”尝试着：</p>
-
-<p>1.让UX和前端开发更紧密的工作在一起，将设计与前端开发的工作闭环缩小，更快速的迭代产品原型 <br/>
-2.将UI开发和业务系统分离开，业务系统不仅仅是指后端系统（不仅仅是前后端分离），也包括业务的Web系统 <br/>
-3.让设计文档更加“灵活”，更加及时（up to date），更加一致（single source of truth） <br/>
-4.让前端资源管理更加规范，开发模式更加清晰 <br/>
-5.让整个Web开发周期更加敏捷（Agile）</p>
-
-<p>它是一种前端开发和团队工作方式的实践。</p>
-
-<p>而实践的方式，就是做到以下两点：组件化的设计和动态风格指南。</p>
-
-<h3>组件化的设计 - 我的眼里一切都可以是组件</h3>
-
-<p>大型的Web应用通常都会有大量的JS，CSS和其他资源文件（字体文件，图标，图片），随着页面越来越多，交互越来越复杂，如果没有很好的管理，就会导致资源的冗余，依赖关系复杂度增加，可维护性降低，开发难度增加，这其实是前端开发常见的通病。</p>
-
-<p>如果和后端的开发相比较，比如：Java开发，天生就拥有包管理和类的支持，而根据业务/功能层次来划分，我们拥有了常见的（或者约定俗成）实现层次，如：Controller，Service，Repository，Util，Constant等，同时，我们还会利用框架和语言特性带来的优势，比如，IOC，AOP，注解，继承，接口等，而统统这些能够带来的好处就是职责的单一，模块的高内聚，接口化，可重用，易于测试等等。</p>
-
-<p>对于Web前端开发，由于涉及到的内容较广，又不太可能完全具备后端语言的优秀特性，所以，更加需要开发人员具有优秀的设计和管理的思想，比如：CSS的合理命名，有效的利用CSS预处理器，JavaScript的模块化，利用框架的特性（比如AngularJS的依赖注入，指令等。）等，在这之中，有一个最近开始被大家关注，非常重要的设计和管理思想就是“组件化”。</p>
-
-<p>组件是一个个独立存在的模块，它能够具备一些非常优秀的特性：<strong>单一的职责，资源的高内聚，独立的作用域，可独立的测试，接口的规范化，可重用，可组合等</strong>。这些优秀的特性其实就已经非常接近我们常常在后端语言中描述的特性。</p>
-
-<p style="text-align: center;">
-  <img src="/images/style-guide/folder-structure.png" width="300" title="代码组织结构" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">我们项目的代码组织结构</p>
-
-
-<p>除开开发关注的特性，组件化对于整个软件开发流程也是有益的，合理的组件划分可以合理控制开发闭环，UX可以更快的看到设计实现的原型，提升团队成员沟通频率，BA（业务分析人员）可以方便的根据组件合理的编写Story（故事卡）和Task（比故事更小的任务卡）等等。</p>
-
-<p>而这些让组件化成为“风格指南驱动开发”的必要元素。</p>
-
-<h3>“风格指南驱动开发”中的“风格指南”</h3>
-
-<p>除了组件化，“风格指南驱动开发”还需要另外一个实现驱动开发的基石，也就是它名字中的“风格指南”。</p>
-
-<p>“风格指南”对大家应该不陌生，主要分为两种类型：静态风格指南和动态风格指南。</p>
-
-<p>静态风格指南是我们比较常见的静态设计文档，比如，由设计师提供的PSD/PDF等文件，文档中包含：调色板，字体，按钮，链接等等。</p>
-
-<p style="text-align: center;">
-  <img src="/images/sgdd/static-style-guide.png" width="500" title="Static Style Guide" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">medialoot上的一个样例</p>
-
-
-<p>动态风格指南，也称为Living Style Guide（“活的”风格指南），它是一个包含风格指南的Web站点。当你看到它时，也许你会觉的有点像BootStrap，然而，和BootStrap以及静态风格指南不同，企业开发中的Living Style Guide得到的是:</p>
-
-<p>1.设计在代码实现层面上的最新版本，它包含了展示UI组件交互和行为的Demo以及相应的实现和使用代码等 <br/>
-2.用户是UX，前端开发和BA（业务分析），在UX和BA的眼中看到的文档即最新实现结果，而在前端开发眼中看到的代码即设计 <br/>
-3.文档中看到的实现即是产品实现中最终的一致结果 <br/>
-4.除了基础组件，也具有更加偏重业务的大型组件 <br/>
-5.产生供产品环境使用的最终资源（库）</p>
-
-<p>综合以上不同之处，相信大家可以猜到对于“风格指南驱动开发”来说，它所需要的是后者。</p>
-
-<p style="text-align: center;">
-  <img src="/images/sgdd/living-style-guide.png" width="500" title="Living Style Guide" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">一个Living Style Guide的样例</p>
-
-
-<h3>工作流程 - 如何“驱动开发”？</h3>
-
-<p style="text-align: center;">
-  <img src="/images/sgdd/sgdd-process.png" width="500" title="Style Guide Driven Development Process" alt="Alt text">
-</p>
-
-
-<p style="text-align: center;">开发流程</p>
-
-
-<p>也许，你会更加关心“风格指南驱动开发”的整个开发流程，但其实，当你拥有了组件化的思想和“动态的风格指南”，“风格指南驱动开发”的整个过程其实是行云流水的，我简单描述一下：</p>
-
-<p>1.挖掘到新的需求/特性</p>
-
-<p>当新的需求出现时，UX开始进行页面设计，Living Style Guide会作为设计的参考文档，通常情况，设计师会查看已有的调色板，字体，和其他基本元素或组件来组成新的页面布局。在组件化的思想和Living Style Guide的帮助下，BA和设计师都会尝试使用或者扩展现有的组件。</p>
-
-<p>2.抽象成组件</p>
-
-<p>一旦设计完成，BA，UX和开发会开始讨论如何把新的设计细分为独立的组件，哪些是已经存在可以重用的，哪些是新的需用新建或者扩展实现的。Living Style Guide作为桥梁帮助设计与开发进行沟通，促进双方的理解，确保实现的准确性。而抽象出来的组件，帮助BA划分任务和故事（Story），以便更加准确的估算“故事点”。</p>
-
-<p>3.实现和文档化</p>
-
-<p>此时，Living Style Guide是作为一个开发框架和设计试验场（playground）。</p>
-
-<p>作为一个试验场（playground），允许你随时看到每一个开发出来的组件，作为开发框架，允许你快速开发，它和真正的产品实现完全隔离，这种隔离会鼓励你一以更加抽象的方式创建组件，以便于让他们更容易被重用。</p>
-
-<p>Living Style Guide的开发注重组件化的隔离和规范化的开发流程（套路清晰明了），我们常常会开发一些自动化的构建任务来帮助快速初始化一个组件需要的基本内容，只要开发人员对开发所需的前端技术栈有掌握，就能较快速的开发完成相应的组件。</p>
-
-<p>而开发完成的组件在Living Style Guide中立刻变成“活的文档”，可以快速展示各种不同的组件应用场景，提供给UX和BA做审查（review）。</p>
-
-<p>4.组件在产品应用中的热插拔</p>
-
-<p>最后一步，就是将组件应用到真正的产品实现中（该产品代码应该是与Living Style Guide毫无关系的业务代码）。而对于Living Style Guide输出的结果，应该可以任意选择刚好满足需求所需要的组件，拥有足够的灵活性，才能实现它在产品应用代码中的热插拔。</p>
-
-<p>如果还有第5步的话，那就是重复上面的4步，这就是“风格指南驱动开发”的完整流程。</p>
-
-<h3>留在最后的思考 - 它到底驱动了什么？</h3>
-
-<p>作为好奇宝宝的你们和我，当你读完这篇文章，当我写完这篇项目上的实践总结，其实，应该仍然在思考，它到底驱动了什么？</p>
-
-<p>在TDD和BDD中，通过测试，驱动我们编写刚好满足测试和满足需求的实现，而测试反过来成为保护伞，在我们通过重构提升代码质量的同时，保证功能的安全性。</p>
-
-<p>那么，“风格指南驱动开发”到底驱动了什么？也许，它驱动着我们尽最大可能去重新使用已有的组件（代码）和设计更通用的组件，也驱动着我们（开发，UX，BA）进行更加频繁的沟通，它驱动着BA（业务分析）书写更加合理的Story，也驱动开发进行更加合理的代码和资源的管理。</p>
-
-<p>如果转载本文，请注明转载地址： <a href="http://benweizhu.github.io/blog/2016/11/19/style-guide-driven-development/">http://benweizhu.github.io/blog/2016/11/19/style-guide-driven-development/</a></p>
 </div>
   
   
@@ -495,6 +511,14 @@ node -version v6.9.4(用nvm) brew update（如果是mac的） brew install yarn 
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（九）- 组织state和reducer（中）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（上）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a>
       </li>
     
@@ -504,14 +528,6 @@ node -version v6.9.4(用nvm) brew update（如果是mac的） brew install yarn 
     
       <li class="post">
         <a href="/blog/2018/04/23/deep-thinking-in-react-6/">React的思考（六）- 不可变性</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/22/deep-thinking-in-react-5/">React的思考（五）- Reconciliation</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/21/deep-thinking-in-react-4/">React的思考（四）- componentDidMakeSense之生命周期面试调侃</a>
       </li>
     
   </ul>

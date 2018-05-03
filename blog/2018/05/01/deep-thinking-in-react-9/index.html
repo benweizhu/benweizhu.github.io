@@ -1,0 +1,310 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>React的思考（九）- 组织state和reducer（上） - NO END FOR LEARNING</title>
+  <meta name="author" content="ZHU Benwei">
+
+  
+  <meta name="description" content="前提条件 在进行深入探讨之前，我先确保大家的理解是一致的，因为这部分是客观的，而之后的内容是相对主观和有争议的。 1.当组件的某个操作dispatch了一个action，所有的reducer都会接收到：All reducers will be invoked when an action is &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://benweizhu.github.io/blog/2018/05/01/deep-thinking-in-react-9">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="NO END FOR LEARNING" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">NO END FOR LEARNING</a></h1>
+  
+    <h2>Writing blog if you feel tired | 学海无涯 苦写博客</h2>
+  
+</hgroup>
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="benweizhu.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">React的思考（九）- 组织state和reducer（上）</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2018-05-01T22:47:38+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2018</span></span> <span class='time'>10:47 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>前提条件</h2>
+
+<p>在进行深入探讨之前，我先确保大家的理解是一致的，因为这部分是客观的，而之后的内容是相对主观和有争议的。</p>
+
+<p>1.当组件的某个操作dispatch了一个action，所有的reducer都会接收到：<a href="https://stackoverflow.com/questions/33590579/all-reducers-will-be-invoked-when-an-action-is-dispatched" title="All reducers will be invoked when an action is dispatched?">All reducers will be invoked when an action is dispatched?</a>，<a href="https://cn.redux.js.org/docs/recipes/reducers/UsingCombineReducers.html" title="combineReducers用法中也有讲到">combineReducers用法中也有讲到</a></p>
+
+<p>2.当combineReducers发现有任意一个reducer返回了新的state，会通知所有和redux关联（connect）的组件准备更新，请检查自己是否要更新</p>
+
+<p>3.每一个通过connect构建的组件，其mapStateToProps中的state，是combineReducers合并的state，也就是每个组件都能拿到所有reducer中的state（曾经有遇到过有人误以为是跟它action相关的reducer的state）</p>
+
+<h2>state的上帝视角</h2>
+
+<p>Redux的三大设计原则之一，单一数据源，定义了整个应用的state被储存在一棵object tree中，并且这个object tree只存在于唯一一个store中。这样一个顶层的状态树，会拥有一个全局的视角，掌握着整个应用的状态。</p>
+
+<p>单一数据源的设计原则在许多程序设计的领域都是准确的，但仅仅用一个JavaScript对象来存储整个应用的状态，总会让人感觉某一天这个对象一定会特别臃肿，上帝实在太忙，要关注的东西太多。</p>
+
+<p>很自然的，我们就会去思考，物尽其用，到底什么样的数据应该放在Redux中，什么样的数据应该放在别处来管理。</p>
+
+<h2>应用的拥有的数据和状态</h2>
+
+<p>大多数应用会处理多种类型的数据和状态，通常可以分为以下三类：领域数据（Domain data），应用状态（App state），UI状态（UI state）</p>
+
+<p>领域数据也就是业务相关数据，一般和你的后台业务系统数据相关联，是领域数据的数据来源，但他们不一定直接对等。</p>
+
+<p>应用状态和UI状态有时候不容易分清，应用状态是描述应用无限循环的生命周期中的某一种存在（中间）状态，而这样一个应用状态可能会导致一个或者多个UI的状态变化。比如：用户登录，是一个应用状态，它可能导致导航栏的UI状态改变。</p>
+
+<p>UI的状态，自然是描述UI的改变，但不一定是由应用状态的变化导致。比如：页面上tab的切换。</p>
+
+<h2>应用数据和状态的存储位置和影响范围</h2>
+
+<p>根据上面的应用数据和状态的分类，好像让我们对这样一个问题有些头绪。不过在你下任何判断之前，我们在从另外一个维度继续思考一下。</p>
+
+<p>从前面我们就了解到，Redux存储的数据，在任何一个与之关联的组件中都能拿到，也就是说，Redux存储的是一个全局的数据。</p>
+
+<p>反之，React本身也有一个state，而它所关注的只是组件本身以及它的子组件，兄弟和父组件它都不关心。</p>
+
+<p>除了Redux和React，就没有别的位置保存数据了？当然不是，比如：cookie，local storage。这些也是保存数据的关键位置，毕竟当页面刷新后，Redux和React中的state就丢失了，还需要从后台重新加载。</p>
+
+<h2>React组件的state存什么？</h2>
+
+<p>现在还不是时候讨论Redux里面存什么，我们反向推理，用排除法，先看看React里面应该存在什么。</p>
+
+<p>React中的state存在于组件当中，那我们就需要思考组件的特性，能独立，也许能自治，必然高可重用，这是它的部分典型特性。基于它这些特性，也就决定了它的state也必须满足这些要求，组件的state是服务于组件本身的，这些state能够不收外部干预下就自我管理，这些state当组件被用在任何位置时，都能适应。一个典型的例子：UI状态。</p>
+
+<p>当然，上面是我对React组件state理解的一个抽象描述，能够一定程度下知道我的思考。还有什么原则，能够帮助决策什么样的state可以放在组件中，Dan Abramov在他的Twitter发了这样一张图片也具有不错的指导意义：</p>
+
+<p><img src="https://camo.githubusercontent.com/5e85994aa142e7699548e2f5a1e74583229ebd10/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f436d654273477a57384151705f61762e6a7067" width="500" alt="" /></p>
+
+<h2>总结</h2>
+
+<p>今天先写到这里，后续还会继续讨论redux的state和reducer的设计思考。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">ZHU Benwei</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2018-05-01T22:47:38+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2018</span></span> <span class='time'>10:47 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://benweizhu.github.io/blog/2018/05/01/deep-thinking-in-react-9/" data-via="" data-counturl="http://benweizhu.github.io/blog/2018/05/01/deep-thinking-in-react-9/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2018/04/27/deep-thinking-in-react-8/" title="Previous Post: React的思考（八）- Redux的Middleware（下）异步的世界">&laquo; React的思考（八）- Redux的Middleware（下）异步的世界</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2018/05/03/deep-thinking-in-react-10/" title="Next Post: React的思考（九）- 组织state和reducer（中）">React的思考（九）- 组织state和reducer（中） &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1 style="margin-left: 5px;">About Me</h1>
+  <div style="margin-left: 8px;">Working in <a href="https://www.thoughtworks.com/" style="text-decoration: blink;font-weight: bolder;">ThoughtWorks</a> Wuhan</div>
+  <div style="margin-left: 8px;margin-top: 10px;">A Java/RoR/NodeJS-FE/Full Stack Developer</div>
+  <div style="margin-left: 8px;margin-top: 10px;">A Gradle Plugin Contributor</div>
+  <div style="margin-top: 10px;"><a href='http://book.douban.com/subject/26609447/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《实战Gradle》</a>译者之一</div>
+  <div style="margin-left: 8px;;margin-top: 10px;">计算机应用技术学术型硕士-<span style="font-weight: bold;">信息安全方向</span></div>
+  <div style="margin-top: 10px;margin-left: 8px;">关注：Gradle，Spring，前端开发，自动化构建，自动化测试，Devops，信息安全</div>
+  <div style="margin-top: 10px;margin-left: 8px;">我正在写的书：<a href='https://benweizhu.gitbooks.io/gradle-best-practice/content/' target="_blank" style="text-decoration: blink;font-weight: bolder;">《Gradle最佳实践》</a></div>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（九）- 组织state和reducer（中）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（上）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/deep-thinking-in-react-6/">React的思考（六）- 不可变性</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'benweizhu',
+            count: 3,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2018 - ZHU Benwei -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'benweiblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://benweizhu.github.io/blog/2018/05/01/deep-thinking-in-react-9/';
+        var disqus_url = 'http://benweizhu.github.io/blog/2018/05/01/deep-thinking-in-react-9/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

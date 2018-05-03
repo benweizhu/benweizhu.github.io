@@ -9,23 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="这一定是一个老生常谈的话题，你们就别多想了，跟我一起回顾一遍，看我说的有没有道理。 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-class Timer extends React.Component { constructor(props) { super( &hellip;">
+  <meta name="description" content="看到一个老外的博客用了这样一个标题《componentDidMakeSense — React Component Lifecycle Explanation》，我只能说：老哥你太有才了，本来都不太想写这篇文章，冲你这个标题，我再啰嗦下生命周期。 没有水平的面试官老喜欢问的问题 面试官：“ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,7 +70,7 @@ class Timer extends React.Component { constructor(props) { super( &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2018/04/18/deep-thinking-in-react-2/">React的思考（二）- 逃不开的生命周期函数之构造函数</a></h1>
+      <h1 class="entry-title"><a href="/blog/2018/04/21/deep-thinking-in-react-4/">React的思考（四）- componentDidMakeSense之生命周期面试调侃</a></h1>
     
     
       <p class="meta">
@@ -95,17 +79,61 @@ class Timer extends React.Component { constructor(props) { super( &hellip;">
 
 
 
-<time class='entry-date' datetime='2018-04-18T21:23:11+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>9:23 pm</span></time>
+<time class='entry-date' datetime='2018-04-21T20:51:50+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2018</span></span> <span class='time'>8:51 pm</span></time>
         
-           | <a href="/blog/2018/04/18/deep-thinking-in-react-2/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/18/deep-thinking-in-react-2/">Comments</a>
+           | <a href="/blog/2018/04/21/deep-thinking-in-react-4/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/21/deep-thinking-in-react-4/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>这一定是一个老生常谈的话题，你们就别多想了，跟我一起回顾一遍，看我说的有没有道理。</p>
+  <div class="entry-content"><p>看到一个老外的博客用了这样一个标题《componentDidMakeSense — React Component Lifecycle Explanation》，我只能说：老哥你太有才了，本来都不太想写这篇文章，冲你这个标题，我再啰嗦下生命周期。</p>
+
+<h3>没有水平的面试官老喜欢问的问题</h3>
+
+<p>面试官：“你能说一下React的生命周期函数调用过程吗？”</p>
+
+<p>我以及和我一样的人：“大哥，是不是我背出来，你就录用我？不是的话，你给我10秒钟，网不卡的话，我立马Google给你答案”</p>
+
+<p>手贱，给你们扩皮了一份。</p>
+
+<p><strong>Mounting</strong></p>
+
+<p>constructor()  <br/>
+static getDerivedStateFromProps()  <br/>
+componentWillMount() / UNSAFE_componentWillMount()  <br/>
+render()  <br/>
+componentDidMount()</p>
+
+<p><strong>Updating</strong></p>
+
+<p>componentWillReceiveProps() / UNSAFE_componentWillReceiveProps()  <br/>
+static getDerivedStateFromProps()  <br/>
+shouldComponentUpdate()  <br/>
+componentWillUpdate() / UNSAFE_componentWillUpdate()  <br/>
+render() <br/>
+getSnapshotBeforeUpdate()  <br/>
+componentDidUpdate()</p>
+
+<p><strong>Unmounting</strong></p>
+
+<p>componentWillUnmount()</p>
+
+<p><strong>Error Handling</strong></p>
+
+<p>componentDidCatch()</p>
+
+<h3>你不如这样问</h3>
+
+<p>你那么问别人问题，既不实际，也很尴尬，别人还觉得你没水平。不如我们结合实际问些问题：</p>
+
+<p>1.组件需要做一次网络请求来获取数据，请问应该怎么写？组件有一些事件订阅放在哪个位置比较合适？为什么？</p>
+
+<p>2.在哪些生命周期函数里面我不应该调用setState？如果调用了，会导致什么样的问题？</p>
+
+<p>3.如果我这么写constructor来初始化对象会有什么问题？</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -113,367 +141,26 @@ class Timer extends React.Component { constructor(props) { super( &hellip;">
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">class</span> <span class="nx">Timer</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">seconds</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">(</span>
-</span><span class='line'>      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
-</span><span class='line'>        <span class="nx">Seconds</span><span class="o">:</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">seconds</span><span class="p">}</span>
-</span><span class='line'>      <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>    <span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Timer</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nx">mountNode</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Constructor</h3>
-
-<p>构造函数（或者构造器），这个概念对于熟悉基于类的面向对象语言的朋友们肯定烂熟于心，但是对于JavaScript而言，这个概念往往容易让人困惑。</p>
-
-<p>在JavaScript的世界里，构造函数和普通函数没有什么区别，你一样的可以像普通函数一样调用它，但如果通过new关键字来调用函数，该函数就成为了构造函数，this指针就会指向新创建的对象。</p>
-
-<p>比如：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kd">function</span> <span class="nx">Person</span><span class="p">(){</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;CodePlayer&quot;</span><span class="p">;</span>
-</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nx">Person</span><span class="p">()</span>
-</span><span class='line'><span class="nx">$</span> <span class="nx">Window</span> <span class="p">{</span><span class="nx">external</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nx">chrome</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nb">document</span><span class="o">:</span> <span class="nb">document</span><span class="p">,</span> <span class="nx">WPCOMSharing</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nx">RecaptchaTemplates</span><span class="o">:</span> <span class="nb">Object</span><span class="err">…</span><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">()</span>
-</span><span class='line'><span class="nx">$</span> <span class="nx">Person</span> <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;CodePlayer&quot;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>更多具体的解释请参考我以前的一篇博客：<a href="http://benweizhu.github.io/blog/2015/12/31/javascript-contructor-new-prototype/" title="JavaScript渐入佳境 - 构造函数、new、原型">JavaScript渐入佳境 - 构造函数、new、原型</a>。</p>
-
-<h3>ES6的Class、extends、super</h3>
-
-<p>上面是一个ES5的例子，然而，当我们写React代码时，我们会用到ES6语法，会用到class，constructor以及super关键字，他们的作用是什么？</p>
-
-<p>我们先看下面一个跟React无关的例子：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="c1">//ES6</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">Rectangle</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">constructor</span> <span class="p">(</span><span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">width</span>  <span class="o">=</span> <span class="nx">width</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="nx">height</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//翻译成ES5</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Rectangle</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">width</span> <span class="o">=</span> <span class="nx">width</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="nx">height</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//ES6</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">Shape</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">Rectangle</span> <span class="kr">extends</span> <span class="nx">Shape</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">constructor</span> <span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="kr">super</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">width</span>  <span class="o">=</span> <span class="nx">width</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="nx">height</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//概念性翻译成ES5</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Share</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Rectangle</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">width</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">Shape</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">width</span>  <span class="o">=</span> <span class="nx">width</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="nx">height</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'><span class="nx">Rectangle</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">Shape</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span>
-</span><span class='line'><span class="nx">Rectangle</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">=</span> <span class="nx">Rectangle</span><span class="p">;</span>
-</span><span class='line'><span class="nx">Rectangle</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">=</span> <span class="nx">Shape</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>简单来说，class的作用就是定义Shape和Rectangle两个function（这就是被人用烂的词，语法糖），extends的作用是定义函数Rectangle的prototype和<strong>proto</strong>属性来实现原型链的继承，super的作用是在Rectangle函数中执行Share函数，并绑定this指针。</p>
-
-<p>建议查看Babel的编译结果，它是更准确的ES5转义：<a href="https://babeljs.io/repl/#?babili=false&amp;browsers=&amp;build=&amp;builtIns=false&amp;code_lz=MYGwhgzhAEDKAWYAOBTaBvAUJgvp0kMASisAC5gB2A5iGigB5kqUAmMCyaW0v0wAe0oQyAJwCu5AaOgAKAJasANNAYqAnioDuisvBXwU86vDIBKDJj7XoEcalELlqjWYDcVm7z3yIAOh1WPV4AXmhAvQ8vb3hfP0NjU2gwhJMyKL48PCA&amp;debug=false&amp;forceAllTransforms=false&amp;shippedProposals=false&amp;circleciRepo=&amp;evaluate=false&amp;fileSize=false&amp;lineWrap=true&amp;presets=es2015&amp;prettier=false&amp;targets=&amp;version=6.26.0&amp;envVersion=" title="babel链接">babel链接</a></p>
-
-<blockquote><p>如果以后有人问我，JavaScript和Java有什么关系，我不会说它们没关系，我会告诉那个人，ES6抄袭Java的语法范式。</p></blockquote>
-
-<h3>React中的constructor</h3>
-
-<p>我们再来回到React上，看ES6和Babel编译后的结果：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="c1">//ES6</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">Rectangle</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//不完全Babel编译代码</span>
-</span><span class='line'><span class="kd">function</span> <span class="nx">Rectangle</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">_classCallCheck</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">Rectangle</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">return</span> <span class="nx">_possibleConstructorReturn</span><span class="p">(</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">,</span>
-</span><span class='line'>    <span class="p">(</span><span class="nx">Rectangle</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">||</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">getPrototypeOf</span><span class="p">(</span><span class="nx">Rectangle</span><span class="p">))</span>
-</span><span class='line'>      <span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">)</span> <span class="c1">// 看这里</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//ES6</span>
-</span><span class='line'><span class="kr">class</span> <span class="nx">Rectangle</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="p">{</span>
-</span><span class='line'>    <span class="nx">constructor</span> <span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//不完全Babel编译代码</span>
-</span><span class='line'><span class="kd">function</span> <span class="nx">Rectangle</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>   <span class="nx">_classCallCheck</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">Rectangle</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>   <span class="k">return</span> <span class="nx">_possibleConstructorReturn</span><span class="p">(</span>
-</span><span class='line'>     <span class="k">this</span><span class="p">,</span>
-</span><span class='line'>     <span class="p">(</span><span class="nx">Rectangle</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">||</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">getPrototypeOf</span><span class="p">(</span><span class="nx">Rectangle</span><span class="p">))</span>
-</span><span class='line'>       <span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">props</span><span class="p">)</span> <span class="c1">// 看这里</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当我们创建一个组件时，如果不需要在constructor里面做任何初始化的操作时，我们是不需要复写constructor的，因为Babel编译后，会将整个arguments都绑定上this指针后传递给被Rectangle的原型（React.Component），并执行，它替我们将constructor中super()的操作做了，如上所示。</p>
-
-<p>如果有需要在constructor中做初始化的操作时，那么必须带上super(props)并放在最前面，因为它的作用是调用Rectangle的原型（React.Component），并绑定this指针。</p>
-
-<p>那么，哪些初始化的操作可以在constructor里面做呢？原则上只有一个，那就是初始化state。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">class</span> <span class="nx">Timer</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">seconds</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>有三个问题：</p>
-
-<p>1.为什么不用this.setState()来执行？</p>
-
-<p>原因：1.this.state够直接了，你还要怎样？2.this.setState()是一个异步执行的函数，执行完之后，组件的响应式重新渲染（render），你这第一次渲染都还没开始呢。3.在这里this.setState()是一个空指令，这么写，不会任何起作用，不信你可以试试。</p>
-
-<p>2.那么能不能在constructor里面执行网络请求来初始化数据？</p>
-
-<p>我问过许多来面试的候选人，你的网络请求会放置在什么时候执行，我印象中确实有人回答我说在constructor中。听起来，在constructor中获取数据来初始化挺合理的。而且确实有人问：<a href="https://stackoverflow.com/questions/39338464/reactjs-why-is-the-convention-to-fetch-data-on-componentdidmount" title="Stack Overflow">Stack Overflow</a></p>
-
-<p>然而，我们在官方文档上看到这样一句话：避免在构造函数中引入任何有副作用的代码（比如data fetching或者DOM manipulation）或执行订阅的操作，如果有，请在componentDidMount里执行。</p>
-
-<p>关于这个位置的理解，我常常这样解释，就像你用jQuery写代码一样，你一定会等到document ready之后，才开始操作DOM或执行网络请求（也是为了操作DOM），否则，很有可能遇到undefined的情况。虽然，React这里也许和jQuery不一样，但我认为它的理由是相似的。（如果不对，请纠正我）。</p>
-
-<p>3.那么可不可以传递props到state呢？非常像Java的写法。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
 </pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
 </span><span class='line'>  <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
 </span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">color</span><span class="o">:</span> <span class="nx">props</span><span class="p">.</span><span class="nx">initialColor</span>
+</span><span class='line'>    <span class="nx">color</span><span class="o">:</span> <span class="nx">props</span><span class="p">.</span><span class="nx">color</span>
 </span><span class='line'>  <span class="p">};</span>
 </span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//Java</span>
-</span><span class='line'><span class="kr">public</span> <span class="nx">Shape</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">Shape</span><span class="p">(</span><span class="nb">String</span> <span class="nx">color</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">color</span> <span class="o">=</span> <span class="nx">color</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>这么写，没有说完全错误，但是你需要注意的是，要同时实现getDerivedStateFromProps()在React 16中，或者16之前的componentWillReceiveProps，来保证当父组件更新时，props能有传递到state，因为constructor只会执行一次。</p>
+<p>4.你以前的经历中，用到了哪些生命周期函数？遇到过什么奇怪的问题没有？</p>
 
-<p>如果出现这种使用场景，我们需要思考一下，能否将state的控制向上提升，将Shape组件仅仅作为Presentional Component，这样减少在不同的两个位置（父组件和它自己）来控制组件的状态。</p>
+<p>等等，这样会显得你比较有水平，如果朋友们还问过其他类型的问题？请不惜赐教！我会好好收藏的。</p>
 
-<h4>this.handleClick = this.handleClick.bind(this);</h4>
+<h3>其他参考资料</h3>
 
-<p>官方文档说，在constructor里面只做两件事情，初始化state，和绑定event的handler函数的this指针到组件对象本身。既然是this指针这么困惑的话题，我再啰嗦一句这里做了什么：</p>
+<p>官方文档其实就是不错的和最准确的 <a href="https://reactjs.org/docs/react-component.html#the-component-lifecycle" title="the-component-lifecycle">the-component-lifecycle</a></p>
 
-<p>当函数（这里指这个组件）就成为了构造函数，该函数中this指针就会指向新创建的对象，也就是constructor里面的this就是指向的它自己（该组件的实例），那么this.handleClick = this.handleClick.bind(this);就能保证在handleClick函数里面的this指针，无论handleClick被传递到了哪里，可能被基础DOM元素button使用，也可能被子组件传递到别的位置，handleClick里面的this指针都能指向该组件的（如果是下面的例子就是Toggle），这样里面的this.setState才能起作用。</p>
+<p>另外推荐看 <a href="https://reactarmory.com/guides/lifecycle-simulators">https://reactarmory.com/guides/lifecycle-simulators</a></p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">class</span> <span class="nx">Toggle</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span><span class="nx">isToggleOn</span><span class="o">:</span> <span class="kc">true</span><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// This binding is necessary to make `this` work in the callback</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">handleClick</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">handleClick</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">handleClick</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">prevState</span> <span class="o">=&gt;</span> <span class="p">({</span>
-</span><span class='line'>      <span class="nx">isToggleOn</span><span class="o">:</span> <span class="o">!</span><span class="nx">prevState</span><span class="p">.</span><span class="nx">isToggleOn</span>
-</span><span class='line'>    <span class="p">}));</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">(</span>
-</span><span class='line'>      <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleClick</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>        <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isToggleOn</span> <span class="o">?</span> <span class="s1">&#39;ON&#39;</span> <span class="o">:</span> <span class="s1">&#39;OFF&#39;</span><span class="p">}</span>
-</span><span class='line'>      <span class="o">&lt;</span><span class="err">/button&gt;</span>
-</span><span class='line'>    <span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>总结</h3>
-
-<p>别小看一个constructor函数，这里面的知识点可多了。总结一下，就是只干这些事情，其他的别干：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{</span><span class="nx">isToggleOn</span><span class="o">:</span> <span class="kc">true</span><span class="p">};</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">handleClick</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">handleClick</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<p>另外，放心，我这些面试问题都没有给答案，不会被套路的，大不了，我换个方式问。</p>
 </div>
   
   
@@ -486,7 +173,7 @@ class Timer extends React.Component { constructor(props) { super( &hellip;">
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2018/04/17/deep-thinking-in-react-1/">React的思考（一）- 官网首页的信息量就挺大</a></h1>
+      <h1 class="entry-title"><a href="/blog/2018/04/20/deep-thinking-in-react-3/">React的思考（三）- 总结下shouldComponentUpdate</a></h1>
     
     
       <p class="meta">
@@ -495,85 +182,75 @@ class Timer extends React.Component { constructor(props) { super( &hellip;">
 
 
 
-<time class='entry-date' datetime='2018-04-17T21:11:23+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>9:11 pm</span></time>
+<time class='entry-date' datetime='2018-04-20T11:10:09+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>11:10 am</span></time>
         
-           | <a href="/blog/2018/04/17/deep-thinking-in-react-1/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/17/deep-thinking-in-react-1/">Comments</a>
+           | <a href="/blog/2018/04/20/deep-thinking-in-react-3/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/20/deep-thinking-in-react-3/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>没错，这个标题有些大的，也挺抽象，给自己画了一个大饼，就看能不能给圆上。</p>
+  <div class="entry-content"><p>Google来，百度去，原来网上已经有一大堆讲解shouldComponentUpdate的文章，差点就打算放弃了，为了学习精神，那我就集百家之长，小总结一下。</p>
 
-<h2>从官网的首页开始</h2>
+<h3>它的作用</h3>
 
-<h3>先看小标题</h3>
-
-<p>我们就从<a href="https://reactjs.org/" title="React">React</a>官方网站的首页开始我们的思考。先看它的小标题：</p>
-
-<blockquote><p>A JavaScript library for building user interfaces。</p></blockquote>
-
-<p>React从一开始就将自己到底是一个什么样的存在，定义的非常的清楚。看清楚，我不是一个框架，我就是一个JavaScript的库，那我是干什么用的呢？构建用户的界面（UI），其他的乱七八糟的事情我不管。</p>
-
-<p>有人可能会问，其他乱七八糟事情的是什么？比如：页面的路由，网络请求，逻辑控制器（Controller），服务等等，是不是听起来挺像前几年某A打头的框架做的事情，这里我就不点名了，大家心里都清楚，没有谁对谁错，此一时彼一时的。</p>
-
-<p>为什么React是这样的一个定义呢？关于这一点，我们可以在Pete Hunt在2013年5月份写的一篇博客<a href="https://reactjs.org/blog/2013/06/05/why-react.html" title="Why did we build React?">Why did we build React?</a>中看到一些insight。比如：
-简单摘录一段：</p>
-
-<p><em>React isn’t an MVC framework.</em></p>
-
-<p><em>React is a library for building composable user interfaces. It encourages the creation of reusable UI components which present data that changes over time.</em></p>
-
-<p>鄙人简单理解和翻译：我不是MVC框架。React是一个用于构建可组合用户界面的库。它鼓励创建可重用的UI组件，以呈现随时间变化的数据。Pete Hunt将React的目的说的很透彻。</p>
-
-<p>React官网也通过这样一句话，给自己了一个清晰的定位，并且在这个清晰的定位下，给出下面三个基本特性：Declarative，Component-Based和Learn Once, Write Anywhere。我们一个个来看：</p>
-
-<h4>Declarative</h4>
-
-<p>Declarative，声明式的，嗯呐嗯呐，这是什么意思？相信大家对“声明”这个词比较了解，比如：声明一个变量，声明一个函数。</p>
-
-<p>要理解它，首先要引入另外一个东西，叫做Imperative Programming（命令式编程）。声明式编程和命令式编程，都是一种编程范式，那么他们的区别是什么？简单来说就是what和how的区别。</p>
-
-<p><em>命令式编程：命令“机器”如何去做事情(how)，这样不管你想要的是什么(what)，它都会按照你的命令实现。</em></p>
-
-<p><em>声明式编程：告诉“机器”你想要的是什么(what)，让“机器”想出如何去做(how)。</em></p>
-
-<p>命令式编程应该大家都比较好理解，比如：操作几个变量，最后计算出你想要的结果，这里的重点在于你通过指令操作它们得到结果。那么声明式呢？举个例子，比如，SQL语句：</p>
+<p>首先，简单说一下shouldComponentUpdate的作用（如果你已经知道，请不要跳过，帮助我审查下有没有描述错误）</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='SQL'><span class='line'><span class="k">Select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">JSLibrary</span> <span class="k">where</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;React&#39;</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">shouldComponentUpdate</span><span class="p">(</span><span class="nx">nextProps</span><span class="p">,</span> <span class="nx">nextState</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>你没告诉SQL该怎么去搜索，只是告诉它要找到名字是React的库，对吧？</p>
+<p>extends React.Component和写Functional Stateless Component（它不能复写shouldComponentUpdate），shouldComponentUpdate默认都是返回true。</p>
 
-<p>React就是采用声明式的编程范式思想，你只需要设计在不同状态下，组件应该是长什么样子，React自己会帮助完成组件的更新。它的最直接明白的对比（反面教材），就是通过jQuery操作DOM来更新UI。</p>
+<p>这意味着，当props或者state更新时，该组件一定会调用render方法。</p>
 
-<p>React的这种开发模式和有限状态机的思想是一致的，在预知所有状态的条件下，去规划你的代码，也因此衍生了Redux, MobX这样的状态管理库。</p>
+<p>也就意味着，React一定会去对比该组件节点上的VisualDOM，但是，不一定会去更新真实DOM，因为reconciliation的结果可能是相等的。（一致性对比，对比新返回的元素是否和之前的元素是否一样）</p>
 
-<h4>Component-Based</h4>
+<p>如果，你将shouldComponentUpdate复写，返回false，那么componentWillUpdate()，render()和componentDidUpdate()都不会被调用，那么该组件不会更新。</p>
 
-<p>基于组件的，这个相对比较好理解，组件是什么？对数据和方法的简单封装。它应该具备具有独立性，封装性，可重用性，职责单一，有自己的状态等等。React组件就封装了自己的状态来构建复杂的UI的组件。</p>
+<p>当shouldComponentUpdate返回true，这个过程是向叶子节点传递的，比如：父节点返回true，它有两个叶子节点A和B，那么A和B会被要求执行mount或者update的生命周期，如果A的shouldComponentUpdate返回false，B返回true，那么只有B更新。</p>
 
-<p><em>Since component logic is written in JavaScript instead of templates, you can easily pass rich data through your app and keep state out of the DOM.</em></p>
+<p>React官方的<a href="https://reactjs.org/docs/optimizing-performance.html#shouldcomponentupdate-in-action" title="ShouldComponentUpdate In Action">ShouldComponentUpdate In Action</a>讲解的很清楚。</p>
 
-<p>官方网站上说：组件的逻辑是用JavaScript编写，而不是模板，所以你轻松的传递数据到应用，并且让状态不和DOM打交道。</p>
+<h3>逃生出口</h3>
 
-<p>如果你十分好奇，这里的“而不是模板”是什么意思？Pete Hunt的那篇文章其实说的很清楚，传统的Web应用是通过HTML或者模板引擎（比如后端模板引擎：JSP，HAML等，前端模板引擎：handlebar,ejs等）来构建UI的，而React使用有完整功能编程语言来渲染视图。</p>
+<p>听起来貌似很有道理，谁不希望减少无谓的计算，提高性能。</p>
 
-<p>其实，我是不太认同的，JSX不算模板，VueTemplate不算模板？不过JSX允许你用JavaScript的方式做一些逻辑的处理，而不像JSP需要些JSTL和ctag的的逻辑标签，如果我的理解有误，请务必纠正我。</p>
+<p>然而，我又看到这样一句话：React team called shouldComponentUpdate an &ldquo;escape hatch&#8221;（逃生出口）instead of &#8220;turbo button&#8221;（涡轮增压按钮）。在 github issue <a href="https://github.com/facebook/react/issues/5677" title="Stateless functional components and shouldComponentUpdate">Stateless functional components and shouldComponentUpdate</a>上也有人这么说。
+听上去总结起来，有两个原因：</p>
 
-<h4>Learn Once, Write Anywhere</h4>
+<p>1.维护自定义的shouldComponentUpdate成本太高，有可能加了一个新的prop，但是忘记更新shouldComponentUpdate的代码，导致bug   <br/>
+2.也许shouldComponentUpdate的比较计算逻辑比起直接重新render更加浪费性能</p>
 
-<p>这个，看看就行，官方网站这里特指的是React Native可以开发移动端的应用，不过大家也不要太天真，你理解成React和React-Native的思想和语法是融会贯通的就行了，不要真的以为可以很轻松的将组件在React和RN之间移植，否则你会被鄙视的。</p>
+<h3>尴尬了</h3>
 
-<p>另外提一点，在ElectronJS的帮助下，可以通过React开发桌面应用，这个倒是真可行。</p>
+<p>那这就尴尬了，这到底是写还是不写呢？当被问到这个问题的时候，永远都有一个正确但不受人欢迎的答案：“Well, it depends”（好吧，看情况）。</p>
+
+<h3>React.Component，PureComponent和Function</h3>
+
+<p>与其思考这个没有人能够给出准确答案的问题，不如我们思考怎么样结合对shouldComponentUpdate的理解，合理的写组件，设计合理的状态结构树。</p>
+
+<p>大家对React.Component和Functional Stateless Component比较熟，一个就是extends React.Component，一个就是函数，前面也说了，它们的shouldComponentUpdate永远返回true。</p>
+
+<p>React里还有一个顶级的组件API：<a href="https://reactjs.org/docs/react-api.html#reactpurecomponent" title="PureComponent">PureComponent</a>。
+这个PureComponent，对shouldComponentUpdate有一个默认实现，官方称为shallow的prop和state对比。啥意思呢？就是帮你对比this.props和this.state上的第一层叶子节点的引用。</p>
+
+<p>如果，某一个叶子节点里面深层的一个元素改变了，而该叶子节点本身的引用没变，shouldComponentUpdate是检查不出来的。</p>
+
+<p>什么类型的组件比较适合写成PureComponent呢？比如：基础组件Button，它本身的属性就相对简单，完全可以和普通HTML的button元素相似，这样就可以将组件的属性拍平一层展现，用PureComponent正好满足shallow对比。</p>
 
 <h3>总结</h3>
 
-<p>你看，首页的信息量其实挺大吧，认证阅读和思考，其实收获不少，总结下来就是：我是一个用来实现基于状态的UI组件的JavaScript库（妈呀，有点绕）。</p>
+<p>一切不分析性能瓶颈而做的性能优化，都是无用功，shouldComponentUpdate不一定是你的性能瓶颈，但是，我们在这里讨论shouldComponentUpdate，为React组件的更新的问题开了一个头，后面介绍Redux和Object.assign还会在提到组件（不）更新的问题。</p>
+
+<p>周五了，祝大家周末愉快。</p>
 </div>
   
   
@@ -608,6 +285,14 @@ class Timer extends React.Component { constructor(props) { super( &hellip;">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（九）- 组织state和reducer（中）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（上）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a>
       </li>
     
@@ -617,14 +302,6 @@ class Timer extends React.Component { constructor(props) { super( &hellip;">
     
       <li class="post">
         <a href="/blog/2018/04/23/deep-thinking-in-react-6/">React的思考（六）- 不可变性</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/22/deep-thinking-in-react-5/">React的思考（五）- Reconciliation</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/21/deep-thinking-in-react-4/">React的思考（四）- componentDidMakeSense之生命周期面试调侃</a>
       </li>
     
   </ul>
