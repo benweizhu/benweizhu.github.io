@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-05-03T23:15:28+08:00</updated>
+  <updated>2018-05-03T23:16:53+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -55,7 +55,7 @@
 
 <p>很自然的，我们就会去思考，物尽其用，到底什么样的数据应该放在Redux中，什么样的数据应该放在别处来管理。</p>
 
-<h2>应用的拥有的数据和状态</h2>
+<h2>应用拥有的数据和状态</h2>
 
 <p>大多数应用会处理多种类型的数据和状态，通常可以分为以下三类：领域数据（Domain data），应用状态（App state），UI状态（UI state）</p>
 
