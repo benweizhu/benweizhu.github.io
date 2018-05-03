@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-05-03T23:20:28+08:00</updated>
+  <updated>2018-05-03T23:25:57+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -84,6 +84,9 @@
 <p>当然，上面是我对React组件state理解的一个抽象描述，能够一定程度下知道我的思考。还有什么原则，能够帮助决策什么样的state可以放在组件中，Dan Abramov在他的Twitter发了这样一张图片也具有不错的指导意义：</p>
 
 <p><img src="https://camo.githubusercontent.com/5e85994aa142e7699548e2f5a1e74583229ebd10/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f436d654273477a57384151705f61762e6a7067" width="500" alt="" /></p>
+
+<p>1.如果这个数据可以从props中计算得到，那么就不应该放在state中   <br/>
+2.如果这个数据在render方法中不被使用，那么就不应该放在state中</p>
 
 <h2>总结</h2>
 
