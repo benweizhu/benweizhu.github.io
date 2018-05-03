@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-05-03T23:12:10+08:00</updated>
+  <updated>2018-05-03T23:15:28+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -47,7 +47,7 @@
 
 <p>3.每一个通过connect构建的组件，其mapStateToProps中的state，是combineReducers合并的state，也就是每个组件都能拿到所有reducer中的state（曾经有遇到过有人误以为是跟它action相关的reducer的state）</p>
 
-<h2>state的上帝视角</h2>
+<h2>Redux的上帝视角</h2>
 
 <p>Redux的三大设计原则之一，单一数据源，定义了整个应用的state被储存在一棵object tree中，并且这个object tree只存在于唯一一个store中。这样一个顶层的状态树，会拥有一个全局的视角，掌握着整个应用的状态。</p>
 
