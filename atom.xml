@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-05-04T23:30:59+08:00</updated>
+  <updated>2018-05-04T23:32:38+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -69,7 +69,7 @@
 
 <p>3.某一天，我被页面的多个位置用到，你不需要在Redux里面配多个数据空间和action以供我的分身使用，我自带装备，我为自己“带盐”</p>
 
-<p>4.我还能配合高阶组件（用高阶组件做数据加载），让你的代码看上更加装逼</p>
+<p>4.我还能配合高阶组件（用高阶函数做数据加载部分），让你的代码看上更加装逼</p>
 
 <p>等等其他我没有想到的好处</p>
 
