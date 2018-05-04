@@ -9,7 +9,14 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="本文的内容来自于 ES6-Promise-Workshop： https://github.com/benweizhu/es6-promise-workshop 什么是Promise？ Promise用来做什么？ 延迟操作？网络请求？回调函数？它们统称为“异步操作”。 User &hellip;">
+  <meta name="description" content="两种场景需要动态的处理资源： 1.对resource下的资源进行处理 2.对war包中其他资源，比如：jsp文件进行处理 1
+2
+3
+4
+5
+6
+7
+import org.apache.tools.ant.filters.* processResources { filter &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +71,81 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/11/23/gradle-resource-filtering/">Gradle对资源的过滤处理</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-11-23T13:01:08+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2017</span></span> <span class='time'>1:01 pm</span></time>
+        
+           | <a href="/blog/2017/11/23/gradle-resource-filtering/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2017/11/23/gradle-resource-filtering/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>两种场景需要动态的处理资源：</p>
+
+<p>1.对resource下的资源进行处理  <br/>
+2.对war包中其他资源，比如：jsp文件进行处理</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.apache.tools.ant.filters.*</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">processResources</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">filter</span> <span class="n">ReplaceTokens</span><span class="o">,</span> <span class="nl">tokens:</span> <span class="o">[</span>
+</span><span class='line'>        <span class="s">&quot;application.version&quot;</span><span class="o">:</span> <span class="n">project</span><span class="o">.</span><span class="na">property</span><span class="o">(</span><span class="s">&quot;application.version&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">]</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">org.apache.tools.ant.filters.*</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">war</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">filter</span> <span class="n">ReplaceTokens</span><span class="o">,</span> <span class="nl">tokens:</span> <span class="o">[</span>
+</span><span class='line'>            <span class="err">&#39;</span><span class="n">versionDate</span><span class="err">&#39;</span><span class="o">:</span> <span class="s">&quot;${new Date().format(&#39;yyyyMMdd&#39;)}&quot;</span><span class="o">.</span><span class="na">toString</span><span class="o">(),</span>
+</span><span class='line'>            <span class="err">&#39;</span><span class="n">copyright</span><span class="err">&#39;</span>  <span class="o">:</span> <span class="s">&quot;${new Date().format(&#39;yyyy&#39;)}&quot;</span><span class="o">.</span><span class="na">toString</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">]</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>比较简单，一眼就看完了，就不多介绍了。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -512,539 +594,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2017/05/12/react-redux-production-optimisation/">React应用在产品环境下的性能优化</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2017-05-12T18:21:55+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>6:21 pm</span></time>
-        
-           | <a href="/blog/2017/05/12/react-redux-production-optimisation/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2017/05/12/react-redux-production-optimisation/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>只有10%~20%的最终用户响应时间花在了下载HTML文档上，其余的80%~90%时间花在了下载页面中的 <strong>所有组件</strong> 上。   - 性能黄金法则，Steve Souders</p>
-
-<p>Steve Souders在2007年提出这样的“性能黄金法则”，我猜测当他看到React这样一项技术之后，一定会觉得自己的这个法则居然如此的准确，可能甚至觉得这个比例不够极致。（虽然此组件非React组件，但是我还是忍不住想笑）</p>
-
-<p>所以，今天我们就来聊聊，React应用在产品环境下的性能优化问题。</p>
-
-<h2>Bundle大小分析</h2>
-
-<p>在开始做任何的优化之前，你需要知道痛点在什么地方？既然Steve说80%~90%时间花在了下载页面中的 <strong>所有组件</strong> 上，那么就从了解项目的模块组成开始。</p>
-
-<p><strong>1.Webpack运行时的输出</strong></p>
-
-<p>在没有任何外部力量帮助的情况下，我们可以直接阅读Webpack的输出
-<img src="/images/react-production/webpack-output.png" width="500" alt="react ouput" /></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>webpack --display-chunks</span></code></pre></td></tr></table></div></figure>
-
-
-<p>可以查看模块在哪个分块中出现，帮助我们查找分块中重复的依赖。</p>
-
-<p><strong>2.bundle-size-analyzer</strong></p>
-
-<p><a href="https://github.com/robertknight/webpack-bundle-size-analyzer" title="webpack-bundle-size-analyzer">webpack-bundle-size-analyzer</a>是我个人比较喜欢的模块大小分析工具，使用起来非常简单，输出也非常清晰。</p>
-
-<p><img src="/images/react-production/webpack-analyzer.png" width="500" alt="webpack-analyzer" /></p>
-
-<p><strong>3.webpack-bundle-analyzer</strong></p>
-
-<p><a href="https://github.com/th0r/webpack-bundle-analyzer" title="webpack-bundle-analyzer">webpack-bundle-analyzer</a>在github上star人数更多，功能也相对更加齐全（fancy）。
-<img src="/images/react-production/webpack-bundle-analyzer.gif" width="500" alt="webpack-bundle-analyzer.gif" /></p>
-
-<h2>代码分离（Code Splitting）</h2>
-
-<p><strong>1.Vendor代码分离</strong></p>
-
-<p>代码分离是Webpack核心功能之一，典型的做法是将第三方依赖代码从应用代码中抽离出来，这样可以利用浏览器的缓存来提高性能（减少下载次数）。</p>
-
-<p>Webpack官方文档有非常详细的介绍： <a href="https://webpack.js.org/guides/code-splitting-libraries/" title="code-splitting-libraries">code-splitting-libraries</a>，我就不在这里赘述，下面是一个简单代码样例：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">webpack</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;webpack&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">env</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">entry</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">main</span><span class="o">:</span> <span class="s1">&#39;./index.js&#39;</span><span class="p">,</span>
-</span><span class='line'>            <span class="nx">vendor</span><span class="o">:</span> <span class="s1">&#39;react&#39;</span><span class="p">,</span> <span class="s1">&#39;react-dom&#39;</span><span class="p">,</span> <span class="s1">&#39;react-redux&#39;</span><span class="p">,</span> <span class="s1">&#39;babel-polyfill&#39;</span><span class="p">]</span>
-</span><span class='line'>        <span class="p">},</span>
-</span><span class='line'>        <span class="nx">output</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">filename</span><span class="o">:</span> <span class="s1">&#39;[name].[chunkhash].js&#39;</span><span class="p">,</span>
-</span><span class='line'>            <span class="nx">path</span><span class="o">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">&#39;dist&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">},</span>
-</span><span class='line'>        <span class="nx">plugins</span><span class="o">:</span> <span class="p">[</span>
-</span><span class='line'>            <span class="k">new</span> <span class="nx">webpack</span><span class="p">.</span><span class="nx">optimize</span><span class="p">.</span><span class="nx">CommonsChunkPlugin</span><span class="p">({</span>
-</span><span class='line'>                <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;vendor&#39;</span> <span class="c1">// Specify the common bundle&#39;s name.</span>
-</span><span class='line'>            <span class="p">})</span>
-</span><span class='line'>        <span class="p">]</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>2.CSS代码</strong></p>
-
-<p>也许你还会想要的就是将CSS文件分离，原因是一样的。官方文档也给出了非常详细的介绍：<a href="https://webpack.js.org/guides/code-splitting-css/" title="code-splitting-css">code-splitting-css</a>，所以同样也不赘述了。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">extractCSS</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ExtractTextPlugin</span><span class="p">(</span><span class="s1">&#39;styles.css&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">module</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">rules</span><span class="o">:</span> <span class="p">[</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>      <span class="nx">test</span><span class="o">:</span> <span class="sr">/\.scss$/</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">use</span><span class="o">:</span> <span class="nx">extractCSS</span><span class="p">.</span><span class="nx">extract</span><span class="p">([</span><span class="s1">&#39;css-loader&#39;</span><span class="p">,</span> <span class="s1">&#39;postcss-loader&#39;</span><span class="p">,</span> <span class="s1">&#39;sass-loader&#39;</span><span class="p">])</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">]</span>
-</span><span class='line'><span class="p">},</span>
-</span><span class='line'><span class="nx">plugins</span><span class="o">:</span> <span class="p">[</span>
-</span><span class='line'>  <span class="nx">extractCSS</span>
-</span><span class='line'><span class="p">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>3.React-Router按需分离</strong></p>
-
-<p>当应用逐渐变得复杂后，你会发现，仅仅将代码分离为vendor和app两个bundle，远远是不够的，要么vendor.js文件特别大，要么app.js文件特别大，这个时候你一定会想到，要按需加载（异步加载）。</p>
-
-<p>ES2015 Loader spec中定义了一个import()方法来在运行时动态加载ES2015的模块，代码如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">determineDate</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kr">import</span><span class="p">(</span><span class="s1">&#39;moment&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">moment</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">moment</span><span class="p">().</span><span class="nx">format</span><span class="p">());</span>
-</span><span class='line'>  <span class="p">}).</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Failed to load moment&#39;</span><span class="p">,</span> <span class="nx">err</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nx">determineDate</span><span class="p">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Webpack会将import()方法看做一个“代码分离点”，将被加载的模块放在一个单独的文件块中。</p>
-
-<p>那么，如果你的应用采用了React-Router，我们就可以根据路由，按需加载所使用的组件。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">errorLoading</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="err">`</span><span class="nx">Dynamic</span> <span class="nx">page</span> <span class="nx">loading</span> <span class="nx">failed</span><span class="o">:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">error</span><span class="p">}</span><span class="err">`</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">function</span> <span class="nx">loadRoute</span><span class="p">(</span><span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="nx">module</span> <span class="o">=&gt;</span> <span class="nx">cb</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">module</span><span class="p">.</span><span class="k">default</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">Router</span> <span class="nx">history</span><span class="o">=</span><span class="p">{</span><span class="nx">history</span><span class="p">}</span> <span class="nx">queryKey</span><span class="o">=</span><span class="s2">&quot;false&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">Route</span> <span class="nx">path</span><span class="o">=</span><span class="s2">&quot;/user&quot;</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;UserPage&quot;</span> <span class="nx">getComponent</span><span class="o">=</span><span class="p">{(</span><span class="nx">location</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">System</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">&#39;./components/UserPage&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">loadRoute</span><span class="p">(</span><span class="nx">cb</span><span class="p">,</span> <span class="kc">false</span><span class="p">)).</span><span class="k">catch</span><span class="p">(</span><span class="nx">errorLoading</span><span class="p">)}}</span>
-</span><span class='line'>  <span class="o">/&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">Route</span> <span class="nx">path</span><span class="o">=</span><span class="s2">&quot;/data&quot;</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;DataPage&quot;</span> <span class="nx">getComponent</span><span class="o">=</span><span class="p">{(</span><span class="nx">location</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">System</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">&#39;./components/DataPage&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">loadRoute</span><span class="p">(</span><span class="nx">cb</span><span class="p">,</span> <span class="kc">false</span><span class="p">)).</span><span class="k">catch</span><span class="p">(</span><span class="nx">errorLoading</span><span class="p">)}}</span>
-</span><span class='line'>  <span class="o">/&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">Route</span> <span class="nx">path</span><span class="o">=</span><span class="s2">&quot;/about&quot;</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;AboutPage&quot;</span> <span class="nx">getComponent</span><span class="o">=</span><span class="p">{(</span><span class="nx">location</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">System</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">&#39;./components/AboutPage&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">loadRoute</span><span class="p">(</span><span class="nx">cb</span><span class="p">,</span> <span class="kc">false</span><span class="p">)).</span><span class="k">catch</span><span class="p">(</span><span class="nx">errorLoading</span><span class="p">)}}</span>
-</span><span class='line'>  <span class="o">/&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/Router&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Webpack会根据分离点生成对应的JS文件</p>
-
-<p><img src="/images/react-production/require-on-demand.jpg" width="500" alt="" /></p>
-
-<p><strong>4.大文件异步加载</strong></p>
-
-<p>笔者遇到过这样的需求，采用了某图表库来做地图绘制，但是地图库JS文件或者JSON文件特别的大，即便压缩之后也有400+KB。所以，我将该依赖放在应用（SPA）的首页，并采用了异步加载，这样，首屏加载速度不会依赖于它，而用户从首页到需要使用该地图的部分还存在一些操作过程，所以留存了一些时间来异步加载地图数据。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">System</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">&#39;./map/china.js&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">().</span><span class="k">catch</span><span class="p">(</span><span class="nx">errorLoading</span><span class="p">);</span>
-</span><span class='line'><span class="nx">System</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">&#39;./map/world.js&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">().</span><span class="k">catch</span><span class="p">(</span><span class="nx">errorLoading</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当首页需要的JS加载完成之后，才开始加载：</p>
-
-<p><img src="/images/react-production/async-require.gif" alt="" /></p>
-
-<h2>运行webpack -p</h2>
-
-<p>Webpack的官方文档有详细的说明，对于产品环境的构建应该运行webpack -p：<a href="https://webpack.js.org/guides/production-build/" title="production-build">production-build</a>。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">webpack</span> <span class="o">--</span><span class="nx">optimize</span><span class="o">-</span><span class="nx">minimize</span> <span class="o">--</span><span class="nx">define</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span><span class="o">=</span><span class="s2">&quot;&#39;production&#39;&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>此时，Webpack会做几件事情，我们也需要根据这些事情做相关的配置：</p>
-
-<p><strong>1.对JS代码进行压缩</strong></p>
-
-<p>&ndash;optimize-minimize 标签会对JS代码用UglifyJsPlugin做压缩，并根据Webpack中配置的devtool配置SourceMap</p>
-
-<p><strong>2.SourceMap</strong></p>
-
-<p>即便在产品环境下，仍然建议使用SourceMap，方便产品环境的bug定位，但是对于开发环境和产品环境，我们需要使用不同力度的SourceMap，才能既方便开发也兼容产品环境性能。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">config</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="c1">// webpack config</span>
-</span><span class='line'>  <span class="nx">devtool</span><span class="o">:</span> <span class="nx">isProd</span> <span class="o">?</span> <span class="s1">&#39;cheap-source-map&#39;</span> <span class="o">:</span> <span class="s1">&#39;cheap-module-inline-source-map&#39;</span><span class="p">,</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>官方提供了7种Devtool，而且有更详细的关于devtool的配置，请详见 <a href="https://webpack.js.org/configuration/devtool/" title="devtool">devtool</a>。
-<strong>3.Node环境变量production</strong></p>
-
-<p>将redux的中间件和开发环境使用的devtool通过变量分离
-&ndash;define process.env.NODE_ENV=&ldquo;&lsquo;production&rsquo;&rdquo; 标签会以下面的方式使用DefinePlugin：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">webpack</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;webpack&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="cm">/*...*/</span>
-</span><span class='line'>  <span class="nx">plugins</span><span class="o">:</span><span class="p">[</span>
-</span><span class='line'>    <span class="k">new</span> <span class="nx">webpack</span><span class="p">.</span><span class="nx">DefinePlugin</span><span class="p">({</span>
-</span><span class='line'>      <span class="s1">&#39;process.env.NODE_ENV&#39;</span><span class="o">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="s1">&#39;production&#39;</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="p">]</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个时候，就可以在产品代码里面获取到此环境变量。这个时候我们要做的就是根据环境变量的不同，来进行不同的配置，比如：这样写log</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">!==</span> <span class="s1">&#39;production&#39;</span><span class="p">)</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;...&#39;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>对于产品环境就等价于：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="kc">false</span><span class="p">)</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;...&#39;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>此时UglifyJS插件就会将它去除掉。</p>
-
-<p>又比如：在react-redux开发中，我们一般都会配置开发插件DevTool，或者log中间件，但其实，在产品环境中，我们不需要，这个时候就需要根据环境变量来动态配置：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="p">{</span> <span class="nx">applyMiddleware</span><span class="p">,</span> <span class="nx">compose</span><span class="p">,</span> <span class="nx">createStore</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;redux&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="kr">import</span> <span class="nx">thunkMiddleware</span> <span class="nx">from</span> <span class="s1">&#39;redux-thunk&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="kr">import</span> <span class="p">{</span> <span class="nx">createLogger</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;redux-logger&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="kr">import</span> <span class="nx">rootReducer</span> <span class="nx">from</span> <span class="s1">&#39;./reducers&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="kr">import</span> <span class="nx">promiseMiddleware</span> <span class="nx">from</span> <span class="s1">&#39;redux-promise-middleware&#39;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kd">let</span> <span class="nx">finalCreateStore</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">===</span> <span class="s1">&#39;production&#39;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">finalCreateStore</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span>
-</span><span class='line'>      <span class="nx">applyMiddleware</span><span class="p">(</span><span class="nx">promiseMiddleware</span><span class="p">(),</span> <span class="nx">thunkMiddleware</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">)(</span><span class="nx">createStore</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">finalCreateStore</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span>
-</span><span class='line'>      <span class="nx">applyMiddleware</span><span class="p">(</span><span class="nx">promiseMiddleware</span><span class="p">(),</span> <span class="nx">thunkMiddleware</span><span class="p">,</span> <span class="nx">createLogger</span><span class="p">()),</span>
-</span><span class='line'>      <span class="nb">window</span><span class="p">.</span><span class="nx">devToolsExtension</span> <span class="o">?</span> <span class="nb">window</span><span class="p">.</span><span class="nx">devToolsExtension</span><span class="p">()</span> <span class="o">:</span> <span class="nx">f</span> <span class="o">=&gt;</span> <span class="nx">f</span>
-</span><span class='line'>    <span class="p">)(</span><span class="nx">createStore</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="k">return</span> <span class="nx">finalCreateStore</span><span class="p">(</span><span class="nx">rootReducer</span><span class="p">);</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Tree Shaking</h2>
-
-<p><a href="https://webpack.js.org/guides/tree-shaking/" title="Webpack TreeShake">Webpack TreeShake</a></p>
-
-<p>清理无用的JS代码，真实导入有用的模块。配置起来非常简单：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;presets&quot;</span><span class="o">:</span> <span class="p">[[</span><span class="s2">&quot;es2015&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;modules&quot;</span><span class="o">:</span> <span class="kc">false</span><span class="p">}],</span> <span class="s2">&quot;react&quot;</span><span class="p">,</span> <span class="s2">&quot;stage-0&quot;</span><span class="p">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img src="/images/react-production/tree-shake.png" alt="tree-shake.png" /></p>
-
-<h2>Babel对React代码的优化</h2>
-
-<p>除了从产品环境模块架构上优化，Babel也在编译阶段优化React应用性能作出了巨大贡献。</p>
-
-<p><strong>1.transform-react-constant-elements插件</strong></p>
-
-<p><a href="https://babeljs.io/docs/plugins/transform-react-constant-elements/" title="transform-react-constant-elements">transform-react-constant-elements</a>，自从React0.14版本，我们可以将React元素以及他们的属性对象当做普通的值对象看待。这时候我们就可以重用那些输入是immutable的React元素。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">Hr</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="o">&lt;</span><span class="nx">hr</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;hr&quot;</span> <span class="o">/&gt;</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">_ref</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">hr</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;hr&quot;</span> <span class="o">/&gt;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kr">const</span> <span class="nx">Hr</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="nx">_ref</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>从而减少对React.createElement的调用。</p>
-
-<p><strong>2.transform-react-inline-elements插件</strong></p>
-
-<p><a href="https://babeljs.io/docs/plugins/transform-react-inline-elements/" title="transform-react-inline-elements">transform-react-inline-elements</a>，自从React0.14版本，可以将React元素内联为对象，Babel将React.createElement方法替换成babelHelpers.jsx来转换元素为对象。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="nx">Baz</span> <span class="nx">foo</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span> <span class="nx">key</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="o">&gt;&lt;</span><span class="err">/Baz&gt;;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">babelHelpers</span><span class="p">.</span><span class="nx">jsx</span><span class="p">(</span><span class="nx">Baz</span><span class="p">,</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">foo</span><span class="o">:</span> <span class="s2">&quot;bar&quot;</span>
-</span><span class='line'><span class="p">},</span> <span class="s2">&quot;1&quot;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">output</span><span class="o">:</span>
-</span><span class='line'><span class="p">{</span><span class="nx">type</span><span class="o">:</span> <span class="nx">Baz</span><span class="p">,</span><span class="nx">props</span><span class="o">:</span><span class="p">{</span><span class="nx">foo</span><span class="o">:</span><span class="s2">&quot;bar&quot;</span><span class="p">},</span><span class="nx">key</span><span class="o">:</span><span class="s2">&quot;1&quot;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>3.其他开源Babel插件</strong></p>
-
-<p>除了以上两个官方插件，在开源世界还有许多其他Babel插件可以优化代码，而且非常实用，这里留给大家自己去探索： <a href="https://github.com/oliviertassinari/babel-plugin-transform-react-remove-prop-types" title="transform-react-remove-prop-types">transform-react-remove-prop-types</a>， <a href="https://github.com/thejameskyle/babel-react-optimize/tree/master/packages/babel-plugin-transform-react-pure-class-to-function" title="transform-react-pure-class-to-function">transform-react-pure-class-to-function</a>， <a href="https://github.com/thejameskyle/babel-react-optimize" title="babel-react-optimize">babel-react-optimize</a>（综合所有优化的插件，此处应该有掌声）</p>
-
-<h2>代码本身的优化</h2>
-
-<p>除了利用工具和构建，以及模块按需加载，来提高产品环境下的代码性能，最最基础的还是开发在平时写代码的需要注意的一些基础原则</p>
-
-<p><strong>1.只导入需要的包</strong></p>
-
-<p>以Lodash为例，比如：如果你只用到isEqual，那么就不要把整个lodash都引入</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">isEqual</span> <span class="nx">from</span> <span class="s1">&#39;lodash/isEqual&#39;</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>通过<a href="https://github.com/lodash/babel-plugin-lodash" title="babel-plugin-lodash">babel-plugin-lodash</a>和<a href="https://github.com/lodash/lodash-webpack-plugin" title="lodash-webpack-plugin">lodash-webpack-plugin</a>来缩小应用所需要的lodash的模块</p>
-
-<p><a href="https://medium.com/making-internets/why-using-chain-is-a-mistake-9bc1f80d51ba" title="用高阶函数Flow来代替Chain">用高阶函数Flow来代替Chain</a>，以避免将整个ladash都加载。</p>
-
-<p><strong>2.使用ESLint</strong></p>
-
-<p>合理的使用ESLint，除了帮助团队指导代码风格，也可以告诉你如何正确的写React应，比如，当组件是纯presentational组件时，就应该使用PureComponent或者纯函数组件，这些eslint都会告诉你。</p>
-
-<p><strong>3.利用React官方的<a href="https://facebook.github.io/react/docs/perf.html" title="Perf工具">Perf工具</a></strong></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">Perf</span><span class="p">.</span><span class="nx">start</span><span class="p">()</span>
-</span><span class='line'><span class="c1">// ...</span>
-</span><span class='line'><span class="nx">Perf</span><span class="p">.</span><span class="nx">stop</span><span class="p">()</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>服务器端优化</h2>
-
-<p>使用Gzip压缩倒不是React应用才有的性能优化策略，但还是要提一下，因为确实有用。</p>
-
-<p><strong>1.Nginx服务器端配置</strong></p>
-
-<p>我猜测大部分的情况下，都会用Nginx来部署静态资源，斗胆提供一个nginx的gzip配置。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">gzip</span> <span class="nx">on</span><span class="p">;</span> <span class="c1">//仅仅配置这一行是不会起作用的</span>
-</span><span class='line'><span class="nx">gzip_types</span>  <span class="nx">text</span><span class="o">/</span><span class="nx">plain</span> <span class="nx">application</span><span class="o">/</span><span class="nx">javascript</span> <span class="nx">application</span><span class="o">/</span><span class="nx">x</span><span class="o">-</span><span class="nx">javascript</span> <span class="nx">text</span><span class="o">/</span><span class="nx">javascript</span> <span class="nx">text</span><span class="o">/</span><span class="nx">xml</span> <span class="nx">text</span><span class="o">/</span><span class="nx">css</span><span class="p">;</span>
-</span><span class='line'><span class="nx">gzip_proxied</span>    <span class="nx">no</span><span class="o">-</span><span class="nx">cache</span> <span class="nx">no</span><span class="o">-</span><span class="nx">store</span> <span class="kr">private</span> <span class="nx">expired</span> <span class="nx">auth</span><span class="p">;</span>
-</span><span class='line'><span class="nx">gzip_min_length</span> <span class="mi">1000</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>2.手动压缩</strong></p>
-
-<p>另外一种方式，就是我们自己手动压缩Gzip，这样可以减少Nginx编码带来的性能消耗，Webpack插件
-<a href="https://github.com/webpack-contrib/compression-webpack-plugin" title="compression-webpack-plugin">compression-webpack-plugin</a>可以做到。</p>
-
-<h2>还有什么别的提高性能的办法呢？</h2>
-
-<p><strong>1.服务器端渲染如何</strong></p>
-
-<p>有人会说，<strong>服务器端渲染如何？</strong> 这个要看情况。服务器端渲染一般主要用来处理首屏渲染性能（注意是首次加载）和搜索引擎爬虫问题。如果你的JS文件特别大，那么服务器端渲染能够，让用户在加载完HTML和CSS之后立刻看到页面。如果不是首次加载，那么其实JS是可以缓存在客户端的，所以即便不用服务器端渲染，之后也不会很慢。</p>
-
-<p>相对的缺点是：配置起来比较麻烦，但如果是一劳永逸的事情，还是值得一做的。</p>
-
-<p>更多关于<a href="http://andrewhfarmer.com/server-side-render/" title="是否应该进行服务器端渲染">是否应该进行服务器端渲染</a>，<a href="https://medium.com/walmartlabs/the-benefits-of-server-side-rendering-over-client-side-rendering-5d07ff2cefe8" title="服务器端渲染的好处">服务器端渲染的好处</a> 以及<a href="http://redux.js.org/docs/recipes/ServerRendering.html" title="如何进行服务器端渲染">如何进行服务器端渲染</a>？请查看相关文章。</p>
-
-<p><strong>2.ServiceWork</strong></p>
-
-<p>渐进式 Web 应用程序思想（PWA）最近可火了，2017年<a href="https://www.thoughtworks.com/radar" title="ThoughtWorks技术雷达">ThoughtWorks技术雷达</a>将<a href="https://www.thoughtworks.com/radar/techniques/progressive-web-applications" title="“Progressive Web Applications”">“Progressive Web Applications”</a>放在了试验阶段。</p>
-
-<p>简单介绍什么是service worker:</p>
-
-<blockquote><p>在2014年，W3C公布了service worker的草案，service worker提供了很多新的能力，使得web app拥有与native app相同的离线体验、消息推送体验。
-service worker是一段脚本，与web worker一样，也是在后台运行。
-作为一个独立的线程，运行环境与普通脚本不同，所以不能直接参与web交互行为。native app可以做到离线使用、消息推送、后台自动更新，service worker的出现是正是为了使得web app也可以具有类似的能力。</p></blockquote>
-
-<p>Github： <a href="https://github.com/GoogleChrome/sw-toolbox" title="Google sw-toolbox">Google sw-toolbox</a>, <a href="https://github.com/goldhand/sw-precache-webpack-plugin" title="sw-precache-webpack-plugin">sw-precache-webpack-plugin</a>和<a href="https://github.com/NekR/offline-plugin" title="offline-plugin">offline-plugin</a></p>
-
-<p><strong>3.Preload</strong></p>
-
-<p>Preload 作为一个新的web标准，旨在提高性能和为web开发人员提供更细粒度的加载控制。Preload使开发者能够自定义资源的加载逻辑，且无需忍受基于脚本的资源加载器带来的性能损失。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">“preload”</span><span class="nt">&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>作为新的标准，浏览器兼容性是你有必要考虑的一个方面：</p>
-
-<p><img src="/images/react-production/preload.png!web" alt="preload" /></p>
-
-<p>github: <a href="https://github.com/GoogleChrome/preload-webpack-plugin" title="preload-webpack-plugin">preload-webpack-plugin</a></p>
-
-<h2>最后</h2>
-
-<p>文章内容有点长，但我相信这些都是干货是值得一读的，前端产品环境性能优化确实是一个说不完的话题，前端技术更新迭代也没有多少其他计算机技术能够匹敌的，这也对前端开发工程师（全栈开发工程师）的技术敏感度和追求新技术的态度有很高的要求。</p>
-
-<p>作者：Benwei，ThoughtWorks高级咨询师，全栈开发工程师，《实战Gradle》译者</p>
-
-<p>转载原文地址： <a href="http://benweizhu.github.io/blog/2017/05/12/react-redux-production-optimisation/">http://benweizhu.github.io/blog/2017/05/12/react-redux-production-optimisation/</a></p>
-
-<p>参考文献：  <br/>
-1.<a href="https://hackernoon.com/optimising-your-application-bundle-size-with-webpack-e85b00bab579">https://hackernoon.com/optimising-your-application-bundle-size-with-webpack-e85b00bab579</a>  <br/>
-2.<a href="https://brotzky.co/blog/code-splitting-react-router-webpack-2/">https://brotzky.co/blog/code-splitting-react-router-webpack-2/</a>  <br/>
-3.<a href="http://www.jianshu.com/p/f4054b2dcc6e">http://www.jianshu.com/p/f4054b2dcc6e</a>  <br/>
-4.<a href="http://2ality.com/2015/12/webpack-tree-shaking.html">http://2ality.com/2015/12/webpack-tree-shaking.html</a>  <br/>
-5.<a href="https://hackernoon.com/how-i-built-a-super-fast-uber-clone-for-mobile-web-863680d2100f">https://hackernoon.com/how-i-built-a-super-fast-uber-clone-for-mobile-web-863680d2100f</a>  <br/>
-6.<a href="http://andrewhfarmer.com/server-side-render/">http://andrewhfarmer.com/server-side-render/</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/8">&larr; Older</a>
@@ -1072,6 +621,10 @@ service worker是一段脚本，与web worker一样，也是在后台运行。
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（下）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（中）</a>
       </li>
     
@@ -1085,10 +638,6 @@ service worker是一段脚本，与web worker一样，也是在后台运行。
     
       <li class="post">
         <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）- 中间件的概念</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/deep-thinking-in-react-6/">React的思考（六）- 不可变性</a>
       </li>
     
   </ul>

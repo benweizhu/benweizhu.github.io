@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="看到一个老外的博客用了这样一个标题《componentDidMakeSense — React Component Lifecycle Explanation》，我只能说：老哥你太有才了，本来都不太想写这篇文章，冲你这个标题，我再啰嗦下生命周期。 没有水平的面试官老喜欢问的问题 面试官：“ &hellip;">
+  <meta name="description" content="Reconciliation的含义本身 Reconciliation有的人翻译成“协调算法”，有的人翻译成“一致性对比”，在没有官方答案之前，我认为直译可能会比较准确，它的作用是React用来区分一棵节点树和另一棵节点树的算法，以确定哪些部分需要更改。 Reconciliation是通常被理解为“ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,217 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2018/04/22/deep-thinking-in-react-5/">React的思考（五）- Reconciliation</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2018-04-22T12:33:42+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2018</span></span> <span class='time'>12:33 pm</span></time>
+        
+           | <a href="/blog/2018/04/22/deep-thinking-in-react-5/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/22/deep-thinking-in-react-5/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>Reconciliation的含义本身</h3>
+
+<p>Reconciliation有的人翻译成“协调算法”，有的人翻译成“一致性对比”，在没有官方答案之前，我认为直译可能会比较准确，它的作用是React用来区分一棵节点树和另一棵节点树的算法，以确定哪些部分需要更改。</p>
+
+<p>Reconciliation是通常被理解为“虚拟DOM”背后的算法。</p>
+
+<p>简单描述就是：当您渲染React应用时，会生成描述该应用的节点树并将其保存在内存中。然后将该节点树刷新到渲染环境 - 例如，在浏览器应用程序的情况下，它会转换为一组DOM操作。当应用程序更新（比如，通过setState）时，会生成一棵新树。对比得到新树与前一棵树的区别，以计算需要更新渲染应用的操作。</p>
+
+<h3>React 16+的Reconciler - React Fiber</h3>
+
+<p>React团队在2016年7月公开发布React Fiber，React新的核心算法，React Fiber的目标是提高其对动画，布局和手势等领域的适用性。它的特征是增量渲染：能够将渲染工作分割成块并将其分散到多个帧中。</p>
+
+<p>按照官方文档的说法，Fiber Reconciler的主要目标：</p>
+
+<ul>
+<li>能够将可中断的任务拆分成块。</li>
+<li>能够对进程中的工作划分优先级、重新设定基址（Rebase）、恢复。</li>
+<li>能够在父子之间来回反复，借此为React的Layout提供支持。</li>
+<li>能够通过render()返回多个元素。</li>
+<li>为错误边界提供了更好的支持。</li>
+</ul>
+
+
+<p>这个项目持续的2年之久，蕴含着过去多年来Facebook不断改进的工作成果。该架构可向后兼容，彻底重写了React的协调（Reconciliation）算法。他们还专门做了一个网站叫：<a href="http://isfiberreadyyet.com/">http://isfiberreadyyet.com/</a></p>
+
+<p><img src="/images/isfiberready.jpg" width="500" title="isfiberreadyyet" alt="Alt text" />    <br/>
+27 September 2017</p>
+
+<p>我们都知道DOM只是React可以渲染的渲染环境之一，另外一个就是React Native。（这就是为什么“虚拟DOM”有点用词不当）。</p>
+
+<p>它可以支持如此多环境的原因是因为React的设计使是Reconciliation和渲染是分开的阶段。Reconciler执行计算树的哪些部分已经改变; 渲染器然后使用该信息实际更新呈现的应用。这种分离意味着React DOM和React Native可以在共享由React核心提供的相同Reconciler的同时使用它们自己的渲染器。</p>
+
+<h3>React 15以及以前的Reconciler - Stack Reconciler</h3>
+
+<p>Fiber在React 16中首次登场，发布时间是2017年9月26号，那么意味着，在这之前，有另外一套Reconciliation的算法。React现在把它命名为Stack Reconciler。它存在于React 15及更早版本的实现中。</p>
+
+<p><strong>Stack Reconciler犯了一个单线程或者存在UI主线程环境下的“禁忌” - 用同步的方式来处理整个组件树。</strong></p>
+
+<p>Virtual DOM diff会一次性处理整个组件树，重点在于，Stack Reconciler始终会一次性地同步处理整个组件树。因为整个过程都是在内存中完成，所以当组件树比较小的时候的，不会感觉到问题，但是，当组件树比较庞大的时候，就会出现卡顿（掉帧）的情况。</p>
+
+<p><img src="/images/Stack.jpg" width="500" title="Stack Reconciler" alt="Alt text" />   <br/>
+单线程进入到栈中，要从栈从退出来，才能响应其他用户操作</p>
+
+<p><img src="/images/Fiber.jpg" width="500" title="Fiber Reconciler" alt="Alt text" />   <br/>
+按照时间片段的方式执行</p>
+
+<p>参考：<a href="https://www.youtube.com/watch?v=ZCuYPiUIONs" title="Lin Clark - A Cartoon Intro to Fiber - React Conf 2017">Lin Clark - A Cartoon Intro to Fiber - React Conf 2017</a></p>
+
+<h3>会不会有影响（参考官方文档）</h3>
+
+<p>首先，不变的地方是，diff节点或者说判断两个节点是否相同的方式没有变：</p>
+
+<p>1.不同的元素类型</p>
+
+<p>每当根元素具有不同类型时，React就会销毁旧的树并从头开始构建新树。从a到img ，或者从Article到Comment，从Button到div – 这些都将导致全部重新构建。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='HTML'><span class='line'><span class="nt">&lt;div&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Counter</span> <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;span&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;Counter</span> <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/span&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2.相同DOM元素类型，有不同的属性</p>
+
+<p>当比较两个相同类型的React DOM元素时，React检查它们的属性（attributes），保留相同的底层DOM节点，只更新发生改变的属性（attributes）。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='HTML'><span class='line'><span class="nt">&lt;div</span> <span class="na">className=</span><span class="s">&quot;before&quot;</span> <span class="na">title=</span><span class="s">&quot;stuff&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">className=</span><span class="s">&quot;after&quot;</span> <span class="na">title=</span><span class="s">&quot;stuff&quot;</span> <span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3.子元素递归</p>
+
+<p>默认情况下，当递归一个DOM节点的子节点时，React只需同时遍历所有的孩子基点同时生成一个改变当它们不同时。</p>
+
+<p>例如，当给子元素末尾添加一个元素，在两棵树之间转化中性能就不错:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='HTML'><span class='line'><span class="nt">&lt;ul&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;</span>first<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;</span>second<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;ul&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;</span>first<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;</span>second<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;</span>third<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>React 会比较两个 li.first 树与两个 li.second 树，然后插入 li.third 树。</p>
+
+<p>如果在开始处插入一个节点也是这样简单地实现，那么性能将会很差。例如，在下面两棵树的转化中性能就不佳。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='HTML'><span class='line'><span class="nt">&lt;ul&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;</span>Duke<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;</span>Villanova<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;ul&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;</span>Connecticut<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;</span>Duke<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li&gt;</span>Villanova<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>React 将会改变每一个子节点而没有意识到需要保留 li.Duke 和 li.Villanova 两个子树。这种低效是一个问题。</p>
+
+<p>为了解决这个问题，React 支持一个 key 属性（attributes）。当子节点有了 key ，React 使用这个 key 去比较原来的树的子节点和之后树的子节点。例如，添加一个 key 到我们上面那个低效的例子中可以使树的转换变高效：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='HTML'><span class='line'><span class="nt">&lt;ul&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">key=</span><span class="s">&quot;2015&quot;</span><span class="nt">&gt;</span>Duke<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">key=</span><span class="s">&quot;2016&quot;</span><span class="nt">&gt;</span>Villanova<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;ul&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">key=</span><span class="s">&quot;2014&quot;</span><span class="nt">&gt;</span>Connecticut<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">key=</span><span class="s">&quot;2015&quot;</span><span class="nt">&gt;</span>Duke<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;li</span> <span class="na">key=</span><span class="s">&quot;2016&quot;</span><span class="nt">&gt;</span>Villanova<span class="nt">&lt;/li&gt;</span>
+</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>现在 React 知道有&#8217;2014&#8217; key 的元素是新的， key为&#8217;2015&#8217; 和&#8217;2016&#8217;的两个元素仅仅只是被移动而已。</p>
+
+<p><strong>关于key的使用，这个key需要在它的兄弟节点中是唯一的就可以了，不需要是全局唯一。而且必须唯一可以表示该节点，比如：不能使用index。</strong></p>
+
+<p>据说，会影响到生命周期的调用，就目前我从官方网站上看到的，还没有正式提出哪些变化，所以可以暂时不用慌张。</p>
+
+<h3>总结</h3>
+
+<p>本来只是想借助Reconciliation来讲最后一点关于key的使用，不知道怎么写成了介绍Reconciliation的历史过程，所以Copy Paste的比较多。不过，从整体看来，Fiber引入时间片的异步更新，确实改进不少页面渲染的性能问题。</p>
+
+<p>另外，<a href="https://www.youtube.com/watch?v=nLF0n9SACd4&amp;list=PL37ZVnwpeshEO7qXEbjG4riQD7SzydLEO&amp;index=2" title="Dan Abramov: Beyond React 16 | JSConf Iceland 2018">Dan Abramov: Beyond React 16 | JSConf Iceland 2018</a>有简单介绍关于这个Fiber的异步更新功能启用后的页面渲染速度演示，但目前这个功能还没有开启。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -168,96 +379,6 @@ componentDidUpdate()</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2018/04/20/deep-thinking-in-react-3/">React的思考（三）- 总结下shouldComponentUpdate</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2018-04-20T11:10:09+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>11:10 am</span></time>
-        
-           | <a href="/blog/2018/04/20/deep-thinking-in-react-3/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/04/20/deep-thinking-in-react-3/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Google来，百度去，原来网上已经有一大堆讲解shouldComponentUpdate的文章，差点就打算放弃了，为了学习精神，那我就集百家之长，小总结一下。</p>
-
-<h3>它的作用</h3>
-
-<p>首先，简单说一下shouldComponentUpdate的作用（如果你已经知道，请不要跳过，帮助我审查下有没有描述错误）</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="nx">shouldComponentUpdate</span><span class="p">(</span><span class="nx">nextProps</span><span class="p">,</span> <span class="nx">nextState</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>extends React.Component和写Functional Stateless Component（它不能复写shouldComponentUpdate），shouldComponentUpdate默认都是返回true。</p>
-
-<p>这意味着，当props或者state更新时，该组件一定会调用render方法。</p>
-
-<p>也就意味着，React一定会去对比该组件节点上的VisualDOM，但是，不一定会去更新真实DOM，因为reconciliation的结果可能是相等的。（一致性对比，对比新返回的元素是否和之前的元素是否一样）</p>
-
-<p>如果，你将shouldComponentUpdate复写，返回false，那么componentWillUpdate()，render()和componentDidUpdate()都不会被调用，那么该组件不会更新。</p>
-
-<p>当shouldComponentUpdate返回true，这个过程是向叶子节点传递的，比如：父节点返回true，它有两个叶子节点A和B，那么A和B会被要求执行mount或者update的生命周期，如果A的shouldComponentUpdate返回false，B返回true，那么只有B更新。</p>
-
-<p>React官方的<a href="https://reactjs.org/docs/optimizing-performance.html#shouldcomponentupdate-in-action" title="ShouldComponentUpdate In Action">ShouldComponentUpdate In Action</a>讲解的很清楚。</p>
-
-<h3>逃生出口</h3>
-
-<p>听起来貌似很有道理，谁不希望减少无谓的计算，提高性能。</p>
-
-<p>然而，我又看到这样一句话：React team called shouldComponentUpdate an &ldquo;escape hatch&#8221;（逃生出口）instead of &#8220;turbo button&#8221;（涡轮增压按钮）。在 github issue <a href="https://github.com/facebook/react/issues/5677" title="Stateless functional components and shouldComponentUpdate">Stateless functional components and shouldComponentUpdate</a>上也有人这么说。
-听上去总结起来，有两个原因：</p>
-
-<p>1.维护自定义的shouldComponentUpdate成本太高，有可能加了一个新的prop，但是忘记更新shouldComponentUpdate的代码，导致bug   <br/>
-2.也许shouldComponentUpdate的比较计算逻辑比起直接重新render更加浪费性能</p>
-
-<h3>尴尬了</h3>
-
-<p>那这就尴尬了，这到底是写还是不写呢？当被问到这个问题的时候，永远都有一个正确但不受人欢迎的答案：“Well, it depends”（好吧，看情况）。</p>
-
-<h3>React.Component，PureComponent和Function</h3>
-
-<p>与其思考这个没有人能够给出准确答案的问题，不如我们思考怎么样结合对shouldComponentUpdate的理解，合理的写组件，设计合理的状态结构树。</p>
-
-<p>大家对React.Component和Functional Stateless Component比较熟，一个就是extends React.Component，一个就是函数，前面也说了，它们的shouldComponentUpdate永远返回true。</p>
-
-<p>React里还有一个顶级的组件API：<a href="https://reactjs.org/docs/react-api.html#reactpurecomponent" title="PureComponent">PureComponent</a>。
-这个PureComponent，对shouldComponentUpdate有一个默认实现，官方称为shallow的prop和state对比。啥意思呢？就是帮你对比this.props和this.state上的第一层叶子节点的引用。</p>
-
-<p>如果，某一个叶子节点里面深层的一个元素改变了，而该叶子节点本身的引用没变，shouldComponentUpdate是检查不出来的。</p>
-
-<p>什么类型的组件比较适合写成PureComponent呢？比如：基础组件Button，它本身的属性就相对简单，完全可以和普通HTML的button元素相似，这样就可以将组件的属性拍平一层展现，用PureComponent正好满足shallow对比。</p>
-
-<h3>总结</h3>
-
-<p>一切不分析性能瓶颈而做的性能优化，都是无用功，shouldComponentUpdate不一定是你的性能瓶颈，但是，我们在这里讨论shouldComponentUpdate，为React组件的更新的问题开了一个头，后面介绍Redux和Object.assign还会在提到组件（不）更新的问题。</p>
-
-<p>周五了，祝大家周末愉快。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/5">&larr; Older</a>
@@ -285,6 +406,10 @@ componentDidUpdate()</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（下）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（中）</a>
       </li>
     
@@ -298,10 +423,6 @@ componentDidUpdate()</p>
     
       <li class="post">
         <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）- 中间件的概念</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/deep-thinking-in-react-6/">React的思考（六）- 不可变性</a>
       </li>
     
   </ul>

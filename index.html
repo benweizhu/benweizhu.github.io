@@ -70,7 +70,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（中）</a></h1>
+      <h1 class="entry-title"><a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（下）</a></h1>
     
     
       <p class="meta">
@@ -79,10 +79,10 @@
 
 
 
-<time class='entry-date' datetime='2018-05-03T23:05:04+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2018</span></span> <span class='time'>11:05 pm</span></time>
+<time class='entry-date' datetime='2018-05-04T23:09:38+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>11:09 pm</span></time>
         
-           | <a href="/blog/2018/05/03/deep-thinking-in-react-10/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/05/03/deep-thinking-in-react-10/">Comments</a>
+           | <a href="/blog/2018/05/04/deep-thinking-in-react-11/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2018/05/04/deep-thinking-in-react-11/">Comments</a>
         
       </p>
     
@@ -112,7 +112,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（上）</a></h1>
+      <h1 class="entry-title"><a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（中）</a></h1>
     
     
       <p class="meta">
@@ -121,70 +121,75 @@
 
 
 
-<time class='entry-date' datetime='2018-05-01T22:47:38+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2018</span></span> <span class='time'>10:47 pm</span></time>
+<time class='entry-date' datetime='2018-05-03T23:05:04+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2018</span></span> <span class='time'>11:05 pm</span></time>
         
-           | <a href="/blog/2018/05/01/deep-thinking-in-react-9/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/05/01/deep-thinking-in-react-9/">Comments</a>
+           | <a href="/blog/2018/05/03/deep-thinking-in-react-10/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2018/05/03/deep-thinking-in-react-10/">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h2>前提条件</h2>
+  <div class="entry-content"><h2>共享的数据</h2>
 
-<p>在进行深入探讨之前，我先确保大家的理解是一致的，因为这部分是客观的，而之后的内容是相对主观和有争议的。</p>
+<p>前面提到应用的数据类型有三种：领域数据，应用状态，UI状态。其中，UI状态看上去更多是存放在React组件里面。那是不是领域数据和应用状态都应该归Redux管理呢？我个人感觉不一定，我是从这角度思考的：共享的数据</p>
 
-<p>1.当组件的某个操作dispatch了一个action，所有的reducer都会接收到：<a href="https://stackoverflow.com/questions/33590579/all-reducers-will-be-invoked-when-an-action-is-dispatched" title="All reducers will be invoked when an action is dispatched?">All reducers will be invoked when an action is dispatched?</a>，<a href="https://cn.redux.js.org/docs/recipes/reducers/UsingCombineReducers.html" title="combineReducers用法中也有讲到">combineReducers用法中也有讲到</a></p>
+<p>Redux本身存储的是一个全局数据，即被共享的数据。那么，我们就会问，不会被共享的数据应该存在哪呢？</p>
 
-<p>2.当combineReducers发现有任意一个reducer返回了新的state，会通知所有和redux关联（connect）的组件准备更新，请检查自己是否要更新</p>
+<h4>存储在Redux里面</h4>
 
-<p>3.每一个通过connect构建的组件，其mapStateToProps中的state，是combineReducers合并的state，也就是每个组件都能拿到所有reducer中的state（曾经有遇到过有人误以为是跟它action相关的reducer的state）</p>
+<p>首先，你当然仍然可以存储在Redux里面，情况是，数据被存放在Redux state树形结构的某一片区域中，被某一个路由下的某一个组件所使用。这样做有什么好处？</p>
 
-<h2>Redux的上帝视角</h2>
+<p>1.单一的数据源，你很放心的将数据存在那里，打开Redux Debug Tool就能看到（心里长叹一口气，还在还在）</p>
 
-<p>Redux的三大设计原则之一，单一数据源，定义了整个应用的state被储存在一棵object tree中，并且这个object tree只存在于唯一一个store中。这样一个顶层的状态树，会拥有一个全局的视角，掌握着整个应用的状态。</p>
+<p>2.将同类型（比如：领域数据）的数据统一类聚在一起，方便你统一管理，让你拥有绝对的上帝视角</p>
 
-<p>单一数据源的设计原则在许多程序设计的领域都是准确的，但仅仅用一个JavaScript对象来存储整个应用的状态，总会让人感觉某一天这个对象一定会特别臃肿，上帝实在太忙，要关注的东西太多。</p>
+<p>3.某一天，设计师说，在一个离原组件很遥远的位置加一个按钮，当点击时，要改变这个数据，此时你可以很轻松的发送一个action并写一个reducer的case操作它（数据和组件的关系是低耦合的</p>
 
-<p>很自然的，我们就会去思考，物尽其用，到底什么样的数据应该放在Redux中，什么样的数据应该放在别处来管理。</p>
+<p>等等其他我没有想到的好处</p>
 
-<h2>应用拥有的数据和状态</h2>
+<h4>存储在Component里面</h4>
 
-<p>大多数应用会处理多种类型的数据和状态，通常可以分为以下三类：领域数据（Domain data），应用状态（App state），UI状态（UI state）</p>
+<p>如果我不存放在Redux中，应该放哪里？可以是组件里面。那么同样的问题，放在组件里面有什么好处？</p>
 
-<p>领域数据也就是业务相关数据，一般和你的后台业务系统数据相关联，是领域数据的数据来源，但他们不一定直接对等。</p>
+<p>1.Redux中存放的都是被共享的数据，相比存放所有的数据，redux的state结构会小一些</p>
 
-<p>应用状态和UI状态有时候不容易分清，应用状态是描述应用无限循环的生命周期中的某一种存在（中间）状态，而这样一个应用状态可能会导致一个或者多个UI的状态变化。比如：用户登录，是一个应用状态，它可能导致导航栏的UI状态改变。</p>
+<p>2.组件的数据和状态是自管理的，无论你把我放在哪，我都能坚强的活着</p>
 
-<p>UI的状态，自然是描述UI的改变，但不一定是由应用状态的变化导致。比如：页面上tab的切换。</p>
+<p>3.某一天，我被页面的多个位置用到，你不需要在Redux里面配多个数据空间和action以供我的分身使用，我自带装备，我为自己“带盐”</p>
 
-<h2>应用数据和状态的存储位置和影响范围</h2>
+<p>4.我还能配合高阶组件（用高阶组件做数据加载），让你的代码看上更加装逼</p>
 
-<p>根据上面的应用数据和状态的分类，好像让我们对这样一个问题有些头绪。不过在你下任何判断之前，我们在从另外一个维度继续思考一下。</p>
+<p>等等其他我没有想到的好处</p>
 
-<p>从前面我们就了解到，Redux存储的数据，在任何一个与之关联的组件中都能拿到，也就是说，Redux存储的是一个全局的数据。</p>
+<p>如果博客里面可以发表情，此时我特别想发一个拍脑袋的表情，请问，看完这一段，我胡乱分析的结果，是不是感觉有些不知所措？</p>
 
-<p>反之，React本身也有一个state，而它所关注的只是组件本身以及它的子组件，兄弟和父组件它都不关心。</p>
+<h2>官文FAQ的经验法则</h2>
 
-<p>除了Redux和React，就没有别的位置保存数据了？当然不是，比如：cookie，local storage。这些也是保存数据的关键位置，毕竟当页面刷新后，Redux和React中的state就丢失了，还需要从后台重新加载。</p>
+<p>正如官方文档里面FAQ的结果</p>
 
-<h2>React组件的state存什么？</h2>
+<blockquote><p>问：必须将所有state都维护在Redux中吗？ 可以用React的setState()方法吗？</p>
 
-<p>现在还不是时候讨论Redux里面存什么，我们反向推理，用排除法，先看看React里面应该存在什么。</p>
+<p>答：没有 “标准”。作为一名开发者，应该决定使用何种 state 来组装你的应用，每个 state 的生存范围是什么。在两者之间做好平衡，然后就去做吧。</p></blockquote>
 
-<p>React中的state存在于组件当中，那我们就需要思考组件的特性，它能独立，也许还能自治，一般都高可重用，这是它的部分典型特性。基于它这些特性，也就决定了它的state也必须满足这些要求，组件的state是服务于组件本身的，这些state能够在不收外部干预下就自我管理，这些state当组件被用在任何位置时，都能适应。一个典型的例子：UI状态。</p>
+<p>所以说，看情况（It depends）永远是正确的答案。</p>
 
-<p>当然，上面是我对React组件state理解的一个抽象描述，能够一定程度下知道我的思考。还有什么原则，能够帮助决策什么样的state可以放在组件中，Dan Abramov在他的Twitter发了这样一张图片也具有不错的指导意义：</p>
+<p>当然官方文档也给了一些将怎样的数据放入Redux的经验法则：</p>
 
-<p><img src="https://camo.githubusercontent.com/5e85994aa142e7699548e2f5a1e74583229ebd10/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f436d654273477a57384151705f61762e6a7067" width="500" alt="" /></p>
+<p>1.应用的其他部分是否关心这个数据？    <br/>
+2.是否需要根据需要在原始数据的基础上创建衍生数据？    <br/>
+3.相同的数据是否被用作驱动多个组件？     <br/>
+4.能否将状态恢复到特定时间点（在时光旅行调试的时候）？    <br/>
+5.是否要缓存数据（比如：数据存在的情况下直接去使用它而不是重复去请求他）？</p>
 
-<p>1.如果这个数据可以从props中计算得到，那么就不应该放在state中   <br/>
-2.如果这个数据在render方法中不被使用，那么就不应该放在state中</p>
+<p>我个人感觉这些经验法则是有些道理的，和我们前面讲解和分析的套路差不多，可以作为参考。</p>
 
 <h2>总结</h2>
 
-<p>今天先写到这里，后续还会继续讨论redux的state和reducer的设计思考。</p>
+<p>首先，我个人认为一定不是讲所有的数据都放在Redux里面，但是至于什么样的数据该放在哪里，那就需要看是什么样的使用场景？然后询问自己几个问题，分析它的好处和坏处，是否满足你的需求，然后做出判断。</p>
+
+<p>我们下一节，来看redux state的组织结构（shape），以及action，reducer如何配合state的更新。</p>
 </div>
   
   
@@ -217,6 +222,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（下）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（中）</a>
       </li>
     
@@ -230,10 +239,6 @@
     
       <li class="post">
         <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）- 中间件的概念</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/deep-thinking-in-react-6/">React的思考（六）- 不可变性</a>
       </li>
     
   </ul>

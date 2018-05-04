@@ -9,13 +9,11 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="看这样一个例子： 1
+  <meta name="description" content="在AngularJS中，视图是模型在模板中的映射的结果（模型（Model）和视图模型的绑定（View Model））。这意味当模型发生变化时，视图上的绑定内容会对应更新。 模型 看第一个的例子，模型与模板： 1
 2
 3
 4
-5
-6
-&lt;body ng-app&gt; &lt;div ng-controller=&quot;textLengthLimitController&quot;&gt; &lt;textarea ng-model=&quot;text&quot;&gt;& &hellip;">
+&lt;body ng-app&gt; &lt;input type=& &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,6 +68,123 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/12/25/yes-angularjs-2/">开始！AngularJS!（二）- 入门：视图，模板，模型，控制器和作用域</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-12-25T22:40:58+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>10:40 pm</span></time>
+        
+           | <a href="/blog/2014/12/25/yes-angularjs-2/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2014/12/25/yes-angularjs-2/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在AngularJS中，视图是模型在模板中的映射的结果（模型（Model）和视图模型的绑定（View Model））。这意味当模型发生变化时，视图上的绑定内容会对应更新。</p>
+
+<p><strong>模型</strong></p>
+
+<p>看第一个的例子，模型与模板：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    { {name} }
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/j6b5271r/">http://jsfiddle.net/benweizhu/j6b5271r/</a></p>
+
+<p>在这个例子中，使用了一个HTML本身没有的语法ng-model=&ldquo;name&#8221;，它是AngularJS扩展的HTML语法，叫做ng-model指令，还用到了，AngularJS的数值表达式。</p>
+
+<p>我们知道在大部分传统模板系统中，对模板的渲染都是线性单向的过程：模型和模板混合在一起产生标记的计算结果。当任何模型发生改变后都需要模板重新计算。</p>
+
+<p>在AngularJS中，当输入框中的内容改变时，对应的模型name会发生改变，AngularJS会<strong>检测到模型发生改变</strong>，重新渲染模板中与该模型绑定的视图部分。</p>
+
+<p>这是AngularJS提供的最基本也是最重要的功能之一，<strong>数据的双向绑定</strong>。</p>
+
+<p><strong>控制器</strong></p>
+
+<p>再来第二个例子，模型和控制器：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body</span> <span class="na">ng-app</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;textController&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>         <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">textController</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$scope</span><span class="p">){</span>
+</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span><span class="o">=</span><span class="s2">&quot;benwei&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在jsfiddle中查看，<a href="http://jsfiddle.net/benweizhu/m5gue0zs/">http://jsfiddle.net/benweizhu/m5gue0zs/</a></p>
+
+<p>在这里，用到了AngularJS中的另一个指令ng-controller，在这个Controller的范围内，定义了一个模型name，我们通过模板域模型$scope对象得到controller范围内定义的模型name，并赋值。</p>
+
+<p>在例子中，我们通过$scope对象将模型数据name传递给Controller，从而进行数据的初始化。</p>
+
+<p>虽然，一般情况下，我们不会用这样的方式去建立controller，但是我们可以清晰的看到，在AngularJS中，一个Controller其实就是JavaScript中的一个函数。所以，Controller可以做事情是很多，它并通过$scope对象与模型关联，从而可以实现对模型的赋值以及其他相关逻辑行为的定义。</p>
+
+<p><strong>作用域</strong></p>
+
+<p>这里你看到了另一个重要对象$scope，<strong>作用域（Scope）是AngularJS的重要概念，它可以看做一种粘合剂，让模板，模型和控制器工作在一起。AngularJS通过作用域，以及模板中包含的信息，数据模型，控制器，让模型和视图保持位置的分离，内容的同步。任何对模型的改变都会反映到视图，任何视图的改变也会映射到模型中。</strong></p>
+
+<p>大部分Web应用都是基于MVC的模式，也衍生出许多中MVC的变种（如MVVM（Model View ViewModel）），但AngularJS宣称自己是MVW（Model View Whatever）。</p>
+
+<p>在本节，最重要的是了解视图，模板，模型，控制器之间的关系，以及对作用域对象$scope有一个基本的了解。我们可以在之后一起去了解一下这个Whatever到底是什么含义。</p>
+
+<p>本节中遇到的概念：</p>
+
+<p>模板(Template) | 带有Angular扩展标记的HTML <br/>
+指令(Directive) | 用于通过自定义属性和元素扩展HTML的行为  <br/>
+模型(Model) | 用于显示给用户并且与用户互动的数据  <br/>
+作用域(Scope) | 用来存储模型(Model)的语境(context)。模型放在这个语境中才能被控制器、指令和表达式等访问到  <br/>
+表达式(Expression) | 模板中可以通过它来访问作用域（Scope）中的变量和函数  <br/>
+视图(View) | 用户看到的内容（即DOM）  <br/>
+数据绑定(Data Binding) | 自动同步模型(Model)中的数据和视图(View)表现 <br/>
+控制器(Controller) | 视图(View)背后的业务逻辑</p>
+
+<p>参考资料：</p>
+
+<p>1.《精通AngularJS》 <br/>
+2.<a href="http://www.ngnice.com/docs/guide/concepts">http://www.ngnice.com/docs/guide/concepts</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -191,285 +306,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">Gradle Jetty和Gradle Watch插件实现热部署</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-07-27T14:53:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>2:53 pm</span></time>
-        
-           | <a href="/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2014/07/27/gradle-jetty-plugin-hot-deploy/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2><strong>Jetty插件</strong></h2>
-
-<p>Jetty插件提供两个重要方法：jettyRun和jettyRunWar。</p>
-
-<p>jettyRun会将一个已暴露（解包的）的web应用部署到嵌入式Jetty Web容器中。它不需要将web应用打包成一个war文件，目的是为了节省部署时间。</p>
-
-<p>jettyRunWar正好相反，是将一个War包部署到Web容器中。</p>
-
-<p><strong>jettyRun的好处是，你可以改变静态文件和JSP文件，而不需要重新启动服务器。</strong></p>
-
-<p>但是即便如此，对于日常开发还是不方便，因为开发过程中改动最多的其实是Java文件和资源配置文件，所以真正需要的是<strong>热部署</strong>。</p>
-
-<p>jettyRun的Gradle API文档中有这么一句话：Once started, the web container can be configured to run continuously, scanning for changes in the project and automatically performing a hot redeploy when necessary. This allows the developer to concentrate on coding changes to the project using their IDE of choice and have those changes immediately and transparently reflected in the running web container, eliminating development time that is wasted on rebuilding, reassembling and redeploying.</p>
-
-<p>这句话简单总结就是Jetty提供实现热部署的特性，开发人员只需要专注于编写代码，减少重新构建，重新组装和重新部署所浪费的时间。</p>
-
-<p>但问题是，官方文档上写了这句话后，就不了了之了，没有说怎么做。我们都试过，默认配置是不会实现热部署的，那么应该怎么做呢？</p>
-
-<h3><strong>两个属性：</strong></h3>
-
-<p><strong>reload</strong>  The reload mode, which is either &ldquo;automatic&rdquo; or &ldquo;manual&rdquo;.</p>
-
-<p><strong>scanIntervalSeconds</strong>  The interval in seconds between scanning the web app for file changes. If file changes are detected, the web app is reloaded. Only relevant if reload is set to &ldquo;automatic&rdquo;. Defaults to 0, which disables automatic reloading.</p>
-
-<p>读完上面两段，说明默认scanIntervalSeconds的配置是不支持自动重新载入变化文件的。</p>
-
-<p>试一把，把它改为支持：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">jettyRun</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">reload</span> <span class="o">=</span> <span class="s2">&quot;automatic&quot;</span>
-</span><span class='line'>    <span class="n">scanIntervalSeconds</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后运行gradle jettyRun启动jetty容器，修改Java类，然后去页面验证变化，结果是没有变化。为什么？</p>
-
-<p>原来，jetty监听的是build目录下的class文件变化，而不是源代码变化，也就说源代码内容改变了，但class文件没有变化，那么不会自动触发jetty重载变化文件，那么该怎么办？最简单粗暴的解决方案就是另起一个命令行窗口，手动运行一次gradle compileJava命令。</p>
-
-<p>没错，这个方法是行得通的。但仍然不是最好的解决方案。我查了下，到目前为止，官方没有给出正式的解决方案，但是该特性是在GradleWare的To-Do-List上的，预计以后应该会有。</p>
-
-<h2><strong>Gradle Watch</strong></h2>
-
-<p>那么，唯一的办法只有借助第三方的插件来协助Jetty插件，一起实现热部署了，gradle-watch（日本人写的，因为上面的饿提交记录全是日文的）。 <a href="https://github.com/bluepapa32/gradle-watch-plugin">https://github.com/bluepapa32/gradle-watch-plugin</a></p>
-
-<p>gradle watch的作用是监听某种类型的文件的变化，包括添加，删除和修改，然后执行预定义的任务。</p>
-
-<p>使用起来很简单：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;jetty&#39;</span>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;idea&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">mavenCentral</span><span class="o">()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">compile</span> <span class="s1">&#39;org.springframework:spring-webmvc:4.0.6.RELEASE&#39;</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">jettyRun</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">reload</span> <span class="o">=</span> <span class="s2">&quot;automatic&quot;</span>
-</span><span class='line'>    <span class="n">scanIntervalSeconds</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">buildscript</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">repositories</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">jcenter</span><span class="o">()</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">dependencies</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">classpath</span> <span class="s1">&#39;com.bluepapa32:gradle-watch-plugin:0.1.3&#39;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">apply</span> <span class="nl">plugin:</span> <span class="s1">&#39;watch&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">watch</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">files</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;src/main/java&#39;</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;compileJava&#39;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>配置watch闭包，什么文件发生变化后就执行什么任务（好像它没有提供默认配置，所以需要手动显示的配置）。</p>
-
-<p>在启动了gradle jettyRun之后，开启另一个窗口运行gradle watch。一次Java文件变化的输出如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">:</span><span class="nx">watch</span>
-</span><span class='line'><span class="nx">Starting</span><span class="p">............</span> <span class="nx">OK</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">--------------------------------------------------------------------------------</span>
-</span><span class='line'><span class="nx">Sun</span> <span class="nx">Jul</span> <span class="mi">27</span> <span class="mi">15</span><span class="o">:</span><span class="mi">36</span><span class="o">:</span><span class="mi">51</span> <span class="nx">CST</span> <span class="mi">2014</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">File</span> <span class="s2">&quot;src/main/java/me/zeph/springmvc/jrebel/controller/HelloJRebelController.java&quot;</span> <span class="nx">was</span> <span class="nx">changed</span><span class="p">.</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">-----------------------------------------------------</span>
-</span><span class='line'><span class="o">:</span><span class="nx">compileJava</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">BUILD</span> <span class="nx">SUCCESSFUL</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">Total</span> <span class="nx">time</span><span class="o">:</span> <span class="mf">0.954</span> <span class="nx">secs</span>
-</span><span class='line'><span class="nx">Building</span> <span class="o">&gt;</span> <span class="o">:</span><span class="nx">watch</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>可见，成功的更新了Java的class文件到build目录。刷新一次页面，就可以查看变化了。</p>
-
-<p>那么对于资源文件呢？比如，我使用了Spring，需要改变Spring的Bean配置文件，同样可以。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="n">watch</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">java</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">files</span> <span class="nf">files</span><span class="o">(</span><span class="s1">&#39;src/main/java&#39;</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;compileJava&#39;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">resources</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">files</span> <span class="nf">fileTree</span><span class="o">(</span><span class="nl">dir:</span> <span class="s1">&#39;src/main/resources&#39;</span><span class="o">,</span> <span class="nl">include:</span> <span class="s1">&#39;**/*.xml&#39;</span><span class="o">)</span>
-</span><span class='line'>        <span class="n">tasks</span> <span class="s1">&#39;processResources&#39;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>输出结果如下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">--------------------------------------------------------------------------------</span>
-</span><span class='line'><span class="nx">Sun</span> <span class="nx">Jul</span> <span class="mi">27</span> <span class="mi">15</span><span class="o">:</span><span class="mi">56</span><span class="o">:</span><span class="mi">39</span> <span class="nx">CST</span> <span class="mi">2014</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">File</span> <span class="s2">&quot;src/main/resources/applicationContextService.xml&quot;</span> <span class="nx">was</span> <span class="nx">changed</span><span class="p">.</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">--------------------------------------------------------------------------------</span>
-</span><span class='line'><span class="o">:</span><span class="nx">processResources</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">BUILD</span> <span class="nx">SUCCESSFUL</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">Total</span> <span class="nx">time</span><span class="o">:</span> <span class="mf">0.501</span> <span class="nx">secs</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>是不是很爽，这样是不是就再也不用重启服务器了，开发速度瞬间提升好几万战斗力。</p>
-
-<p>加一句，该插件同样支持properties文件的改变，与XML一样配置。</p>
-
-<p>好吧，就到这里，我觉得热部署也算的上某种自动化开发的一部分，至少他们的目的一样，提升开发效率，得到快速反馈，希望这篇文章对大家有所帮助。</p>
-
-<p>参考资料：</p>
-
-<p>1.<a href="http://forums.gradle.org/gradle/topics/hot_deploy_with_jetty_plugins_jettyrun">http://forums.gradle.org/gradle/topics/hot_deploy_with_jetty_plugins_jettyrun</a></p>
-
-<p>2.<a href="http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.jetty.JettyRun.html">http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.jetty.JettyRun.html</a></p>
-
-<p>3.<a href="https://github.com/bluepapa32/gradle-watch-plugin">https://github.com/bluepapa32/gradle-watch-plugin</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/48">&larr; Older</a>
@@ -497,6 +333,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（下）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（中）</a>
       </li>
     
@@ -510,10 +350,6 @@
     
       <li class="post">
         <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）- 中间件的概念</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/deep-thinking-in-react-6/">React的思考（六）- 不可变性</a>
       </li>
     
   </ul>
