@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-05-09T00:12:26+08:00</updated>
+  <updated>2018-05-09T00:16:37+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -118,7 +118,11 @@
 
 <h2>响应同一个操作</h2>
 
-<p>有了这样一层结构，我们该如何操作它呢？假设这样一个操作，它既需要更新zoos下面的数据，又需要更新animals下面的数据。如果放在后端代码中，你会怎么做？</p>
+<p>有了这样一层结构，我们该如何操作它呢？</p>
+
+<p>现在我们假设有这样一个操作，它既需要更新zoos下面的数据，又需要更新animals下面的数据。</p>
+
+<p>如果放在后端代码中，你会怎么做？</p>
 
 <p>我的思路会是写一个函数A，在这个函数里面调用zoos和animals的service或者repository的方法完成更新操作，那么，真正使用的时候，只需要调用这个函数A即可，思路很明朗直接。</p>
 
