@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-05-09T00:16:37+08:00</updated>
+  <updated>2018-05-09T00:17:56+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -126,7 +126,7 @@
 
 <p>我的思路会是写一个函数A，在这个函数里面调用zoos和animals的service或者repository的方法完成更新操作，那么，真正使用的时候，只需要调用这个函数A即可，思路很明朗直接。</p>
 
-<p>在combineReducer和redux结合情况，我们需要转换一下思路，不同业务领域下的数据被放置到了不同的reducer，而你能做的是发送action。</p>
+<p>在combineReducer和redux结合情况下，我们就需要转换一下思路了，不同业务领域下的数据被放置到了不同的reducer，而你能做的只是发送action。</p>
 
 <p>combineReducer神奇的地方就是，被发送的action会被所有的reducer接收到。（有点像发布订阅模式）</p>
 
