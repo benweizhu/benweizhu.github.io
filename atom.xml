@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-05-09T00:10:21+08:00</updated>
+  <updated>2018-05-09T00:11:21+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -87,7 +87,7 @@
 
 <h2>combineReducer下的拆分</h2>
 
-<p>让我们再回到Redux中，基于Redux的应用程序中比较常见的state结构是一个简单的JavaScript对象，它最外层的每个key中拥有特定域的数据，这其实是Redux官方文档上的一句话，我在其他的一些博客上也看到了采用基于业务领域的方式组织state结构。</p>
+<p>让我们再回到Redux中，基于Redux的应用程序中，比较常见的state结构是一个简单的JavaScript对象，它最外层的每个key中拥有特定域的数据，这其实是Redux官方文档上的一句话，我在其他的一些博客上也看到了采用基于业务领域的方式组织state结构。</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -114,7 +114,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>在combineReducer的帮助下，构建上面这个结构，其实就是分拆成多个reducer，拆分之后的reducer独立负责管理该特定切片state的更新。好处是，它提供了一种非常直接的代码逻辑拆分管理的方式，职责独立，物理位置独立（文件独立）。</p>
+<p>在combineReducer的帮助下，构建上面这个结构，其实就是拆分成多个reducer，拆分之后的reducer独立负责管理该特定切片state的更新。好处是，它提供了一种非常直接的代码逻辑拆分管理的方式，职责独立，物理位置独立（文件独立）。</p>
 
 <h2>响应同一个操作</h2>
 
