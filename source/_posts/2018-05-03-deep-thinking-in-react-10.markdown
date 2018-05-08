@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "React的思考（十）- 组织state和reducer（中）"
+title: "React的思考（十）- 组织state和reducer（2）"
 date: 2018-05-03 23:05:04 +0800
 comments: true
 categories:
