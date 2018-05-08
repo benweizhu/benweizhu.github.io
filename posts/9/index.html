@@ -9,8 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="
-">
+  <meta name="description" content="VR的风口 VR（Virtual Reality）即虚拟现实，这个作为由美国VPL公司创始人拉尼尔在20世纪80年代初提出的一个概念，在16，17年成为了除AI（在此感谢“阿法狗”）之外，最为接近风口的技术行业。 雷总说过“站在台风口，猪都能飞上天”，何况这只猪还有点本事。 回想一下，在这个风口上 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -71,6 +70,179 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2017/04/26/web-vr/">技术雷达之Web VR浅尝</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-04-26T21:25:15+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>9:25 pm</span></time>
+        
+           | <a href="/blog/2017/04/26/web-vr/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2017/04/26/web-vr/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>VR的风口</h3>
+
+<p>VR（Virtual Reality）即虚拟现实，这个作为由美国VPL公司创始人拉尼尔在20世纪80年代初提出的一个概念，在16，17年成为了除AI（在此感谢“阿法狗”）之外，最为接近风口的技术行业。</p>
+
+<p>雷总说过“站在台风口，猪都能飞上天”，何况这只猪还有点本事。</p>
+
+<p>回想一下，在这个风口上，哪些人已经参与进去了？VR设备厂家（VR眼镜），视频拍摄设备厂家（360度全景视频拍摄相机），视频制作工作室，游戏工作室，还有CCTV5体育台（忍不住笑出声），最后还有我们普罗大众（整个生态链上的消费者）。</p>
+
+<h3>Web VR</h3>
+
+<p>有时候，我还真的很羡慕那些做游戏开发的程序员，一边拿着高工资，一边实现着小时候的梦想，偶尔通宵紧急修bug也情有可原，看看他们现在又多了个玩具。</p>
+
+<p>光羡慕可不行，我要充分发挥自己的能动性为最具程序员群众基础的Web程序员谋福利。</p>
+
+<p>我们除了作为一个普通的消费者参与到VR的风口中，当真没有别的办法了？<a href="https://www.thoughtworks.com/radar" title="ThoughtWorks技术雷达">ThoughtWorks技术雷达</a>第16卷（2017年）告诉你，答案就是Web VR。</p>
+
+<p><strong>什么是Web VR</strong></p>
+
+<p><video width='640' height='320' preload='none' controls poster='https://s3-ap-northeast-1.amazonaws.com/for-benwei-blog/what-is-web-vr.png'><source src='https://s3-ap-northeast-1.amazonaws.com/for-benwei-blog/What+is+WebVR.mp4' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'></video></p>
+
+<p>下面快速的引用一下本期技术雷达对Web VR的描述：</p>
+
+<blockquote><p>Web VR是一组可让你通过浏览器访问VR设备的实验性JavaScript API。它已经获得了技术社区的支持，并有正式版本和每日构建的版本可用。如果你想在浏览器中构造VR 体验，那么WebVR将会是一个不错的开始。此项技术以及相关补充工具，例如 Three.js，A-Frame，ReactVR，Argon.js和Awe.js都能够为浏览器带来AR体验。除了互联网委员会标准以外，该领域中的各种工具也将有助于促进AR和VR更广泛的应用。</p></blockquote>
+
+<p>WebVR更主要的是一种开放标准，目的是能够从浏览器给用户带来VR体验。 &ndash;webvr.info</p>
+
+<p>今天最主要的目的就是和大家一起快速的浏览一下三个github上比较火的开源Web VR技术。</p>
+
+<h4>Three.js</h4>
+
+<p>github: <a href="https://github.com/mrdoob/three.js/">https://github.com/mrdoob/three.js/</a></p>
+
+<p>光看这个名字，就能深深的感受它，和3d，和VR，和Web有着非比寻常的相关系。Three.js其实不是一个很新的东西，2010年的4月就已经发布了它的第一个开源版本R1（至今有7年了）。它是一个JavaScript 3D库，提供Canvas，SVG，CSS3D的渲染方式，但更多的是封装了底层的WebGL图形接口，以提供简化、高效的三维图形程序开发。</p>
+
+<p><a href="https://threejs.org/examples/webvr_rollercoaster.html" title="一个Three.js VR例子">一个Three.js VR例子</a>（可惜需要兼容性的浏览器，Android的Chrome，HTC Vive，Gear VR等）</p>
+
+<h4>A-Frame</h4>
+
+<p>github: <a href="https://github.com/aframevr/aframe/">https://github.com/aframevr/aframe/</a></p>
+
+<p>A-Frame相对Three.js要更新一些，第一个开源版本发布于2015年12月。它是由Mozilla旗下的VR研究团队MozVR推出的开源框架，A-Frame旨在帮助开发者更轻松的开发在浏览器中运行的高性能响应式的VR体验。</p>
+
+<p>和Three.js不同，A-Frame是纯粹的VR Web框架，而且它与现代Web开发的趋势结合更加紧密，使用Web开发者熟悉的HTML标签来创建WebVR场景，提供自定义的语义化标签，降低学习成本。你只需要仅仅几行代码就可以创建一个VR场景，如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;https://aframe.io/releases/0.5.0/aframe.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;a-scene&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;a-box</span> <span class="na">color=</span><span class="s">&quot;#6173F4&quot;</span> <span class="na">opacity=</span><span class="s">&quot;0.8&quot;</span> <span class="na">depth=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;&lt;/a-box&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;a-sphere</span> <span class="na">radius=</span><span class="s">&quot;2&quot;</span> <span class="na">src=</span><span class="s">&quot;texture.png&quot;</span> <span class="na">position=</span><span class="s">&quot;1 1 0&quot;</span><span class="nt">&gt;&lt;/a-sphere&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;a-sky</span> <span class="na">color=</span><span class="s">&quot;#ECECEC&quot;</span><span class="nt">&gt;&lt;/a-sky&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/a-scene&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>因为A-Frame基于DOM，他可以和现有其他现代Web框架结合。比如：<a href="https://github.com/aframevr/aframe-react" title="A-Frame-React">A-Frame-React</a>。
+<img src="/images/vrweb/a-frame-works-with-everything.jpg" alt="" /></p>
+
+<p><a href="https://aframe.io/a-blast/" title="A-Blast">A-Blast</a> - Mozilla基于A-Frame研发的VR游戏（请在Wifi环境下打开）。</p>
+
+<p><strong>超强的场景Inspector工具 - A-Frame Inspector</strong>   <br/>
+A-Frame提供一个场景查看工具A-Frame Inspector，可以让你改变场景，操作组件。
+<img src="/images/vrweb/a-frame-inspector.gif" alt="Inspector工具" /></p>
+
+<h4>ReactVR</h4>
+
+<p>Mozilla都建立了自己的专门的VR团队来专注于A-Frame的研发，你想其他的巨头们就不会蠢蠢欲动，Facebook就是其中一个。</p>
+
+<p>github: <a href="https://github.com/facebook/react-vr">https://github.com/facebook/react-vr</a></p>
+
+<p>一个好消息是React于2017年04月19日正式推出ReactVR（即正式开源），即去年第一次在Twitter上公布React VR项目已过去10个月了。</p>
+
+<p>React的优势在于它已经在广大人民群众中打下坚实的基础，并且拥有了一群忠实的粉丝。从技术角度上谈，React VR使用了一个简化版的OVRUI库，其内部使用的是我们上面已经介绍的Three.js（即通过WebGL来渲染场景）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">React</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="p">{</span><span class="nx">AppRegistry</span><span class="p">,</span> <span class="nx">Pano</span><span class="p">,</span> <span class="nx">Text</span><span class="p">,</span> <span class="nx">View</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;react-vr&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">class</span> <span class="nx">WelcomeToVR</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// Displays &quot;hello&quot; text on top of a loaded 360 panorama image.</span>
+</span><span class='line'>    <span class="c1">// Text is 0.8 meters in size and is centered three meters in front of you.</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="nx">View</span><span class="o">&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="nx">Pano</span> <span class="nx">source</span><span class="o">=</span><span class="p">{</span><span class="nx">asset</span><span class="p">(</span><span class="s1">&#39;chess-world.jpg&#39;</span><span class="p">)}</span><span class="o">/&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="nx">Text</span>
+</span><span class='line'>          <span class="nx">style</span><span class="o">=</span><span class="p">{{</span>
+</span><span class='line'>            <span class="nx">fontSize</span><span class="o">:</span> <span class="mf">0.8</span><span class="p">,</span>
+</span><span class='line'>            <span class="nx">layoutOrigin</span><span class="o">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+</span><span class='line'>            <span class="nx">transform</span><span class="o">:</span> <span class="p">[{</span><span class="nx">translate</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">]}],</span>
+</span><span class='line'>          <span class="p">}}</span><span class="o">&gt;</span>
+</span><span class='line'>          <span class="nx">hello</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="err">/Text&gt;</span>
+</span><span class='line'>      <span class="o">&lt;</span><span class="err">/View&gt;</span>
+</span><span class='line'>    <span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">AppRegistry</span><span class="p">.</span><span class="nx">registerComponent</span><span class="p">(</span><span class="s1">&#39;WelcomeToVR&#39;</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">WelcomeToVR</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="/images/vrweb/hellovr.jpg" alt="" /></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2017/04/26/web-debug/">Web Debug</a></h1>
     
     
@@ -91,42 +263,6 @@
 
 
   <div class="entry-content">
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2017/04/15/website-effecient/">前端不止系列 - 时间都去哪了？</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2017-04-15T18:58:04+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>6:58 pm</span></time>
-        
-           | <a href="/blog/2017/04/15/website-effecient/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2017/04/15/website-effecient/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>只有10%~20%的最终用户响应时间花在了下载HTML文档上，其余的80%~90%时间花在了下载页面中的所有组件上。   - 性能黄金法则，Steve Souders</p>
-
-<p><img src="/images/performance/golden-top10.png" width="400" title="前十名网站" alt="Alt text" /></p>
-
-<p>性能黄金法则由《高性能网站建站指南》的作者Steve Souders在2007年提出。在2012年，他重新发表了一篇博客<a href="https://www.stevesouders.com/blog/2012/02/10/the-performance-golden-rule/" title="《The Performance Golden Rule》">《The Performance Golden Rule》</a>，分析并统计排名前10，10个在10000排名左右网站的加载时间，并计算了在<a href="http://httparchive.org/index.php" title="HTTP Archive">HTTP Archive</a>上被抓取到的50000个网站的前后端耗时占比，而最终验证了自2007年提出的这个理念的准确性。</p>
 </div>
   
   
@@ -161,23 +297,23 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（下）</a>
+        <a href="/blog/2018/05/08/deep-thinking-in-react-12/">React的思考（十二）- 组织state和reducer（4）</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（中）</a>
+        <a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（3）</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（上）</a>
+        <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（2）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（1）</a>
       </li>
     
       <li class="post">
         <a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）- 中间件的概念</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="redux的state和服务器端的数据 reducer共享state 一个action要操作多个reducer中的state 思考后端的操作逻辑，微服务的场景，按照业务的Restful API，Redux的这种设计模式导致这种CRUD和Service的冲突 redux的state和页面的关系 &hellip;">
+  <meta name="description" content="不同的页面也可能有相同领域，不同状态的数据，也算是一个Domain吧？ 没有BFF的情况下 基于Redux的应用程序中最常见的state结构是一个简单的JavaScript对象，它最外层的每个key中拥有特定域的数据。 然而，BFF可以是来自不同Domain的数据库合并后返回到前端的。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,7 +70,59 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（下）</a></h1>
+      <h1 class="entry-title"><a href="/blog/2018/05/08/deep-thinking-in-react-12/">React的思考（十二）- 组织state和reducer（4）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2018-05-08T23:45:26+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>11:45 pm</span></time>
+        
+           | <a href="/blog/2018/05/08/deep-thinking-in-react-12/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2018/05/08/deep-thinking-in-react-12/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>不同的页面也可能有相同领域，不同状态的数据，也算是一个Domain吧？</h2>
+
+<h2>没有BFF的情况下</h2>
+
+<p>基于Redux的应用程序中最常见的state结构是一个简单的JavaScript对象，它最外层的每个key中拥有特定域的数据。</p>
+
+<p>然而，BFF可以是来自不同Domain的数据库合并后返回到前端的。</p>
+
+<h2>暴露的服务和接口</h2>
+
+<p>思考后端的操作逻辑，微服务的场景，按照业务的Restful API，Redux的这种设计模式导致这种CRUD和Service的冲突</p>
+
+<h2>Normalize State</h2>
+
+<h2>BFF层的数据结构</h2>
+
+<h2>一个action要操作多个reducer中的state</h2>
+
+<h2>redux的state和页面的关系</h2>
+
+<h2>开发过程中state的演进过程</h2>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（3）</a></h1>
     
     
       <p class="meta">
@@ -89,111 +141,144 @@
   </header>
 
 
-  <div class="entry-content"><h2>redux的state和服务器端的数据</h2>
+  <div class="entry-content"><p>以React为首的“数据驱动”的开发方式，让我们从过去的DOM操作，慢慢转化成对应用状态和数据的管理，这些状态和数据在应用的生命周期中被持久化，被应用管理和使用。</p>
 
-<h2>reducer共享state</h2>
+<h2>前后端不同的数据模型</h2>
 
-<h3>一个action要操作多个reducer中的state</h3>
+<p>在后端开发中，我们设计数据库或者对象模型，通常会根据领域模型来建立不同的数据表和对象，以反映我们对客观现实的抽象，这种抽象在MVC的世界里通常由Model表示。</p>
 
-<p>思考后端的操作逻辑，微服务的场景，按照业务的Restful API，Redux的这种设计模式导致这种CRUD和Service的冲突</p>
+<p>而在前端开发中，我们一般会从UI的角度出发，去设计前端展示所需要的视图对象模型，我们也称之为View Model。</p>
 
-<h2>redux的state和页面的关系</h2>
+<p>因此，往往大多数情况下，后端的数据模型Model和前端的数据模型View Model是不对等的。</p>
 
-<h2>开发过程中state的演进过程</h2>
-</div>
-  
-  
+<h2>来自后方的数据</h2>
 
+<p>当一个应用的生命周期启动，应用会调用后台的API获取后端数据，然后以某种方式转换成前端所需数据模型，最后展示在应用的页面上。</p>
 
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（中）</a></h1>
-    
-    
-      <p class="meta">
-        
+<p>作为一个后端的开发人员，通常以什么样的方式暴露后端的资源给别的应用使用呢？</p>
 
+<p>如果需要API的通用度比较高，一般最简单直接的方法是开放领域资源的CRUD操作（你可以是RESTful API也可以是别的方式）。</p>
 
-
-
-<time class='entry-date' datetime='2018-05-03T23:05:04+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2018</span></span> <span class='time'>11:05 pm</span></time>
-        
-           | <a href="/blog/2018/05/03/deep-thinking-in-react-10/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2018/05/03/deep-thinking-in-react-10/">Comments</a>
-        
-      </p>
-    
-  </header>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>https://api.example.com/v1/zoos
+</span><span class='line'>https://api.example.com/v1/animals
+</span><span class='line'>https://api.example.com/v1/employees
+</span><span class='line'>
+</span><span class='line'>GET /zoos：列出所有动物园
+</span><span class='line'>POST /zoos：新建一个动物园
+</span><span class='line'>GET /zoos/ID：获取某个指定动物园的信息
+</span><span class='line'>PUT /zoos/ID：更新某个指定动物园的信息（提供该动物园的全部信息）</span></code></pre></td></tr></table></div></figure>
 
 
-  <div class="entry-content"><h2>共享的数据</h2>
+<p>我们目前就暂且以这种方式为例，目测这种方式暴露的API比较常见，后面我们再讨论其他的。</p>
 
-<p>前面提到应用的数据类型有三种：领域数据，应用状态，UI状态。</p>
+<h2>combineReducer下的拆分</h2>
 
-<p>其中，UI状态看上去更多是存放在React组件里面。</p>
+<p>让我们再回到Redux中，基于Redux的应用程序中比较常见的state结构是一个简单的JavaScript对象，它最外层的每个key中拥有特定域的数据，这其实是Redux官方文档上的一句话，我在其他的一些博客上也看到了采用基于业务领域的方式组织state结构。</p>
 
-<p>那是不是领域数据和应用状态都应该归Redux管理呢？不一定，为什么呢？我是从这角度思考的：</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;zoos&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="s2">&quot;animals&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="s2">&quot;employees&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>Redux本身存储的是一个全局数据，即被共享的数据。那么，我们就会问，不会被共享的数据应该存在哪呢？</p>
 
-<h4>存储在Redux里面</h4>
+<p>在combineReducer的帮助下，构建上面这个结构，其实就是分拆成多个reducer，拆分之后的reducer独立负责管理该特定切片state的更新。好处是，它提供了一种非常直接的代码逻辑拆分管理的方式，职责独立，物理位置独立（文件独立）。</p>
 
-<p>首先，你当然仍然可以存储在Redux里面，那么当前情况会是，数据被存放在Redux state树形结构的某一片区域中，被某一个路由下的某一个组件所使用。你一定会问，这样做有什么好处？</p>
+<h2>响应同一个操作</h2>
 
-<p>1.单一的数据源，你很放心的将数据存在那里，打开Redux Debug Tool就能看到（心里长叹一口气，数据还在还在）</p>
+<p>有了这样一层结构，我们该如何操作它呢？假设这样一个操作，它既需要更新zoos下面的数据，又需要更新animals下面的数据。如果放在后端代码中，你会怎么做？</p>
 
-<p>2.将同类型（比如：领域数据）的数据统一类聚在一起，方便你统一管理，让你拥有绝对的上帝视角</p>
+<p>我的思路会是写一个函数A，在这个函数里面调用zoos和animals的service或者repository的方法完成更新操作，那么，真正使用的时候，只需要调用这个函数A即可，思路很明朗直接。</p>
 
-<p>3.某一天，设计师说，在一个离原组件很遥远的位置加一个按钮，当点击时，要改变这个数据，此时你可以很轻松的发送一个action并写一个reducer的case操作它，就完成了（数据操作和组件的关系是低耦合的）</p>
+<p>在combineReducer和redux结合情况，我们需要转换一下思路，不同业务领域下的数据被放置到了不同的reducer，而你能做的是发送action。</p>
 
-<p>等等其他我没有想到的好处</p>
+<p>combineReducer神奇的地方就是，被发送的action会被所有的reducer接收到。（有点像发布订阅模式）</p>
 
-<h4>存储在Component里面</h4>
+<p>这样一个过去直觉上同步有序的操作过程，在redux中，被分发到多个拆分之后的多个reducer中，每个reducer都去响应这个action，在需要的情况下独立的更新他们自己的切片state，最后组合成新的state。</p>
 
-<p>如果我不存放在Redux中，应该放哪里？可以是组件里面。那么同样的问题，放在组件里面有什么好处？</p>
+<h2>计算衍生（derived）数据</h2>
 
-<p>1.Redux中存放的都是被共享的数据，相比存放所有的数据，redux的state结构会小一些</p>
+<p>后端的业务数据被存储在了redux的store中，然而它是以后端model的形式保存在那。我们的前端页面需要的数据模型，一般和后端model不完全一样，也许是多个后端model组合在一起才能使用的view model，这种情况很常见。</p>
 
-<p>2.组件的数据和状态是自管理的，无论你把我放在哪，我都能坚强的活着</p>
+<p>这个时候，我们就需要从后端数据模型中计算衍生数据，得到我们最终需要的View Model。</p>
 
-<p>3.某一天，我被页面的多个位置用到，你不需要在Redux里面配多个数据空间和action以供我的分身使用，我自带装备，我为自己“带盐”</p>
+<p>一般的做法是在mapStateToProps中进行，mapStateToProps中的state是根节点上的state，所以可以拿到所有的领域数据。</p>
 
-<p>4.我还能配合高阶组件（用高阶函数做数据加载部分），让你的代码看上更加装逼</p>
+<p>这里一般都会推荐使用reselect库来做，好处是：</p>
 
-<p>等等其他我没有想到的好处</p>
+<p>第一，能够借机将这个计算衍生数据的逻辑拆分到另一个模块中     <br/>
+第二，它能帮你记住之前的计算过的数据，避免二次计算，同时避免无意义的重新渲染。</p>
 
-<p>如果博客里面可以发表情，此时我特别想发一个拍脑袋的表情，请问，看完这一段，我胡乱分析的结果，是不是感觉有些不知所措？我到底应该放在哪呢？</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">import</span> <span class="p">{</span> <span class="nx">createSelector</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;reselect&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">getVisibilityFilter</span> <span class="o">=</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">state</span><span class="p">.</span><span class="nx">visibilityFilter</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">getTodos</span> <span class="o">=</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">state</span><span class="p">.</span><span class="nx">todos</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="kr">const</span> <span class="nx">getVisibleTodos</span> <span class="o">=</span> <span class="nx">createSelector</span><span class="p">(</span>
+</span><span class='line'>  <span class="p">[</span> <span class="nx">getVisibilityFilter</span><span class="p">,</span> <span class="nx">getTodos</span> <span class="p">],</span>
+</span><span class='line'>  <span class="p">(</span><span class="nx">visibilityFilter</span><span class="p">,</span> <span class="nx">todos</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">switch</span> <span class="p">(</span><span class="nx">visibilityFilter</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;SHOW_ALL&#39;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">todos</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;SHOW_COMPLETED&#39;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">todos</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">t</span> <span class="o">=&gt;</span> <span class="nx">t</span><span class="p">.</span><span class="nx">completed</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;SHOW_ACTIVE&#39;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">todos</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">t</span> <span class="o">=&gt;</span> <span class="o">!</span><span class="nx">t</span><span class="p">.</span><span class="nx">completed</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<h2>官文FAQ的经验法则</h2>
-
-<p>正如官方文档里面FAQ的结果</p>
-
-<blockquote><p>问：必须将所有state都维护在Redux中吗？ 可以用React的setState()方法吗？</p>
-
-<p>答：没有 “标准”。作为一名开发者，应该决定使用何种 state 来组装你的应用，每个 state 的生存范围是什么。在两者之间做好平衡，然后就去做吧。</p></blockquote>
-
-<p>所以说，看情况（It depends）永远是正确的答案。</p>
-
-<p>当然官方文档也给了一些将怎样的数据放入Redux的经验法则：</p>
-
-<p>1.应用的其他部分是否关心这个数据？    <br/>
-2.是否需要根据需要在原始数据的基础上创建衍生数据？    <br/>
-3.相同的数据是否被用作驱动多个组件？     <br/>
-4.能否将状态恢复到特定时间点（在时光旅行调试的时候）？    <br/>
-5.是否要缓存数据（比如：数据存在的情况下直接去使用它而不是重复去请求他）？</p>
-
-<p>我个人感觉这些经验法则是有些道理的，和我们前面讲解和分析的套路差不多，可以作为参考。</p>
 
 <h2>总结</h2>
 
-<p>首先，我个人认为一定不是将所有的数据都放在Redux里面，但是至于什么样的数据该放在哪里，那就需要看是什么样的使用场景？你需要询问自己几个问题（如上面说问），分析它的好处和坏处，是否满足你的需求，然后做出判断。</p>
+<p>这么分析下来，每个部分的职责都很清晰，开发的模式也比较明确，然而理想和设计在业务不复杂的时候都很美好，现实往往比它们骨感很多，这一篇文章只是给了一个简单的例子，没有分析复杂的场景。</p>
 
-<p>我们下一节，来看redux state的组织结构（shape），以及action，reducer如何配合state的更新。</p>
+<p>在下一篇，我们可以在此基础上分析开发中的复杂场景，一起思考下怎么样管理是合适的。同时，我们也来思考另一种新的前端架构BFF下的Redux应该怎么管理，当后端API不再是资源的CRUD，而是面向业务的API操作时，Redux又应该怎么管理state。</p>
 </div>
   
   
@@ -226,23 +311,23 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（下）</a>
+        <a href="/blog/2018/05/08/deep-thinking-in-react-12/">React的思考（十二）- 组织state和reducer（4）</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（中）</a>
+        <a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（3）</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（上）</a>
+        <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（2）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（1）</a>
       </li>
     
       <li class="post">
         <a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）- 中间件的概念</a>
       </li>
     
   </ul>

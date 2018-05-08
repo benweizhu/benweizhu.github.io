@@ -9,20 +9,7 @@
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="在JavaScript中，随着函数使用场合的不同，this的值会发生变化。但是有一个总的原则，那就是this指的是，调用该函数的那个对象。this关键字在Javascript中和执行环境，而非声明环境有关。 举个例子： 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-var &hellip;">
+  <meta name="description" content="自从Spring 3.1，Spring框架提供了透明式给Spring应用添加缓存。类似于对事物的支持，抽象缓存机制允许一致的方式来实现不同的缓存解决方案，以满足对代码的最小影响。 Spring 4.1后，抽象缓存机制有了重大的改进，包含支持JSR-107注解和更多的定制选项。 Cache vs &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +64,160 @@ var &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/01/17/spring-cache/">了解Spring Cache</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-01-17T09:26:45+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:26 am</span></time>
+        
+           | <a href="/blog/2016/01/17/spring-cache/#disqus_thread"
+             data-disqus-identifier="http://benweizhu.github.io/blog/2016/01/17/spring-cache/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>自从Spring 3.1，Spring框架提供了透明式给Spring应用添加缓存。类似于对事物的支持，抽象缓存机制允许一致的方式来实现不同的缓存解决方案，以满足对代码的最小影响。</p>
+
+<p>Spring 4.1后，抽象缓存机制有了重大的改进，包含支持JSR-107注解和更多的定制选项。</p>
+
+<h2>Cache vs Buffer</h2>
+
+<p>术语“buffer”和“cache”倾向于交换的使用。然而，它们代表着不同的东西。buffer常常被作为快慢实体之间（比如：发送方很快，接收方较慢）的中间临时存储。乙方必须等待另一方，因为执行效率（速率）的不同，buffer通过允许数据在移动时，以一整块数据为单位而不是小块形式来调解这种速率不一致的问题。数据在buffer中只会读写一次。更进一步，至少对于一方来说buffer是可见的。</p>
+
+<p>另一方面，Cache就定义上而言，对于任何一方都是隐藏。它也会提升性能，但是仅限于同样地数据以快速的方式读取多次。</p>
+
+<p>Cache的核心是将抽象层应用到Java方法上，减少方法执行的次数，因为信息在Cache中可以获取到。那就是，每次目标方法被触发时，抽象层就会执行一个cache行为，来检测方法是否已经针对指定的参数执行过一次。如果是，那么就会cache结果，而不会执行实际方法；如果没有，那么就执行相应的方法，方法执行的结果会被cache，下次同样的方法和参数执行的时候，就会返回cache的结果。这样，对于消耗更大的方法（无论是CPU还是IO）都只会针对给定的参数执行一次。Cache的逻辑完全是透明的，不会对触发调用产生任何干扰。</p>
+
+<p>该抽象层也提供了其他Cache相关的操作的，允许更新Cache的内容或者删除一部分内容（条目）。这对于需要在应用程序运行阶段改变Cache的情况非常有用。</p>
+
+<p>就像其他Spring框架的其他服务，Cache服务只是一个抽象层，需要实际的存储方式来存储数据。抽象层的关键类是org.springframework.cache.Cache和org.springframework.cache.CacheManager接口。</p>
+
+<p>有几种开箱即用的实现：JDK java.util.concurrent.ConcurrentMap based caches, EhCache, Gemfire cache, Guava caches， JSR-107 compliant caches。</p>
+
+<p>要使用cache抽象机制，需要负责两个方面：
+cache声明 - 指定要被cache的方法以及策略
+cache配置 - 背后的cache存储在哪里，从哪里读取</p>
+
+<h2>关键注解</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Cacheable</span> <span class="n">triggers</span> <span class="n">cache</span> <span class="n">population</span>
+</span><span class='line'><span class="nd">@CacheEvict</span> <span class="n">triggers</span> <span class="n">cache</span> <span class="n">eviction</span>
+</span><span class='line'><span class="nd">@CachePut</span> <span class="n">updates</span> <span class="n">the</span> <span class="n">cache</span> <span class="n">without</span> <span class="n">interfering</span> <span class="n">with</span> <span class="n">the</span> <span class="n">method</span> <span class="n">execution</span>
+</span><span class='line'><span class="nd">@Caching</span> <span class="n">regroups</span> <span class="n">multiple</span> <span class="n">cache</span> <span class="n">operations</span> <span class="n">to</span> <span class="n">be</span> <span class="n">applied</span> <span class="n">on</span> <span class="n">a</span> <span class="n">method</span>
+</span><span class='line'><span class="nd">@CacheConfig</span> <span class="n">shares</span> <span class="n">some</span> <span class="n">common</span> <span class="n">cache</span><span class="o">-</span><span class="n">related</span> <span class="n">settings</span> <span class="n">at</span> <span class="n">class</span><span class="o">-</span><span class="n">level</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>@Cacheable用来声明方法可以被缓存（cache）</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Cacheable</span><span class="o">(</span><span class="s">&quot;books&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">Book</span> <span class="nf">findBook</span><span class="o">(</span><span class="n">ISBN</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{...}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其中，books是该cache的名字。   <br/>
+在大部分情况下，只有一个cache被声明，注解允许多个名字被指定，所以就可以有多个cache被使用。在这种情况下，每个cache都会在方法执行之前被检测，如果至少有一个cache命中，那么相关的值就会被返回：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Cacheable</span><span class="o">({</span><span class="s">&quot;books&quot;</span><span class="o">,</span> <span class="s">&quot;isbns&quot;</span><span class="o">})</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">Book</span> <span class="nf">findBook</span><span class="o">(</span><span class="n">ISBN</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{...}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>cache本质上是键值对存储，每一个cache的方法在被触发时，都会转换成一个合适的key来访问cache。开箱即用的是，有一个简单地KeyGenerator基于下面这个简单算法：</p>
+
+<p>如果没有参数，就返回SimpleKey.EMPTY   <br/>
+如果有一个参数，就返回该实例   <br/>
+如果有多个参数，就返回一个SimpleKey包含所有的参数</p>
+
+<p>只要参数包含自然键值，并且实现了合法的hashCode和equals方法，这种算法就适用于所有场景。</p>
+
+<p>默认情况下，Cache抽象层会使用一个简单地CacheResolver来获取cache。</p>
+
+<h2>有条件的cache</h2>
+
+<p>有些时候，一个方法并不适合在任何时候都cache，cache注解支持通过SpEL来指定条件，只有满足条件的参数来会被cache。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Cacheable</span><span class="o">(</span><span class="n">cacheNames</span><span class="o">=</span><span class="s">&quot;book&quot;</span><span class="o">,</span> <span class="n">condition</span><span class="o">=</span><span class="s">&quot;#name.length &lt; 32&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">Book</span> <span class="nf">findBook</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>cache抽象不仅允许存储缓存，也允许收回（eviction）缓存。这个操作对于删除陈旧无用的缓存非常有用。和注解@Cacheable相反，@CacheEvict指定方法执行cache收回，也就是方法执行时会从cache中删除数据。和@Cacheable需要指定一个或者多个cache的名字。还提供一个额外allEntries属性，用来指定是否需要一个更广范围的cache需要收回（所有条目（无参数的，一个参数的，多个参数的））。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@CacheEvict</span><span class="o">(</span><span class="n">cacheNames</span><span class="o">=</span><span class="s">&quot;books&quot;</span><span class="o">,</span> <span class="n">allEntries</span><span class="o">=</span><span class="kc">true</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">loadBooks</span><span class="o">(</span><span class="n">InputStream</span> <span class="n">batch</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>CacheConfig</h2>
+
+<p>如果一个类中的所有方法操作都需要Cache，那么就可以使用@CacheConfig注解。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@CacheConfig</span><span class="o">(</span><span class="s">&quot;books&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookRepositoryImpl</span> <span class="kd">implements</span> <span class="n">BookRepository</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Cacheable</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">Book</span> <span class="nf">findBook</span><span class="o">(</span><span class="n">ISBN</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{...}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>EnableCaching</h2>
+
+<p>仅仅声明上面你需要cache的方法或者类是不足够的，和Spring的其他服务一样，该特性需要被启动（Enable）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Configuration</span>
+</span><span class='line'><span class="nd">@EnableCaching</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AppConfig</span> <span class="o">{</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Cache正如它在对于Buffer时所解释的那样，用来解决对重复获取的数据，减少对数据库的重复操作，从而提高数据获取速度。</p>
+
+<p>参考资料：</p>
+
+<p>1.<a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/cache.html">http://docs.spring.io/spring/docs/current/spring-framework-reference/html/cache.html</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -354,440 +495,6 @@ var &hellip;">
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/12/31/javascript-contructor-new-prototype/">JavaScript渐入佳境 - 构造函数、new、原型</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-12-31T21:38:21+08:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>9:38 pm</span></time>
-        
-           | <a href="/blog/2015/12/31/javascript-contructor-new-prototype/#disqus_thread"
-             data-disqus-identifier="http://benweizhu.github.io/blog/2015/12/31/javascript-contructor-new-prototype/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>在JavaScript中，对象是一系列的键值对，ECMA-262把对象（object）定义为“属性的无序集合，每个属性存放一个原始值、对象或函数”。</p>
-
-<p>JavaScript是面向对象的语言（而且比C++/Java更加的面向对象），因为所有东西都是对象，包括函数，但是在JavaScript没有类的概念。既然没有类，根据对之前对C++/Java这样的基于类的面向对象语言的理解，应该如何理解JavaScript中构造函数的概念，因为在基于类的面向对象中，构造函数只存在于类当中。</p>
-
-<h3>JavaScript构造函数、JavaScript中的constructor属性</h3>
-
-<p>在JavaScript中，每个具有原型的对象都会自动获得constructor属性。除了arguments、Enumerator、Error、Global、Math、RegExp、Regular Expression等一些特殊对象之外，其他所有的JavaScript内置对象都具备constructor属性。例如：Array、Boolean、Date、Function、Number、Object、String等。所有主流浏览器均支持该属性。</p>
-
-<p>现在，请暂且不要去思考“具有原型的对象”中原型的意思。</p>
-
-<p>对象的constructor属性返回创建该对象的函数的引用，无论直译或者按照基于类的面向对象语言的理解，我们且把该函数称为“构造函数”。下面是一些例子：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// 字符串：String()</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">str</span> <span class="o">=</span> <span class="s2">&quot;张三&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">str</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function String() { [native code] }</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">str</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nb">String</span><span class="p">);</span> <span class="c1">// true</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// 数组：Array()</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">arr</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function Array() { [native code] }</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">arr</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nb">Array</span><span class="p">);</span> <span class="c1">// true</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// 数字：Number()</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">num</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">num</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function Number() { [native code] }</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">num</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nb">Number</span><span class="p">);</span> <span class="c1">// true</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// 自定义对象：Person()</span>
-</span><span class='line'><span class="kd">function</span> <span class="nx">Person</span><span class="p">(){</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;CodePlayer&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">();</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function Person(){ this.name = &quot;CodePlayer&quot;; }</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nx">Person</span><span class="p">);</span> <span class="c1">// true</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// 字面量对象：Object()</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">o</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;张三&quot;</span><span class="p">};</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">o</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function Object() { [native code] }</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">o</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nb">Object</span><span class="p">);</span> <span class="c1">// true</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// 自定义函数：Function()</span>
-</span><span class='line'><span class="kd">function</span> <span class="nx">foo</span><span class="p">(){</span>
-</span><span class='line'>    <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;CodePlayer&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function Function() { [native code] }</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nb">Function</span><span class="p">);</span> <span class="c1">// true</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// 函数的原型：bar()</span>
-</span><span class='line'><span class="kd">function</span> <span class="nx">bar</span><span class="p">(){</span>
-</span><span class='line'>    <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;CodePlayer&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">bar</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constructor</span><span class="p">);</span> <span class="c1">// function bar(){ alert(&quot;CodePlayer&quot;); }</span>
-</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">writeln</span><span class="p">(</span><span class="nx">bar</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">===</span> <span class="nx">bar</span><span class="p">);</span> <span class="c1">// true</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>代码中的[native code]，表示这是JavaScript的底层内部代码实现，无法显示代码细节。</p>
-
-<p>你会发现连那些看似是基本类型的数字“5”和字符串“张三”（当然Java里面有String类型）都具有constructor属性。特别是定义一个函数foo，foo也有constructor属性，而且指向名字是Function的函数（暂且不管为什么如此）。</p>
-
-<p>通过var str = &ldquo;张三&rdquo;;，我创建了一个String对象，通过var num = 5;，我创建了一个Number对象。</p>
-
-<p>在Java或者C++中，通过new关键字调用某个类的构造函数，例如：new SomeConstructor()，来创建对象，知识SomeConstructor和类名一样。</p>
-
-<p>那么在JavaScript，如何自定一个具有类型对象呢？上面的Person例子已经给出了答案。</p>
-
-<p>p对象的constructor是它：function Person(){ this.name = &ldquo;CodePlayer&rdquo;; }</p>
-
-<p>那么要创建一个新的p对象，只需要var p = new Person();。表面上的理解和C++或者Java相似。</p>
-
-<p>剩下的疑问是创建这个对象的时候使用了new关键字。它是干什么的？new关键字很容易让你想到C++和Java中通过new来创建新的对象（分配一段内存空间）。</p>
-
-<p>在《JavaScript高级编程》里对new操作符的解释：</p>
-
-<p>new操作符会让构造函数产生如下变化：  <br/>
-1.创建一个新对象  <br/>
-2.将构造函数的作用域赋给新对象（因此this就指向了这个新对象）  <br/>
-3.执行构造函数中的代码（为这个新对象添加属性） <br/>
-4.返回新对象</p>
-
-<p>MDN上也有介绍new关键字： <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/new">https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/new</a></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Person</span><span class="p">(){</span> <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;CodePlayer&quot;</span><span class="p">;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">)</span> <span class="p">}</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">()</span>
-</span><span class='line'><span class="nx">$</span> <span class="nx">Window</span> <span class="p">{</span><span class="nx">external</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nx">chrome</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nb">document</span><span class="o">:</span> <span class="nb">document</span><span class="p">,</span> <span class="nx">WPCOMSharing</span><span class="o">:</span> <span class="nb">Object</span><span class="p">,</span> <span class="nx">RecaptchaTemplates</span><span class="o">:</span> <span class="nb">Object</span><span class="err">…</span><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">()</span>
-</span><span class='line'><span class="nx">$</span> <span class="nx">Person</span> <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;CodePlayer&quot;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>JavaScirpt中的构造函数和普通函数没有什么区别，你一样的可以像普通函数一样调用它，如上例，那么this指向函数执行时的当前对象（关于this指针会在之后的文章中详解）。</p>
-
-<p>但如果通过new关键字来调用函数，该函数就成为了构造函数，this指针就会指向新创建的对象。这就是JavaScript的构造函数。</p>
-
-<h3>通过new和构造函数创建对象的问题</h3>
-
-<p>new的方式创建对象看上去非常好用，而且和C++或者Java语言很相似，比较容易理解它在创建一个新的对象。但是构造函数方法创建对象存在一个浪费内存的问题。</p>
-
-<p>以下摘抄自阮一峰的文章： <a href="http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html">http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html</a></p>
-
-<p>“请看，我们现在为Cat对象添加一个不变的属性&#8221;type&#8221;（种类），再添加一个方法eat（吃老鼠）。那么，原型对象Cat就变成了下面这样：”</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Cat</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span><span class="nx">color</span><span class="p">){</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">color</span> <span class="o">=</span> <span class="nx">color</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="s2">&quot;猫科动物&quot;</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">eat</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span><span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;吃老鼠&quot;</span><span class="p">);};</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">cat1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Cat</span><span class="p">(</span><span class="s2">&quot;大毛&quot;</span><span class="p">,</span><span class="s2">&quot;黄色&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">cat2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Cat</span> <span class="p">(</span><span class="s2">&quot;二毛&quot;</span><span class="p">,</span><span class="s2">&quot;黑色&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">alert</span><span class="p">(</span><span class="nx">cat1</span><span class="p">.</span><span class="nx">type</span><span class="p">);</span> <span class="c1">// 猫科动物</span>
-</span><span class='line'><span class="nx">cat1</span><span class="p">.</span><span class="nx">eat</span><span class="p">();</span> <span class="c1">// 吃老鼠</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">alert</span><span class="p">(</span><span class="nx">cat1</span><span class="p">.</span><span class="nx">eat</span> <span class="o">==</span> <span class="nx">cat2</span><span class="p">.</span><span class="nx">eat</span><span class="p">);</span> <span class="c1">//false</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>“表面上好像没什么问题，但是实际上这样做，有一个很大的弊端。那就是对于每一个实例对象，type属性和eat()方法都是一模一样的内容，每一次生成一个实例，都必须为重复的内容，多占用一些内存。这样既不环保，也缺乏效率。能不能让type属性和eat()方法在内存中只生成一次，然后所有实例都指向那个内存地址呢？回答是可以的。”</p>
-
-<p>解决这个问题，阮一峰在他的文章中介绍了Prototype模式。我猜测对JavaScript面向对象感兴趣的同志已经无数次看到这样的代码了。</p>
-
-<h2>JavaScript原型、Prototype和__proto__</h2>
-
-<p>prototype英文翻译过来“原型”</p>
-
-<p>什么是原型？原型是一个从其他对象继承属性的对象。</p>
-
-<p>是不是任何对象都可以是原型？是的。</p>
-
-<p>哪些对象有原型？每个对象都有一个默认的原型。原型本身就是对象，每一个原型本身也存在一个原型。（只有一个例外，默认的对象原型在每条原型链的顶端，其他的原型在原型链的后面）</p>
-
-<p>当我看到上面的回答时，加上我对prototype英文含义的理解，我会认为每个对象都有一个prototype. 但当我写({}).prototype的时候，或者&#8221;&ldquo;.prototype，我却得到了undefined，是不是疯了？</p>
-
-<p>忘记你所理解的关于prototype属性的理解（它其实只是函数对象的一个属性，比如Object.prototype，Function.prototype，Array.prototype，在浏览器控制台查看Object，Function，Array这些值，它们都是函数） - 这个名字很可能是迷惑的根源。</p>
-
-<p>一个对象真正的prototype是内部[[Prototype]]属性. ECMA5介绍了标准的访问方法，Object.getPrototypeOf(object)。这个最新的实现已被Firefox, Safari, Chrome and IE9所支持。另外，除了IE，所有的浏览器都支持非标准的访问方法__proto__，它指向当对象被实例化的时候，用作原型的对象。</p>
-
-<p>那么我想知道prototype属性到底是干什么的?比如Object.prototype，Function.prototype，Array.prototype等。特别是上面的阮一峰介绍的Prototype模式。</p>
-
-<p>Object.prototype属性表示对象Object的原型对象，它是所有对象原型链的根节点。</p>
-
-<p>那其他的呢？好吧，首先，在前面介绍构造函数时已经知道，JavaScript不区分构造函数和其它普通函数，所以每个函数都有prototype属性。反而任何不是方法的，都没有这样的属性。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">//永远不是构造函数的方法，无论如何都是有prototype属性的</span>
-</span><span class='line'><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span> <span class="c1">//[object Object]</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//构造函数也有prototype属性</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">A</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nx">A</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span> <span class="c1">//[object Object]</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//Math不是一个方法，所以没有prototype属性</span>
-</span><span class='line'><span class="nb">Math</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span> <span class="c1">//null</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>现在可以定义: <br/>
-一个方法的prototype属性是当这个方法被用作构造函数来创建实例时，赋给该实例的原型（内部Prototype）的对象。非常重要的一点是，要理解方法的prototype属性和实际的prototype（原型）没有任何关系。看下面一段代码和解释：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">//构造器，this作为新对象返回并且它内部的[[prototype]]属性将被设置为构造器默认的prototype属性</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Circle</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">radius</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">radius</span> <span class="o">=</span> <span class="nx">radius</span><span class="p">;</span>
-</span><span class='line'>    <span class="c1">//next line is implicit, added for illustration only</span>
-</span><span class='line'>    <span class="c1">//this.__proto__ = Circle.prototype;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//扩充 Circle默认的prototype对象的属性因此扩充了每个由它新建实例的prototype对象的属性</span>
-</span><span class='line'><span class="nx">Circle</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">area</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>   <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="o">*</span><span class="k">this</span><span class="p">.</span><span class="nx">radius</span><span class="o">*</span><span class="k">this</span><span class="p">.</span><span class="nx">radius</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//创建Circle的两个示例，每个都可以使用相同的真正prototype所拥有属性area</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Circle</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Circle</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-</span><span class='line'><span class="nx">a</span><span class="p">.</span><span class="nx">area</span><span class="p">().</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="c1">//28.27</span>
-</span><span class='line'><span class="nx">b</span><span class="p">.</span><span class="nx">area</span><span class="p">().</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="c1">//50.27</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>那么，根据上面的定义，下面的内容非常有趣：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span>
-</span><span class='line'><span class="nx">$</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">func</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Function</span><span class="p">()</span>
-</span><span class='line'><span class="nx">func</span><span class="p">.</span><span class="nx">__proto__</span>
-</span><span class='line'><span class="nx">$</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">functionA</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(){}</span>
-</span><span class='line'><span class="nx">functionA</span><span class="p">.</span><span class="nx">__proto__</span>
-</span><span class='line'><span class="nx">$</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">myFunction</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Function</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="s1">&#39;salary&#39;</span><span class="p">,</span> <span class="s1">&#39;return users * salary&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">myFunction</span><span class="p">.</span><span class="nx">__proto__</span>
-</span><span class='line'><span class="nx">$</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
-</span><span class='line'><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span>
-</span><span class='line'><span class="nx">$</span> <span class="p">[]</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Array</span><span class="p">()</span>
-</span><span class='line'><span class="nx">arr</span><span class="p">.</span><span class="nx">__proto__</span>
-</span><span class='line'><span class="nx">$</span> <span class="p">[]</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">array</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span class='line'><span class="nx">array</span><span class="p">.</span><span class="nx">__proto__</span>
-</span><span class='line'><span class="nx">$</span> <span class="p">[]</span>
-</span><span class='line'><span class="nx">Cat</span><span class="p">.</span><span class="nx">prototype</span>
-</span><span class='line'><span class="nx">$</span> <span class="nx">Cat</span> <span class="p">{}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>原型链和instanceof</h2>
-
-<h3>原型链又是什么？</h3>
-
-<p>因为每个对象和每个原型(本身)都有一个原型，我们可以想象，一个接一个的对象连接在一起形成一个原型链。原型链的终端总是默认对象（object）的原型，即Object.prototype。你可以在自定义的对象上调用__proto__方法就来自于Object.prototype.__proto__上。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Cat</span><span class="p">(){}</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">cat</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Cat</span><span class="p">()</span>
-</span><span class='line'><span class="nx">cat</span><span class="p">.</span><span class="nx">__proto__</span>
-</span><span class='line'><span class="nx">$</span> <span class="nx">Cat</span> <span class="p">{}</span>
-</span><span class='line'><span class="nx">cat</span><span class="p">.</span><span class="nx">__proto__</span><span class="p">.</span><span class="nx">__proto__</span>
-</span><span class='line'><span class="nx">$</span> <span class="nb">Object</span> <span class="p">{}</span>
-</span><span class='line'><span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span>
-</span><span class='line'><span class="nx">$</span> <span class="nb">Object</span> <span class="p">{}</span>
-</span><span class='line'><span class="nx">cat</span><span class="p">.</span><span class="nx">__proto__</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">===</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">prototype</span>
-</span><span class='line'><span class="nx">$</span> <span class="kc">true</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>原型继承机制是内在且隐式实现的。当对象a要访问属性foo时，Javascript会遍历a的原型链（首先从a自身开始），检查原型链的每一个环节中存在的foo属性。如果找到了foo属性就会将其返回，否则返回undefined值。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">A</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{};</span>
-</span><span class='line'><span class="nx">A</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">==</span> <span class="nx">A</span><span class="p">;</span> <span class="c1">//true</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A</span><span class="p">();</span>
-</span><span class='line'><span class="nx">a</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">==</span> <span class="nx">A</span><span class="p">;</span> <span class="c1">//true (a 的constructor属性继承自它的原型)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>instanceof与prototype有啥关系？</h3>
-
-<p>如果A的prototype属性出现在a的原型链中，则表达式a instanceof A会返回true。这意味着我们可以欺骗instanceof，让它失效。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">A</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">A</span><span class="p">();</span>
-</span><span class='line'><span class="nx">a</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">==</span> <span class="nx">A</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span> <span class="c1">//true - so instanceof A will return true</span>
-</span><span class='line'><span class="nx">a</span> <span class="k">instanceof</span> <span class="nx">A</span><span class="p">;</span> <span class="c1">//true;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//mess around with a&#39;s prototype</span>
-</span><span class='line'><span class="nx">a</span><span class="p">.</span><span class="nx">__proto__</span> <span class="o">=</span> <span class="nb">Function</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//a&#39;s prototype no longer in same prototype chain as A&#39;s prototype property</span>
-</span><span class='line'><span class="nx">a</span> <span class="k">instanceof</span> <span class="nx">A</span><span class="p">;</span> <span class="c1">//false</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>使用instanceof操作符需要注意的一件事情是，任何时间判断对象是否是Object的实例，它都会返回true，因为所有对象都继承自Object.prototype。</p>
-
-<p>原始值使用对象包装器判断实例时，比如 &lsquo;foo&rsquo; instanceof String返回false。如果使用new操作符创建的字符串，instanceof返回true。所以，请记住instanceof只适用于构造函数创建返回的复杂对象和实例。</p>
-
-<h2>总结</h2>
-
-<p>看完这篇文章，你需要记住一下几点：</p>
-
-<p>构造函数和普通函数没有区别，只有在结合new关键字时，有特定的作用，可以创建一个对象实例，而该对象实例有一个constructor属性指向创建它的函数，即构造函数。每个对象都有原型，不要误解Prototype属性，它是函数对象的属性（比如Object，Array，Function），真正的原型通过Object.getPrototypeOf(object)和__proto__获取。因为构造函数隐式的执行this.__proto__ = Circle.prototype，所以Prototype模式可以实现对象方法是定义（对象中的属性只是引用，指向的是构造函数Prototype属性上定义的一个方法）。</p>
-
-<p>参考文献：   <br/>
-1.<a href="http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html">http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html</a>  <br/>
-2.<a href="http://www.oschina.net/translate/understanding-javascript-prototypes">http://www.oschina.net/translate/understanding-javascript-prototypes</a>  <br/>
-3.<a href="http://yehudakatz.com/2011/08/12/understanding-prototypes-in-javascript/">http://yehudakatz.com/2011/08/12/understanding-prototypes-in-javascript/</a>  <br/>
-4.JavaScript启示录</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/21">&larr; Older</a>
@@ -815,23 +522,23 @@ var &hellip;">
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（下）</a>
+        <a href="/blog/2018/05/08/deep-thinking-in-react-12/">React的思考（十二）- 组织state和reducer（4）</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（中）</a>
+        <a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（3）</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（上）</a>
+        <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（2）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（1）</a>
       </li>
     
       <li class="post">
         <a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）- 中间件的概念</a>
       </li>
     
   </ul>

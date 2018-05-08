@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>React的思考（十一）- 组织state和reducer（下） - NO END FOR LEARNING</title>
+  <title>React的思考（十一）- 组织state和reducer（3） - NO END FOR LEARNING</title>
   <meta name="author" content="ZHU Benwei">
 
   
-  <meta name="description" content="redux的state和服务器端的数据 reducer共享state 一个action要操作多个reducer中的state 思考后端的操作逻辑，微服务的场景，按照业务的Restful API，Redux的这种设计模式导致这种CRUD和Service的冲突 redux的state和页面的关系 &hellip;">
+  <meta name="description" content="以React为首的“数据驱动”的开发方式，让我们从过去的DOM操作，慢慢转化成对应用状态和数据的管理，这些状态和数据在应用的生命周期中被持久化，被应用管理和使用。 前后端不同的数据模型 在后端开发中，我们设计数据库或者对象模型，通常会根据领域模型来建立不同的数据表和对象，以反映我们对客观现实的抽象 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,7 +67,7 @@
   
   <header>
     
-      <h1 class="entry-title">React的思考（十一）- 组织state和reducer（下）</h1>
+      <h1 class="entry-title">React的思考（十一）- 组织state和reducer（3）</h1>
     
     
       <p class="meta">
@@ -86,17 +86,144 @@
   </header>
 
 
-<div class="entry-content"><h2>redux的state和服务器端的数据</h2>
+<div class="entry-content"><p>以React为首的“数据驱动”的开发方式，让我们从过去的DOM操作，慢慢转化成对应用状态和数据的管理，这些状态和数据在应用的生命周期中被持久化，被应用管理和使用。</p>
 
-<h2>reducer共享state</h2>
+<h2>前后端不同的数据模型</h2>
 
-<h3>一个action要操作多个reducer中的state</h3>
+<p>在后端开发中，我们设计数据库或者对象模型，通常会根据领域模型来建立不同的数据表和对象，以反映我们对客观现实的抽象，这种抽象在MVC的世界里通常由Model表示。</p>
 
-<p>思考后端的操作逻辑，微服务的场景，按照业务的Restful API，Redux的这种设计模式导致这种CRUD和Service的冲突</p>
+<p>而在前端开发中，我们一般会从UI的角度出发，去设计前端展示所需要的视图对象模型，我们也称之为View Model。</p>
 
-<h2>redux的state和页面的关系</h2>
+<p>因此，往往大多数情况下，后端的数据模型Model和前端的数据模型View Model是不对等的。</p>
 
-<h2>开发过程中state的演进过程</h2>
+<h2>来自后方的数据</h2>
+
+<p>当一个应用的生命周期启动，应用会调用后台的API获取后端数据，然后以某种方式转换成前端所需数据模型，最后展示在应用的页面上。</p>
+
+<p>作为一个后端的开发人员，通常以什么样的方式暴露后端的资源给别的应用使用呢？</p>
+
+<p>如果需要API的通用度比较高，一般最简单直接的方法是开放领域资源的CRUD操作（你可以是RESTful API也可以是别的方式）。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>https://api.example.com/v1/zoos
+</span><span class='line'>https://api.example.com/v1/animals
+</span><span class='line'>https://api.example.com/v1/employees
+</span><span class='line'>
+</span><span class='line'>GET /zoos：列出所有动物园
+</span><span class='line'>POST /zoos：新建一个动物园
+</span><span class='line'>GET /zoos/ID：获取某个指定动物园的信息
+</span><span class='line'>PUT /zoos/ID：更新某个指定动物园的信息（提供该动物园的全部信息）</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们目前就暂且以这种方式为例，目测这种方式暴露的API比较常见，后面我们再讨论其他的。</p>
+
+<h2>combineReducer下的拆分</h2>
+
+<p>让我们再回到Redux中，基于Redux的应用程序中比较常见的state结构是一个简单的JavaScript对象，它最外层的每个key中拥有特定域的数据，这其实是Redux官方文档上的一句话，我在其他的一些博客上也看到了采用基于业务领域的方式组织state结构。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;zoos&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="s2">&quot;animals&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="s2">&quot;employees&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在combineReducer的帮助下，构建上面这个结构，其实就是分拆成多个reducer，拆分之后的reducer独立负责管理该特定切片state的更新。好处是，它提供了一种非常直接的代码逻辑拆分管理的方式，职责独立，物理位置独立（文件独立）。</p>
+
+<h2>响应同一个操作</h2>
+
+<p>有了这样一层结构，我们该如何操作它呢？假设这样一个操作，它既需要更新zoos下面的数据，又需要更新animals下面的数据。如果放在后端代码中，你会怎么做？</p>
+
+<p>我的思路会是写一个函数A，在这个函数里面调用zoos和animals的service或者repository的方法完成更新操作，那么，真正使用的时候，只需要调用这个函数A即可，思路很明朗直接。</p>
+
+<p>在combineReducer和redux结合情况，我们需要转换一下思路，不同业务领域下的数据被放置到了不同的reducer，而你能做的是发送action。</p>
+
+<p>combineReducer神奇的地方就是，被发送的action会被所有的reducer接收到。（有点像发布订阅模式）</p>
+
+<p>这样一个过去直觉上同步有序的操作过程，在redux中，被分发到多个拆分之后的多个reducer中，每个reducer都去响应这个action，在需要的情况下独立的更新他们自己的切片state，最后组合成新的state。</p>
+
+<h2>计算衍生（derived）数据</h2>
+
+<p>后端的业务数据被存储在了redux的store中，然而它是以后端model的形式保存在那。我们的前端页面需要的数据模型，一般和后端model不完全一样，也许是多个后端model组合在一起才能使用的view model，这种情况很常见。</p>
+
+<p>这个时候，我们就需要从后端数据模型中计算衍生数据，得到我们最终需要的View Model。</p>
+
+<p>一般的做法是在mapStateToProps中进行，mapStateToProps中的state是根节点上的state，所以可以拿到所有的领域数据。</p>
+
+<p>这里一般都会推荐使用reselect库来做，好处是：</p>
+
+<p>第一，能够借机将这个计算衍生数据的逻辑拆分到另一个模块中     <br/>
+第二，它能帮你记住之前的计算过的数据，避免二次计算，同时避免无意义的重新渲染。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='JavaScript'><span class='line'><span class="kr">import</span> <span class="p">{</span> <span class="nx">createSelector</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;reselect&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">const</span> <span class="nx">getVisibilityFilter</span> <span class="o">=</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">state</span><span class="p">.</span><span class="nx">visibilityFilter</span>
+</span><span class='line'><span class="kr">const</span> <span class="nx">getTodos</span> <span class="o">=</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">state</span><span class="p">.</span><span class="nx">todos</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="kr">const</span> <span class="nx">getVisibleTodos</span> <span class="o">=</span> <span class="nx">createSelector</span><span class="p">(</span>
+</span><span class='line'>  <span class="p">[</span> <span class="nx">getVisibilityFilter</span><span class="p">,</span> <span class="nx">getTodos</span> <span class="p">],</span>
+</span><span class='line'>  <span class="p">(</span><span class="nx">visibilityFilter</span><span class="p">,</span> <span class="nx">todos</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">switch</span> <span class="p">(</span><span class="nx">visibilityFilter</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;SHOW_ALL&#39;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">todos</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;SHOW_COMPLETED&#39;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">todos</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">t</span> <span class="o">=&gt;</span> <span class="nx">t</span><span class="p">.</span><span class="nx">completed</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;SHOW_ACTIVE&#39;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">todos</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">t</span> <span class="o">=&gt;</span> <span class="o">!</span><span class="nx">t</span><span class="p">.</span><span class="nx">completed</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>总结</h2>
+
+<p>这么分析下来，每个部分的职责都很清晰，开发的模式也比较明确，然而理想和设计在业务不复杂的时候都很美好，现实往往比它们骨感很多，这一篇文章只是给了一个简单的例子，没有分析复杂的场景。</p>
+
+<p>在下一篇，我们可以在此基础上分析开发中的复杂场景，一起思考下怎么样管理是合适的。同时，我们也来思考另一种新的前端架构BFF下的Redux应该怎么管理，当后端API不再是资源的CRUD，而是面向业务的API操作时，Redux又应该怎么管理state。</p>
 </div>
 
 
@@ -129,8 +256,10 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2018/05/03/deep-thinking-in-react-10/" title="Previous Post: React的思考（十）- 组织state和reducer（中）">&laquo; React的思考（十）- 组织state和reducer（中）</a>
+        <a class="basic-alignment left" href="/blog/2018/05/03/deep-thinking-in-react-10/" title="Previous Post: React的思考（十）- 组织state和reducer（2）">&laquo; React的思考（十）- 组织state和reducer（2）</a>
       
+      
+        <a class="basic-alignment right" href="/blog/2018/05/08/deep-thinking-in-react-12/" title="Next Post: React的思考（十二）- 组织state和reducer（4）">React的思考（十二）- 组织state和reducer（4） &raquo;</a>
       
     </p>
   </footer>
@@ -161,23 +290,23 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（下）</a>
+        <a href="/blog/2018/05/08/deep-thinking-in-react-12/">React的思考（十二）- 组织state和reducer（4）</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（中）</a>
+        <a href="/blog/2018/05/04/deep-thinking-in-react-11/">React的思考（十一）- 组织state和reducer（3）</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（上）</a>
+        <a href="/blog/2018/05/03/deep-thinking-in-react-10/">React的思考（十）- 组织state和reducer（2）</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/05/01/deep-thinking-in-react-9/">React的思考（九）- 组织state和reducer（1）</a>
       </li>
     
       <li class="post">
         <a href="/blog/2018/04/27/deep-thinking-in-react-8/">React的思考（八）- Redux的Middleware（下）异步的世界</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/25/deep-thinking-in-react-7/">React的思考（七）- Redux的Middleware（上）- 中间件的概念</a>
       </li>
     
   </ul>
