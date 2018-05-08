@@ -4,7 +4,7 @@
   <title><![CDATA[NO END FOR LEARNING]]></title>
   <link href="http://benweizhu.github.io/atom.xml" rel="self"/>
   <link href="http://benweizhu.github.io/"/>
-  <updated>2018-05-09T00:19:26+08:00</updated>
+  <updated>2018-05-09T00:20:43+08:00</updated>
   <id>http://benweizhu.github.io/</id>
   <author>
     <name><![CDATA[ZHU Benwei]]></name>
@@ -143,7 +143,7 @@
 <p>而在这里一般都会推荐使用reselect库来做，好处是：</p>
 
 <p>第一，能够借机将这个计算衍生数据的逻辑拆分到另一个模块中     <br/>
-第二，它能帮你记住之前的计算过的数据，避免二次计算，同时避免无意义的重新渲染。</p>
+第二，它能帮你记住之前的计算过的数据，避免二次计算，同时避免无意义的重新渲染（关于什么时候重新渲染，在前面已经介绍过了）。</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
